@@ -363,17 +363,17 @@ sealed class BorderImageRepeat private constructor(private val value: String) : 
     override fun toString() = value
 
     private class Keyword(value: String) : BorderImageRepeat(value)
-    class Repeatable internal constructor(value: String) : BorderImageRepeat(value)
-    private class TwoValue(topBottom: Repeatable, leftRight: Repeatable) : BorderImageRepeat("$topBottom $leftRight")
+    class Listable internal constructor(value: String) : BorderImageRepeat(value)
+    private class TwoValue(topBottom: Listable, leftRight: Listable) : BorderImageRepeat("$topBottom $leftRight")
 
     companion object {
         // Keyword
-        val Stretch: Repeatable get() = Repeatable("stretch")
-        val Repeat: Repeatable get() = Repeatable("repeat")
-        val Round: Repeatable get() = Repeatable("round")
-        val Space: Repeatable get() = Repeatable("space")
+        val Stretch: Listable get() = Listable("stretch")
+        val Repeat: Listable get() = Listable("repeat")
+        val Round: Listable get() = Listable("round")
+        val Space: Listable get() = Listable("space")
 
-        fun of(topBottom: Repeatable, leftRight: Repeatable): BorderImageRepeat = TwoValue(topBottom, leftRight)
+        fun of(topBottom: Listable, leftRight: Listable): BorderImageRepeat = TwoValue(topBottom, leftRight)
 
         // Global
         val Inherit: BorderImageRepeat get() = Keyword("inherit")

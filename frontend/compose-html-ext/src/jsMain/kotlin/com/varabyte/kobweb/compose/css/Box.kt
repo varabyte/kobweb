@@ -162,7 +162,7 @@ fun StyleScope.boxShadow(boxShadow: BoxShadow) {
  *             rgba(0, 0, 0, 0.318) 5px 8px 10px -1px;
  * ```
  */
-fun StyleScope.boxShadow(vararg boxShadows: BoxShadow.Repeatable) {
+fun StyleScope.boxShadow(vararg boxShadows: BoxShadow.Listable) {
     if (boxShadows.isNotEmpty()) {
         boxShadow(boxShadows.joinToString())
     }
@@ -176,9 +176,9 @@ sealed class BoxShadow private constructor(private val value: String) : StylePro
 
     private class Keyword(value: String) : BoxShadow(value)
 
-    private class ValueList(shadows: List<Repeatable>) : BoxShadow(shadows.joinToString())
+    private class ValueList(shadows: List<Listable>) : BoxShadow(shadows.joinToString())
 
-    class Repeatable internal constructor(
+    class Listable internal constructor(
         offsetX: CSSLengthNumericValue = 0.px,
         offsetY: CSSLengthNumericValue = 0.px,
         blurRadius: CSSLengthNumericValue? = null,
@@ -258,7 +258,7 @@ sealed class BoxShadow private constructor(private val value: String) : StylePro
             spreadRadius: CSSLengthNumericValue? = null,
             color: CSSColorValue? = null,
             inset: Boolean = false,
-        ): Repeatable = Repeatable(
+        ): Listable = Listable(
             offsetX = offsetX,
             offsetY = offsetY,
             blurRadius = blurRadius,
@@ -267,6 +267,6 @@ sealed class BoxShadow private constructor(private val value: String) : StylePro
             inset = inset,
         )
 
-        fun list(vararg shadows: Repeatable): BoxShadow = ValueList(shadows.toList())
+        fun list(vararg shadows: Listable): BoxShadow = ValueList(shadows.toList())
     }
 }

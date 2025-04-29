@@ -80,7 +80,7 @@ sealed class TextShadow private constructor(private val value: String) : StylePr
     override fun toString() = value
 
     private class Keyword(value: String) : TextShadow(value)
-    class Repeatable internal constructor(
+    class Listable internal constructor(
         offsetX: CSSLengthNumericValue,
         offsetY: CSSLengthNumericValue,
         blurRadius: CSSLengthNumericValue?,
@@ -107,7 +107,7 @@ sealed class TextShadow private constructor(private val value: String) : StylePr
             offsetY: CSSLengthNumericValue,
             blurRadius: CSSLengthNumericValue? = null,
             color: CSSColorValue? = null,
-        ) = Repeatable(offsetX, offsetY, blurRadius, color)
+        ) = Listable(offsetX, offsetY, blurRadius, color)
 
         val Inherit: TextShadow get() = Keyword("inherit")
         val Initial: TextShadow get() = Keyword("initial")
@@ -148,7 +148,7 @@ fun StyleScope.textShadow(
     textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))
 }
 
-fun StyleScope.textShadow(vararg shadows: TextShadow.Repeatable) {
+fun StyleScope.textShadow(vararg shadows: TextShadow.Listable) {
     if (shadows.isNotEmpty()) {
         property("text-shadow", shadows.joinToString())
     }

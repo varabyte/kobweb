@@ -11,11 +11,11 @@ fun Modifier.background(background: Background) = styleModifier {
     background(background)
 }
 
-fun Modifier.background(vararg backgrounds: Background.Repeatable) = styleModifier {
+fun Modifier.background(vararg backgrounds: Background.Listable) = styleModifier {
     background(Background.list(*backgrounds))
 }
 
-fun Modifier.background(backgrounds: List<Background.Repeatable>) = background(*backgrounds.toTypedArray())
+fun Modifier.background(backgrounds: List<Background.Listable>) = background(*backgrounds.toTypedArray())
 
 /**
  * Configure an element's background appearance.
@@ -30,11 +30,11 @@ fun Modifier.background(backgrounds: List<Background.Repeatable>) = background(*
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background">background</a>
  */
-fun Modifier.background(color: CSSColorValue, vararg backgrounds: Background.Repeatable) = styleModifier {
+fun Modifier.background(color: CSSColorValue, vararg backgrounds: Background.Listable) = styleModifier {
     background(Background.list(color, *backgrounds))
 }
 
-fun Modifier.background(color: CSSColorValue, backgrounds: List<Background.Repeatable>) =
+fun Modifier.background(color: CSSColorValue, backgrounds: List<Background.Listable>) =
     background(color, *backgrounds.toTypedArray())
 
 fun Modifier.backgroundAttachment(backgroundAttachment: BackgroundAttachment) = styleModifier {

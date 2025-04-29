@@ -552,7 +552,7 @@ interface CssStyleScopeBase {
         direction: AnimationDirection? = null,
         fillMode: AnimationFillMode? = null,
         playState: AnimationPlayState? = null
-    ): Animation.Repeatable =
+    ): Animation.Listable =
         this.toAnimation(colorMode, duration, timingFunction, delay, iterationCount, direction, fillMode, playState)
 }
 

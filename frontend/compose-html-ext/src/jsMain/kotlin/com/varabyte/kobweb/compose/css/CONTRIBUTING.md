@@ -368,7 +368,7 @@ is a particular subset of them. (For example, you can declare a list of animatio
 multiple times is invalid.)
 
 Because this pattern is so common, we've developed a standard for it. You should use a sealed class, expose a subclass
-named `Repeatable`, and provide a `list` companion object method which takes vararg parameters.
+named `Listable`, and provide a `list` companion object method which takes vararg parameters.
 
 #### Example
 
@@ -376,12 +376,12 @@ named `Repeatable`, and provide a `list` companion object method which takes var
 sealed class StyleExample /*...*/ {
   private class Keyword(value: String) : StyleExample(value)
   private class ValueList(value: List<Any>) : StyleExample(value.joinToString())
-  class Repeatable(value: String) : StyleExample(value)
-  private class OfInt(value: Int) : Repeatable(value.toString())
+  class Listable(value: String) : StyleExample(value)
+  private class OfInt(value: Int) : Listable(value.toString())
 
   companion object {
-    fun of(value: Int): Repeatable = OfInt(value)
-    fun list(vararg examples: StyleExample.Repeatable): StyleExample = ValueList(examples)
+    fun of(value: Int): Listable = OfInt(value)
+    fun list(vararg examples: Listable): StyleExample = ValueList(examples)
     
     val None: StyleExample get() = Keyword("none")
   }
@@ -392,7 +392,7 @@ For a time, we considered a pattern that would guarantee at least one item, beca
 
 ```kotlin
 ❌
-fun list(first: StyleExample.Repeatable, vararg rest: StyleExample.Repeatable): StyleExample =
+fun list(first: StyleExample.Listable, vararg rest: StyleExample.Listable): StyleExample =
     ValueList(listOf(first) + rest)
 ```
 

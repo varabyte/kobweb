@@ -36,20 +36,20 @@ sealed class Content private constructor(private val value: String) : StylePrope
     override fun toString() = value
 
     /** Content keywords that cannot be used in combination with any others. */
-    private sealed class SingleValue(value: String) : Content(value)
+    sealed class SingleValue(value: String) : Content(value)
     private class Keyword(value: String) : SingleValue(value)
 
     /** Content keywords that can be used in combination with others. */
-    sealed class Repeatable(value: String) : Content(value)
+    sealed class Listable(value: String) : SingleValue(value)
 
-    private class RepeatableKeyword(value: String) : Repeatable(value)
-    private class Text(value: String) : Repeatable(value.wrapQuotesIfNecessary())
+    private class ListableKeyword(value: String) : Listable(value)
+    private class Text(value: String) : Listable(value.wrapQuotesIfNecessary())
 
-    private class Url(url: CSSUrl) : Repeatable(url.toString())
+    private class Url(url: CSSUrl) : Listable(url.toString())
     private class Gradient(gradient: com.varabyte.kobweb.compose.css.functions.Gradient) :
-        Repeatable(gradient.toString())
+        Listable(gradient.toString())
 
-    private class ValueList(altText: String?, values: List<Repeatable>) : Content(
+    private class ValueList(altText: String?, values: List<Listable>) : Content(
         buildString {
             if (values.isEmpty()) return@buildString
             append(values.joinToString(" "))
@@ -58,26 +58,26 @@ sealed class Content private constructor(private val value: String) : StylePrope
     )
 
     companion object {
-        fun of(url: CSSUrl): Repeatable = Url(url)
-        fun of(gradient: com.varabyte.kobweb.compose.css.functions.Gradient): Repeatable = Gradient(gradient)
-        fun of(text: String): Repeatable = Text(text)
+        fun of(url: CSSUrl): Listable = Url(url)
+        fun of(gradient: com.varabyte.kobweb.compose.css.functions.Gradient): Listable = Gradient(gradient)
+        fun of(text: String): Listable = Text(text)
 
         fun of(url: CSSUrl, altText: String): Content = list(altText, of(url))
         fun of(gradient: com.varabyte.kobweb.compose.css.functions.Gradient, altText: String): Content = list(altText, of(gradient))
         fun of(text: String, altText: String): Content = list(altText, of(text))
 
-        fun list(vararg contents: Repeatable): Content = ValueList(null, contents.toList())
-        fun list(altText: String, vararg contents: Repeatable): Content = ValueList(altText.takeIf { it.isNotBlank() }, contents.toList())
+        fun list(vararg contents: Listable): Content = ValueList(null, contents.toList())
+        fun list(altText: String, vararg contents: Listable): Content = ValueList(altText.takeIf { it.isNotBlank() }, contents.toList())
 
         // Non-combinable keywords
         val None get(): Content = Keyword("none")
         val Normal get(): Content = Keyword("normal")
 
         // Language / position-dependent keywords
-        val CloseQuote get(): Repeatable = RepeatableKeyword("close-quote")
-        val NoCloseQuote get(): Repeatable = RepeatableKeyword("no-close-quote")
-        val NoOpenQuote get(): Repeatable = RepeatableKeyword("no-open-quote")
-        val OpenQuote get(): Repeatable = RepeatableKeyword("open-quote")
+        val CloseQuote get(): Listable = ListableKeyword("close-quote")
+        val NoCloseQuote get(): Listable = ListableKeyword("no-close-quote")
+        val NoOpenQuote get(): Listable = ListableKeyword("no-open-quote")
+        val OpenQuote get(): Listable = ListableKeyword("open-quote")
 
         // Global
         val Inherit get(): Content = Keyword("inherit")
@@ -92,16 +92,16 @@ fun StyleScope.content(content: Content) {
 }
 
 // Needed temporarily until we can remove the deprecated `vararg` version
-fun StyleScope.content(content: Content.Repeatable) {
+fun StyleScope.content(content: Content.Listable) {
     content(content as Content)
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use content(Content.list(...)) instead.", ReplaceWith("content(Content.list(*contents))"))
-fun StyleScope.content(vararg contents: Content.Repeatable) {
+fun StyleScope.content(vararg contents: Content.Listable) {
     content(Content.list(*contents))
 }
 @Deprecated("Use content(Content.list(...)) instead.", ReplaceWith("content(Content.list(altText, *contents))"))
-fun StyleScope.content(altText: String, vararg contents: Content.Repeatable) {
+fun StyleScope.content(altText: String, vararg contents: Content.Listable) {
     content(Content.list(altText, *contents))
 }
 

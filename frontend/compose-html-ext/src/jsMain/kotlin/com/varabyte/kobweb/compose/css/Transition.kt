@@ -109,9 +109,9 @@ sealed class Transition private constructor(private val value: String) : StylePr
     override fun toString(): String = value
 
     private class Keyword(value: String) : Transition(value)
-    private class ValueList(values: List<Repeatable>) : Transition(values.joinToString())
+    private class ValueList(values: List<Listable>) : Transition(values.joinToString())
 
-    class Repeatable internal constructor(
+    class Listable internal constructor(
         property: TransitionProperty.Name,
         duration: CSSTimeNumericValue?,
         timingFunction: TransitionTimingFunction?,
@@ -149,7 +149,7 @@ sealed class Transition private constructor(private val value: String) : StylePr
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null,
             behavior: TransitionBehavior? = null,
-        ): Repeatable = Repeatable(property, duration, timingFunction, delay, behavior)
+        ): Listable = Listable(property, duration, timingFunction, delay, behavior)
 
         fun of(
             property: String,
@@ -157,9 +157,9 @@ sealed class Transition private constructor(private val value: String) : StylePr
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null,
             behavior: TransitionBehavior? = null,
-        ): Repeatable = Repeatable(TransitionProperty.of(property), duration, timingFunction, delay, behavior)
+        ): Listable = Listable(TransitionProperty.of(property), duration, timingFunction, delay, behavior)
 
-        fun list(vararg transitions: Repeatable): Transition = ValueList(transitions.toList())
+        fun list(vararg transitions: Listable): Transition = ValueList(transitions.toList())
 
         /**
          * Specify transition details that should apply to every animatable property on this element.
@@ -169,7 +169,7 @@ sealed class Transition private constructor(private val value: String) : StylePr
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null,
             behavior: TransitionBehavior? = null,
-        ): Repeatable = of(TransitionProperty.All, duration, timingFunction, delay, behavior)
+        ): Listable = of(TransitionProperty.All, duration, timingFunction, delay, behavior)
 
         /**
          * A convenience method for when you want to animate multiple properties with the same values.
@@ -214,11 +214,11 @@ fun StyleScope.transition(transition: Transition) {
 }
 
 // Needed temporarily until we can remove the deprecated `vararg` version
-fun StyleScope.transition(transition: Transition.Repeatable) {
+fun StyleScope.transition(transition: Transition.Listable) {
     transition(transition as Transition)
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use transition(Transition.list(...)) instead.", ReplaceWith("transition(Transition.list(*transitions))"))
-fun StyleScope.transition(vararg transitions: Transition.Repeatable) {
+fun StyleScope.transition(vararg transitions: Transition.Listable) {
     transition(Transition.list(*transitions))
 }

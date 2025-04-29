@@ -21,17 +21,17 @@ fun Modifier.content(content: Content) = styleModifier {
     content(content)
 }
 
-fun Modifier.content(vararg contents: Content.Repeatable) = styleModifier {
+fun Modifier.content(vararg contents: Content.Listable) = styleModifier {
     content(Content.list(*contents))
 }
 
-fun Modifier.content(contents: List<Content.Repeatable>) = content(*contents.toTypedArray())
+fun Modifier.content(contents: List<Content.Listable>) = content(*contents.toTypedArray())
 
-fun Modifier.content(altText: String, vararg contents: Content.Repeatable) = styleModifier {
+fun Modifier.content(altText: String, vararg contents: Content.Listable) = styleModifier {
     content(Content.list(altText, *contents))
 }
 
-fun Modifier.content(altText: String, contents: List<Content.Repeatable>) = content(altText, *contents.toTypedArray())
+fun Modifier.content(altText: String, contents: List<Content.Listable>) = content(altText, *contents.toTypedArray())
 
 fun Modifier.content(value: String) = styleModifier {
     content(value)

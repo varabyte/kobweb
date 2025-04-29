@@ -159,11 +159,11 @@ up a property argument as a list of elements. Therefore, we should support that 
 #### Example
 
 ```kotlin
-fun Modifier.transition(vararg transitions: Transition.Repeatable) = styleModifier {
+fun Modifier.transition(vararg transitions: Transition.Listable) = styleModifier {
     transition(*transitions)
 }
 
-fun Modifier.transition(transitions: List<Transition.Repeatable>) =
+fun Modifier.transition(transitions: List<Transition.Listable>) =
     transition(*transitions.toTypedArray())
 ```
 

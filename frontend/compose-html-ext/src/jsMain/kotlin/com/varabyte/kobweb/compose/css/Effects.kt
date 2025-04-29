@@ -12,17 +12,17 @@ sealed class BackdropFilter private constructor(private val value: String) : Sty
     override fun toString() = value
 
     private class Keyword(value: String): BackdropFilter(value)
-    class Repeatable internal constructor(filter: CSSFilter) :
+    class Listable internal constructor(filter: CSSFilter) :
         BackdropFilter(filter.toString())
-    private class ValueList(values: List<Repeatable>) : BackdropFilter(values.joinToString(" "))
+    private class ValueList(values: List<Listable>) : BackdropFilter(values.joinToString(" "))
 
     companion object {
         // Keyword
         val None: BackdropFilter get() = Keyword("none")
 
-        fun of(filter: CSSFilter) = Repeatable(filter)
+        fun of(filter: CSSFilter) = Listable(filter)
         fun list(vararg filters: CSSFilter): BackdropFilter = ValueList(filters.map { of(it) }.toList())
-        fun list(vararg filters: Repeatable): BackdropFilter = ValueList(filters.toList())
+        fun list(vararg filters: Listable): BackdropFilter = ValueList(filters.toList())
 
         // Global
         val Inherit: BackdropFilter get() = Keyword("inherit")
@@ -43,7 +43,7 @@ fun StyleScope.backdropFilter(vararg filters: CSSFilter) {
 }
 
 @Deprecated("Use `backdropFilter(BackdropFilter.list(...))` instead.", ReplaceWith("backdropFilter(BackdropFilter.list(*filters))"))
-fun StyleScope.backdropFilter(vararg filters: BackdropFilter.Repeatable) {
+fun StyleScope.backdropFilter(vararg filters: BackdropFilter.Listable) {
     backdropFilter(BackdropFilter.list(*filters))
 }
 
@@ -53,17 +53,17 @@ sealed class Filter private constructor(private val value: String) : StyleProper
     override fun toString() = value
 
     private class Keyword(value: String): Filter(value)
-    class Repeatable internal constructor(filter: CSSFilter) :
+    class Listable internal constructor(filter: CSSFilter) :
         Filter(filter.toString())
-    private class ValueList(values: List<Repeatable>) : Filter(values.joinToString(" "))
+    private class ValueList(values: List<Listable>) : Filter(values.joinToString(" "))
 
     companion object {
         // Keyword
         val None: Filter get() = Keyword("none")
 
-        fun of(filter: CSSFilter) = Repeatable(filter)
+        fun of(filter: CSSFilter) = Listable(filter)
         fun list(vararg filters: CSSFilter): Filter = ValueList(filters.map { of(it) }.toList())
-        fun list(vararg filters: Repeatable): Filter = ValueList(filters.toList())
+        fun list(vararg filters: Listable): Filter = ValueList(filters.toList())
 
         // Global
         val Inherit: Filter get() = Keyword("inherit")
@@ -78,7 +78,7 @@ fun StyleScope.filter(filter: Filter) {
 }
 
 @Deprecated("Use filter(Filter.list(...)) instead.", ReplaceWith("filter(Filter.list(*filters))"))
-fun StyleScope.filter(vararg filters: Filter.Repeatable) {
+fun StyleScope.filter(vararg filters: Filter.Listable) {
     filter(Filter.list(*filters))
 }
 

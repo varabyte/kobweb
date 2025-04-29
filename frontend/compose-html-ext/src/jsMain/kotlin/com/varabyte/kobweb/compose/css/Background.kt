@@ -219,7 +219,7 @@ sealed class Background private constructor(private val value: String) : StylePr
     override fun toString(): String = value
 
     private class Keyword(value: String) : Background(value)
-    internal class ValueList(color: CSSColorValue?, internal val backgrounds: List<Repeatable>) : Background(
+    internal class ValueList(color: CSSColorValue?, internal val backgrounds: List<Listable>) : Background(
         buildString {
             if (color == null && backgrounds.isEmpty()) return@buildString
             // CSS order is backwards (IMO). We attempt to fix that in Kobweb.
@@ -236,7 +236,7 @@ sealed class Background private constructor(private val value: String) : StylePr
     // Note: Color is actually a separate property and intentionally not included here.
     // Note: blend mode *is* specified here but needs to be handled externally, since
     //   (probably for legacy reasons?) the `background` property does not accept it.
-    class Repeatable internal constructor(
+    class Listable internal constructor(
         val image: BackgroundImage?,
         val repeat: BackgroundRepeat?,
         val size: BackgroundSize?,
@@ -290,9 +290,9 @@ sealed class Background private constructor(private val value: String) : StylePr
             origin: BackgroundOrigin? = null,
             clip: BackgroundClip? = null,
             attachment: BackgroundAttachment? = null,
-        ): Repeatable = Repeatable(image, repeat, size, position, blend, origin, clip, attachment)
+        ): Listable = Listable(image, repeat, size, position, blend, origin, clip, attachment)
 
-        fun list(vararg backgrounds: Repeatable): Background = ValueList(null, backgrounds.toList())
+        fun list(vararg backgrounds: Listable): Background = ValueList(null, backgrounds.toList())
 
         /**
          * A Kotlin-idiomatic API to configure the `background` CSS property with repeating backgrounds.
@@ -307,7 +307,7 @@ sealed class Background private constructor(private val value: String) : StylePr
          *
          * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background">background</a>
          */
-        fun list(color: CSSColorValue, vararg backgrounds: Repeatable): Background = ValueList(color, backgrounds.toList())
+        fun list(color: CSSColorValue, vararg backgrounds: Listable): Background = ValueList(color, backgrounds.toList())
     }
 }
 
@@ -315,7 +315,7 @@ sealed class Background private constructor(private val value: String) : StylePr
 fun StyleScope.background(background: Background) {
     property("background", background)
     when (background) {
-        is Background.Repeatable -> if (background.blend != null) {
+        is Background.Listable -> if (background.blend != null) {
             property("background-blend-mode", background.blend)
         }
         is Background.ValueList -> {
@@ -333,16 +333,16 @@ fun StyleScope.background(background: Background) {
 }
 
 // Needed temporarily until we can remove the deprecated `vararg` version
-fun StyleScope.background(background: Background.Repeatable) {
+fun StyleScope.background(background: Background.Listable) {
     background(background as Background)
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use `background(Background.list(...))` instead.", ReplaceWith("background(Background.list(*backgrounds))"))
-fun StyleScope.background(vararg backgrounds: Background.Repeatable) {
+fun StyleScope.background(vararg backgrounds: Background.Listable) {
     background(Background.list(*backgrounds))
 }
 
 @Deprecated("Use `background(Background.list(...))` instead.", ReplaceWith("background(Background.list(color, *backgrounds))"))
-fun StyleScope.background(color: CSSColorValue, vararg backgrounds: Background.Repeatable) {
+fun StyleScope.background(color: CSSColorValue, vararg backgrounds: Background.Listable) {
     background(Background.list(color, *backgrounds))
 }

@@ -10,17 +10,18 @@ sealed class OverscrollBehavior private constructor(private val value: String) :
     override fun toString() = value
 
     sealed class SingleValue(value: String) : OverscrollBehavior(value)
-    class RepeatableValue internal constructor(value: String) : SingleValue(value)
     private class Keyword(value: String) : SingleValue(value)
-    private class TwoValue(x: RepeatableValue, y: RepeatableValue) : OverscrollBehavior("$x $y")
+    sealed class Listable(value: String) : SingleValue(value)
+    private class ListableKeyword(value: String) : Listable(value)
+    private class TwoValue(x: Listable, y: Listable) : OverscrollBehavior("$x $y")
 
     companion object {
         // Keyword
-        val Auto get() = RepeatableValue("auto")
-        val Contain get() = RepeatableValue("contain")
-        val None get() = RepeatableValue("none")
+        val Auto: Listable get() = ListableKeyword("auto")
+        val Contain: Listable get() = ListableKeyword("contain")
+        val None: Listable get() = ListableKeyword("none")
 
-        fun of(x: RepeatableValue, y: RepeatableValue): OverscrollBehavior = TwoValue(x, y)
+        fun of(x: Listable, y: Listable): OverscrollBehavior = TwoValue(x, y)
 
         // Global
         val Inherit: SingleValue get() = Keyword("inherit")

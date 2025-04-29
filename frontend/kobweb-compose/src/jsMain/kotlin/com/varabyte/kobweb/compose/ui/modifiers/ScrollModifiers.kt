@@ -9,7 +9,7 @@ fun Modifier.overscrollBehavior(overscrollBehavior: OverscrollBehavior) = styleM
     overscrollBehavior(overscrollBehavior)
 }
 
-fun Modifier.overscrollBehavior(x: OverscrollBehavior.RepeatableValue, y: OverscrollBehavior.RepeatableValue) =
+fun Modifier.overscrollBehavior(x: OverscrollBehavior.Listable, y: OverscrollBehavior.Listable) =
     styleModifier {
         overscrollBehavior(OverscrollBehavior.of(x, y))
     }

@@ -51,11 +51,11 @@ fun Modifier.textShadow(vararg shadows: CSSTextShadow) = styleModifier {
     }.toTypedArray())
 }
 
-fun Modifier.textShadow(vararg shadows: TextShadow.Repeatable) = styleModifier {
+fun Modifier.textShadow(vararg shadows: TextShadow.Listable) = styleModifier {
     textShadow(*shadows)
 }
 
-fun Modifier.textShadow(shadows: List<TextShadow.Repeatable>) = textShadow(*shadows.toTypedArray())
+fun Modifier.textShadow(shadows: List<TextShadow.Listable>) = textShadow(*shadows.toTypedArray())
 
 fun Modifier.textShadow(textShadow: TextShadow): Modifier = styleModifier {
     textShadow(textShadow)

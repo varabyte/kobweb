@@ -20,12 +20,12 @@ sealed class Animation private constructor(private val value: String) : StylePro
 
     private class Keyword(value: String) : Animation(value)
 
-    private class ValueList(values: List<Repeatable>) : Animation(values.joinToString())
+    private class ValueList(values: List<Listable>) : Animation(values.joinToString())
 
     // A replacement for org.jetbrains.compose.web.css.CSSAnimation which is currently implemented incorrectly
     // (it exposes a 1:many relationship between an animation's name and its properties, but
     // it should be 1:1).
-    class Repeatable internal constructor(
+    class Listable internal constructor(
         name: String,
         duration: CSSTimeNumericValue?,
         timingFunction: AnimationTimingFunction?,
@@ -65,10 +65,10 @@ sealed class Animation private constructor(private val value: String) : StylePro
             direction: AnimationDirection? = null,
             fillMode: AnimationFillMode? = null,
             playState: AnimationPlayState? = null
-        ): Repeatable =
-            Repeatable(name, duration, timingFunction, delay, iterationCount, direction, fillMode, playState)
+        ): Listable =
+            Listable(name, duration, timingFunction, delay, iterationCount, direction, fillMode, playState)
 
-        fun list(vararg animations: Repeatable): Animation = ValueList(animations.toList())
+        fun list(vararg animations: Listable): Animation = ValueList(animations.toList())
 
         // Keyword
         val None: Animation get() = Keyword("none")
@@ -86,11 +86,11 @@ fun StyleScope.animation(animation: Animation) {
 }
 
 // Needed temporarily until we can remove the deprecated `vararg` version
-fun StyleScope.animation(animation: Animation.Repeatable) {
+fun StyleScope.animation(animation: Animation.Listable) {
     animation(animation as Animation)
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use `animation(Animation.list(...))` instead.", ReplaceWith("animation(Animation.list(*animations))"))
-fun StyleScope.animation(vararg animations: Animation.Repeatable) {
+fun StyleScope.animation(vararg animations: Animation.Listable) {
     animation(Animation.list(*animations))
 }

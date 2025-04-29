@@ -15,16 +15,16 @@ fun Modifier.transition(transition: Transition) = styleModifier {
     transition(transition)
 }
 
-fun Modifier.transition(vararg transitions: Transition.Repeatable) = styleModifier {
+fun Modifier.transition(vararg transitions: Transition.Listable) = styleModifier {
     transition(*transitions)
 }
 
-fun Modifier.transition(transitions: List<Transition.Repeatable>) = styleModifier {
+fun Modifier.transition(transitions: List<Transition.Listable>) = styleModifier {
     transition(*transitions.toTypedArray())
 }
 
 // Convenience method for accepting the output of Transition.group(...)
-fun Modifier.transition(transitions: Array<Transition.Repeatable>) = styleModifier {
+fun Modifier.transition(transitions: Array<Transition.Listable>) = styleModifier {
     transition(*transitions)
 }
 
