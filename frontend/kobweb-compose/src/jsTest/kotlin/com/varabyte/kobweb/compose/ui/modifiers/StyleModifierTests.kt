@@ -431,4 +431,11 @@ class StyleModifierTests {
             }
         }).isEqualTo("transition-property: margin-right, color; transition-duration: 2s, 1s")
     }
+
+    @Test
+    fun verifyTypography() {
+        assertThat(modifierToText { Modifier.widows(Widows.of(2)) }).isEqualTo("widows: 2")
+        assertThat(modifierToText { Modifier.widows(3) }).isEqualTo("widows: 3")
+        assertThat(modifierToText { Modifier.widows(Widows.Revert) }).isEqualTo("widows: revert")
+    }
 }

@@ -2096,7 +2096,17 @@ class CssStylePropertyTests {
         assertThat(styleToText { whiteSpace(WhiteSpace.Revert) }).isEqualTo("white-space: revert")
         assertThat(styleToText { whiteSpace(WhiteSpace.Unset) }).isEqualTo("white-space: unset")
     }
-    
+
+    @Test
+    fun verifyWidows() {
+        assertThat(styleToText { widows(Widows.of(2)) }).isEqualTo("widows: 2")
+
+        assertThat(styleToText { widows(Widows.Inherit) }).isEqualTo("widows: inherit")
+        assertThat(styleToText { widows(Widows.Initial) }).isEqualTo("widows: initial")
+        assertThat(styleToText { widows(Widows.Revert) }).isEqualTo("widows: revert")
+        assertThat(styleToText { widows(Widows.Unset) }).isEqualTo("widows: unset")
+    }
+
     @Test
     fun verifyWidth() {
         assertThat(styleToText { width(Width.of(10.px)) }).isEqualTo("width: 10px")
