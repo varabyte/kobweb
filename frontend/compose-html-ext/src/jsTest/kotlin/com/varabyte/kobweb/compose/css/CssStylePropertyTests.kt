@@ -372,6 +372,7 @@ class CssStylePropertyTests {
 
     @Test
     fun verifyBackground() {
+        @Suppress("DEPRECATION") // Will be removed when blend gets removed
         assertThat(styleToText {
             background(
                 Background.of(
@@ -386,6 +387,20 @@ class CssStylePropertyTests {
                 )
             )
         }).isEqualTo("background: url(\"test.png\") no-repeat 10px 20px / 100px border-box content-box fixed; background-blend-mode: multiply")
+
+        assertThat(styleToText {
+            background(
+                Background.of(
+                    image = BackgroundImage.of(CSSUrl("test.png")),
+                    repeat = BackgroundRepeat.NoRepeat,
+                    size = BackgroundSize.of(100.px),
+                    position = BackgroundPosition.of(CSSPosition(10.px, 20.px)),
+                    origin = BackgroundOrigin.BorderBox,
+                    clip = BackgroundClip.ContentBox,
+                    attachment = BackgroundAttachment.Fixed
+                )
+            )
+        }).isEqualTo("background: url(\"test.png\") no-repeat 10px 20px / 100px border-box content-box fixed")
 
         assertThat(styleToText {
             background(

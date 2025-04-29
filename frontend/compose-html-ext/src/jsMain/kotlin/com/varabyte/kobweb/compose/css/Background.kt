@@ -233,6 +233,7 @@ sealed class Background private constructor(private val value: String) : StylePr
         val repeat: BackgroundRepeat?,
         val size: BackgroundSize?,
         val position: BackgroundPosition?,
+        @Deprecated("Due to technical limitations, we will be removing blend mode support from Background. Set the `backgroundBlendMode` property instead.")
         val blend: BackgroundBlendMode?, // See StyleScope.background for where this is used
         val origin: BackgroundOrigin?,
         val clip: BackgroundClip?,
@@ -267,12 +268,24 @@ sealed class Background private constructor(private val value: String) : StylePr
         // Keyword
         val None: Background get() = Keyword("none")
 
+        // NOTE: If you also want to support blending between images, see `BackgroundBlendMode`
         fun of(
             image: BackgroundImage? = null,
             repeat: BackgroundRepeat? = null,
             size: BackgroundSize? = null,
             position: BackgroundPosition? = null,
-            blend: BackgroundBlendMode? = null,
+            origin: BackgroundOrigin? = null,
+            clip: BackgroundClip? = null,
+            attachment: BackgroundAttachment? = null,
+        ): Listable = Listable(image, repeat, size, position, blend = null, origin, clip, attachment)
+
+        @Deprecated("Unfortunately, we need to deprecate supporting `blend` in `Background`. It was a nice idea but we hit technical limitations. Instead, CSS offers a separate `backgroundBlendMode` property you should set directly.")
+        fun of(
+            image: BackgroundImage? = null,
+            repeat: BackgroundRepeat? = null,
+            size: BackgroundSize? = null,
+            position: BackgroundPosition? = null,
+            blend: BackgroundBlendMode?,
             origin: BackgroundOrigin? = null,
             clip: BackgroundClip? = null,
             attachment: BackgroundAttachment? = null,
@@ -281,7 +294,7 @@ sealed class Background private constructor(private val value: String) : StylePr
         fun list(vararg backgrounds: Listable): Background = ValueList(null, backgrounds.toList())
 
         /**
-         * A Kotlin-idiomatic API to configure the `background` CSS property with repeating backgrounds.
+         * A Kotlin-idiomatic API to configure the `background` CSS property with multiple backgrounds.
          *
          * Background layers are specified in bottom-to-top order. Note that this is the *opposite* of how CSS does it,
          * which for this property expects a top-to-bottom order. However, we decided to deviate from the standard here for
@@ -298,6 +311,7 @@ sealed class Background private constructor(private val value: String) : StylePr
 }
 
 
+@Suppress("DEPRECATION") // We can remove this after `blend` goes away
 fun StyleScope.background(background: Background) {
     property("background", background)
     when (background) {
