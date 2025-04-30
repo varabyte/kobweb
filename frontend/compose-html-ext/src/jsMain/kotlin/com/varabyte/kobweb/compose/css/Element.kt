@@ -48,10 +48,10 @@ sealed interface Content : StylePropertyValue {
         val Normal get() = "normal".unsafeCast<Content>()
 
         // Language / position-dependent keywords
-        val CloseQuote get(): Listable = "close-quote".unsafeCast<Listable>()
-        val NoCloseQuote get(): Listable = "no-close-quote".unsafeCast<Listable>()
-        val NoOpenQuote get(): Listable = "no-open-quote".unsafeCast<Listable>()
-        val OpenQuote get(): Listable = "open-quote".unsafeCast<Listable>()
+        val CloseQuote get() = "close-quote".unsafeCast<Listable>()
+        val NoCloseQuote get() = "no-close-quote".unsafeCast<Listable>()
+        val NoOpenQuote get() = "no-open-quote".unsafeCast<Listable>()
+        val OpenQuote get() = "open-quote".unsafeCast<Listable>()
     }
 }
 

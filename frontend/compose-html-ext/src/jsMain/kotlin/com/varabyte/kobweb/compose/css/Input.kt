@@ -49,10 +49,10 @@ sealed interface TouchAction : StylePropertyValue {
         val PanY get() = "pan-y".unsafeCast<PanVertical>()
         val PinchZoom get() = "pinch-zoom".unsafeCast<TouchAction>()
 // Still experimental: https://caniuse.com/mdn-css_properties_touch-action_unidirectional-pan
-//        val PanLeft get(): TouchAction = PanHorizontal("pan-left")
-//        val PanRight get(): TouchAction = PanHorizontal("pan-right")
-//        val PanUp get(): TouchAction = PanVertical("pan-up")
-//        val PanDown get(): TouchAction = PanVertical("pan-down")
+//        val PanLeft get() = "pan-left".unsafeCast<PanHorizontal>()
+//        val PanRight get() = "pan-right".unsafeCast<PanHorizontal>()
+//        val PanUp get() = "pan-up".unsafeCast<PanVertical>()
+//        val PanDown get() = "pan-down".unsafeCast<PanVertical>()
         val Manipulation get() = "manipulation".unsafeCast<TouchAction>()
     }
 }
