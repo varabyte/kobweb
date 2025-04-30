@@ -104,7 +104,7 @@ fun Modifier.fontVariationSettings(value: FontVariationSettings): Modifier = sty
 }
 
 fun Modifier.fontVariationSettings(vararg axes: FontVariationSettings.Axis): Modifier = styleModifier {
-    fontVariationSettings(FontVariationSettings.list(*axes))
+    fontVariationSettings(FontVariationSettings.Axes(*axes))
 }
 
 fun Modifier.fontVariationSettings(axes: List<FontVariationSettings.Axis>): Modifier = fontVariationSettings(*axes.toTypedArray())
