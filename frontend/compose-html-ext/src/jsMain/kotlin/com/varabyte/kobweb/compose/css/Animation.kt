@@ -1,6 +1,3 @@
-// Sealed class private constructors are useful, actually!
-@file:Suppress("RedundantVisibilityModifier")
-
 package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*

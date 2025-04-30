@@ -5,7 +5,6 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-
 // https://developer.mozilla.org/en-US/docs/Web/CSS/accent-color
 sealed interface AccentColor : StylePropertyValue {
     companion object : CssGlobalValues<AccentColor> {

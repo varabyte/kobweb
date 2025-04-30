@@ -1,6 +1,5 @@
-// Sealed class private constructors are useful, actually!
 // Intentionally make some function names look like constructors
-@file:Suppress("RedundantVisibilityModifier", "FunctionName")
+@file:Suppress("FunctionName")
 
 package com.varabyte.kobweb.compose.css
 
