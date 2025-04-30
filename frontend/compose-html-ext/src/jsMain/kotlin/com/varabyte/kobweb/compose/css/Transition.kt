@@ -197,7 +197,7 @@ fun StyleScope.transition(transition: Transition) {
 
 // Needed temporarily until we can remove the deprecated `vararg` version
 fun StyleScope.transition(transition: Transition.Listable) {
-    transition(transition as Transition)
+    transition(transition.unsafeCast<Transition>())
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use transition(Transition.list(...)) instead.", ReplaceWith("transition(Transition.list(*transitions))"))

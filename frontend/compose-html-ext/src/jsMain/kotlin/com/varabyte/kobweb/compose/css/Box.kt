@@ -118,7 +118,7 @@ fun StyleScope.boxShadow(boxShadow: BoxShadow) {
 
 // Needed temporarily until we can remove the deprecated `vararg` version
 fun StyleScope.boxShadow(boxShadow: BoxShadow.Listable) {
-    boxShadow(boxShadow as BoxShadow)
+    boxShadow(boxShadow.unsafeCast<BoxShadow>())
 }
 @Deprecated("Use `boxShadow(BoxShadow.list(*boxShadows))` instead", ReplaceWith("boxShadow(BoxShadow.list(*boxShadows))"))
 fun StyleScope.boxShadow(vararg boxShadows: BoxShadow.Listable) {
