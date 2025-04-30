@@ -1764,12 +1764,43 @@ class CssStylePropertyTests {
         assertThat(styleToText { overflow(Overflow.Clip) }).isEqualTo("overflow: clip")
         assertThat(styleToText { overflow(Overflow.Scroll) }).isEqualTo("overflow: scroll")
         assertThat(styleToText { overflow(Overflow.Auto) }).isEqualTo("overflow: auto")
+        assertThat(styleToText { overflow(Overflow.of(Overflow.Visible, Overflow.Hidden)) }).isEqualTo("overflow: visible hidden")
 
         assertThat(styleToText { overflow(Overflow.Inherit) }).isEqualTo("overflow: inherit")
         assertThat(styleToText { overflow(Overflow.Initial) }).isEqualTo("overflow: initial")
         assertThat(styleToText { overflow(Overflow.Revert) }).isEqualTo("overflow: revert")
         assertThat(styleToText { overflow(Overflow.RevertLayer) }).isEqualTo("overflow: revert-layer")
         assertThat(styleToText { overflow(Overflow.Unset) }).isEqualTo("overflow: unset")
+    }
+
+    @Test
+    fun verifyOverflowBlock() {
+        assertThat(styleToText { overflowBlock(OverflowBlock.Visible) }).isEqualTo("overflow-block: visible")
+        assertThat(styleToText { overflowBlock(OverflowBlock.Hidden) }).isEqualTo("overflow-block: hidden")
+        assertThat(styleToText { overflowBlock(OverflowBlock.Clip) }).isEqualTo("overflow-block: clip")
+        assertThat(styleToText { overflowBlock(OverflowBlock.Scroll) }).isEqualTo("overflow-block: scroll")
+        assertThat(styleToText { overflowBlock(OverflowBlock.Auto) }).isEqualTo("overflow-block: auto")
+
+        assertThat(styleToText { overflowBlock(OverflowBlock.Inherit) }).isEqualTo("overflow-block: inherit")
+        assertThat(styleToText { overflowBlock(OverflowBlock.Initial) }).isEqualTo("overflow-block: initial")
+        assertThat(styleToText { overflowBlock(OverflowBlock.Revert) }).isEqualTo("overflow-block: revert")
+        assertThat(styleToText { overflowBlock(OverflowBlock.RevertLayer) }).isEqualTo("overflow-block: revert-layer")
+        assertThat(styleToText { overflowBlock(OverflowBlock.Unset) }).isEqualTo("overflow-block: unset")
+    }
+
+    @Test
+    fun verifyOverflowInline() {
+        assertThat(styleToText { overflowInline(OverflowInline.Visible) }).isEqualTo("overflow-inline: visible")
+        assertThat(styleToText { overflowInline(OverflowInline.Hidden) }).isEqualTo("overflow-inline: hidden")
+        assertThat(styleToText { overflowInline(OverflowInline.Clip) }).isEqualTo("overflow-inline: clip")
+        assertThat(styleToText { overflowInline(OverflowInline.Scroll) }).isEqualTo("overflow-inline: scroll")
+        assertThat(styleToText { overflowInline(OverflowInline.Auto) }).isEqualTo("overflow-inline: auto")
+
+        assertThat(styleToText { overflowInline(OverflowInline.Inherit) }).isEqualTo("overflow-inline: inherit")
+        assertThat(styleToText { overflowInline(OverflowInline.Initial) }).isEqualTo("overflow-inline: initial")
+        assertThat(styleToText { overflowInline(OverflowInline.Revert) }).isEqualTo("overflow-inline: revert")
+        assertThat(styleToText { overflowInline(OverflowInline.RevertLayer) }).isEqualTo("overflow-inline: revert-layer")
+        assertThat(styleToText { overflowInline(OverflowInline.Unset) }).isEqualTo("overflow-inline: unset")
     }
 
     @Test

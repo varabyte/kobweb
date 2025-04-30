@@ -46,8 +46,6 @@ sealed interface OverscrollBehaviorInline : StylePropertyValue {
     companion object : CssOverscrollModeValues<OverscrollBehaviorInline>, CssGlobalValues<OverscrollBehaviorInline>
 }
 
-// NOTE: Can't use OverscrollBehaviorInline.SingleValue here. Nested classes under typealiases are unsupported.
-// See also: https://youtrack.jetbrains.com/issue/KT-34281
 fun StyleScope.overscrollBehaviorInline(overscrollBehaviorInline: OverscrollBehaviorInline) {
     property("overscroll-behavior-inline", overscrollBehaviorInline)
 }
