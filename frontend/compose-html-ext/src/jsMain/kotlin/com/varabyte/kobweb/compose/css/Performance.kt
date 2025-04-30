@@ -3,17 +3,15 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/will-change
-class WillChange private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface WillChange : StylePropertyValue {
     companion object : CssGlobalValues<WillChange> {
         // Keyword values
-        val Auto get() = WillChange("auto")
-        val ScrollPosition get() = WillChange("scroll-position")
-        val Contents get() = WillChange("contents")
+        val Auto get() = "auto".unsafeCast<WillChange>()
+        val ScrollPosition get() = "scroll-position".unsafeCast<WillChange>()
+        val Contents get() = "contents".unsafeCast<WillChange>()
 
         // Custom ident values
-        fun of(vararg values: String) = WillChange(values.joinToString())
+        fun of(vararg values: String) = values.joinToString().unsafeCast<WillChange>()
     }
 }
 
