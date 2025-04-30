@@ -4,6 +4,8 @@ import androidx.compose.web.events.SyntheticDragEvent
 import androidx.compose.web.events.SyntheticEvent
 import androidx.compose.web.events.SyntheticMouseEvent
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.CaretColor
+import com.varabyte.kobweb.compose.css.caretColor
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
@@ -19,7 +21,7 @@ fun Modifier.caretColor(caretColor: CaretColor) = styleModifier {
 }
 
 fun Modifier.caretColor(color: CSSColorValue) = styleModifier {
-    caretColor(color)
+    caretColor(CaretColor.of(color))
 }
 
 fun Modifier.contentEditable(editable: Boolean) = attrsModifier {

@@ -8,14 +8,14 @@ import kotlin.collections.emptyList
 
 // region Caret Color, see https://developer.mozilla.org/en-US/docs/Web/CSS/caret-color
 
-class CaretColor private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface CaretColor : StylePropertyValue {
     companion object : CssGlobalValues<CaretColor> {
+        fun of(color: CSSColorValue) = color.unsafeCast<CaretColor>()
+
         // Keyword
-        val Auto get() = CaretColor("auto")
-        val Transparent get() = CaretColor("transparent")
-        val CurrentColor get() = CaretColor("currentcolor")
+        val Auto get() = "auto".unsafeCast<CaretColor>()
+        val Transparent get() = "transparent".unsafeCast<CaretColor>()
+        val CurrentColor get() = "currentcolor".unsafeCast<CaretColor>()
     }
 }
 
@@ -23,6 +23,7 @@ fun StyleScope.caretColor(caretColor: CaretColor) {
     property("caret-color", caretColor)
 }
 
+@Deprecated("Use `caretColor(CaretColor.of(color))` instead.", ReplaceWith("caretColor(CaretColor.of(color))"))
 fun StyleScope.caretColor(color: CSSColorValue) {
     property("caret-color", color)
 }
@@ -30,39 +31,33 @@ fun StyleScope.caretColor(color: CSSColorValue) {
 // endregion
 
 // region Touch Action, see https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action
-
-sealed class TouchAction private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    private class Keyword(value: String) : TouchAction(value)
-    class PanHorizontal internal constructor(value: String) : TouchAction(value)
-    class PanVertical internal constructor(value: String) : TouchAction(value)
+sealed interface TouchAction : StylePropertyValue {
+    sealed interface PanHorizontal : TouchAction
+    sealed interface PanVertical : TouchAction
 
     companion object : CssGlobalValues<TouchAction> {
         @Suppress("FunctionName")
         private fun _of(vararg touchAction: TouchAction, withPinchZoom: Boolean): TouchAction =
-            Keyword(
-                (touchAction.toList() + if (withPinchZoom) listOf("pinch-zoom") else emptyList())
-                    .joinToString(" ")
-            )
+            (touchAction.toList() + if (withPinchZoom) listOf("pinch-zoom") else emptyList())
+                .joinToString(" ").unsafeCast<TouchAction>()
+
         fun of(horiz: PanHorizontal, vert: PanVertical, withPinchZoom: Boolean = false) =
             _of(horiz, vert, withPinchZoom = withPinchZoom)
         fun of(horiz: PanHorizontal, withPinchZoom: Boolean = false) = _of(horiz, withPinchZoom = withPinchZoom)
         fun of(vert: PanVertical, withPinchZoom: Boolean = false) = _of(vert, withPinchZoom = withPinchZoom)
 
         // Keyword
-        val Auto get(): TouchAction = Keyword("auto")
-        val None get(): TouchAction = Keyword("none")
-        val PanX get() = PanHorizontal("pan-x")
-        val PanY get() = PanVertical("pan-y")
-        val PinchZoom get(): TouchAction = Keyword("pinch-zoom")
+        val Auto get() = "auto".unsafeCast<TouchAction>()
+        val None get() = "none".unsafeCast<TouchAction>()
+        val PanX get() = "pan-x".unsafeCast<PanHorizontal>()
+        val PanY get() = "pan-y".unsafeCast<PanVertical>()
+        val PinchZoom get() = "pinch-zoom".unsafeCast<TouchAction>()
 // Still experimental: https://caniuse.com/mdn-css_properties_touch-action_unidirectional-pan
 //        val PanLeft get(): TouchAction = PanHorizontal("pan-left")
 //        val PanRight get(): TouchAction = PanHorizontal("pan-right")
 //        val PanUp get(): TouchAction = PanVertical("pan-up")
 //        val PanDown get(): TouchAction = PanVertical("pan-down")
-
-        val Manipulation get(): TouchAction = Keyword("manipulation")
+        val Manipulation get() = "manipulation".unsafeCast<TouchAction>()
     }
 }
 
