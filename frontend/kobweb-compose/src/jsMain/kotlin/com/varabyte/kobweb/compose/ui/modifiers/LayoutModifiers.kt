@@ -6,11 +6,11 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
 fun Modifier.aspectRatio(ratio: Number) = styleModifier {
-    aspectRatio(ratio)
+    aspectRatio(AspectRatio.of(ratio))
 }
 
 fun Modifier.aspectRatio(width: Number, height: Number) = styleModifier {
-    aspectRatio(width, height)
+    aspectRatio(AspectRatio.of(width, height))
 }
 
 fun Modifier.aspectRatio(ratio: AspectRatio): Modifier = styleModifier {

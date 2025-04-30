@@ -190,6 +190,8 @@ class CssStylePropertyTests {
 
     @Test
     fun verifyAspectRatio() {
+        assertThat(styleToText { aspectRatio(AspectRatio.of(1.5)) }).isEqualTo("aspect-ratio: 1.5")
+        assertThat(styleToText { aspectRatio(AspectRatio.of(16, 9)) }).isEqualTo("aspect-ratio: 16 / 9")
         assertThat(styleToText { aspectRatio(AspectRatio.Auto) }).isEqualTo("aspect-ratio: auto")
 
         assertThat(styleToText { aspectRatio(AspectRatio.Inherit) }).isEqualTo("aspect-ratio: inherit")

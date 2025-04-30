@@ -21,7 +21,7 @@ class StyleModifierTests {
 
         return styleScope.properties.entries.joinToString("; ") { (key, value) -> "$key: $value" }
     }
-
+    
     @Test
     fun verifyBackground() {
         assertThat(modifierToText {
@@ -132,6 +132,152 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.boxShadow(BoxShadow.of(0.px, 1.px, 3.px, 1.px, Color.gray))
         }).isEqualTo("box-shadow: 0px 1px 3px 1px gray")
+    }
+
+    @Test
+    fun verifyLayout() {
+        assertThat(modifierToText {
+            Modifier.aspectRatio(1.5)
+        }).isEqualTo("aspect-ratio: 1.5")
+
+        assertThat(modifierToText {
+            Modifier.aspectRatio(16, 9)
+        }).isEqualTo("aspect-ratio: 16 / 9")
+
+        assertThat(modifierToText {
+            Modifier.aspectRatio(AspectRatio.Auto)
+        }).isEqualTo("aspect-ratio: auto")
+
+        assertThat(modifierToText {
+            Modifier.clear(Clear.Both)
+        }).isEqualTo("clear: both")
+
+        assertThat(modifierToText {
+            Modifier.lineHeight(20.px)
+        }).isEqualTo("line-height: 20px")
+
+        assertThat(modifierToText {
+            Modifier.lineHeight(1.5)
+        }).isEqualTo("line-height: 1.5")
+
+        assertThat(modifierToText {
+            Modifier.lineHeight(LineHeight.Normal)
+        }).isEqualTo("line-height: normal")
+
+        assertThat(modifierToText {
+            Modifier.margin(10.px)
+        }).isEqualTo("margin: 10px")
+
+        assertThat(modifierToText {
+            Modifier.margin {
+                top(10.px)
+                right(20.px)
+                bottom(30.px)
+                left(40.px)
+            }
+        }).isEqualTo("margin-top: 10px; margin-right: 20px; margin-bottom: 30px; margin-left: 40px")
+
+        assertThat(modifierToText {
+            Modifier.margin(10.px, 20.px)
+        }).isEqualTo("margin: 10px 20px")
+
+        assertThat(modifierToText {
+            Modifier.margin(10.px, 20.px, 30.px)
+        }).isEqualTo("margin: 10px 20px 30px")
+
+        assertThat(modifierToText {
+            Modifier.margin(10.px, 20.px, 30.px, 40.px)
+        }).isEqualTo("margin: 10px 20px 30px 40px")
+
+        assertThat(modifierToText {
+            Modifier.marginBlock(10.px)
+        }).isEqualTo("margin-block: 10px")
+
+        assertThat(modifierToText {
+            Modifier.marginBlock(10.px, 20.px)
+        }).isEqualTo("margin-block: 10px 20px")
+
+        assertThat(modifierToText {
+            Modifier.marginBlock {
+                start(10.px)
+                end(20.px)
+            }
+        }).isEqualTo("margin-block-start: 10px; margin-block-end: 20px")
+
+        assertThat(modifierToText {
+            Modifier.overflow(Overflow.Hidden)
+        }).isEqualTo("overflow: hidden")
+
+        assertThat(modifierToText {
+            Modifier.overflow(Overflow.Auto, Overflow.Scroll)
+        }).isEqualTo("overflow: auto scroll")
+
+        assertThat(modifierToText {
+            Modifier.overflow {
+                x(Overflow.Hidden)
+                y(Overflow.Scroll)
+            }
+        }).isEqualTo("overflow-x: hidden; overflow-y: scroll")
+
+        assertThat(modifierToText {
+            Modifier.overflowWrap(OverflowWrap.BreakWord)
+        }).isEqualTo("overflow-wrap: break-word")
+
+        assertThat(modifierToText {
+            Modifier.padding(10.px)
+        }).isEqualTo("padding: 10px")
+
+        assertThat(modifierToText {
+            Modifier.padding {
+                top(10.px)
+                right(20.px)
+                bottom(30.px)
+                left(40.px)
+            }
+        }).isEqualTo("padding-top: 10px; padding-right: 20px; padding-bottom: 30px; padding-left: 40px")
+
+        assertThat(modifierToText {
+            Modifier.padding(10.px, 20.px)
+        }).isEqualTo("padding: 10px 20px")
+
+        assertThat(modifierToText {
+            Modifier.padding(10.px, 20.px, 30.px)
+        }).isEqualTo("padding: 10px 20px 30px")
+
+        assertThat(modifierToText {
+            Modifier.padding(10.px, 20.px, 30.px, 40.px)
+        }).isEqualTo("padding: 10px 20px 30px 40px")
+
+        assertThat(modifierToText {
+            Modifier.paddingBlock(10.px)
+        }).isEqualTo("padding-block: 10px")
+
+        assertThat(modifierToText {
+            Modifier.paddingBlock(10.px, 20.px)
+        }).isEqualTo("padding-block: 10px 20px")
+
+        assertThat(modifierToText {
+            Modifier.paddingBlock {
+                start(10.px)
+                end(20.px)
+            }
+        }).isEqualTo("padding-block-start: 10px; padding-block-end: 20px")
+    
+        assertThat(modifierToText {
+            Modifier.resize(Resize.Both)
+        }).isEqualTo("resize: both")
+    
+        assertThat(modifierToText {
+            Modifier.verticalAlign(VerticalAlign.Middle)
+        }).isEqualTo("vertical-align: middle")
+    
+        assertThat(modifierToText {
+            Modifier.verticalAlign(10.px)
+        }).isEqualTo("vertical-align: 10px")
+    
+        assertThat(modifierToText {
+            Modifier.zIndex(100)
+        }).isEqualTo("z-index: 100")
     }
 
     @Test

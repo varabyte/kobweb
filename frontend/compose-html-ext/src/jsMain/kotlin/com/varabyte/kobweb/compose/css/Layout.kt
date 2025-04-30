@@ -7,17 +7,22 @@ class AspectRatio private constructor(private val value: String) : StyleProperty
     override fun toString() = value
 
     companion object : CssGlobalValues<AspectRatio> {
+        fun of(ratio: Number) = AspectRatio("$ratio")
+        fun of(width: Number, height: Number) = AspectRatio("$width / $height")
+
         // Keywords
         val Auto get() = AspectRatio("auto")
     }
 }
 
+@Deprecated("Use `aspectRatio(AspectRatio.of(ratio))` instead", ReplaceWith("aspectRatio(AspectRatio.of(ratio))"))
 fun StyleScope.aspectRatio(ratio: Number) {
-    property("aspect-ratio", ratio)
+    aspectRatio(AspectRatio.of(ratio))
 }
 
+@Deprecated("Use `aspectRation(AspectRatio.of(width, height))` instead", ReplaceWith("aspectRatio(AspectRatio.of(width, height))"))
 fun StyleScope.aspectRatio(width: Number, height: Number) {
-    property("aspect-ratio", "$width / $height")
+    aspectRatio(AspectRatio.of(width, height))
 }
 
 fun StyleScope.aspectRatio(aspectRatio: AspectRatio) {
