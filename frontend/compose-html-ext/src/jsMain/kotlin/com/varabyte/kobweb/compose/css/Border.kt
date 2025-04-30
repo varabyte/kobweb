@@ -36,13 +36,11 @@ fun StyleScope.borderWidth(width: CSSLengthNumericValue) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-collapse
-class BorderCollapse private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface BorderCollapse : StylePropertyValue {
     companion object : CssGlobalValues<BorderCollapse> {
         // Keyword
-        val Separate get() = BorderCollapse("separate")
-        val Collapse get() = BorderCollapse("collapse")
+        val Separate get() = "separate".unsafeCast<BorderCollapse>()
+        val Collapse get() = "collapse".unsafeCast<BorderCollapse>()
     }
 }
 
@@ -269,9 +267,7 @@ fun StyleScope.borderImageSource(source: BorderImageSource) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-image-slice
-class BorderImageSlice private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface BorderImageSlice : StylePropertyValue {
     class Builder internal constructor() : BorderImageNumericBuilder<CSSPercentageValue>() {
         private var fill = false
         fun fill() {
@@ -279,10 +275,8 @@ class BorderImageSlice private constructor(private val value: String) : StylePro
         }
 
         internal fun build(): BorderImageSlice =
-            BorderImageSlice(
-                listOfNotNull(top, right, bottom, left, if (fill) "fill" else null)
-                    .joinToString(" ")
-            )
+            listOfNotNull(top, right, bottom, left, if (fill) "fill" else null)
+                .joinToString(" ").unsafeCast<BorderImageSlice>()
     }
 
     companion object : CssGlobalValues<BorderImageSlice> {
@@ -297,11 +291,9 @@ fun StyleScope.borderImageSlice(slice: BorderImageSlice) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-image-width
-class BorderImageWidth private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface BorderImageWidth : StylePropertyValue {
     class Builder internal constructor() : BorderImageNumericBuilder<CSSLengthOrPercentageNumericValue>() {
-        internal fun build(): BorderImageWidth = BorderImageWidth("$top $right $bottom $left")
+        internal fun build(): BorderImageWidth = "$top $right $bottom $left".unsafeCast<BorderImageWidth>()
     }
 
     companion object : CssGlobalValues<BorderImageWidth> {
@@ -316,11 +308,9 @@ fun StyleScope.borderImageWidth(width: BorderImageWidth) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-image-outset
-class BorderImageOutset private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface BorderImageOutset : StylePropertyValue {
     class Builder internal constructor() : BorderImageNumericBuilder<CSSLengthNumericValue>() {
-        internal fun build(): BorderImageOutset = BorderImageOutset("$top $right $bottom $left")
+        internal fun build(): BorderImageOutset = "$top $right $bottom $left".unsafeCast<BorderImageOutset>()
     }
 
     companion object : CssGlobalValues<BorderImageOutset> {
@@ -335,21 +325,17 @@ fun StyleScope.borderImageOutset(outset: BorderImageOutset) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-image-repeat
-sealed class BorderImageRepeat private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    private class Keyword(value: String) : BorderImageRepeat(value)
-    class Listable internal constructor(value: String) : BorderImageRepeat(value)
-    private class TwoValue(topBottom: Listable, leftRight: Listable) : BorderImageRepeat("$topBottom $leftRight")
+sealed interface BorderImageRepeat : StylePropertyValue {
+    sealed interface Mode : BorderImageRepeat
 
     companion object : CssGlobalValues<BorderImageRepeat> {
         // Keyword
-        val Stretch: Listable get() = Listable("stretch")
-        val Repeat: Listable get() = Listable("repeat")
-        val Round: Listable get() = Listable("round")
-        val Space: Listable get() = Listable("space")
+        val Stretch get() = "stretch".unsafeCast<Mode>()
+        val Repeat get() = "repeat".unsafeCast<Mode>()
+        val Round get() = "round".unsafeCast<Mode>()
+        val Space get() = "space".unsafeCast<Mode>()
 
-        fun of(topBottom: Listable, leftRight: Listable): BorderImageRepeat = TwoValue(topBottom, leftRight)
+        fun of(topBottom: Mode, leftRight: Mode) = "$topBottom $leftRight".unsafeCast<BorderImageRepeat>()
     }
 }
 
@@ -357,9 +343,7 @@ fun StyleScope.borderImageRepeat(repeat: BorderImageRepeat) {
     property("border-image-repeat", repeat)
 }
 
-class BorderImage private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface BorderImage : StylePropertyValue {
     companion object : CssGlobalValues<BorderImage> {
         fun of(
             source: BorderImageSource? = null,
@@ -367,20 +351,18 @@ class BorderImage private constructor(private val value: String) : StyleProperty
             width: BorderImageWidth? = null,
             outset: BorderImageOutset? = null,
             repeat: BorderImageRepeat? = null,
-        ): BorderImage {
-            return BorderImage(buildString {
-                source?.let { append("$it ") }
-                if (slice != null || width != null || outset != null) {
-                    // width requires slice to be present, and outset requires width to be present
-                    append("${slice ?: BorderImageSlice.of(100.percent)} ")
-                    if (outset != null || width != null) {
-                        append("/ ${width ?: BorderImageWidth.of(1)} ")
-                        outset?.let { append("/ $it ") }
-                    }
+        ) = buildString {
+            source?.let { append("$it ") }
+            if (slice != null || width != null || outset != null) {
+                // width requires slice to be present, and outset requires width to be present
+                append("${slice ?: BorderImageSlice.of(100.percent)} ")
+                if (outset != null || width != null) {
+                    append("/ ${width ?: BorderImageWidth.of(1)} ")
+                    outset?.let { append("/ $it ") }
                 }
-                repeat?.let { append(it) }
-            })
-        }
+            }
+            repeat?.let { append(it) }
+        }.unsafeCast<BorderImage>()
     }
 }
 

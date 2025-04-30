@@ -249,7 +249,7 @@ class BorderImageScope internal constructor(private val styleScope: StyleScope) 
     fun outset(all: CSSLengthNumericValue) = outset(BorderImageOutset.of(all))
     fun outset(all: Number) = outset(BorderImageOutset.of(all))
     fun outset(block: BorderImageOutset.Builder.() -> Unit) = outset(BorderImageOutset.of(block))
-    fun repeat(topBottom: BorderImageRepeat.Listable, leftRight: BorderImageRepeat.Listable) =
+    fun repeat(topBottom: BorderImageRepeat.Mode, leftRight: BorderImageRepeat.Mode) =
         repeat(BorderImageRepeat.of(topBottom, leftRight))
 }
 
