@@ -3,15 +3,13 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/column-count
-class ColumnCount private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface ColumnCount : StylePropertyValue {
     companion object : CssGlobalValues<ColumnCount> {
         // Keyword value
-        val Auto get() = ColumnCount("auto")
+        val Auto get() = "auto".unsafeCast<ColumnCount>()
 
         // <integer> value
-        fun of(count: Int) = ColumnCount("$count")
+        fun of(count: Int) = "$count".unsafeCast<ColumnCount>()
 
     }
 }
@@ -21,13 +19,11 @@ fun StyleScope.columnCount(columnCount: ColumnCount) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/column-fill
-class ColumnFill private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface ColumnFill : StylePropertyValue {
     companion object : CssGlobalValues<ColumnFill> {
         // Keyword value
-        val Auto get() = ColumnFill("auto")
-        val Balance get() = ColumnFill("balance")
+        val Auto get() = "auto".unsafeCast<ColumnFill>()
+        val Balance get() = "balance".unsafeCast<ColumnFill>()
     }
 }
 
@@ -55,13 +51,11 @@ fun StyleScope.columnRule(
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/column-span
-class ColumnSpan private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface ColumnSpan : StylePropertyValue {
     companion object : CssGlobalValues<ColumnSpan> {
         // Keyword value
-        val None get() = ColumnSpan("none")
-        val All get() = ColumnSpan("all")
+        val None get() = "none".unsafeCast<ColumnSpan>()
+        val All get() = "all".unsafeCast<ColumnSpan>()
     }
 }
 
