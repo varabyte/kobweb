@@ -5,22 +5,19 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
+internal sealed interface CssOverscrollModeValues<T: StylePropertyValue> {
+    val Auto get() = "auto".unsafeCast<T>()
+    val Contain get() = "contain".unsafeCast<T>()
+    val None get() = "none".unsafeCast<T>()
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
-sealed class OverscrollBehavior private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface OverscrollBehavior : StylePropertyValue {
+    sealed interface SingleValue : OverscrollBehavior
+    sealed interface Mode : SingleValue
 
-    sealed class SingleValue(value: String) : OverscrollBehavior(value)
-    sealed class Mode(value: String) : SingleValue(value)
-    private class ModeKeyword(value: String) : Mode(value)
-    private class DoubleValue(x: Mode, y: Mode) : OverscrollBehavior("$x $y")
-
-    companion object : CssGlobalValues<SingleValue> {
-        // Keyword
-        val Auto: Mode get() = ModeKeyword("auto")
-        val Contain: Mode get() = ModeKeyword("contain")
-        val None: Mode get() = ModeKeyword("none")
-
-        fun of(x: Mode, y: Mode): OverscrollBehavior = DoubleValue(x, y)
+    companion object : CssOverscrollModeValues<Mode>, CssGlobalValues<SingleValue> {
+        fun of(x: Mode, y: Mode): OverscrollBehavior = "$x $y".unsafeCast<OverscrollBehavior>()
     }
 }
 
@@ -38,26 +35,19 @@ fun StyleScope.overscrollBehaviorY(overscrollBehavior: OverscrollBehavior.Single
     property("overscroll-behavior-y", overscrollBehavior)
 }
 
-class OverscrollBehaviorMode private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object : CssGlobalValues<OverscrollBehaviorMode> {
-        val Auto get() = OverscrollBehaviorMode("auto")
-        val Contain get() = OverscrollBehaviorMode("contain")
-        val None get() = OverscrollBehaviorMode("none")
-    }
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior-block
+sealed interface OverscrollBehaviorBlock : StylePropertyValue {
+    companion object : CssOverscrollModeValues<OverscrollBehaviorBlock>, CssGlobalValues<OverscrollBehaviorBlock>
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior-block
-typealias OverscrollBehaviorBlock = OverscrollBehaviorMode
-
-// NOTE: Can't use OverscrollBehaviorBlock.SingleValue here. Nested classes under typealiases are unsupported.
-// See also: https://youtrack.jetbrains.com/issue/KT-34281
 fun StyleScope.overscrollBehaviorBlock(overscrollBehaviorBlock: OverscrollBehaviorBlock) {
     property("overscroll-behavior-block", overscrollBehaviorBlock)
 }
 
-typealias OverscrollBehaviorInline = OverscrollBehaviorMode
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior-inline
+sealed interface OverscrollBehaviorInline : StylePropertyValue {
+    companion object : CssOverscrollModeValues<OverscrollBehaviorInline>, CssGlobalValues<OverscrollBehaviorInline>
+}
 
 // NOTE: Can't use OverscrollBehaviorInline.SingleValue here. Nested classes under typealiases are unsupported.
 // See also: https://youtrack.jetbrains.com/issue/KT-34281
