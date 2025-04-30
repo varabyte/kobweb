@@ -55,16 +55,14 @@ fun StyleScope.mixBlendMode(blendMode: MixBlendMode) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit
-class ObjectFit private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface ObjectFit : StylePropertyValue {
     companion object : CssGlobalValues<ObjectFit> {
         // Keywords
-        val Contain get() = ObjectFit("contain")
-        val Cover get() = ObjectFit("cover")
-        val Fill get() = ObjectFit("fill")
-        val None get() = ObjectFit("none")
-        val ScaleDown get() = ObjectFit("scale-down")
+        val Contain get() = "contain".unsafeCast<ObjectFit>()
+        val Cover get() = "cover".unsafeCast<ObjectFit>()
+        val Fill get() = "fill".unsafeCast<ObjectFit>()
+        val None get() = "none".unsafeCast<ObjectFit>()
+        val ScaleDown get() = "scale-down".unsafeCast<ObjectFit>()
     }
 }
 
