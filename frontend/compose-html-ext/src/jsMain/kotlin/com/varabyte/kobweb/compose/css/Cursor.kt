@@ -3,57 +3,55 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
-class Cursor private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface Cursor : StylePropertyValue {
     companion object : CssGlobalValues<Cursor> {
         // General
-        val Auto get() = Cursor("auto")
-        val Default get() = Cursor("default")
-        val None get() = Cursor("none")
+        val Auto get() = "auto".unsafeCast<Cursor>()
+        val Default get() = "default".unsafeCast<Cursor>()
+        val None get() = "none".unsafeCast<Cursor>()
 
         // Links and status
-        val ContextMenu get() = Cursor("context-menu")
-        val Help get() = Cursor("help")
-        val Pointer get() = Cursor("pointer")
-        val Progress get() = Cursor("progress")
-        val Wait get() = Cursor("wait")
+        val ContextMenu get() = "context-menu".unsafeCast<Cursor>()
+        val Help get() = "help".unsafeCast<Cursor>()
+        val Pointer get() = "pointer".unsafeCast<Cursor>()
+        val Progress get() = "progress".unsafeCast<Cursor>()
+        val Wait get() = "wait".unsafeCast<Cursor>()
 
         // Selection
-        val Cell get() = Cursor("cell")
-        val Crosshair get() = Cursor("crosshair")
-        val Text get() = Cursor("text")
-        val VerticalText get() = Cursor("vertical-text")
+        val Cell get() = "cell".unsafeCast<Cursor>()
+        val Crosshair get() = "crosshair".unsafeCast<Cursor>()
+        val Text get() = "text".unsafeCast<Cursor>()
+        val VerticalText get() = "vertical-text".unsafeCast<Cursor>()
 
         // Drag and drop
-        val Alias get() = Cursor("alias")
-        val Copy get() = Cursor("copy")
-        val Move get() = Cursor("move")
-        val NoDrop get() = Cursor("no-drop")
-        val NotAllowed get() = Cursor("not-allowed")
-        val Grab get() = Cursor("grab")
-        val Grabbing get() = Cursor("grabbing")
+        val Alias get() = "alias".unsafeCast<Cursor>()
+        val Copy get() = "copy".unsafeCast<Cursor>()
+        val Move get() = "move".unsafeCast<Cursor>()
+        val NoDrop get() = "no-drop".unsafeCast<Cursor>()
+        val NotAllowed get() = "not-allowed".unsafeCast<Cursor>()
+        val Grab get() = "grab".unsafeCast<Cursor>()
+        val Grabbing get() = "grabbing".unsafeCast<Cursor>()
 
         // Resizing and scrolling
-        val AllScroll get() = Cursor("all-scroll")
-        val ColumnResize get() = Cursor("col-resize")
-        val RowResize get() = Cursor("row-resize")
-        val NResize get() = Cursor("n-resize")
-        val NeResize get() = Cursor("ne-resize")
-        val EResize get() = Cursor("e-resize")
-        val SeResize get() = Cursor("se-resize")
-        val SResize get() = Cursor("s-resize")
-        val SwResize get() = Cursor("sw-resize")
-        val WResize get() = Cursor("w-resize")
-        val NwResize get() = Cursor("nw-resize")
-        val EwResize get() = Cursor("ew-resize")
-        val NsResize get() = Cursor("ns-resize")
-        val NeswResize get() = Cursor("nesw-resize")
-        val NwseResize get() = Cursor("nwse-resize")
+        val AllScroll get() = "all-scroll".unsafeCast<Cursor>()
+        val ColumnResize get() = "col-resize".unsafeCast<Cursor>()
+        val RowResize get() = "row-resize".unsafeCast<Cursor>()
+        val NResize get() = "n-resize".unsafeCast<Cursor>()
+        val NeResize get() = "ne-resize".unsafeCast<Cursor>()
+        val EResize get() = "e-resize".unsafeCast<Cursor>()
+        val SeResize get() = "se-resize".unsafeCast<Cursor>()
+        val SResize get() = "s-resize".unsafeCast<Cursor>()
+        val SwResize get() = "sw-resize".unsafeCast<Cursor>()
+        val WResize get() = "w-resize".unsafeCast<Cursor>()
+        val NwResize get() = "nw-resize".unsafeCast<Cursor>()
+        val EwResize get() = "ew-resize".unsafeCast<Cursor>()
+        val NsResize get() = "ns-resize".unsafeCast<Cursor>()
+        val NeswResize get() = "nesw-resize".unsafeCast<Cursor>()
+        val NwseResize get() = "nwse-resize".unsafeCast<Cursor>()
 
         // Zoom
-        val ZoomIn get() = Cursor("zoom-in")
-        val ZoomOut get() = Cursor("zoom-out")
+        val ZoomIn get() = "zoom-in".unsafeCast<Cursor>()
+        val ZoomOut get() = "zoom-out".unsafeCast<Cursor>()
     }
 }
 
