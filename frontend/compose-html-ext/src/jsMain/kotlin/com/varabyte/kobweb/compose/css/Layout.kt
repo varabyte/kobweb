@@ -3,15 +3,13 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio
-class AspectRatio private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface AspectRatio : StylePropertyValue {
     companion object : CssGlobalValues<AspectRatio> {
-        fun of(ratio: Number) = AspectRatio("$ratio")
-        fun of(width: Number, height: Number) = AspectRatio("$width / $height")
+        fun of(ratio: Number) = "$ratio".unsafeCast<AspectRatio>()
+        fun of(width: Number, height: Number) = "$width / $height".unsafeCast<AspectRatio>()
 
         // Keywords
-        val Auto get() = AspectRatio("auto")
+        val Auto get() = "auto".unsafeCast<AspectRatio>()
     }
 }
 
@@ -30,17 +28,15 @@ fun StyleScope.aspectRatio(aspectRatio: AspectRatio) {
 }
 
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/clear
-class Clear private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface Clear : StylePropertyValue {
     companion object : CssGlobalValues<Clear> {
         // Keyword values
-        val None get() = Clear("none")
-        val Left get() = Clear("left")
-        val Right get() = Clear("right")
-        val Both get() = Clear("both")
-        val InlineStart get() = Clear("inline-start")
-        val InlineEnd get() = Clear("inline-end")
+        val None get() = "none".unsafeCast<Clear>()
+        val Left get() = "left".unsafeCast<Clear>()
+        val Right get() = "right".unsafeCast<Clear>()
+        val Both get() = "both".unsafeCast<Clear>()
+        val InlineStart get() = "inline-start".unsafeCast<Clear>()
+        val InlineEnd get() = "inline-end".unsafeCast<Clear>()
     }
 }
 
@@ -49,12 +45,10 @@ fun StyleScope.clear(clear: Clear) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/line-height
-class LineHeight private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface LineHeight : StylePropertyValue {
     companion object : CssGlobalValues<LineHeight> {
         // Keywords
-        val Normal get() = LineHeight("normal")
+        val Normal get() = "normal".unsafeCast<LineHeight>()
     }
 }
 
@@ -156,17 +150,15 @@ fun StyleScope.paddingBlockEnd(value: CSSLengthOrPercentageNumericValue) {
 // endregion
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/resize
-class Resize private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface Resize : StylePropertyValue {
     companion object : CssGlobalValues<Resize> {
         // Keyword
-        val None get() = Resize("none")
-        val Both get() = Resize("both")
-        val Horizontal get() = Resize("horizontal")
-        val Vertical get() = Resize("vertical")
-        val Block get() = Resize("block")
-        val Inline get() = Resize("inline")
+        val None get() = "none".unsafeCast<Resize>()
+        val Both get() = "both".unsafeCast<Resize>()
+        val Horizontal get() = "horizontal".unsafeCast<Resize>()
+        val Vertical get() = "vertical".unsafeCast<Resize>()
+        val Block get() = "block".unsafeCast<Resize>()
+        val Inline get() = "inline".unsafeCast<Resize>()
     }
 }
 
@@ -175,19 +167,17 @@ fun StyleScope.resize(resize: Resize) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/vertical-align
-class VerticalAlign private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface VerticalAlign : StylePropertyValue {
     companion object : CssGlobalValues<VerticalAlign> {
         // Keyword
-        val Baseline get() = VerticalAlign("baseline")
-        val Sub get() = VerticalAlign("sub")
-        val Super get() = VerticalAlign("super")
-        val TextTop get() = VerticalAlign("text-top")
-        val TextBottom get() = VerticalAlign("text-bottom")
-        val Middle get() = VerticalAlign("middle")
-        val Top get() = VerticalAlign("top")
-        val Bottom get() = VerticalAlign("bottom")
+        val Baseline get() = "baseline".unsafeCast<VerticalAlign>()
+        val Sub get() = "sub".unsafeCast<VerticalAlign>()
+        val Super get() = "super".unsafeCast<VerticalAlign>()
+        val TextTop get() = "text-top".unsafeCast<VerticalAlign>()
+        val TextBottom get() = "text-bottom".unsafeCast<VerticalAlign>()
+        val Middle get() = "middle".unsafeCast<VerticalAlign>()
+        val Top get() = "top".unsafeCast<VerticalAlign>()
+        val Bottom get() = "bottom".unsafeCast<VerticalAlign>()
     }
 }
 
