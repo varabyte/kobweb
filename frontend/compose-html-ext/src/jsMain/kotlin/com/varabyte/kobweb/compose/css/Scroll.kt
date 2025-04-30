@@ -38,19 +38,18 @@ fun StyleScope.overscrollBehaviorY(overscrollBehavior: OverscrollBehavior.Single
     property("overscroll-behavior-y", overscrollBehavior)
 }
 
-class OverscrollBehaviorKeyword private constructor(private val value: String) : StylePropertyValue {
+class OverscrollBehaviorMode private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object : CssGlobalValues<OverscrollBehaviorKeyword> {
-        // Keyword
-        val Auto get() = OverscrollBehaviorKeyword("auto")
-        val Contain get() = OverscrollBehaviorKeyword("contain")
-        val None get() = OverscrollBehaviorKeyword("none")
+    companion object : CssGlobalValues<OverscrollBehaviorMode> {
+        val Auto get() = OverscrollBehaviorMode("auto")
+        val Contain get() = OverscrollBehaviorMode("contain")
+        val None get() = OverscrollBehaviorMode("none")
     }
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior-block
-typealias OverscrollBehaviorBlock = OverscrollBehaviorKeyword
+typealias OverscrollBehaviorBlock = OverscrollBehaviorMode
 
 // NOTE: Can't use OverscrollBehaviorBlock.SingleValue here. Nested classes under typealiases are unsupported.
 // See also: https://youtrack.jetbrains.com/issue/KT-34281
@@ -58,7 +57,7 @@ fun StyleScope.overscrollBehaviorBlock(overscrollBehaviorBlock: OverscrollBehavi
     property("overscroll-behavior-block", overscrollBehaviorBlock)
 }
 
-typealias OverscrollBehaviorInline = OverscrollBehaviorKeyword
+typealias OverscrollBehaviorInline = OverscrollBehaviorMode
 
 // NOTE: Can't use OverscrollBehaviorInline.SingleValue here. Nested classes under typealiases are unsupported.
 // See also: https://youtrack.jetbrains.com/issue/KT-34281
