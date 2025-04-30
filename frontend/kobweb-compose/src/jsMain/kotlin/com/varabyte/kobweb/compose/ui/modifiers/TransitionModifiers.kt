@@ -34,14 +34,14 @@ class TransitionScope(private val styleScope: StyleScope) {
     fun duration(vararg durations: CSSTimeNumericValue) = styleScope.transitionDuration(*durations)
     fun timingFunction(vararg timingFunctions: TransitionTimingFunction) = styleScope.transitionTimingFunction(*timingFunctions)
     fun delay(vararg delays: CSSTimeNumericValue) = styleScope.transitionDelay(*delays)
-    fun behavior(vararg behaviors: TransitionBehavior) = styleScope.transitionBehavior(*behaviors)
+    fun behavior(vararg behaviors: TransitionBehavior.Listable) = styleScope.transitionBehavior(*behaviors)
 
     fun property(properties: List<TransitionProperty.Name>) = property(*properties.toTypedArray())
     fun property(properties: List<String>) = property(*properties.toTypedArray())
     fun duration(durations: List<CSSTimeNumericValue>) = duration(*durations.toTypedArray())
     fun timingFunction(timingFunctions: List<TransitionTimingFunction>) = timingFunction(*timingFunctions.toTypedArray())
     fun delay(delays: List<CSSTimeNumericValue>) = delay(*delays.toTypedArray())
-    fun behavior(behaviors: List<TransitionBehavior>) = behavior(*behaviors.toTypedArray())
+    fun behavior(behaviors: List<TransitionBehavior.Listable>) = behavior(*behaviors.toTypedArray())
 }
 
 fun Modifier.transition(scope: TransitionScope.() -> Unit) = styleModifier {
