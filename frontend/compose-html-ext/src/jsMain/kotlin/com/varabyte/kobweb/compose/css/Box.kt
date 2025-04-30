@@ -226,6 +226,6 @@ sealed interface BoxShadow : StylePropertyValue {
          *             rgba(0, 0, 0, 0.318) 5px 8px 10px -1px;
          * ```
          */
-        fun list(vararg shadows: Listable): BoxShadow = shadows.toList().joinToString().unsafeCast<BoxShadow>()
+        fun list(vararg shadows: Listable): BoxShadow = shadows.joinToString().unsafeCast<BoxShadow>()
     }
 }

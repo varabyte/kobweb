@@ -45,7 +45,7 @@ sealed interface Animation : StylePropertyValue {
             add(name)
         }.joinToString(" ").unsafeCast<Listable>()
 
-        fun list(vararg animations: Listable) = animations.toList().joinToString().unsafeCast<Animation>()
+        fun list(vararg animations: Listable) = animations.joinToString().unsafeCast<Animation>()
 
         // Keyword
         val None: Animation get() = "none".unsafeCast<Animation>()

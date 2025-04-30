@@ -50,7 +50,7 @@ sealed interface FontVariantAlternates : StylePropertyValue {
         fun Ornaments(ident: String): Listable = "ornaments($ident)".unsafeCast<Listable>()
         fun Annotation(ident: String): Listable = "annotation($ident)".unsafeCast<Listable>()
 
-        fun list(vararg values: Listable): FontVariantAlternates = values.toList().joinToString(" ").unsafeCast<FontVariantAlternates>()
+        fun list(vararg values: Listable): FontVariantAlternates = values.joinToString(" ").unsafeCast<FontVariantAlternates>()
     }
 }
 
@@ -99,7 +99,7 @@ sealed interface FontVariantEastAsian : StylePropertyValue {
         val FullWidth get() = "full-width".unsafeCast<Listable>()
         val ProportionalWidth get() = "proportional-width".unsafeCast<Listable>()
 
-        fun list(vararg values: Listable): FontVariantEastAsian = values.toList().joinToString(" ").unsafeCast<FontVariantEastAsian>()
+        fun list(vararg values: Listable): FontVariantEastAsian = values.joinToString(" ").unsafeCast<FontVariantEastAsian>()
     }
 }
 
@@ -147,7 +147,7 @@ sealed interface FontVariantLigatures : StylePropertyValue {
         val Contextual get() = "contextual".unsafeCast<Listable>()
         val NoContextual get() = "no-contextual".unsafeCast<Listable>()
 
-        fun list(vararg values: Listable) = values.toList().joinToString(" ").unsafeCast<FontVariantLigatures>()
+        fun list(vararg values: Listable) = values.joinToString(" ").unsafeCast<FontVariantLigatures>()
 
         fun of(
             common: Boolean? = null,
@@ -199,7 +199,7 @@ sealed interface FontVariantNumeric : StylePropertyValue {
         val DiagonalFractions get() = "diagonal-fractions".unsafeCast<Listable>()
         val StackedFractions get() = "stacked-fractions".unsafeCast<Listable>()
 
-        fun list(vararg keywords: Listable): FontVariantNumeric = keywords.toList().joinToString(" ").unsafeCast<FontVariantNumeric>()
+        fun list(vararg keywords: Listable): FontVariantNumeric = keywords.joinToString(" ").unsafeCast<FontVariantNumeric>()
     }
 }
 

@@ -274,7 +274,7 @@ sealed interface StyleExample : StylePropertyValue {
 
   companion object : CssGlobalValues<StyleExample> {
     fun of(value: Int) = "$value".unsafeCast<Listable>()
-    fun list(vararg examples: Listable): StyleExample = examples.toList().joinToString().unsafeCast<StyleExample>()
+    fun list(vararg examples: Listable): StyleExample = examples.joinToString().unsafeCast<StyleExample>()
 
     val None: StyleExample get() = "none".unsafeCast<StyleExample>() // not listable!
   }

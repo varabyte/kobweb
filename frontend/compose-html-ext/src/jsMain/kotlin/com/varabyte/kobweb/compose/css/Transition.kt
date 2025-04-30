@@ -127,7 +127,7 @@ sealed interface Transition : StylePropertyValue {
             behavior: TransitionBehavior? = null,
         ) = of(TransitionProperty.of(property), duration, timingFunction, delay, behavior)
 
-        fun list(vararg transitions: Listable) = transitions.toList().joinToString().unsafeCast<Transition>()
+        fun list(vararg transitions: Listable) = transitions.joinToString().unsafeCast<Transition>()
 
         /**
          * Specify transition details that should apply to every animatable property on this element.

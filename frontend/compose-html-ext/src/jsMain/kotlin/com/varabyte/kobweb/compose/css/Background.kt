@@ -25,7 +25,7 @@ sealed interface BackgroundBlendMode : StylePropertyValue {
     sealed interface Listable : BackgroundBlendMode
 
     companion object : CssBlendModeValues<Listable>, CssGlobalValues<BackgroundBlendMode> {
-        fun list(vararg blendModes: Listable): BackgroundBlendMode = blendModes.toList().joinToString().unsafeCast<BackgroundBlendMode>()
+        fun list(vararg blendModes: Listable): BackgroundBlendMode = blendModes.joinToString().unsafeCast<BackgroundBlendMode>()
 
         override val Normal get() = "normal".unsafeCast<Listable>()
         override val Multiply get() = "multiply".unsafeCast<Listable>()

@@ -8,7 +8,7 @@ internal sealed interface CssFilterValues<T: StylePropertyValue, L: T> {
     val None get() = "none".unsafeCast<T>()
 
     fun of(filter: CSSFilter) = filter.toString().unsafeCast<L>()
-    fun list(vararg filters: L) = filters.toList().joinToString(" ").unsafeCast<T>()
+    fun list(vararg filters: L) = filters.joinToString(" ").unsafeCast<T>()
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter
