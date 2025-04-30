@@ -126,14 +126,20 @@ private fun Array<out GridEntry>.validate() {
     require(autoRepeatCount == 1) { "Only one auto-repeat call is allowed per track list" }
 
     trackSizes.forEach {
-        require (it !is GridEntry.TrackSize.Flex) { "Cannot use flex values with auto-repeat" }
-        require(it !is GridEntry.TrackSize.Keyword) { "Cannot use keywords with auto-repeat" }
-        require(it !is GridEntry.TrackSize.FitContent) { "Cannot use fit-content with auto-repeat" }
-        if (it is GridEntry.TrackSize.MinMax) {
-            require(it.min is GridEntry.TrackSize.Fixed || it.max is GridEntry.TrackSize.Fixed) {
-                "Cannot use minmax with auto-repeat unless at least one of the values is a fixed value (a length or percentage)"
+        val errorMessage = when (it) {
+            is GridEntry.TrackSize.Fixed -> null
+            is GridEntry.TrackSize.FitContent -> "Cannot use fit-content with auto-repeat"
+            is GridEntry.TrackSize.Flex -> "Cannot use flex values with auto-repeat"
+            is GridEntry.TrackSize.Keyword -> "Cannot use keywords with auto-repeat"
+            is GridEntry.TrackSize.MinMax -> {
+                if (it.min !is GridEntry.TrackSize.Fixed && it.max !is GridEntry.TrackSize.Fixed) {
+                    "Cannot use minmax with auto-repeat unless at least one of the values is a fixed value (a length or percentage)"
+                } else {
+                    null
+                }
             }
         }
+        require(errorMessage == null) { errorMessage!! }
     }
 }
 
@@ -242,7 +248,7 @@ fun StyleScope.gridAutoRows(block: GridTrackBuilder.() -> Unit) {
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template">Grid Template</a>
  */
 sealed interface GridTemplate : StylePropertyValue {
-    class SubgridBuilder {
+    class SubgridBuilder internal constructor() {
         internal val names = mutableListOf<GridEntry>()
 
         fun lineName(lineName: String) {
