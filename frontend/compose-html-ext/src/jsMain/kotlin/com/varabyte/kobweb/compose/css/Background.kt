@@ -10,14 +10,12 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment
-class BackgroundAttachment private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface BackgroundAttachment : StylePropertyValue {
     companion object : CssGlobalValues<BackgroundAttachment> {
         // Keywords
-        val Scroll get() = BackgroundAttachment("scroll")
-        val Fixed get() = BackgroundAttachment("fixed")
-        val Local get() = BackgroundAttachment("local")
+        val Scroll get() = "scroll".unsafeCast<BackgroundAttachment>()
+        val Fixed get() = "fixed".unsafeCast<BackgroundAttachment>()
+        val Local get() = "local".unsafeCast<BackgroundAttachment>()
     }
 }
 
@@ -26,33 +24,30 @@ fun StyleScope.backgroundAttachment(backgroundAttachment: BackgroundAttachment) 
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-blend-mode
-sealed class BackgroundBlendMode private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    class Listable(value: String) : BackgroundBlendMode(value)
-    private class ValueList(values: List<Listable>) : BackgroundBlendMode(values.joinToString())
+sealed interface BackgroundBlendMode : StylePropertyValue {
+    sealed interface Listable : BackgroundBlendMode
 
     companion object : CssBlendModeValues<Listable>, CssGlobalValues<BackgroundBlendMode> {
-        fun list(vararg blendModes: Listable): BackgroundBlendMode = ValueList(blendModes.toList())
+        fun list(vararg blendModes: Listable): BackgroundBlendMode = blendModes.toList().joinToString().unsafeCast<BackgroundBlendMode>()
 
-        override val Normal get() = Listable("normal")
-        override val Multiply get() = Listable("multiply")
-        override val Screen get() = Listable("screen")
-        override val Overlay get() = Listable("overlay")
-        override val Darken get() = Listable("darken")
-        override val Lighten get() = Listable("lighten")
-        override val ColorDodge get() = Listable("color-dodge")
-        override val ColorBurn get() = Listable("color-burn")
-        override val HardLight get() = Listable("hard-light")
-        override val SoftLight get() = Listable("soft-light")
-        override val Difference get() = Listable("difference")
-        override val Exclusion get() = Listable("exclusion")
-        override val Hue get() = Listable("hue")
-        override val Saturation get() = Listable("saturation")
-        override val Color get() = Listable("color")
-        override val Luminosity get() = Listable("luminosity")
-        override val PlusDarker get() = Listable("plus-darker")
-        override val PlusLighter get() = Listable("plus-lighter")
+        override val Normal get() = "normal".unsafeCast<Listable>()
+        override val Multiply get() = "multiply".unsafeCast<Listable>()
+        override val Screen get() = "screen".unsafeCast<Listable>()
+        override val Overlay get() = "overlay".unsafeCast<Listable>()
+        override val Darken get() = "darken".unsafeCast<Listable>()
+        override val Lighten get() = "lighten".unsafeCast<Listable>()
+        override val ColorDodge get() = "color-dodge".unsafeCast<Listable>()
+        override val ColorBurn get() = "color-burn".unsafeCast<Listable>()
+        override val HardLight get() = "hard-light".unsafeCast<Listable>()
+        override val SoftLight get() = "soft-light".unsafeCast<Listable>()
+        override val Difference get() = "difference".unsafeCast<Listable>()
+        override val Exclusion get() = "exclusion".unsafeCast<Listable>()
+        override val Hue get() = "hue".unsafeCast<Listable>()
+        override val Saturation get() = "saturation".unsafeCast<Listable>()
+        override val Color get() = "color".unsafeCast<Listable>()
+        override val Luminosity get() = "luminosity".unsafeCast<Listable>()
+        override val PlusDarker get() = "plus-darker".unsafeCast<Listable>()
+        override val PlusLighter get() = "plus-lighter".unsafeCast<Listable>()
     }
 }
 
@@ -62,7 +57,7 @@ fun StyleScope.backgroundBlendMode(blendMode: BackgroundBlendMode) {
 
 // Needed temporarily until we can remove the deprecated `vararg` version
 fun StyleScope.backgroundBlendMode(blendMode: BackgroundBlendMode.Listable) {
-    backgroundBlendMode(blendMode as BackgroundBlendMode)
+    backgroundBlendMode(blendMode.unsafeCast<BackgroundBlendMode>())
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use `backgroundBlendMode(BackgroundBlendMode.list(...))` instead.", ReplaceWith("backgroundBlendMode(BackgroundBlendMode.list(*blendModes))"))
@@ -71,15 +66,13 @@ fun StyleScope.backgroundBlendMode(vararg blendModes: BackgroundBlendMode.Listab
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip
-class BackgroundClip private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface BackgroundClip : StylePropertyValue {
     companion object : CssGlobalValues<BackgroundClip> {
         // Keywords
-        val BorderBox get() = BackgroundClip("border-box")
-        val PaddingBox get() = BackgroundClip("padding-box")
-        val ContentBox get() = BackgroundClip("content-box")
-        val Text get() = BackgroundClip("text")
+        val BorderBox get() = "border-box".unsafeCast<BackgroundClip>()
+        val PaddingBox get() = "padding-box".unsafeCast<BackgroundClip>()
+        val ContentBox get() = "content-box".unsafeCast<BackgroundClip>()
+        val Text get() = "text".unsafeCast<BackgroundClip>()
     }
 }
 
@@ -88,13 +81,11 @@ fun StyleScope.backgroundClip(backgroundClip: BackgroundClip) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-color
-class BackgroundColor private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface BackgroundColor : StylePropertyValue {
     companion object : CssGlobalValues<BackgroundColor> {
         // Keywords
-        val CurrentColor get() = BackgroundColor("currentcolor")
-        val Transparent get() = BackgroundColor("transparent")
+        val CurrentColor get() = "currentcolor".unsafeCast<BackgroundColor>()
+        val Transparent get() = "transparent".unsafeCast<BackgroundColor>()
     }
 }
 
@@ -115,17 +106,14 @@ fun StyleScope.backgroundImage(url: CSSUrl) = backgroundImage(BackgroundImage.of
 fun StyleScope.backgroundImage(gradient: Gradient) = backgroundImage(BackgroundImage.of(gradient))
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin
-class BackgroundOrigin private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface BackgroundOrigin : StylePropertyValue {
     companion object : CssGlobalValues<BackgroundOrigin> {
         // Keywords
-        val BorderBox get() = BackgroundOrigin("border-box")
-        val PaddingBox get() = BackgroundOrigin("padding-box")
-        val ContentBox get() = BackgroundOrigin("content-box")
+        val BorderBox get() = "border-box".unsafeCast<BackgroundOrigin>()
+        val PaddingBox get() = "padding-box".unsafeCast<BackgroundOrigin>()
+        val ContentBox get() = "content-box".unsafeCast<BackgroundOrigin>()
     }
 }
-
 fun StyleScope.backgroundOrigin(backgroundOrigin: BackgroundOrigin) {
     backgroundOrigin(backgroundOrigin.toString())
 }
@@ -144,99 +132,72 @@ fun StyleScope.backgroundPosition(backgroundPosition: BackgroundPosition) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat
-sealed class BackgroundRepeat private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    private class Keyword(value: String) : BackgroundRepeat(value)
-    class RepeatStyle internal constructor(value: String) : BackgroundRepeat(value)
-    private class TwoValue(horizontal: RepeatStyle, vertical: RepeatStyle) :
-        BackgroundRepeat("$horizontal $vertical")
+sealed interface BackgroundRepeat : StylePropertyValue {
+    sealed interface Mode : BackgroundRepeat
 
     companion object : CssGlobalValues<BackgroundRepeat> {
-        fun of(horizontal: RepeatStyle, vertical: RepeatStyle): BackgroundRepeat = TwoValue(horizontal, vertical)
+        fun of(horizontal: Mode, vertical: Mode): BackgroundRepeat =
+            "$horizontal $vertical".unsafeCast<BackgroundRepeat>()
 
         // Keywords
-        val RepeatX get(): BackgroundRepeat = Keyword("repeat-x")
-        val RepeatY get(): BackgroundRepeat = Keyword("repeat-y")
+        val RepeatX get() = "repeat-x".unsafeCast<BackgroundRepeat>()
+        val RepeatY get() = "repeat-y".unsafeCast<BackgroundRepeat>()
 
-        val Repeat get() = RepeatStyle("repeat")
-        val Space get() = RepeatStyle("space")
-        val Round get() = RepeatStyle("round")
-        val NoRepeat get() = RepeatStyle("no-repeat")
+        val Repeat get() = "repeat".unsafeCast<Mode>()
+        val Space get() = "space".unsafeCast<Mode>()
+        val Round get() = "round".unsafeCast<Mode>()
+        val NoRepeat get() = "no-repeat".unsafeCast<Mode>()
     }
 }
-
 fun StyleScope.backgroundRepeat(backgroundRepeat: BackgroundRepeat) {
     backgroundRepeat(backgroundRepeat.toString())
 }
 
-fun StyleScope.backgroundRepeat(horizontal: BackgroundRepeat.RepeatStyle, vertical: BackgroundRepeat.RepeatStyle) {
+fun StyleScope.backgroundRepeat(horizontal: BackgroundRepeat.Mode, vertical: BackgroundRepeat.Mode) {
     backgroundRepeat(BackgroundRepeat.of(horizontal, vertical))
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-size
-sealed class BackgroundSize private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    private class Keyword(value: String) : BackgroundSize(value)
-    private class Size(value: String) : BackgroundSize(value)
-
+sealed interface BackgroundSize : StylePropertyValue {
     companion object : CssGlobalValues<BackgroundSize> {
-        fun of(width: CSSLengthOrPercentageNumericValue): BackgroundSize = Size("$width")
-        fun of(width: CSSAutoKeyword): BackgroundSize = Size("$width")
+        fun of(width: CSSLengthOrPercentageNumericValue): BackgroundSize = "$width".unsafeCast<BackgroundSize>()
+        fun of(width: CSSAutoKeyword): BackgroundSize = "$width".unsafeCast<BackgroundSize>()
         fun of(width: CSSLengthOrPercentageNumericValue, height: CSSLengthOrPercentageNumericValue): BackgroundSize =
-            Size("$width $height")
+            "$width $height".unsafeCast<BackgroundSize>()
 
         fun of(width: CSSAutoKeyword, height: CSSLengthOrPercentageNumericValue): BackgroundSize =
-            Size("$width $height")
+            "$width $height".unsafeCast<BackgroundSize>()
 
         fun of(width: CSSLengthOrPercentageNumericValue, height: CSSAutoKeyword): BackgroundSize =
-            Size("$width $height")
+            "$width $height".unsafeCast<BackgroundSize>()
 
         // Keywords
-        val Cover get(): BackgroundSize = Keyword("cover")
-        val Contain get(): BackgroundSize = Keyword("contain")
+        val Cover get() = "cover".unsafeCast<BackgroundSize>()
+        val Contain get() = "contain".unsafeCast<BackgroundSize>()
     }
 }
-
 fun StyleScope.backgroundSize(backgroundSize: BackgroundSize) {
     backgroundSize(backgroundSize.toString())
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background
-sealed class Background private constructor(private val value: String) : StylePropertyValue {
-    override fun toString(): String = value
+sealed interface Background : StylePropertyValue {
+    sealed interface Listable
 
-    private class Keyword(value: String) : Background(value)
-    internal class ValueList(color: CSSColorValue?, internal val backgrounds: List<Listable>) : Background(
-        buildString {
-            if (color == null && backgrounds.isEmpty()) return@buildString
-            // CSS order is backwards (IMO). We attempt to fix that in Kobweb.
-            append(backgrounds.reversed().joinToString())
-            // Backgrounds only allow you to specify a single color. If provided, it must be included with
-            // the final layer.
-            if (color != null) {
-                if (this.isNotEmpty()) append(' ')
-                append(color)
-            }
-        }
-    )
+    companion object : CssGlobalValues<Background> {
+        // Keyword
+        val None get() = "none".unsafeCast<Background>()
 
-    // Note: Color is actually a separate property and intentionally not included here.
-    // Note: blend mode *is* specified here but needs to be handled externally, since
-    //   (probably for legacy reasons?) the `background` property does not accept it.
-    class Listable internal constructor(
-        val image: BackgroundImage?,
-        val repeat: BackgroundRepeat?,
-        val size: BackgroundSize?,
-        val position: BackgroundPosition?,
-        @Deprecated("Due to technical limitations, we will be removing blend mode support from Background. Set the `backgroundBlendMode` property instead.")
-        val blend: BackgroundBlendMode?, // See StyleScope.background for where this is used
-        val origin: BackgroundOrigin?,
-        val clip: BackgroundClip?,
-        val attachment: BackgroundAttachment?,
-    ) : Background(
-        buildList {
+        // NOTE: If you also want to support blending between images, see `BackgroundBlendMode`
+        fun of(
+            image: BackgroundImage? = null,
+            repeat: BackgroundRepeat? = null,
+            size: BackgroundSize? = null,
+            position: BackgroundPosition? = null,
+            origin: BackgroundOrigin? = null,
+            clip: BackgroundClip? = null,
+            attachment: BackgroundAttachment? = null,
+        ) = buildList {
             image?.let { add(it.toString()) }
             repeat?.let { add(it) }
             position?.let { add(it.toString()) }
@@ -258,25 +219,12 @@ sealed class Background private constructor(private val value: String) : StylePr
                 add(it)
             }
             attachment?.let { add(it) }
-        }.joinToString(" ")
-    )
+        }.joinToString(" ").unsafeCast<Listable>()
 
-    companion object : CssGlobalValues<Background> {
-        // Keyword
-        val None: Background get() = Keyword("none")
-
-        // NOTE: If you also want to support blending between images, see `BackgroundBlendMode`
-        fun of(
-            image: BackgroundImage? = null,
-            repeat: BackgroundRepeat? = null,
-            size: BackgroundSize? = null,
-            position: BackgroundPosition? = null,
-            origin: BackgroundOrigin? = null,
-            clip: BackgroundClip? = null,
-            attachment: BackgroundAttachment? = null,
-        ): Listable = Listable(image, repeat, size, position, blend = null, origin, clip, attachment)
-
-        @Deprecated("Unfortunately, we need to deprecate supporting `blend` in `Background`. It was a nice idea but we hit technical limitations. Instead, CSS offers a separate `backgroundBlendMode` property you should set directly.")
+        @Deprecated(
+            "Unfortunately, we need to deprecate supporting `blend` in `Background`. Moving forward, the value is ignored. It was a nice idea but we hit technical limitations. Instead, CSS offers a separate `backgroundBlendMode` property you should set directly.",
+            level = DeprecationLevel.ERROR
+        )
         fun of(
             image: BackgroundImage? = null,
             repeat: BackgroundRepeat? = null,
@@ -286,9 +234,22 @@ sealed class Background private constructor(private val value: String) : StylePr
             origin: BackgroundOrigin? = null,
             clip: BackgroundClip? = null,
             attachment: BackgroundAttachment? = null,
-        ): Listable = Listable(image, repeat, size, position, blend, origin, clip, attachment)
+        ): Listable = of(image, repeat, size, position, origin, clip, attachment)
 
-        fun list(vararg backgrounds: Listable): Background = ValueList(null, backgrounds.toList())
+        @Suppress("FunctionName")
+        private fun _list(color: CSSColorValue?, backgrounds: List<Listable>) = buildString {
+            if (color == null && backgrounds.isEmpty()) return@buildString
+            // CSS order is backwards (IMO). We attempt to fix that in Kobweb.
+            append(backgrounds.reversed().joinToString())
+            // Backgrounds only allow you to specify a single color. If provided, it must be included with
+            // the final layer.
+            if (color != null) {
+                if (this.isNotEmpty()) append(' ')
+                append(color)
+            }
+        }.unsafeCast<Background>()
+
+        fun list(vararg backgrounds: Listable) = _list(null, backgrounds.toList())
 
         /**
          * A Kotlin-idiomatic API to configure the `background` CSS property with multiple backgrounds.
@@ -303,35 +264,17 @@ sealed class Background private constructor(private val value: String) : StylePr
          *
          * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background">background</a>
          */
-        fun list(color: CSSColorValue, vararg backgrounds: Listable): Background = ValueList(color, backgrounds.toList())
+        fun list(color: CSSColorValue, vararg backgrounds: Listable) = _list(color, backgrounds.toList())
     }
 }
 
-
-@Suppress("DEPRECATION") // We can remove this after `blend` goes away
 fun StyleScope.background(background: Background) {
     property("background", background)
-    when (background) {
-        is Background.Listable -> if (background.blend != null) {
-            property("background-blend-mode", background.blend)
-        }
-        is Background.ValueList -> {
-            val defaultBlendMode = BackgroundBlendMode.Normal
-            val blendModes = background.backgrounds
-                .map { it.blend ?: defaultBlendMode }
-                // Use toString comparison because otherwise equality checks are against instance
-                .takeIf { blendModes -> blendModes.any { it.toString() != defaultBlendMode.toString() } }
-            if (blendModes != null) {
-                property("background-blend-mode", blendModes.joinToString())
-            }
-        }
-        else -> {} // No other types of background implementations have a blend mode
-    }
 }
 
 // Needed temporarily until we can remove the deprecated `vararg` version
 fun StyleScope.background(background: Background.Listable) {
-    background(background as Background)
+    background(background.unsafeCast<Background>())
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use `background(Background.list(...))` instead.", ReplaceWith("background(Background.list(*backgrounds))"))

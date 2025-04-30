@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.compose.css
 
-import com.varabyte.kobweb.compose.css.BackgroundSize.Size
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
