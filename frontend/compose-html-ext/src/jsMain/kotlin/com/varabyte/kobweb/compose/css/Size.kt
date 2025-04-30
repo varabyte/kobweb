@@ -5,36 +5,32 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
 // NOTE: This class is used as a typealias and should not be referenced directly by the end user.
-class CSSElementSize private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface CSSElementSize : StylePropertyValue {
     companion object : CssGlobalValues<CSSElementSize> {
-        fun of(value: CSSLengthOrPercentageNumericValue) = CSSElementSize("$value")
-        fun of(width: CSSAutoKeyword) = CSSElementSize("$width")
+        fun of(value: CSSLengthOrPercentageNumericValue) = "$value".unsafeCast<CSSElementSize>()
+        fun of(width: CSSAutoKeyword) = "$width".unsafeCast<CSSElementSize>()
 
         // Keyword
         @Suppress("FunctionName")
-        fun FitContent(value: CSSLengthOrPercentageNumericValue) = CSSElementSize("fit-content($value)")
-        val FitContent get() = CSSElementSize("fit-content")
-        val MaxContent get() = CSSElementSize("max-content")
-        val MinContent get() = CSSElementSize("min-content")
+        fun FitContent(value: CSSLengthOrPercentageNumericValue) = "fit-content($value)".unsafeCast<CSSElementSize>()
+        val FitContent get() = "fit-content".unsafeCast<CSSElementSize>()
+        val MaxContent get() = "max-content".unsafeCast<CSSElementSize>()
+        val MinContent get() = "min-content".unsafeCast<CSSElementSize>()
     }
 }
 
-class CSSElementMaxSize private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface CSSElementMaxSize : StylePropertyValue {
     companion object : CssGlobalValues<CSSElementMaxSize> {
-        fun of(value: CSSLengthOrPercentageNumericValue) = CSSElementMaxSize("$value")
-        fun of(width: CSSAutoKeyword) = CSSElementMaxSize("$width")
+        fun of(value: CSSLengthOrPercentageNumericValue) = "$value".unsafeCast<CSSElementMaxSize>()
+        fun of(width: CSSAutoKeyword) = "$width".unsafeCast<CSSElementMaxSize>()
 
         // Keyword
-        val None get() = CSSElementMaxSize("none")
+        val None get() = "none".unsafeCast<CSSElementMaxSize>()
         @Suppress("FunctionName")
-        fun FitContent(value: CSSLengthOrPercentageNumericValue) = CSSElementMaxSize("fit-content($value)")
-        val FitContent get() = CSSElementMaxSize("fit-content")
-        val MaxContent get() = CSSElementMaxSize("max-content")
-        val MinContent get() = CSSElementMaxSize("min-content")
+        fun FitContent(value: CSSLengthOrPercentageNumericValue) = "fit-content($value)".unsafeCast<CSSElementMaxSize>()
+        val FitContent get() = "fit-content".unsafeCast<CSSElementMaxSize>()
+        val MaxContent get() = "max-content".unsafeCast<CSSElementMaxSize>()
+        val MinContent get() = "min-content".unsafeCast<CSSElementMaxSize>()
     }
 }
 
