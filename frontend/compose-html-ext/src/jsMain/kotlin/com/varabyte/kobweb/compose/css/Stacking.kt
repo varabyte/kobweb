@@ -6,13 +6,11 @@ import org.jetbrains.compose.web.css.*
 // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_positioned_layout/Understanding_z-index/Stacking_context
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/isolation
-class Isolation private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface Isolation : StylePropertyValue {
     companion object : CssGlobalValues<Isolation> {
         // Keywords
-        val Auto get() = Isolation("auto")
-        val Isolate get() = Isolation("isolate")
+        val Auto get() = "auto".unsafeCast<Isolation>()
+        val Isolate get() = "isolate".unsafeCast<Isolation>()
     }
 }
 
