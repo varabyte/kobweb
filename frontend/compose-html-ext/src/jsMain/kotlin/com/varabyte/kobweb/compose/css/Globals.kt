@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.compose.css
 
-import com.varabyte.kobweb.compose.css.internal.keyword
 import org.jetbrains.compose.web.css.StylePropertyValue
 
 /**
@@ -20,10 +19,10 @@ import org.jetbrains.compose.web.css.StylePropertyValue
  * This will make `ExampleStyle.Inherit`, `ExampleStyle.Initial`, etc. available to the API.
  */
 @Suppress("PropertyName")
-interface CssGlobalValues<T : StylePropertyValue> {
-    val Inherit get() = keyword<T>("inherit")
-    val Initial get() = keyword<T>("initial")
-    val Revert get() = keyword<T>("revert")
-    val RevertLayer get() = keyword<T>("revert-layer")
-    val Unset get() = keyword<T>("unset")
+internal interface CssGlobalValues<T : StylePropertyValue> {
+    val Inherit get() = "inherit".unsafeCast<T>()
+    val Initial get() = "initial".unsafeCast<T>()
+    val Revert get() = "revert".unsafeCast<T>()
+    val RevertLayer get() = "revert-layer".unsafeCast<T>()
+    val Unset get() = "unset".unsafeCast<T>()
 }
