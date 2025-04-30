@@ -3,28 +3,24 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow
-class Overflow private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface Overflow : StylePropertyValue {
     companion object : CssGlobalValues<Overflow> {
         // General
-        val Visible get() = Overflow("visible")
-        val Hidden get() = Overflow("hidden")
-        val Clip get() = Overflow("clip")
-        val Scroll get() = Overflow("scroll")
-        val Auto get() = Overflow("auto")
+        val Visible get() = "visible".unsafeCast<Overflow>()
+        val Hidden get() = "hidden".unsafeCast<Overflow>()
+        val Clip get() = "clip".unsafeCast<Overflow>()
+        val Scroll get() = "scroll".unsafeCast<Overflow>()
+        val Auto get() = "auto".unsafeCast<Overflow>()
     }
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-wrap
-class OverflowWrap private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface OverflowWrap : StylePropertyValue {
     companion object : CssGlobalValues<OverflowWrap> {
         // General
-        val Normal get() = OverflowWrap("normal")
-        val BreakWord get() = OverflowWrap("break-word")
-        val Anywhere get() = OverflowWrap("anywhere")
+        val Normal get() = "normal".unsafeCast<OverflowWrap>()
+        val BreakWord get() = "break-word".unsafeCast<OverflowWrap>()
+        val Anywhere get() = "anywhere".unsafeCast<OverflowWrap>()
     }
 }
 
