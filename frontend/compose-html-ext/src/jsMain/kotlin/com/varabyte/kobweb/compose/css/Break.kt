@@ -27,9 +27,7 @@ internal interface CssBreakValues<T: StylePropertyValue> {
 }
 
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/break-after
-class BreakAfter private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface BreakAfter : StylePropertyValue {
     companion object : CssBreakValues<BreakAfter>, CssGlobalValues<BreakAfter>
 }
 

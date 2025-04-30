@@ -119,11 +119,9 @@ fun StyleScope.backgroundOrigin(backgroundOrigin: BackgroundOrigin) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
-class BackgroundPosition private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface BackgroundPosition : StylePropertyValue {
     companion object : CssGlobalValues<BackgroundPosition> {
-        fun of(position: CSSPosition): BackgroundPosition = BackgroundPosition("$position")
+        fun of(position: CSSPosition): BackgroundPosition = "$position".unsafeCast<BackgroundPosition>()
     }
 }
 
