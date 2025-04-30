@@ -1277,6 +1277,110 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyGrid() {
+        assertThat(styleToText { grid {
+            // empty
+        } }).isEqualTo("display: grid")
+
+        assertThat(styleToText {
+            grid {
+               columns { size(40.px); size(1.fr); repeat(3) { size(200.px) } }
+               rows { repeat(2) { size(1.fr) } }
+               auto { columns { size(50.px) } }
+            }
+        }).isEqualTo("display: grid; grid-template-columns: 40px 1fr repeat(3, 200px); grid-template-rows: repeat(2, 1fr); grid-auto-columns: 50px")
+
+        assertThat(styleToText {
+            grid {
+               columns { lineNames("a", "b"); repeat(3) { size(1.fr) }; lineNames("y", "z") }
+               auto { rows { minmax(100.px, auto) } }
+            }
+        }).isEqualTo("display: grid; grid-template-columns: [a b] repeat(3, 1fr) [y z]; grid-auto-rows: minmax(100px, auto)")
+
+        assertThat(styleToText {
+            grid {
+               columns { repeat(autoFit) { size(10.percent) } }
+               rows { repeat(autoFill) { size(50.px) } }
+            }
+        }).isEqualTo("display: grid; grid-template-columns: repeat(auto-fit, 10%); grid-template-rows: repeat(auto-fill, 50px)")
+
+        assertThrows<IllegalArgumentException> {
+            styleToText {
+                grid {
+                    // Repeats must have at least one value
+                    columns { repeat(1) { } }
+                }
+            }
+        }
+        assertThrows<IllegalArgumentException> {
+            styleToText {
+                grid {
+                    // Flex values not allowed with repeat
+                    columns { repeat(autoFit) { size(1.fr) } }
+                }
+            }
+        }
+        assertThrows<IllegalArgumentException> {
+            styleToText {
+                grid {
+                    // Keywords not allowed with repeat
+                    columns { repeat(autoFit) { size(minContent) } }
+                }
+            }
+        }
+
+        assertThat(styleToText {
+            grid {
+                columns { fitContent(40.percent) }
+            }
+        }).isEqualTo("display: grid; grid-template-columns: fit-content(40%)")
+
+        assertThat(styleToText {
+            grid {
+                rows { minmax(minContent, 100.px); minmax(maxContent, 1.fr) }
+            }
+        }).isEqualTo("display: grid; grid-template-rows: minmax(min-content, 100px) minmax(max-content, 1fr)")
+
+        assertThat(styleToText {
+            grid {
+                columns { minmax(10.percent, 50.percent) }
+            }
+        }).isEqualTo("display: grid; grid-template-columns: minmax(10%, 50%)")
+
+        assertThat(styleToText {
+            gridTemplateColumns(GridTemplate.Subgrid)
+        }).isEqualTo("grid-template-columns: subgrid")
+
+        assertThat(styleToText {
+            gridTemplateColumns(GridTemplate.Subgrid {
+                lineName("a")
+                lineNames("b", "c")
+                repeat(2, "d", "e", "f")
+                repeatAutoFill("g", "h")
+                lineNames("i", "j", "k")
+            })
+        }).isEqualTo("grid-template-columns: subgrid [a] [b] [c] repeat(2, [d] [e] [f]) repeat(auto-fill, [g] [h]) [i] [j] [k]")
+
+        assertThat(styleToText {
+            gridTemplateColumns(GridTemplate.None)
+        }).isEqualTo("grid-template-columns: none")
+        assertThat(styleToText { gridTemplateColumns(GridTemplate.Inherit) }).isEqualTo("grid-template-columns: inherit")
+        assertThat(styleToText { gridTemplateColumns(GridTemplate.Initial) }).isEqualTo("grid-template-columns: initial")
+        assertThat(styleToText { gridTemplateColumns(GridTemplate.Revert) }).isEqualTo("grid-template-columns: revert")
+        assertThat(styleToText { gridTemplateColumns(GridTemplate.RevertLayer) }).isEqualTo("grid-template-columns: revert-layer")
+        assertThat(styleToText { gridTemplateColumns(GridTemplate.Unset) }).isEqualTo("grid-template-columns: unset")
+
+        assertThat(styleToText {
+            gridAutoRows(GridAuto.None)
+        }).isEqualTo("grid-auto-rows: none")
+        assertThat(styleToText { gridAutoRows(GridAuto.Inherit) }).isEqualTo("grid-auto-rows: inherit")
+        assertThat(styleToText { gridAutoRows(GridAuto.Initial) }).isEqualTo("grid-auto-rows: initial")
+        assertThat(styleToText { gridAutoRows(GridAuto.Revert) }).isEqualTo("grid-auto-rows: revert")
+        assertThat(styleToText { gridAutoRows(GridAuto.RevertLayer) }).isEqualTo("grid-auto-rows: revert-layer")
+        assertThat(styleToText { gridAutoRows(GridAuto.Unset) }).isEqualTo("grid-auto-rows: unset")
+    }
+
+    @Test
     fun verifyHeight() {
         assertThat(styleToText { height(Height.of(10.px)) }).isEqualTo("height: 10px")
         assertThat(styleToText { height(Height.of(10.percent)) }).isEqualTo("height: 10%")

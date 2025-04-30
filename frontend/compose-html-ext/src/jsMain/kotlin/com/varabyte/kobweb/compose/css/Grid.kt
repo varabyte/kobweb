@@ -109,28 +109,29 @@ private fun Array<out GridEntry>.validate() {
         when (it) {
             is GridEntry.LineNames -> emptyList()
             is GridEntry.TrackSize -> listOf(it)
-            is GridEntry.Repeat -> it.entries.filterIsInstance<GridEntry.TrackSize>()
-                .ifEmpty { error("repeat() must contain at least one track size") }
+            is GridEntry.Repeat -> {
+                it.entries.filterIsInstance<GridEntry.TrackSize>()
+                    .also {
+                        require(it.isNotEmpty()) { "repeat() must contain at least one track size" }
+                    }
+            }
         }
     }
 
-    check(trackSizes.isNotEmpty()) { "You must specify at least one track size" }
+    require(trackSizes.isNotEmpty()) { "You must specify at least one track size" }
 
     val autoRepeatCount = this.count { it is GridEntry.Repeat.Auto }
     if (autoRepeatCount == 0) return
 
-    check(autoRepeatCount == 1) { "Only one auto-repeat call is allowed per track list" }
+    require(autoRepeatCount == 1) { "Only one auto-repeat call is allowed per track list" }
 
     trackSizes.forEach {
-        when (it) {
-            is GridEntry.TrackSize.Fixed -> {} // OK
-            is GridEntry.TrackSize.Flex -> error("Cannot use flex values with auto-repeat")
-            is GridEntry.TrackSize.Keyword -> error("Cannot use keywords with auto-repeat")
-            is GridEntry.TrackSize.FitContent -> error("Cannot use fit-content with auto-repeat")
-            is GridEntry.TrackSize.MinMax -> {
-                check(it.min is GridEntry.TrackSize.Fixed || it.max is GridEntry.TrackSize.Fixed) {
-                    "Cannot use minmax with auto-repeat unless at least one of the values is a fixed value (a length or percentage)"
-                }
+        require (it !is GridEntry.TrackSize.Flex) { "Cannot use flex values with auto-repeat" }
+        require(it !is GridEntry.TrackSize.Keyword) { "Cannot use keywords with auto-repeat" }
+        require(it !is GridEntry.TrackSize.FitContent) { "Cannot use fit-content with auto-repeat" }
+        if (it is GridEntry.TrackSize.MinMax) {
+            require(it.min is GridEntry.TrackSize.Fixed || it.max is GridEntry.TrackSize.Fixed) {
+                "Cannot use minmax with auto-repeat unless at least one of the values is a fixed value (a length or percentage)"
             }
         }
     }
@@ -197,12 +198,10 @@ class GridTrackBuilder : GridTrackBuilderInRepeat() {
     }
 }
 
-class GridAuto private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface GridAuto : StylePropertyValue {
     companion object : CssGlobalValues<GridAuto> {
         // Keywords
-        val None get() = GridAuto("none")
+        val None get() = "none".unsafeCast<GridAuto>()
     }
 }
 
@@ -242,42 +241,45 @@ fun StyleScope.gridAutoRows(block: GridTrackBuilder.() -> Unit) {
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template">Grid Template</a>
  */
-sealed class GridTemplate private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface GridTemplate : StylePropertyValue {
+    class SubgridBuilder {
+        internal val names = mutableListOf<GridEntry>()
 
-    private class Keyword(value: String) : GridTemplate(value)
-
-    class Subgrid(block: (Builder.() -> Unit)? = null) : GridTemplate("subgrid${buildNames(block)}") {
-        class Builder internal constructor() {
-            internal val names = mutableListOf<GridEntry>()
-
-            fun lineNames(vararg lineNames: String) {
-                names.add(GridEntry.lineNames(*lineNames))
-            }
-
-            // Don't use GridEntry.Repeat as it does not support name-only repeats
-            private fun internalRepeat(count: Any, lineNames: Array<out String>) {
-                val repeatTrack = GridEntry.TrackSize.Keyword("repeat($count, ${GridEntry.lineNames(*lineNames)})")
-                names.add(repeatTrack)
-            }
-
-            fun repeat(count: Int, vararg lineNames: String) = internalRepeat(count, lineNames)
-
-            fun repeatAutoFill(vararg lineNames: String) =
-                internalRepeat(GridEntry.Repeat.Auto.Type.AutoFill, lineNames)
+        fun lineName(lineName: String) {
+            names.add(GridEntry.lineNames(lineName))
         }
 
-        internal companion object {
-            fun buildNames(block: (Builder.() -> Unit)? = null): String {
-                return if (block == null) "" else Builder().apply(block).names.joinToString(" ", prefix = " ")
-            }
+        // Subgrids only allow stand-alone, ungrouped line names
+        fun lineNames(vararg lineNames: String) {
+            names.addAll(lineNames.map { GridEntry.lineNames(it) })
+        }
+
+        // Don't use GridEntry.Repeat as it does not support name-only repeats
+        private fun internalRepeat(count: Any, lineNames: Array<out String>) {
+            val repeatTrack = GridEntry.TrackSize.Keyword("repeat($count, ${lineNames.map { GridEntry.lineNames(it) }.joinToString(" ") })")
+            names.add(repeatTrack)
+        }
+
+        fun repeat(count: Int, vararg lineNames: String) {
+            internalRepeat(count, lineNames)
+        }
+
+        fun repeatAutoFill(vararg lineNames: String) {
+            internalRepeat(GridEntry.Repeat.Auto.Type.AutoFill, lineNames)
+        }
+
+        internal fun build(): GridTemplate {
+            return (listOf("subgrid") + names).joinToString(" ").unsafeCast<GridTemplate>()
         }
     }
 
     companion object : CssGlobalValues<GridTemplate> {
+        fun Subgrid(block: (SubgridBuilder.() -> Unit)? = null) =
+            SubgridBuilder().apply { block?.invoke(this) }.build()
+
         // Keywords
-        val None: GridTemplate get() = Keyword("none")
-        val Subgrid: GridTemplate get() = Subgrid()
+        val None get() = "none".unsafeCast<GridTemplate>()
+        val Subgrid get() = Subgrid()
     }
 }
 
