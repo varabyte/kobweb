@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.AccentColor
+import com.varabyte.kobweb.compose.css.accentColor
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
@@ -10,7 +12,7 @@ fun Modifier.accentColor(accentColor: AccentColor): Modifier = styleModifier {
 }
 
 fun Modifier.accentColor(color: CSSColorValue): Modifier = styleModifier {
-    accentColor(color)
+    accentColor(AccentColor.of(color))
 }
 
 fun Modifier.color(color: CSSColorValue) = styleModifier {

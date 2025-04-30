@@ -7,15 +7,13 @@ import org.jetbrains.compose.web.css.*
 
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/accent-color
-class AccentColor private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface AccentColor : StylePropertyValue {
     companion object : CssGlobalValues<AccentColor> {
         // Keyword values
-        val Auto get() = AccentColor("auto")
+        val Auto get() = "auto".unsafeCast<AccentColor>()
 
         // <color> values
-        fun of(color: CSSColorValue) = AccentColor(color.toString())
+        fun of(color: CSSColorValue) = color.toString().unsafeCast<AccentColor>()
     }
 }
 
@@ -23,23 +21,22 @@ fun StyleScope.accentColor(accentColor: AccentColor) {
     property("accent-color", accentColor)
 }
 
+@Deprecated("Use accentColor(AccentColor.of(color)) instead.", ReplaceWith("accentColor(AccentColor.of(color))"))
 fun StyleScope.accentColor(color: CSSColorValue) {
-    property("accent-color", AccentColor.of(color))
+    accentColor(AccentColor.of(color))
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme
-class ColorScheme private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface ColorScheme : StylePropertyValue {
     companion object : CssGlobalValues<ColorScheme> {
         // Keyword values
-        val Normal get() = ColorScheme("normal")
-        val Light get() = ColorScheme("light")
-        val Dark get() = ColorScheme("dark")
-        val LightDark get() = ColorScheme("light dark")
-        val DarkLight get() = ColorScheme("dark light")
-        val OnlyLight get() = ColorScheme("only light")
-        val OnlyDark get() = ColorScheme("only dark")
+        val Normal get() = "normal".unsafeCast<ColorScheme>()
+        val Light get() = "light".unsafeCast<ColorScheme>()
+        val Dark get() = "dark".unsafeCast<ColorScheme>()
+        val LightDark get() = "light dark".unsafeCast<ColorScheme>()
+        val DarkLight get() = "dark light".unsafeCast<ColorScheme>()
+        val OnlyLight get() = "only light".unsafeCast<ColorScheme>()
+        val OnlyDark get() = "only dark".unsafeCast<ColorScheme>()
     }
 }
 
@@ -49,12 +46,10 @@ fun StyleScope.colorScheme(colorScheme: ColorScheme) {
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/color
 // Named CSSColor to avoid ambiguity with org.jetbrains.compose.web.css.Color
-class CSSColor private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface CSSColor : StylePropertyValue {
     companion object : CssGlobalValues<CSSColor> {
         // Keywords
-        val CurrentColor get() = CSSColor("currentColor")
+        val CurrentColor get() = "currentColor".unsafeCast<CSSColor>()
     }
 }
 
