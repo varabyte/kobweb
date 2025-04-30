@@ -817,10 +817,15 @@ class CssStylePropertyTests {
         assertThat(styleToText { content(Content.of("Some text")) }).isEqualTo("content: \"Some text\"")
         assertThat(styleToText { content(Content.of(CSSUrl("test.png"))) }).isEqualTo("content: url(\"test.png\")")
         assertThat(styleToText { content(Content.of(linearGradient(Color.red, Color.green))) }).isEqualTo("content: linear-gradient(red, green)")
+        assertThat(styleToText { content(Content.of(CSSUrl("test.png"), "alt-text")) }).isEqualTo("content: url(\"test.png\") / \"alt-text\"")
+
         assertThat(styleToText {
             content(Content.list(Content.of("Some text"), Content.of(CSSUrl("test.png"))))
         }).isEqualTo("content: \"Some text\" url(\"test.png\")")
-        assertThat(styleToText { content(Content.of(CSSUrl("test.png"), "alt-text")) }).isEqualTo("content: url(\"test.png\") / \"alt-text\"")
+
+        assertThat(styleToText {
+            content(Content.list("alt-text", Content.of("Some text"), Content.of(CSSUrl("test.png"))))
+        }).isEqualTo("content: \"Some text\" url(\"test.png\") / \"alt-text\"")
 
         // Non-combinable
         assertThat(styleToText { content(Content.None) }).isEqualTo("content: none")
