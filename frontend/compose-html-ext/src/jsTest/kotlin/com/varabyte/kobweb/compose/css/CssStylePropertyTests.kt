@@ -1343,6 +1343,8 @@ class CssStylePropertyTests {
         assertThat(styleToText { justifyItems(JustifyItems.End) }).isEqualTo("justify-items: end")
         assertThat(styleToText { justifyItems(JustifyItems.FlexStart) }).isEqualTo("justify-items: flex-start")
         assertThat(styleToText { justifyItems(JustifyItems.FlexEnd) }).isEqualTo("justify-items: flex-end")
+        assertThat(styleToText { justifyItems(JustifyItems.SelfStart) }).isEqualTo("justify-items: self-start")
+        assertThat(styleToText { justifyItems(JustifyItems.SelfEnd) }).isEqualTo("justify-items: self-end")
         assertThat(styleToText { justifyItems(JustifyItems.Left) }).isEqualTo("justify-items: left")
         assertThat(styleToText { justifyItems(JustifyItems.Right) }).isEqualTo("justify-items: right")
 
