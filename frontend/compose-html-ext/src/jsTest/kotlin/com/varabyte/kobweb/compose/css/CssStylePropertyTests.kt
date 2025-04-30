@@ -2029,10 +2029,10 @@ class CssStylePropertyTests {
         }).isEqualTo("text-shadow: 2px 3px 4px red")
 
         assertThat(styleToText {
-            textShadow(
+            textShadow(TextShadow.list(
                 TextShadow.of(2.px, 3.px, 4.px, Color.red),
                 TextShadow.of(4.px, 5.px, 6.px, Color.blue)
-            )
+            ))
         }).isEqualTo("text-shadow: 2px 3px 4px red, 4px 5px 6px blue")
 
         assertThat(styleToText { textShadow(TextShadow.Inherit) }).isEqualTo("text-shadow: inherit")
