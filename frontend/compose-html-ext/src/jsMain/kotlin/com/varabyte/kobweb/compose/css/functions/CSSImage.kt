@@ -6,25 +6,17 @@ package com.varabyte.kobweb.compose.css.functions
 import com.varabyte.kobweb.compose.css.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
-sealed class CSSImage private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    private class Keyword(value: String) : CSSImage(value)
-    private class Url(url: CSSUrl) : CSSImage(url.toString())
-    private class Gradient(gradient: com.varabyte.kobweb.compose.css.functions.Gradient) :
-        CSSImage(gradient.toString())
-
-
+sealed interface CSSImage : StylePropertyValue {
     companion object : CssGlobalValues<CSSImage> {
-        fun of(url: CSSUrl): CSSImage = Url(url)
+        fun of(url: CSSUrl) = url.toString().unsafeCast<CSSImage>()
 
         /**
          * @see toImage
          */
-        fun of(gradient: com.varabyte.kobweb.compose.css.functions.Gradient): CSSImage = Gradient(gradient)
+        fun of(gradient: Gradient) = gradient.toString().unsafeCast<CSSImage>()
 
         // Keyword
-        val None get(): CSSImage = Keyword("none")
+        val None get() = "none".unsafeCast<CSSImage>()
     }
 }
 
