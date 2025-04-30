@@ -4,7 +4,6 @@
 package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
-import kotlin.collections.emptyList
 
 // region Caret Color, see https://developer.mozilla.org/en-US/docs/Web/CSS/caret-color
 

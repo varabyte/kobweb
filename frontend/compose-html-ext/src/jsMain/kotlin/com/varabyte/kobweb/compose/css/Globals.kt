@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
-import org.jetbrains.compose.web.css.StylePropertyValue
+import org.jetbrains.compose.web.css.*
 
 /**
  * Provides the global values present on EVERY CSS property.

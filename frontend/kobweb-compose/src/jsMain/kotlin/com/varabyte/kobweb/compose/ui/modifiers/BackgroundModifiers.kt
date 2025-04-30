@@ -1,8 +1,6 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.compose.css.BackgroundBlendMode
-import com.varabyte.kobweb.compose.css.backgroundBlendMode
 import com.varabyte.kobweb.compose.css.functions.CSSUrl
 import com.varabyte.kobweb.compose.css.functions.Gradient
 import com.varabyte.kobweb.compose.ui.Modifier

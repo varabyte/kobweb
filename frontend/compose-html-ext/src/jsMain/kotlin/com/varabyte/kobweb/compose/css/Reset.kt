@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
-import org.jetbrains.compose.web.css.StylePropertyValue
-import org.jetbrains.compose.web.css.StyleScope
+import org.jetbrains.compose.web.css.*
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/all
 sealed interface All : StylePropertyValue {

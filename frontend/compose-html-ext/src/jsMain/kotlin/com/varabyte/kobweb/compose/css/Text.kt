@@ -3,9 +3,7 @@
 
 package com.varabyte.kobweb.compose.css
 
-import com.varabyte.kobweb.compose.css.color
 import org.jetbrains.compose.web.css.*
-import kotlin.text.append
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/ruby-position
 sealed interface RubyPosition : StylePropertyValue {

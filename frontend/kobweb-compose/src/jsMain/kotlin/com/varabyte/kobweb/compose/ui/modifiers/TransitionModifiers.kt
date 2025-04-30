@@ -5,11 +5,12 @@ import com.varabyte.kobweb.compose.attributes.onTransitionEnd
 import com.varabyte.kobweb.compose.attributes.onTransitionRun
 import com.varabyte.kobweb.compose.attributes.onTransitionStart
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.events.SyntheticTransitionEvent
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
-import org.jetbrains.compose.web.css.StyleScope
+import org.jetbrains.compose.web.css.*
 
 fun Modifier.transition(transition: Transition) = styleModifier {
     transition(transition)

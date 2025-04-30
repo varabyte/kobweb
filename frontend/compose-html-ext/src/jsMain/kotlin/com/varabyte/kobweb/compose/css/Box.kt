@@ -3,9 +3,7 @@
 
 package com.varabyte.kobweb.compose.css
 
-import com.varabyte.kobweb.compose.css.color
 import org.jetbrains.compose.web.css.*
-import kotlin.text.append
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/box-decoration-break
 sealed interface BoxDecorationBreak : StylePropertyValue {

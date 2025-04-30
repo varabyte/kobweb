@@ -3,7 +3,7 @@
 
 package com.varabyte.kobweb.compose.css.functions
 
-import com.varabyte.kobweb.compose.css.CssGlobalValues
+import com.varabyte.kobweb.compose.css.*
 import org.jetbrains.compose.web.css.*
 
 sealed interface CSSImage : StylePropertyValue {

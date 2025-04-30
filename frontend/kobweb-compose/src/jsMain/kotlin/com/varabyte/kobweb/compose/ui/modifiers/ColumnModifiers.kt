@@ -3,9 +3,7 @@ package com.varabyte.kobweb.compose.ui.modifiers
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
-import org.jetbrains.compose.web.css.CSSColorValue
-import org.jetbrains.compose.web.css.LineStyle
-import org.jetbrains.compose.web.css.StyleScope
+import org.jetbrains.compose.web.css.*
 
 fun Modifier.columnCount(columnCount: ColumnCount) = styleModifier {
     columnCount(columnCount)
