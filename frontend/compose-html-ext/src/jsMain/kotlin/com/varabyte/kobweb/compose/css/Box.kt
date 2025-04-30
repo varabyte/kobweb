@@ -3,16 +3,16 @@
 
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.color
 import org.jetbrains.compose.web.css.*
+import kotlin.text.append
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/box-decoration-break
-class BoxDecorationBreak private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface BoxDecorationBreak : StylePropertyValue {
     companion object : CssGlobalValues<BoxDecorationBreak> {
         // Keyword
-        val Slice get() = BoxDecorationBreak("slice")
-        val Clone get() = BoxDecorationBreak("clone")
+        val Slice get() = "slice".unsafeCast<BoxDecorationBreak>()
+        val Clone get() = "clone".unsafeCast<BoxDecorationBreak>()
     }
 }
 
@@ -21,13 +21,11 @@ fun StyleScope.boxDecorationBreak(boxDecorationBreak: BoxDecorationBreak) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
-class BoxSizing private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface BoxSizing : StylePropertyValue {
     companion object : CssGlobalValues<BoxSizing> {
         // Keyword
-        val BorderBox get() = BoxSizing("border-box")
-        val ContentBox get() = BoxSizing("content-box")
+        val BorderBox get() = "border-box".unsafeCast<BoxSizing>()
+        val ContentBox get() = "content-box".unsafeCast<BoxSizing>()
     }
 }
 
@@ -128,54 +126,12 @@ fun StyleScope.boxShadow(vararg boxShadows: BoxShadow.Listable) {
 /**
  * The Kotlin representation of the CSS box-shadow.
  */
-sealed class BoxShadow private constructor(private val value: String) : StylePropertyValue {
-    override fun toString(): String = value
-
-    private class Keyword(value: String) : BoxShadow(value)
-
-    private class ValueList(shadows: List<Listable>) : BoxShadow(shadows.joinToString())
-
-    class Listable internal constructor(
-        offsetX: CSSLengthNumericValue = 0.px,
-        offsetY: CSSLengthNumericValue = 0.px,
-        blurRadius: CSSLengthNumericValue? = null,
-        spreadRadius: CSSLengthNumericValue? = null,
-        color: CSSColorValue? = null,
-        inset: Boolean = false,
-    ) : BoxShadow(
-        value = buildString {
-            if (inset) {
-                append("inset")
-                append(' ')
-            }
-            append(offsetX)
-            append(' ')
-            append(offsetY)
-
-            if (blurRadius != null) {
-                append(' ')
-                append(blurRadius)
-            }
-
-            if (spreadRadius != null) {
-                if (blurRadius == null) {
-                    append(' ')
-                    append('0')
-                }
-                append(' ')
-                append(spreadRadius)
-            }
-
-            if (color != null) {
-                append(' ')
-                append(color)
-            }
-        },
-    )
+sealed interface BoxShadow : StylePropertyValue {
+    sealed interface Listable : BoxShadow
 
     companion object : CssGlobalValues<BoxShadow> {
         // Keyword
-        val None: BoxShadow get() = Keyword("none")
+        val None: BoxShadow get() = "none".unsafeCast<BoxShadow>()
 
         // Custom
         /**
@@ -209,14 +165,35 @@ sealed class BoxShadow private constructor(private val value: String) : StylePro
             spreadRadius: CSSLengthNumericValue? = null,
             color: CSSColorValue? = null,
             inset: Boolean = false,
-        ): Listable = Listable(
-            offsetX = offsetX,
-            offsetY = offsetY,
-            blurRadius = blurRadius,
-            spreadRadius = spreadRadius,
-            color = color,
-            inset = inset,
-        )
+        ) = buildString {
+            if (inset) {
+                append("inset")
+                append(' ')
+            }
+            append(offsetX)
+            append(' ')
+            append(offsetY)
+
+            if (blurRadius != null) {
+                append(' ')
+                append(blurRadius)
+            }
+
+            if (spreadRadius != null) {
+                if (blurRadius == null) {
+                    append(' ')
+                    append('0')
+                }
+                append(' ')
+                append(spreadRadius)
+            }
+
+            if (color != null) {
+                append(' ')
+                append(color)
+            }
+        }.unsafeCast<Listable>()
+
 
         /**
          * Creates a box-shadow property with multiple shadow.
@@ -254,6 +231,6 @@ sealed class BoxShadow private constructor(private val value: String) : StylePro
          *             rgba(0, 0, 0, 0.318) 5px 8px 10px -1px;
          * ```
          */
-        fun list(vararg shadows: Listable): BoxShadow = ValueList(shadows.toList())
+        fun list(vararg shadows: Listable): BoxShadow = shadows.toList().joinToString().unsafeCast<BoxShadow>()
     }
 }
