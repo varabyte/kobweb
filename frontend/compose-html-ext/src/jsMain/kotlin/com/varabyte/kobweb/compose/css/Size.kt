@@ -4,38 +4,35 @@ import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
-// NOTE: This class is used as a typealias and should not be referenced directly by the end user.
-sealed interface CSSElementSize : StylePropertyValue {
-    companion object : CssGlobalValues<CSSElementSize> {
-        fun of(value: CSSLengthOrPercentageNumericValue) = "$value".unsafeCast<CSSElementSize>()
-        fun of(width: CSSAutoKeyword) = "$width".unsafeCast<CSSElementSize>()
+internal sealed interface CssSizeValues<T: StylePropertyValue> {
+    fun of(value: CSSLengthOrPercentageNumericValue) = "$value".unsafeCast<T>()
+    fun of(width: CSSAutoKeyword) = "$width".unsafeCast<T>()
 
-        // Keyword
-        @Suppress("FunctionName")
-        fun FitContent(value: CSSLengthOrPercentageNumericValue) = "fit-content($value)".unsafeCast<CSSElementSize>()
-        val FitContent get() = "fit-content".unsafeCast<CSSElementSize>()
-        val MaxContent get() = "max-content".unsafeCast<CSSElementSize>()
-        val MinContent get() = "min-content".unsafeCast<CSSElementSize>()
-    }
+    // Keyword
+    @Suppress("FunctionName")
+    fun FitContent(value: CSSLengthOrPercentageNumericValue) = "fit-content($value)".unsafeCast<T>()
+    val FitContent get() = "fit-content".unsafeCast<T>()
+    val MaxContent get() = "max-content".unsafeCast<T>()
+    val MinContent get() = "min-content".unsafeCast<T>()
 }
 
-sealed interface CSSElementMaxSize : StylePropertyValue {
-    companion object : CssGlobalValues<CSSElementMaxSize> {
-        fun of(value: CSSLengthOrPercentageNumericValue) = "$value".unsafeCast<CSSElementMaxSize>()
-        fun of(width: CSSAutoKeyword) = "$width".unsafeCast<CSSElementMaxSize>()
+internal sealed interface CssMaxSizeValues<T: StylePropertyValue> {
+    fun of(value: CSSLengthOrPercentageNumericValue) = "$value".unsafeCast<T>()
+    fun of(width: CSSAutoKeyword) = "$width".unsafeCast<T>()
 
-        // Keyword
-        val None get() = "none".unsafeCast<CSSElementMaxSize>()
-        @Suppress("FunctionName")
-        fun FitContent(value: CSSLengthOrPercentageNumericValue) = "fit-content($value)".unsafeCast<CSSElementMaxSize>()
-        val FitContent get() = "fit-content".unsafeCast<CSSElementMaxSize>()
-        val MaxContent get() = "max-content".unsafeCast<CSSElementMaxSize>()
-        val MinContent get() = "min-content".unsafeCast<CSSElementMaxSize>()
-    }
+    // Keyword
+    val None get() = "none".unsafeCast<T>()
+    @Suppress("FunctionName")
+    fun FitContent(value: CSSLengthOrPercentageNumericValue) = "fit-content($value)".unsafeCast<T>()
+    val FitContent get() = "fit-content".unsafeCast<T>()
+    val MaxContent get() = "max-content".unsafeCast<T>()
+    val MinContent get() = "min-content".unsafeCast<T>()
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/width
-typealias Width = CSSElementSize
+sealed interface Width : StylePropertyValue {
+    companion object : CssSizeValues<Width>, CssGlobalValues<Width>
+}
 
 fun AttrsScope<*>.width(width: Int) {
     attr("width", width.toString())
@@ -46,14 +43,18 @@ fun StyleScope.width(width: Width) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/min-width
-typealias MinWidth = CSSElementSize
+sealed interface MinWidth : StylePropertyValue {
+    companion object : CssSizeValues<MinWidth>, CssGlobalValues<MinWidth>
+}
 
 fun StyleScope.minWidth(minWidth: MinWidth) {
     property("min-width", minWidth)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/height
-typealias Height = CSSElementSize
+sealed interface Height : StylePropertyValue {
+    companion object : CssSizeValues<Height>, CssGlobalValues<Height>
+}
 
 fun AttrsScope<*>.height(height: Int) {
     attr("height", height.toString())
@@ -64,21 +65,28 @@ fun StyleScope.height(height: Height) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/min-height
-typealias MinHeight = CSSElementSize
+sealed interface MinHeight : StylePropertyValue {
+    companion object : CssSizeValues<MinHeight>, CssGlobalValues<MinHeight>
+}
+
 
 fun StyleScope.minHeight(minHeight: MinHeight) {
     property("min-height", minHeight)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/max-width
-typealias MaxWidth = CSSElementMaxSize
+sealed interface MaxWidth : StylePropertyValue {
+    companion object : CssMaxSizeValues<MaxWidth>, CssGlobalValues<MaxWidth>
+}
 
 fun StyleScope.maxWidth(maxWidth: MaxWidth) {
     property("max-width", maxWidth)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/max-height
-typealias MaxHeight = CSSElementMaxSize
+sealed interface MaxHeight : StylePropertyValue {
+    companion object : CssMaxSizeValues<MaxHeight>, CssGlobalValues<MaxHeight>
+}
 
 fun StyleScope.maxHeight(maxHeight: MaxHeight) {
     property("max-height", maxHeight)

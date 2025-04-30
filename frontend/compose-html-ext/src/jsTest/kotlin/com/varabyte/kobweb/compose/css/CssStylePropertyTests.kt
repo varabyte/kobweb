@@ -1648,7 +1648,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { minHeight(MinHeight.of(auto)) }).isEqualTo("min-height: auto")
 
         assertThat(styleToText { minHeight(MinHeight.FitContent) }).isEqualTo("min-height: fit-content")
-        assertThat(styleToText { minHeight(Height.FitContent(20.em)) }).isEqualTo("min-height: fit-content(20em)")
+        assertThat(styleToText { minHeight(MinHeight.FitContent(20.em)) }).isEqualTo("min-height: fit-content(20em)")
         assertThat(styleToText { minHeight(MinHeight.MaxContent) }).isEqualTo("min-height: max-content")
         assertThat(styleToText { minHeight(MinHeight.MinContent) }).isEqualTo("min-height: min-content")
 
@@ -1666,7 +1666,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { minWidth(MinWidth.of(auto)) }).isEqualTo("min-width: auto")
 
         assertThat(styleToText { minWidth(MinWidth.FitContent) }).isEqualTo("min-width: fit-content")
-        assertThat(styleToText { minWidth(Width.FitContent(20.em)) }).isEqualTo("min-width: fit-content(20em)")
+        assertThat(styleToText { minWidth(MinWidth.FitContent(20.em)) }).isEqualTo("min-width: fit-content(20em)")
         assertThat(styleToText { minWidth(MinWidth.MaxContent) }).isEqualTo("min-width: max-content")
         assertThat(styleToText { minWidth(MinWidth.MinContent) }).isEqualTo("min-width: min-content")
 
