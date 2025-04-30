@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.browser.util.wrapQuotesIfNecessary
-import com.varabyte.kobweb.compose.css.Animation.Keyword
 import com.varabyte.kobweb.compose.css.functions.CSSImage
 import org.jetbrains.compose.web.css.*
 

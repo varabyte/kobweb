@@ -62,6 +62,18 @@ class CssStylePropertyTests {
         }).isEqualTo("animation: 3s ease-in 1s 2 reverse both paused slide-in")
 
         assertThat(styleToText {
+            animation(
+                Animation.of(
+                    "animate-forever",
+                    duration = 1.s,
+                    timingFunction = AnimationTimingFunction.EaseIn,
+                    iterationCount = AnimationIterationCount.Infinite,
+                    fillMode = AnimationFillMode.Both,
+                )
+            )
+        }).isEqualTo("animation: 1s ease-in infinite both animate-forever")
+
+        assertThat(styleToText {
             animation(Animation.list(
                 Animation.of(
                     "slide-in",

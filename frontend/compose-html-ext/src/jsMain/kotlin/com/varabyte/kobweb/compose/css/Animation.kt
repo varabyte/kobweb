@@ -5,37 +5,31 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-value class AnimationIterationCount private constructor(private val count: Number?) : StylePropertyValue {
+sealed interface AnimationIterationCount : StylePropertyValue {
     companion object {
-        fun of(count: Number) = AnimationIterationCount(count)
-        val Infinite get() = AnimationIterationCount(null)
+        fun of(count: Number) = count.toString().unsafeCast<AnimationIterationCount>()
+        val Infinite get() = "infinite".unsafeCast<AnimationIterationCount>()
     }
-
-    override fun toString() = count?.toString() ?: "infinite"
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/animation
-sealed class Animation private constructor(private val value: String) : StylePropertyValue {
-    override fun toString(): String = value
+sealed interface Animation : StylePropertyValue {
+    sealed interface Listable : Animation
 
-    private class Keyword(value: String) : Animation(value)
-
-    private class ValueList(values: List<Listable>) : Animation(values.joinToString())
-
-    // A replacement for org.jetbrains.compose.web.css.CSSAnimation which is currently implemented incorrectly
-    // (it exposes a 1:many relationship between an animation's name and its properties, but
-    // it should be 1:1).
-    class Listable internal constructor(
-        name: String,
-        duration: CSSTimeNumericValue?,
-        timingFunction: AnimationTimingFunction?,
-        delay: CSSTimeNumericValue?,
-        iterationCount: AnimationIterationCount?,
-        direction: AnimationDirection?,
-        fillMode: AnimationFillMode?,
-        playState: AnimationPlayState?
-    ) : Animation(
-        buildList {
+    companion object : CssGlobalValues<Animation> {
+        // A replacement for org.jetbrains.compose.web.css.CSSAnimation which is currently implemented incorrectly
+        // (it exposes a 1:many relationship between an animation's name and its properties, but
+        // it should be 1:1).
+        fun of(
+            name: String,
+            duration: CSSTimeNumericValue? = null,
+            timingFunction: AnimationTimingFunction? = null,
+            delay: CSSTimeNumericValue? = null,
+            iterationCount: AnimationIterationCount? = null,
+            direction: AnimationDirection? = null,
+            fillMode: AnimationFillMode? = null,
+            playState: AnimationPlayState? = null
+        ) = buildList {
             // https://developer.mozilla.org/en-US/docs/Web/CSS/animation#syntax
             duration?.let { add(it.toString()) }
             timingFunction?.let { add(it.toString()) }
@@ -52,26 +46,12 @@ sealed class Animation private constructor(private val value: String) : StylePro
             playState?.let { add(it.toString().lowercase()) }
 
             add(name)
-        }.joinToString(" ")
-    )
+        }.joinToString(" ").unsafeCast<Listable>()
 
-    companion object : CssGlobalValues<Animation> {
-        fun of(
-            name: String,
-            duration: CSSTimeNumericValue? = null,
-            timingFunction: AnimationTimingFunction? = null,
-            delay: CSSTimeNumericValue? = null,
-            iterationCount: AnimationIterationCount? = null,
-            direction: AnimationDirection? = null,
-            fillMode: AnimationFillMode? = null,
-            playState: AnimationPlayState? = null
-        ): Listable =
-            Listable(name, duration, timingFunction, delay, iterationCount, direction, fillMode, playState)
-
-        fun list(vararg animations: Listable): Animation = ValueList(animations.toList())
+        fun list(vararg animations: Listable) = animations.toList().joinToString().unsafeCast<Animation>()
 
         // Keyword
-        val None: Animation get() = Keyword("none")
+        val None: Animation get() = "none".unsafeCast<Animation>()
     }
 }
 
@@ -81,7 +61,7 @@ fun StyleScope.animation(animation: Animation) {
 
 // Needed temporarily until we can remove the deprecated `vararg` version
 fun StyleScope.animation(animation: Animation.Listable) {
-    animation(animation as Animation)
+    animation(animation.unsafeCast<Animation>())
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use `animation(Animation.list(...))` instead.", ReplaceWith("animation(Animation.list(*animations))"))
