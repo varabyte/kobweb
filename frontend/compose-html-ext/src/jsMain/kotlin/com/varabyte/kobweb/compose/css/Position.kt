@@ -7,11 +7,9 @@ import org.jetbrains.compose.web.css.*
 // NOTE: This class is used as a typealias and should not be referenced directly by the end user.
 // TODO: In a future refactoring, this will likely change into an interface instead using unsafe casts; we want to wait until
 //  all tests are done before doing this.
-class CSSElementPosition private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface CSSElementPosition : StylePropertyValue {
     companion object : CssGlobalValues<CSSElementPosition> {
-        fun of(value: CSSLengthOrPercentageNumericValue) = CSSElementPosition("$value")
+        fun of(value: CSSLengthOrPercentageNumericValue) = "$value".unsafeCast<CSSElementPosition>()
     }
 }
 
@@ -53,16 +51,14 @@ fun StyleScope.right(right: Right) {
  *
  * See: https://developer.mozilla.org/en-US/docs/Web/CSS/float
  */
-class CSSFloat private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface CSSFloat : StylePropertyValue {
     companion object : CssGlobalValues<CSSFloat> {
         // Keyword
-        val Left get() = CSSFloat("left")
-        val Right get() = CSSFloat("right")
-        val None get() = CSSFloat("none")
-        val InlineStart get() = CSSFloat("inline-start")
-        val InlineEnd get() = CSSFloat("inline-end")
+        val Left get() = "left".unsafeCast<CSSFloat>()
+        val Right get() = "right".unsafeCast<CSSFloat>()
+        val None get() = "none".unsafeCast<CSSFloat>()
+        val InlineStart get() = "inline-start".unsafeCast<CSSFloat>()
+        val InlineEnd get() = "inline-end".unsafeCast<CSSFloat>()
     }
 }
 
