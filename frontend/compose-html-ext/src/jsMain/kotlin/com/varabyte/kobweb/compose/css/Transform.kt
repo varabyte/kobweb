@@ -82,13 +82,11 @@ fun StyleScope.scaleZ(s: CSSPercentageNumericValue) {
 // endregion
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/backface-visibility
-class BackfaceVisibility private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface BackfaceVisibility : StylePropertyValue {
     companion object : CssGlobalValues<BackfaceVisibility> {
         // Keyword values
-        val Visible get() = BackfaceVisibility("visible")
-        val Hidden get() = BackfaceVisibility("hidden")
+        val Visible get() = "visible".unsafeCast<BackfaceVisibility>()
+        val Hidden get() = "hidden".unsafeCast<BackfaceVisibility>()
     }
 }
 
@@ -98,16 +96,14 @@ fun StyleScope.backfaceVisibility(backFaceVisibility: BackfaceVisibility) {
 
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/transform-box
-class TransformBox private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface TransformBox : StylePropertyValue {
     companion object : CssGlobalValues<TransformBox> {
         // Keyword
-        val BorderBox get() = TransformBox("border-box")
-        val ContentBox get() = TransformBox("content-box")
-        val FillBox get() = TransformBox("fill-box")
-        val StrokeBox get() = TransformBox("stroke-box")
-        val ViewBox get() = TransformBox("view-box")
+        val BorderBox get() = "border-box".unsafeCast<TransformBox>()
+        val ContentBox get() = "content-box".unsafeCast<TransformBox>()
+        val FillBox get() = "fill-box".unsafeCast<TransformBox>()
+        val StrokeBox get() = "stroke-box".unsafeCast<TransformBox>()
+        val ViewBox get() = "view-box".unsafeCast<TransformBox>()
     }
 }
 
@@ -116,44 +112,39 @@ fun StyleScope.transformBox(transformBox: TransformBox) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/transform-origin
-sealed class TransformOrigin private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    private class Keyword(value: String) : TransformOrigin(value)
-    private class Origin(value: String) : TransformOrigin(value)
-
+sealed interface TransformOrigin : StylePropertyValue {
     companion object : CssGlobalValues<TransformOrigin> {
         // We cannot use CssPosition as transform-origin does not support offsets from edges, e.g. Edge.Right(10.px)
 
         @Suppress("FunctionName")
         private fun _of(xOffset: Any? = null, yOffset: Any? = null, zOffset: Any? = null): TransformOrigin =
-            Origin(listOfNotNull(xOffset, yOffset, zOffset).joinToString(" "))
+            listOfNotNull(xOffset, yOffset, zOffset).joinToString(" ").unsafeCast<TransformOrigin>()
 
         // NOTE: the following 2 functions do not take a `zOffset` parameter as `of(Edge.Right, 5.px)` would then apply
         // the `5.px` to the z-axis despite intuitively appearing to refer to the y-axis
-        fun of(xOffset: EdgeXOrCenter): TransformOrigin = of(xOffset, Edge.CenterY)
-        fun of(yOffset: EdgeYOrCenter): TransformOrigin = of(Edge.CenterX, yOffset)
+        fun of(xOffset: EdgeXOrCenter) = of(xOffset, Edge.CenterY)
+        fun of(yOffset: EdgeYOrCenter) = of(Edge.CenterX, yOffset)
 
-        fun of(xOffset: EdgeXOrCenter, yOffset: EdgeYOrCenter, zOffset: CSSLengthNumericValue? = null): TransformOrigin =
+        fun of(xOffset: EdgeXOrCenter, yOffset: EdgeYOrCenter, zOffset: CSSLengthNumericValue? = null) =
             _of(xOffset, yOffset, zOffset)
 
         fun of(
             xOffset: EdgeXOrCenter,
             yOffset: CSSLengthOrPercentageNumericValue,
             zOffset: CSSLengthNumericValue? = null,
-        ): TransformOrigin = _of(xOffset, yOffset, zOffset)
+        ) = _of(xOffset, yOffset, zOffset)
 
         fun of(
             xOffset: CSSLengthOrPercentageNumericValue,
             yOffset: EdgeYOrCenter,
             zOffset: CSSLengthNumericValue? = null,
-        ): TransformOrigin = _of(xOffset, yOffset, zOffset)
+        ) = _of(xOffset, yOffset, zOffset)
 
         fun of(
             xOffset: CSSLengthOrPercentageNumericValue,
             yOffset: CSSLengthOrPercentageNumericValue,
             zOffset: CSSLengthNumericValue? = null,
-        ): TransformOrigin = _of(xOffset, yOffset, zOffset)
+        ) = _of(xOffset, yOffset, zOffset)
 
         // Duplicate the values provided by CssPosition
         val Top get() = of(Edge.Top)
@@ -173,13 +164,11 @@ fun StyleScope.transformOrigin(transformOrigin: TransformOrigin) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/transform-style
-class TransformStyle private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface TransformStyle : StylePropertyValue {
     companion object : CssGlobalValues<TransformStyle> {
         // Keyword
-        val Flat get() = TransformStyle("flat")
-        val Preserve3d get() = TransformStyle("preserve-3d")
+        val Flat get() = "flat".unsafeCast<TransformStyle>()
+        val Preserve3d get() = "preserve-3d".unsafeCast<TransformStyle>()
     }
 }
 
