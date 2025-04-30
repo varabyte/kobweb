@@ -10,18 +10,17 @@ sealed class OverscrollBehavior private constructor(private val value: String) :
     override fun toString() = value
 
     sealed class SingleValue(value: String) : OverscrollBehavior(value)
-    private class Keyword(value: String) : SingleValue(value)
-    sealed class Listable(value: String) : SingleValue(value)
-    private class ListableKeyword(value: String) : Listable(value)
-    private class TwoValue(x: Listable, y: Listable) : OverscrollBehavior("$x $y")
+    sealed class Mode(value: String) : SingleValue(value)
+    private class ModeKeyword(value: String) : Mode(value)
+    private class DoubleValue(x: Mode, y: Mode) : OverscrollBehavior("$x $y")
 
-    companion object : CssGlobalValues<OverscrollBehavior> {
+    companion object : CssGlobalValues<SingleValue> {
         // Keyword
-        val Auto: Listable get() = ListableKeyword("auto")
-        val Contain: Listable get() = ListableKeyword("contain")
-        val None: Listable get() = ListableKeyword("none")
+        val Auto: Mode get() = ModeKeyword("auto")
+        val Contain: Mode get() = ModeKeyword("contain")
+        val None: Mode get() = ModeKeyword("none")
 
-        fun of(x: Listable, y: Listable): OverscrollBehavior = TwoValue(x, y)
+        fun of(x: Mode, y: Mode): OverscrollBehavior = DoubleValue(x, y)
     }
 }
 
