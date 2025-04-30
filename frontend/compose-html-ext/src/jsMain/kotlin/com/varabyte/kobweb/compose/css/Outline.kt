@@ -59,16 +59,14 @@ fun StyleScope.outlineStyle(value: LineStyle) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-width
-class OutlineWidth private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
+sealed interface OutlineWidth : StylePropertyValue {
     companion object : CssGlobalValues<OutlineWidth> {
-        fun of(value: CSSLengthNumericValue) = OutlineWidth(value.toString())
+        fun of(value: CSSLengthNumericValue) = value.toString().unsafeCast<OutlineWidth>()
 
         // Keyword
-        val Thin get() = OutlineWidth("thin")
-        val Medium get() = OutlineWidth("medium")
-        val Thick get() = OutlineWidth("thick")
+        val Thin get() = "thin".unsafeCast<OutlineWidth>()
+        val Medium get() = "medium".unsafeCast<OutlineWidth>()
+        val Thick get() = "thick".unsafeCast<OutlineWidth>()
     }
 }
 
@@ -82,11 +80,10 @@ fun StyleScope.outlineWidth(value: CSSLengthNumericValue) {
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/outline
 // Eventually deprecate CSSOutline?
-class Outline private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface Outline : StylePropertyValue {
     companion object : CssGlobalValues<Outline> {
         fun of(outlineWidth: OutlineWidth? = null, outlineStyle: LineStyle? = null, outlineColor: CSSColorValue? = null) =
-            Outline(listOfNotNull(outlineWidth, outlineStyle, outlineColor).joinToString(" "))
+            listOfNotNull(outlineWidth, outlineStyle, outlineColor).joinToString(" ").unsafeCast<Outline>()
 
         fun of(outlineWidth: CSSLengthNumericValue, outlineStyle: LineStyle? = null, outlineColor: CSSColorValue? = null) =
             of(OutlineWidth.of(outlineWidth), outlineStyle, outlineColor)
