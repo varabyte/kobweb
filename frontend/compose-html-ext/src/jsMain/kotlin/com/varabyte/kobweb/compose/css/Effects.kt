@@ -4,26 +4,22 @@
 package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.compose.css.functions.CSSFilter
-import com.varabyte.kobweb.compose.css.functions.blur
 import org.jetbrains.compose.web.css.*
+
+internal sealed interface CssFilterValues<T: StylePropertyValue, L: T> {
+    // Keyword
+    val None get() = "none".unsafeCast<T>()
+
+    fun of(filter: CSSFilter) = filter.toString().unsafeCast<L>()
+    fun list(vararg filters: L) = filters.toList().joinToString(" ").unsafeCast<T>()
+}
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter
 // See also: CSSFilter
-sealed class BackdropFilter private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface BackdropFilter : StylePropertyValue {
+    sealed interface Listable : BackdropFilter
 
-    private class Keyword(value: String): BackdropFilter(value)
-    class Listable internal constructor(filter: CSSFilter) :
-        BackdropFilter(filter.toString())
-    private class ValueList(values: List<Listable>) : BackdropFilter(values.joinToString(" "))
-
-    companion object : CssGlobalValues<BackdropFilter> {
-        // Keyword
-        val None: BackdropFilter get() = Keyword("none")
-
-        fun of(filter: CSSFilter) = Listable(filter)
-        fun list(vararg filters: Listable): BackdropFilter = ValueList(filters.toList())
-    }
+    companion object : CssFilterValues<BackdropFilter, Listable>, CssGlobalValues<BackdropFilter>
 }
 
 fun StyleScope.backdropFilter(backdropFilter: BackdropFilter) {
@@ -43,22 +39,10 @@ fun StyleScope.backdropFilter(vararg filters: BackdropFilter.Listable) {
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/filter
 // See also: CSSFilter
-sealed class Filter private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface Filter : StylePropertyValue {
+    sealed interface Listable : Filter
 
-    private class Keyword(value: String): Filter(value)
-    class Listable internal constructor(filter: CSSFilter) :
-        Filter(filter.toString())
-    private class ValueList(values: List<Listable>) : Filter(values.joinToString(" "))
-
-    companion object : CssGlobalValues<Filter> {
-        // Keyword
-        val None: Filter get() = Keyword("none")
-
-        fun of(filter: CSSFilter) = Listable(filter)
-        fun list(vararg filters: CSSFilter): Filter = ValueList(filters.map { of(it) }.toList())
-        fun list(vararg filters: Listable): Filter = ValueList(filters.toList())
-    }
+    companion object : CssFilterValues<Filter, Listable>, CssGlobalValues<Filter>
 }
 
 fun StyleScope.filter(filter: Filter) {
@@ -72,5 +56,5 @@ fun StyleScope.filter(vararg filters: Filter.Listable) {
 
 @Deprecated("Use filter(Filter.list(...)) instead.", ReplaceWith("filter(Filter.list(*filters))"))
 fun StyleScope.filter(vararg filters: CSSFilter) {
-    filter(Filter.list(*filters))
+    filter(Filter.list(*filters.map { Filter.of(it) }.toTypedArray()))
 }

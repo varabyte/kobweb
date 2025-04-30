@@ -26,7 +26,7 @@ fun Modifier.filter(filter: Filter) = styleModifier {
 }
 
 fun Modifier.filter(vararg filters: CSSFilter) = styleModifier {
-    filter(Filter.list(*filters))
+    filter(Filter.list(*filters.map { Filter.of(it) }.toTypedArray()))
 }
 
 fun Modifier.filter(filters: List<CSSFilter>) = filter(*filters.toTypedArray())
