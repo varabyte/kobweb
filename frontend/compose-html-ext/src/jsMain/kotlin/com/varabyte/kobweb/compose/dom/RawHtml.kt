@@ -3,6 +3,7 @@ package com.varabyte.kobweb.compose.dom
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.framework.annotations.DelicateApi
 import org.w3c.dom.Comment
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
@@ -14,7 +15,7 @@ import org.jetbrains.compose.web.dom.Text as JbText
 @Composable
 private fun walk(node: Node) {
     when (node) {
-        is HTMLElement -> {
+        is Element -> {
             val attrsStr = node.attributes.asList().takeIf { it.isNotEmpty() }
                 ?.joinToString(" ") { attr -> "${attr.name}=\"${attr.value}\"" }
 
