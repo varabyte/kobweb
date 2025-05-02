@@ -244,7 +244,7 @@ enum class SVGAspectRatioScale {
 
 // region Shared SVG traits
 
-internal interface CenterCoordinateAttrs<T : SVGElement> : AttrsScope<T> {
+interface SvgCenterCoordinateAttrs<T : SVGElement> : AttrsScope<T> {
     fun cx(value: Number) {
         attr("cx", value.toString())
     }
@@ -262,7 +262,7 @@ internal interface CenterCoordinateAttrs<T : SVGElement> : AttrsScope<T> {
     }
 }
 
-internal interface CoordinateAttrs<T : SVGElement> : AttrsScope<T> {
+interface SvgCoordinateAttrs<T : SVGElement> : AttrsScope<T> {
     fun x(value: Number) {
         attr("x", value.toString())
     }
@@ -280,13 +280,13 @@ internal interface CoordinateAttrs<T : SVGElement> : AttrsScope<T> {
     }
 }
 
-internal interface CrossOriginAttrs<T : SVGElement> : AttrsScope<T> {
+interface SvgCrossOriginAttrs<T : SVGElement> : AttrsScope<T> {
     fun crossOrigin(value: SVGCrossOrigin) {
         attr("crossOrigin", value.toString())
     }
 }
 
-internal interface LengthAttrs<T : SVGElement> : AttrsScope<T> {
+interface SvgLengthAttrs<T : SVGElement> : AttrsScope<T> {
     fun height(value: Number) {
         attr("height", value.toString())
     }
@@ -304,14 +304,14 @@ internal interface LengthAttrs<T : SVGElement> : AttrsScope<T> {
     }
 }
 
-internal interface PointsAttrs<T : SVGElement> : AttrsScope<T> {
+interface SvgPointsAttrs<T : SVGElement> : AttrsScope<T> {
     fun points(vararg pairs: Pair<Number, Number>) {
         val pointString = pairs.joinToString(" ") { "${it.first},${it.second}" }
         attr("points", pointString)
     }
 }
 
-internal interface PresentationAttrs<T : SVGElement> : AttrsScope<T> {
+interface SvgPresentationAttrs<T : SVGElement> : AttrsScope<T> {
     fun stroke(value: CSSColorValue) = this.attr("stroke", value.toString())
     fun stroke(value: SVGStrokeType) = this.attr("stroke", value.toString())
     fun stroke(id: SvgId) = this.attr("stroke", id.urlReference)
@@ -354,7 +354,7 @@ internal interface PresentationAttrs<T : SVGElement> : AttrsScope<T> {
     fun lightingColor(color: CSSColorValue) = attr("lighting-color", color.toString())
 }
 
-internal interface PreserveAspectRatioAttrs<T : SVGElement> : AttrsScope<T> {
+interface SvgPreserveAspectRatioAttrs<T : SVGElement> : AttrsScope<T> {
     fun preserveAspectRatio(alignment: SVGAspectRatioAlignment, scale: SVGAspectRatioScale? = null) {
         attr("preserveAspectRatio", buildString {
             append(alignment)
@@ -373,7 +373,7 @@ class ViewBox(val x: Int, val y: Int, val width: Int, val height: Int) {
 }
 
 
-internal interface ViewBoxAttrs<T : SVGElement> : AttrsScope<T> {
+interface SvgViewBoxAttrs<T : SVGElement> : AttrsScope<T> {
     fun viewBox(x: Number, y: Number, width: Number, height: Number) {
         attr("viewBox", "$x $y $width $height")
     }
@@ -386,7 +386,7 @@ internal interface ViewBoxAttrs<T : SVGElement> : AttrsScope<T> {
 // endregion
 
 abstract class SVGGraphicalElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E>) : SVGElementAttrsScope<E>(attrs),
-    PresentationAttrs<E>
+    SvgPresentationAttrs<E>
 
 // Useful for attributes shared between top-level svg elements and group elements
 abstract class SVGContainerElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E>) :
@@ -395,7 +395,7 @@ abstract class SVGContainerElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E
 
 class SVGSvgAttrsScope private constructor(attrs: AttrsScope<SVGSVGElement>) :
     SVGContainerElementAttrsScope<SVGSVGElement>(attrs),
-    CoordinateAttrs<SVGSVGElement>, LengthAttrs<SVGSVGElement>, ViewBoxAttrs<SVGSVGElement> {
+    SvgCoordinateAttrs<SVGSVGElement>, SvgLengthAttrs<SVGSVGElement>, SvgViewBoxAttrs<SVGSVGElement> {
     companion object {
         operator fun invoke(attrs: (SVGSvgAttrsScope.() -> Unit)?): AttrBuilderContext<SVGSVGElement> {
             return { if (attrs != null) SVGSvgAttrsScope(this).attrs() }
@@ -657,7 +657,7 @@ enum class SVGPatternUnits {
 
 class SVGPatternAttrsScope private constructor(id: SvgId, attrs: AttrsScope<SVGPatternElement>) :
     SVGContainerElementAttrsScope<SVGPatternElement>(attrs.id(id.toString())),
-    CoordinateAttrs<SVGPatternElement>, LengthAttrs<SVGPatternElement>, ViewBoxAttrs<SVGPatternElement> {
+    SvgCoordinateAttrs<SVGPatternElement>, SvgLengthAttrs<SVGPatternElement>, SvgViewBoxAttrs<SVGPatternElement> {
 
     fun patternContentUnits(value: SVGPatternUnits) {
         attr("patternContentUnits", value.toString())
@@ -700,7 +700,7 @@ fun ElementScope<SVGDefsElement>.Pattern(
 
 class SVGSymbolAttrsScope private constructor(id: SvgId, attrs: AttrsScope<SVGSymbolElement>) :
     SVGContainerElementAttrsScope<SVGSymbolElement>(attrs.id(id.toString())),
-    CoordinateAttrs<SVGSymbolElement>, LengthAttrs<SVGSymbolElement>, ViewBoxAttrs<SVGSymbolElement> {
+    SvgCoordinateAttrs<SVGSymbolElement>, SvgLengthAttrs<SVGSymbolElement>, SvgViewBoxAttrs<SVGSymbolElement> {
 
     companion object {
         operator fun invoke(
@@ -730,7 +730,7 @@ fun ElementScope<SVGElement>.Symbol(
 }
 
 class SVGUseAttrsScope private constructor(href: String?, attrs: AttrsScope<SVGUseElement>) :
-    CoordinateAttrs<SVGUseElement>, LengthAttrs<SVGUseElement>,
+    SvgCoordinateAttrs<SVGUseElement>, SvgLengthAttrs<SVGUseElement>,
     SVGGraphicalElementAttrsScope<SVGUseElement>(
         if (href != null) {
             attrs.attr("href", href.prefixWithHash())
@@ -766,7 +766,7 @@ fun ElementScope<SVGElement>.Use(
 // region SVG graphical elements
 
 class SVGCircleAttrsScope private constructor(attrs: AttrsScope<SVGCircleElement>) :
-    SVGGraphicalElementAttrsScope<SVGCircleElement>(attrs), CenterCoordinateAttrs<SVGCircleElement> {
+    SVGGraphicalElementAttrsScope<SVGCircleElement>(attrs), SvgCenterCoordinateAttrs<SVGCircleElement> {
 
     companion object {
         operator fun invoke(attrs: SVGCircleAttrsScope.() -> Unit): AttrBuilderContext<SVGCircleElement> {
@@ -807,7 +807,7 @@ fun ElementScope<SVGElement>.Circle(attrs: SVGCircleAttrsScope.() -> Unit) {
 }
 
 class SVGEllipseAttrsScope private constructor(attrs: AttrsScope<SVGEllipseElement>) :
-    SVGGraphicalElementAttrsScope<SVGEllipseElement>(attrs), CenterCoordinateAttrs<SVGEllipseElement> {
+    SVGGraphicalElementAttrsScope<SVGEllipseElement>(attrs), SvgCenterCoordinateAttrs<SVGEllipseElement> {
 
     companion object {
         operator fun invoke(attrs: SVGEllipseAttrsScope.() -> Unit): AttrBuilderContext<SVGEllipseElement> {
@@ -877,8 +877,8 @@ fun ElementScope<SVGElement>.Group(
 }
 
 class SVGImageAttrsScope private constructor(attrs: AttrsScope<SVGImageElement>) :
-    SVGGraphicalElementAttrsScope<SVGImageElement>(attrs), CoordinateAttrs<SVGImageElement>,
-    LengthAttrs<SVGImageElement>, PreserveAspectRatioAttrs<SVGImageElement>, CrossOriginAttrs<SVGImageElement> {
+    SVGGraphicalElementAttrsScope<SVGImageElement>(attrs), SvgCoordinateAttrs<SVGImageElement>,
+    SvgLengthAttrs<SVGImageElement>, SvgPreserveAspectRatioAttrs<SVGImageElement>, SvgCrossOriginAttrs<SVGImageElement> {
 
     companion object {
         operator fun invoke(attrs: SVGImageAttrsScope.() -> Unit): AttrBuilderContext<SVGImageElement> {
@@ -1102,7 +1102,7 @@ fun ElementScope<SVGElement>.Path(attrs: SVGPathAttrsScope.() -> Unit) {
 
 
 class SVGPolygonAttrsScope private constructor(attrs: AttrsScope<SVGPolygonElement>) :
-    SVGGraphicalElementAttrsScope<SVGPolygonElement>(attrs), PointsAttrs<SVGPolygonElement> {
+    SVGGraphicalElementAttrsScope<SVGPolygonElement>(attrs), SvgPointsAttrs<SVGPolygonElement> {
 
     companion object {
         operator fun invoke(attrs: SVGPolygonAttrsScope.() -> Unit): AttrBuilderContext<SVGPolygonElement> {
@@ -1133,7 +1133,7 @@ fun ElementScope<SVGElement>.Polygon(attrs: SVGPolygonAttrsScope.() -> Unit) {
 
 
 class SVGPolylineAttrsScope private constructor(attrs: AttrsScope<SVGPolylineElement>) :
-    SVGGraphicalElementAttrsScope<SVGPolylineElement>(attrs), PointsAttrs<SVGPolylineElement> {
+    SVGGraphicalElementAttrsScope<SVGPolylineElement>(attrs), SvgPointsAttrs<SVGPolylineElement> {
 
     companion object {
         operator fun invoke(attrs: SVGPolylineAttrsScope.() -> Unit): AttrBuilderContext<SVGPolylineElement> {
@@ -1165,7 +1165,7 @@ fun ElementScope<SVGElement>.Polyline(attrs: SVGPolylineAttrsScope.() -> Unit) {
 
 
 class SVGRectAttrsScope private constructor(attrs: AttrsScope<SVGRectElement>) :
-    SVGGraphicalElementAttrsScope<SVGRectElement>(attrs), CoordinateAttrs<SVGRectElement>, LengthAttrs<SVGRectElement> {
+    SVGGraphicalElementAttrsScope<SVGRectElement>(attrs), SvgCoordinateAttrs<SVGRectElement>, SvgLengthAttrs<SVGRectElement> {
 
     companion object {
         operator fun invoke(attrs: SVGRectAttrsScope.() -> Unit): AttrBuilderContext<SVGRectElement> {
@@ -1234,7 +1234,7 @@ enum class SVGTextLengthAdjust {
 }
 
 class SVGTextAttrsScope private constructor(attrs: AttrsScope<SVGTextElement>) :
-    SVGGraphicalElementAttrsScope<SVGTextElement>(attrs), CoordinateAttrs<SVGTextElement> {
+    SVGGraphicalElementAttrsScope<SVGTextElement>(attrs), SvgCoordinateAttrs<SVGTextElement> {
 
     companion object {
         operator fun invoke(attrs: SVGTextAttrsScope.() -> Unit): AttrBuilderContext<SVGTextElement> {
