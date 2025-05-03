@@ -6,6 +6,9 @@ import com.varabyte.kobweb.compose.attributes.onTransitionRun
 import com.varabyte.kobweb.compose.attributes.onTransitionStart
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.Transition
+import com.varabyte.kobweb.compose.css.TransitionBehavior
+import com.varabyte.kobweb.compose.css.transition
+import com.varabyte.kobweb.compose.css.transitionBehavior
 import com.varabyte.kobweb.compose.events.SyntheticTransitionEvent
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
@@ -17,16 +20,16 @@ fun Modifier.transition(transition: Transition) = styleModifier {
 }
 
 fun Modifier.transition(vararg transitions: Transition.Listable) = styleModifier {
-    transition(*transitions)
+    transition(Transition.list(*transitions))
 }
 
 fun Modifier.transition(transitions: List<Transition.Listable>) = styleModifier {
-    transition(*transitions.toTypedArray())
+    transition(Transition.list(*transitions.toTypedArray()))
 }
 
 // Convenience method for accepting the output of Transition.group(...)
 fun Modifier.transition(transitions: Array<Transition.Listable>) = styleModifier {
-    transition(*transitions)
+    transition(Transition.list(*transitions))
 }
 
 class TransitionScope(private val styleScope: StyleScope) {
@@ -35,7 +38,9 @@ class TransitionScope(private val styleScope: StyleScope) {
     fun duration(vararg durations: CSSTimeNumericValue) = styleScope.transitionDuration(*durations)
     fun timingFunction(vararg timingFunctions: TransitionTimingFunction) = styleScope.transitionTimingFunction(*timingFunctions)
     fun delay(vararg delays: CSSTimeNumericValue) = styleScope.transitionDelay(*delays)
-    fun behavior(vararg behaviors: TransitionBehavior.Listable) = styleScope.transitionBehavior(*behaviors)
+    fun behavior(vararg behaviors: TransitionBehavior.Listable) {
+        styleScope.transitionBehavior(TransitionBehavior.list(*behaviors))
+    }
 
     fun property(properties: List<TransitionProperty.Name>) = property(*properties.toTypedArray())
     fun property(properties: List<String>) = property(*properties.toTypedArray())

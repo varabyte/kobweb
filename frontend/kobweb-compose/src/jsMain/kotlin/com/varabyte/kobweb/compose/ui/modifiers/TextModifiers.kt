@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.TextShadow
+import com.varabyte.kobweb.compose.css.textShadow
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
@@ -56,7 +58,7 @@ fun Modifier.textShadow(vararg shadows: CSSTextShadow) = styleModifier {
 }
 
 fun Modifier.textShadow(vararg shadows: TextShadow.Listable) = styleModifier {
-    textShadow(*shadows)
+    textShadow(TextShadow.list(*shadows))
 }
 
 fun Modifier.textShadow(shadows: List<TextShadow.Listable>) = textShadow(*shadows.toTypedArray())

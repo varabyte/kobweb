@@ -22,6 +22,7 @@ class CSSOutline internal constructor() : CSSStyleValue {
     }
 }
 
+@Suppress("DEPRECATION")
 @Deprecated("Use `outline(Outline.of(...)` instead.")
 fun StyleScope.outline(outlineBuilder: CSSOutline.() -> Unit) {
     val outlineValues = CSSOutline().apply(outlineBuilder)
