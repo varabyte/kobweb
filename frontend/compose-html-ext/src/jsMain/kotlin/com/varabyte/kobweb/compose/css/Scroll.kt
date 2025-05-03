@@ -2,27 +2,19 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-sealed class OverscrollBehavior private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+internal sealed interface CssOverscrollModeValues<T: StylePropertyValue> {
+    val Auto get() = "auto".unsafeCast<T>()
+    val Contain get() = "contain".unsafeCast<T>()
+    val None get() = "none".unsafeCast<T>()
+}
 
-    sealed class SingleValue(value: String) : OverscrollBehavior(value)
-    class RepeatableValue internal constructor(value: String) : SingleValue(value)
-    private class Keyword(value: String) : SingleValue(value)
-    private class TwoValue(x: RepeatableValue, y: RepeatableValue) : OverscrollBehavior("$x $y")
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
+sealed interface OverscrollBehavior : StylePropertyValue {
+    sealed interface SingleValue : OverscrollBehavior
+    sealed interface Mode : SingleValue
 
-    companion object {
-        // Keyword
-        val Auto get() = RepeatableValue("auto")
-        val Contain get() = RepeatableValue("contain")
-        val None get() = RepeatableValue("none")
-
-        fun of(x: RepeatableValue, y: RepeatableValue): OverscrollBehavior = TwoValue(x, y)
-
-        // Global
-        val Inherit: SingleValue get() = Keyword("inherit")
-        val Initial: SingleValue get() = Keyword("initial")
-        val Revert: SingleValue get() = Keyword("revert")
-        val Unset: SingleValue get() = Keyword("unset")
+    companion object : CssOverscrollModeValues<Mode>, CssGlobalValues<SingleValue> {
+        fun of(x: Mode, y: Mode): OverscrollBehavior = "$x $y".unsafeCast<OverscrollBehavior>()
     }
 }
 
@@ -30,35 +22,39 @@ fun StyleScope.overscrollBehavior(overscrollBehavior: OverscrollBehavior) {
     property("overscroll-behavior", overscrollBehavior)
 }
 
-fun StyleScope.overscrollBehaviorBlock(overscrollBehavior: OverscrollBehavior.SingleValue) {
-    property("overscroll-behavior-block", overscrollBehavior)
-}
-
-fun StyleScope.overscrollBehaviorInline(overscrollBehavior: OverscrollBehavior.SingleValue) {
-    property("overscroll-behavior-inline", overscrollBehavior)
-}
-
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior-x
 fun StyleScope.overscrollBehaviorX(overscrollBehavior: OverscrollBehavior.SingleValue) {
     property("overscroll-behavior-x", overscrollBehavior)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior-y
 fun StyleScope.overscrollBehaviorY(overscrollBehavior: OverscrollBehavior.SingleValue) {
     property("overscroll-behavior-y", overscrollBehavior)
 }
 
-class ScrollBehavior private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior-block
+sealed interface OverscrollBehaviorBlock : StylePropertyValue {
+    companion object : CssOverscrollModeValues<OverscrollBehaviorBlock>, CssGlobalValues<OverscrollBehaviorBlock>
+}
 
-    companion object {
+fun StyleScope.overscrollBehaviorBlock(overscrollBehaviorBlock: OverscrollBehaviorBlock) {
+    property("overscroll-behavior-block", overscrollBehaviorBlock)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior-inline
+sealed interface OverscrollBehaviorInline : StylePropertyValue {
+    companion object : CssOverscrollModeValues<OverscrollBehaviorInline>, CssGlobalValues<OverscrollBehaviorInline>
+}
+
+fun StyleScope.overscrollBehaviorInline(overscrollBehaviorInline: OverscrollBehaviorInline) {
+    property("overscroll-behavior-inline", overscrollBehaviorInline)
+}
+
+sealed interface ScrollBehavior : StylePropertyValue {
+    companion object : CssGlobalValues<ScrollBehavior> {
         // Keyword
-        val Auto get() = ScrollBehavior("auto")
-        val Smooth get() = ScrollBehavior("smooth")
-
-        // Global
-        val Inherit get() = ScrollBehavior("inherit")
-        val Initial get() = ScrollBehavior("initial")
-        val Revert get() = ScrollBehavior("revert")
-        val Unset get() = ScrollBehavior("unset")
+        val Auto get() = "auto".unsafeCast<ScrollBehavior>()
+        val Smooth get() = "smooth".unsafeCast<ScrollBehavior>()
     }
 }
 
@@ -68,12 +64,8 @@ fun StyleScope.scrollBehavior(scrollBehavior: ScrollBehavior) {
 
 // region Scroll snap
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-type
-sealed class ScrollSnapType private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    private class Keyword(value: String) : ScrollSnapType(value)
-    class Axis internal constructor(value: String) : ScrollSnapType(value)
-    private class AxisWithStrictness(axis: Axis, strictness: Strictness) : ScrollSnapType("$axis $strictness")
+sealed interface ScrollSnapType : StylePropertyValue {
+    sealed interface Axis : ScrollSnapType
 
     enum class Strictness : StylePropertyValue {
         Mandatory, Proximity;
@@ -81,24 +73,18 @@ sealed class ScrollSnapType private constructor(private val value: String) : Sty
         override fun toString() = name.lowercase()
     }
 
-    companion object {
+    companion object : CssGlobalValues<ScrollSnapType> {
         // Keyword
-        val None: ScrollSnapType get() = Keyword("none")
+        val None: ScrollSnapType get() = "none".unsafeCast<ScrollSnapType>()
 
         // Axes
-        val X get() = Axis("x")
-        val Y get() = Axis("y")
-        val Block get() = Axis("block")
-        val Inline get() = Axis("inline")
-        val Both get() = Axis("both")
+        val X get() = "x".unsafeCast<Axis>()
+        val Y get() = "y".unsafeCast<Axis>()
+        val Block get() = "block".unsafeCast<Axis>()
+        val Inline get() = "inline".unsafeCast<Axis>()
+        val Both get() = "both".unsafeCast<Axis>()
 
-        fun of(axis: Axis, strictness: Strictness): ScrollSnapType = AxisWithStrictness(axis, strictness)
-
-        // Global
-        val Inherit: ScrollSnapType get() = Keyword("inherit")
-        val Initial: ScrollSnapType get() = Keyword("initial")
-        val Revert: ScrollSnapType get() = Keyword("revert")
-        val Unset: ScrollSnapType get() = Keyword("unset")
+        fun of(axis: Axis, strictness: Strictness): ScrollSnapType = "$axis $strictness".unsafeCast<ScrollSnapType>()
     }
 }
 
@@ -199,27 +185,17 @@ fun StyleScope.scrollPaddingBlockEnd(value: CSSLengthOrPercentageNumericValue) {
 // region Scroll snap align
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-align
-sealed class ScrollSnapAlign private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface ScrollSnapAlign : StylePropertyValue {
+    sealed interface Alignment : ScrollSnapAlign
 
-    private class Keyword(value: String) : ScrollSnapAlign(value)
-    class Alignment internal constructor(value: String) : ScrollSnapAlign(value)
-    private class TwoAxis(block: Alignment, inline: Alignment) : ScrollSnapAlign("$block $inline")
-
-    companion object {
+    companion object : CssGlobalValues<ScrollSnapAlign> {
         // Keyword
-        val None get() = Alignment("none")
-        val Start get() = Alignment("start")
-        val End get() = Alignment("end")
-        val Center get() = Alignment("center")
+        val None get() = "none".unsafeCast<Alignment>()
+        val Start get() = "start".unsafeCast<Alignment>()
+        val End get() = "end".unsafeCast<Alignment>()
+        val Center get() = "center".unsafeCast<Alignment>()
 
-        fun of(blockAxis: Alignment, inlineAxis: Alignment): ScrollSnapAlign = TwoAxis(blockAxis, inlineAxis)
-
-        // Global
-        val Inherit: ScrollSnapAlign get() = Keyword("inherit")
-        val Initial: ScrollSnapAlign get() = Keyword("initial")
-        val Revert: ScrollSnapAlign get() = Keyword("revert")
-        val Unset: ScrollSnapAlign get() = Keyword("unset")
+        fun of(blockAxis: Alignment, inlineAxis: Alignment) = "$blockAxis $inlineAxis".unsafeCast<ScrollSnapAlign>()
     }
 }
 
@@ -232,19 +208,11 @@ fun StyleScope.scrollSnapAlign(scrollSnapAlign: ScrollSnapAlign) {
 // region Scroll snap stop
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-stop
-class ScrollSnapStop private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
+sealed interface ScrollSnapStop : StylePropertyValue {
+    companion object : CssGlobalValues<ScrollSnapStop> {
         // Keyword
-        val Normal get() = ScrollSnapStop("normal")
-        val Always get() = ScrollSnapStop("always")
-
-        // Global
-        val Inherit get() = ScrollSnapStop("inherit")
-        val Initial get() = ScrollSnapStop("initial")
-        val Revert get() = ScrollSnapStop("revert")
-        val Unset get() = ScrollSnapStop("unset")
+        val Normal get() = "normal".unsafeCast<ScrollSnapStop>()
+        val Always get() = "always".unsafeCast<ScrollSnapStop>()
     }
 }
 
@@ -337,20 +305,12 @@ fun StyleScope.scrollMarginBlockEnd(value: CSSLengthNumericValue) {
 // region ScrollbarWidth
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-width
-class ScrollbarWidth private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
+sealed interface ScrollbarWidth : StylePropertyValue {
+    companion object : CssGlobalValues<ScrollbarWidth> {
         // Keyword
-        val Auto get() = ScrollbarWidth("auto")
-        val Thin get() = ScrollbarWidth("thin")
-        val None get() = ScrollbarWidth("none")
-
-        // Global
-        val Inherit get() = ScrollbarWidth("inherit")
-        val Initial get() = ScrollbarWidth("initial")
-        val Revert get() = ScrollbarWidth("revert")
-        val Unset get() = ScrollbarWidth("unset")
+        val Auto get() = "auto".unsafeCast<ScrollbarWidth>()
+        val Thin get() = "thin".unsafeCast<ScrollbarWidth>()
+        val None get() = "none".unsafeCast<ScrollbarWidth>()
     }
 }
 

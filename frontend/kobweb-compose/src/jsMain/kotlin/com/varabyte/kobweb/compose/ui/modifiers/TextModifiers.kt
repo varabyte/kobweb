@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.TextShadow
+import com.varabyte.kobweb.compose.css.textShadow
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
@@ -17,6 +19,10 @@ fun Modifier.lang(value: String) = attrsModifier {
 
 fun Modifier.letterSpacing(value: CSSLengthNumericValue) = styleModifier {
     letterSpacing(value)
+}
+
+fun Modifier.rubyPosition(rubyPosition: RubyPosition) = styleModifier {
+    rubyPosition(rubyPosition)
 }
 
 fun Modifier.spellCheck(enabled: Boolean) = attrsModifier {
@@ -41,12 +47,21 @@ fun Modifier.textShadow(
     blurRadius: CSSLengthNumericValue? = null,
     color: CSSColorValue? = null
 ) = styleModifier {
-    textShadow(offsetX, offsetY, blurRadius, color)
+    textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))
 }
 
-fun Modifier.textShadow(vararg textShadows: CSSTextShadow) = styleModifier {
-    textShadow(*textShadows)
+@Suppress("DEPRECATION")
+fun Modifier.textShadow(vararg shadows: CSSTextShadow) = styleModifier {
+    textShadow(*shadows.map {
+        TextShadow.of(it.offsetX, it.offsetY, it.blurRadius, it.color)
+    }.toTypedArray())
 }
+
+fun Modifier.textShadow(vararg shadows: TextShadow.Listable) = styleModifier {
+    textShadow(TextShadow.list(*shadows))
+}
+
+fun Modifier.textShadow(shadows: List<TextShadow.Listable>) = textShadow(*shadows.toTypedArray())
 
 fun Modifier.textShadow(textShadow: TextShadow): Modifier = styleModifier {
     textShadow(textShadow)
@@ -64,6 +79,13 @@ fun Modifier.wordBreak(wordBreak: WordBreak): Modifier = styleModifier {
     wordBreak(wordBreak)
 }
 
+fun Modifier.wordSpacing(wordSpacing: WordSpacing) = styleModifier {
+    wordSpacing(wordSpacing)
+}
+
+fun Modifier.wordSpacing(value: CSSLengthNumericValue) = styleModifier {
+    wordSpacing(WordSpacing.of(value))
+}
 fun Modifier.writingMode(writingMode: WritingMode) = styleModifier {
     writingMode(writingMode)
 }

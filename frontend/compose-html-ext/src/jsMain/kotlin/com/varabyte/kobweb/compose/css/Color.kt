@@ -1,26 +1,18 @@
+// Sealed class private constructors are useful, actually!
+@file:Suppress("RedundantVisibilityModifier")
+
 package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-
 // https://developer.mozilla.org/en-US/docs/Web/CSS/accent-color
-class AccentColor private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
+sealed interface AccentColor : StylePropertyValue {
+    companion object : CssGlobalValues<AccentColor> {
         // Keyword values
-        val Auto get() = AccentColor("auto")
+        val Auto get() = "auto".unsafeCast<AccentColor>()
 
         // <color> values
-        fun of(color: CSSColorValue) = AccentColor(color.toString())
-
-        // Global values
-        val Inherit get() = AccentColor("inherit");
-        val Initial get() = AccentColor("initial")
-        val Revert get() = AccentColor("revert")
-
-        //        val RevertLayer get() = AccentColor("revert-layer")
-        val Unset get() = AccentColor("unset")
+        fun of(color: CSSColorValue) = color.toString().unsafeCast<AccentColor>()
     }
 }
 
@@ -28,29 +20,22 @@ fun StyleScope.accentColor(accentColor: AccentColor) {
     property("accent-color", accentColor)
 }
 
+@Deprecated("Use accentColor(AccentColor.of(color)) instead.", ReplaceWith("accentColor(AccentColor.of(color))"))
 fun StyleScope.accentColor(color: CSSColorValue) {
-    property("accent-color", AccentColor.of(color))
+    accentColor(AccentColor.of(color))
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme
-class ColorScheme private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
+sealed interface ColorScheme : StylePropertyValue {
+    companion object : CssGlobalValues<ColorScheme> {
         // Keyword values
-        val Normal get() = ColorScheme("normal")
-        val Light get() = ColorScheme("light")
-        val Dark get() = ColorScheme("dark")
-        val LightDark get() = ColorScheme("light dark")
-        val DarkLight get() = ColorScheme("dark light")
-        val OnlyLight get() = ColorScheme("only light")
-        val OnlyDark get() = ColorScheme("only dark")
-
-        // Global values
-        val Inherit get() = ColorScheme("inherit")
-        val Initial get() = ColorScheme("initial")
-        val Revert get() = ColorScheme("revert")
-        val Unset get() = ColorScheme("unset")
+        val Normal get() = "normal".unsafeCast<ColorScheme>()
+        val Light get() = "light".unsafeCast<ColorScheme>()
+        val Dark get() = "dark".unsafeCast<ColorScheme>()
+        val LightDark get() = "light dark".unsafeCast<ColorScheme>()
+        val DarkLight get() = "dark light".unsafeCast<ColorScheme>()
+        val OnlyLight get() = "only light".unsafeCast<ColorScheme>()
+        val OnlyDark get() = "only dark".unsafeCast<ColorScheme>()
     }
 }
 
@@ -60,18 +45,10 @@ fun StyleScope.colorScheme(colorScheme: ColorScheme) {
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/color
 // Named CSSColor to avoid ambiguity with org.jetbrains.compose.web.css.Color
-class CSSColor private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
+sealed interface CSSColor : StylePropertyValue {
+    companion object : CssGlobalValues<CSSColor> {
         // Keywords
-        val CurrentColor get() = CSSColor("currentColor")
-
-        // Global values
-        val Inherit get() = CSSColor("inherit")
-        val Initial get() = CSSColor("initial")
-        val Revert get() = CSSColor("revert")
-        val Unset get() = CSSColor("unset")
+        val CurrentColor get() = "currentColor".unsafeCast<CSSColor>()
     }
 }
 

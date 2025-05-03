@@ -151,7 +151,7 @@ fun Keyframes.toAnimation(
     direction: AnimationDirection? = null,
     fillMode: AnimationFillMode? = null,
     playState: AnimationPlayState? = null
-): Animation.Repeatable {
+): Animation.Listable {
     val colorMode = if (this.usesColorMode) ColorMode.current else null
     return toAnimation(colorMode, duration, timingFunction, delay, iterationCount, direction, fillMode, playState)
 }
@@ -185,7 +185,7 @@ fun Keyframes.toAnimation(
     direction: AnimationDirection? = null,
     fillMode: AnimationFillMode? = null,
     playState: AnimationPlayState? = null,
-): Animation.Repeatable {
+): Animation.Listable {
     val name = this.name
 
     @Suppress("NAME_SHADOWING")

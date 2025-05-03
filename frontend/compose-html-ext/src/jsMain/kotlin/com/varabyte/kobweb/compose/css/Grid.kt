@@ -1,3 +1,6 @@
+// Sealed class private constructors are useful, actually!
+@file:Suppress("RedundantVisibilityModifier")
+
 package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
@@ -10,7 +13,7 @@ annotation class GridDslMarker
  *
  * This allows a user to convert a CSS value like "1fr `[name]` repeat(3, 100px) 1fr" into a list of [GridEntry]s.
  */
-sealed class GridEntry(private val value: String) {
+sealed class GridEntry private constructor(private val value: String) {
     override fun toString() = value
 
     /**
@@ -106,30 +109,37 @@ private fun Array<out GridEntry>.validate() {
         when (it) {
             is GridEntry.LineNames -> emptyList()
             is GridEntry.TrackSize -> listOf(it)
-            is GridEntry.Repeat -> it.entries.filterIsInstance<GridEntry.TrackSize>()
-                .ifEmpty { error("repeat() must contain at least one track size") }
+            is GridEntry.Repeat -> {
+                it.entries.filterIsInstance<GridEntry.TrackSize>()
+                    .also {
+                        require(it.isNotEmpty()) { "repeat() must contain at least one track size" }
+                    }
+            }
         }
     }
 
-    check(trackSizes.isNotEmpty()) { "You must specify at least one track size" }
+    require(trackSizes.isNotEmpty()) { "You must specify at least one track size" }
 
     val autoRepeatCount = this.count { it is GridEntry.Repeat.Auto }
     if (autoRepeatCount == 0) return
 
-    check(autoRepeatCount == 1) { "Only one auto-repeat call is allowed per track list" }
+    require(autoRepeatCount == 1) { "Only one auto-repeat call is allowed per track list" }
 
     trackSizes.forEach {
-        when (it) {
-            is GridEntry.TrackSize.Fixed -> {} // OK
-            is GridEntry.TrackSize.Flex -> error("Cannot use flex values with auto-repeat")
-            is GridEntry.TrackSize.Keyword -> error("Cannot use keywords with auto-repeat")
-            is GridEntry.TrackSize.FitContent -> error("Cannot use fit-content with auto-repeat")
+        val errorMessage = when (it) {
+            is GridEntry.TrackSize.Fixed -> null
+            is GridEntry.TrackSize.FitContent -> "Cannot use fit-content with auto-repeat"
+            is GridEntry.TrackSize.Flex -> "Cannot use flex values with auto-repeat"
+            is GridEntry.TrackSize.Keyword -> "Cannot use keywords with auto-repeat"
             is GridEntry.TrackSize.MinMax -> {
-                check(it.min is GridEntry.TrackSize.Fixed || it.max is GridEntry.TrackSize.Fixed) {
+                if (it.min !is GridEntry.TrackSize.Fixed && it.max !is GridEntry.TrackSize.Fixed) {
                     "Cannot use minmax with auto-repeat unless at least one of the values is a fixed value (a length or percentage)"
+                } else {
+                    null
                 }
             }
         }
+        require(errorMessage == null) { errorMessage!! }
     }
 }
 
@@ -194,18 +204,10 @@ class GridTrackBuilder : GridTrackBuilderInRepeat() {
     }
 }
 
-class GridAuto private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
+sealed interface GridAuto : StylePropertyValue {
+    companion object : CssGlobalValues<GridAuto> {
         // Keywords
-        val None get() = GridAuto("none")
-
-        // Global values
-        val Inherit get() = GridAuto("inherit")
-        val Initial get() = GridAuto("initial")
-        val Revert get() = GridAuto("revert")
-        val Unset get() = GridAuto("unset")
+        val None get() = "none".unsafeCast<GridAuto>()
     }
 }
 
@@ -214,7 +216,9 @@ fun StyleScope.gridAutoColumns(gridAutoColumns: GridAuto) {
 }
 
 fun StyleScope.gridAutoColumns(vararg gridAutoColumns: GridEntry) {
-    gridAutoColumns(gridAutoColumns.toTrackListString())
+    if (gridAutoColumns.isNotEmpty()) {
+        gridAutoColumns(gridAutoColumns.toTrackListString())
+    }
 }
 
 fun StyleScope.gridAutoColumns(block: GridTrackBuilder.() -> Unit) {
@@ -226,7 +230,9 @@ fun StyleScope.gridAutoRows(gridAutoRows: GridAuto) {
 }
 
 fun StyleScope.gridAutoRows(vararg gridAutoRows: GridEntry) {
-    gridAutoRows(gridAutoRows.toTrackListString())
+    if (gridAutoRows.isNotEmpty()) {
+        gridAutoRows(gridAutoRows.toTrackListString())
+    }
 }
 
 fun StyleScope.gridAutoRows(block: GridTrackBuilder.() -> Unit) {
@@ -241,48 +247,45 @@ fun StyleScope.gridAutoRows(block: GridTrackBuilder.() -> Unit) {
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template">Grid Template</a>
  */
-sealed class GridTemplate private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface GridTemplate : StylePropertyValue {
+    class SubgridBuilder internal constructor() {
+        internal val names = mutableListOf<GridEntry>()
 
-    private class Keyword(value: String) : GridTemplate(value)
-
-    class Subgrid(block: (Builder.() -> Unit)? = null) : GridTemplate("subgrid${buildNames(block)}") {
-        class Builder internal constructor() {
-            internal val names = mutableListOf<GridEntry>()
-
-            fun lineNames(vararg lineNames: String) {
-                names.add(GridEntry.lineNames(*lineNames))
-            }
-
-            // Don't use GridEntry.Repeat as it does not support name-only repeats
-            private fun internalRepeat(count: Any, lineNames: Array<out String>) {
-                val repeatTrack = GridEntry.TrackSize.Keyword("repeat($count, ${GridEntry.lineNames(*lineNames)})")
-                names.add(repeatTrack)
-            }
-
-            fun repeat(count: Int, vararg lineNames: String) = internalRepeat(count, lineNames)
-
-            fun repeatAutoFill(vararg lineNames: String) =
-                internalRepeat(GridEntry.Repeat.Auto.Type.AutoFill, lineNames)
+        fun lineName(lineName: String) {
+            names.add(GridEntry.lineNames(lineName))
         }
 
-        internal companion object {
-            fun buildNames(block: (Builder.() -> Unit)? = null): String {
-                return if (block == null) "" else Builder().apply(block).names.joinToString(" ", prefix = " ")
-            }
+        // Subgrids only allow stand-alone, ungrouped line names
+        fun lineNames(vararg lineNames: String) {
+            names.addAll(lineNames.map { GridEntry.lineNames(it) })
+        }
+
+        // Don't use GridEntry.Repeat as it does not support name-only repeats
+        private fun internalRepeat(count: Any, lineNames: Array<out String>) {
+            val repeatTrack = GridEntry.TrackSize.Keyword("repeat($count, ${lineNames.map { GridEntry.lineNames(it) }.joinToString(" ") })")
+            names.add(repeatTrack)
+        }
+
+        fun repeat(count: Int, vararg lineNames: String) {
+            internalRepeat(count, lineNames)
+        }
+
+        fun repeatAutoFill(vararg lineNames: String) {
+            internalRepeat(GridEntry.Repeat.Auto.Type.AutoFill, lineNames)
+        }
+
+        internal fun build(): GridTemplate {
+            return (listOf("subgrid") + names).joinToString(" ").unsafeCast<GridTemplate>()
         }
     }
 
-    companion object {
-        // Keywords
-        val None: GridTemplate get() = Keyword("none")
-        val Subgrid: GridTemplate get() = Subgrid()
+    companion object : CssGlobalValues<GridTemplate> {
+        fun Subgrid(block: (SubgridBuilder.() -> Unit)? = null) =
+            SubgridBuilder().apply { block?.invoke(this) }.build()
 
-        // Global
-        val Initial: GridTemplate get() = Keyword("initial")
-        val Inherit: GridTemplate get() = Keyword("inherit")
-        val Revert: GridTemplate get() = Keyword("revert")
-        val Unset: GridTemplate get() = Keyword("unset")
+        // Keywords
+        val None get() = "none".unsafeCast<GridTemplate>()
+        val Subgrid get() = Subgrid()
     }
 }
 
@@ -291,7 +294,9 @@ fun StyleScope.gridTemplateColumns(gridTemplateColumns: GridTemplate) {
 }
 
 fun StyleScope.gridTemplateColumns(vararg gridTemplateColumns: GridEntry) {
-    gridTemplateColumns(gridTemplateColumns.toTrackListString())
+    if (gridTemplateColumns.isNotEmpty()) {
+        gridTemplateColumns(gridTemplateColumns.toTrackListString())
+    }
 }
 
 fun StyleScope.gridTemplateColumns(block: GridTrackBuilder.() -> Unit) {
@@ -303,7 +308,9 @@ fun StyleScope.gridTemplateRows(gridTemplateRows: GridTemplate) {
 }
 
 fun StyleScope.gridTemplateRows(vararg gridTemplateRows: GridEntry) {
-    gridTemplateRows(gridTemplateRows.toTrackListString())
+    if (gridTemplateRows.isNotEmpty()) {
+        gridTemplateRows(gridTemplateRows.toTrackListString())
+    }
 }
 
 fun StyleScope.gridTemplateRows(block: GridTrackBuilder.() -> Unit) {

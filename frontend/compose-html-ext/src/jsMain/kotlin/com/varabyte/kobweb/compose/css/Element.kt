@@ -6,21 +6,13 @@ import com.varabyte.kobweb.compose.css.functions.Gradient
 import org.jetbrains.compose.web.css.*
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/appearance
-class Appearance private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
+sealed interface Appearance : StylePropertyValue {
+    companion object : CssGlobalValues<Appearance> {
         // CSS Basic User Interface Module Level 4 values
-        val None get() = Appearance("none")
-        val Auto get() = Appearance("auto")
-        val MenuListButton get() = Appearance("menulist-button")
-        val TextField get() = Appearance("textfield")
-
-        // Global values
-        val Inherit get() = Appearance("inherit")
-        val Initial get() = Appearance("initial")
-        val Revert get() = Appearance("revert")
-        val Unset get() = Appearance("unset")
+        val None get() = "none".unsafeCast<Appearance>()
+        val Auto get() = "auto".unsafeCast<Appearance>()
+        val MenuListButton get() = "menulist-button".unsafeCast<Appearance>()
+        val TextField get() = "textfield".unsafeCast<Appearance>()
     }
 }
 
@@ -29,56 +21,56 @@ fun StyleScope.appearance(appearance: Appearance) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/content
-sealed class Content(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface Content : StylePropertyValue {
+    sealed interface SingleValue : Content
+    sealed interface Listable : SingleValue
 
-    /** Content keywords that cannot be used in combination with any others. */
-    sealed class Restricted(value: String) : Content(value)
+    companion object : CssGlobalValues<Content> {
+        private fun toContent(altText: String?, values: List<Listable>) = buildString {
+            if (values.isEmpty()) return@buildString
+            append(values.joinToString(" "))
+            if (altText != null) append(" / ${altText.wrapQuotesIfNecessary()}")
+        }.unsafeCast<Content>()
 
-    /** Content keywords that can be used in combination with others. */
-    sealed class Unrestricted(value: String) : Content(value)
+        fun of(url: CSSUrl) = url.toString().unsafeCast<Listable>()
+        fun of(gradient: Gradient) = gradient.toString().unsafeCast<Listable>()
+        fun of(text: String) = text.wrapQuotesIfNecessary().unsafeCast<Listable>()
 
-    private class Keyword(value: String) : Unrestricted(value)
-    private class RestrictedKeyword(value: String) : Restricted(value)
-    private class Text(value: String) : Unrestricted(value.wrapQuotesIfNecessary())
+        fun of(url: CSSUrl, altText: String) = list(altText, of(url))
+        fun of(gradient: Gradient, altText: String) = list(altText, of(gradient))
+        fun of(text: String, altText: String) = list(altText, of(text))
 
-    private class Url(url: CSSUrl) : Unrestricted(url.toString())
-    private class Gradient(gradient: com.varabyte.kobweb.compose.css.functions.Gradient) :
-        Unrestricted(gradient.toString())
-
-    companion object {
-        fun of(url: CSSUrl): Unrestricted = Url(url)
-        fun of(gradient: com.varabyte.kobweb.compose.css.functions.Gradient): Unrestricted = Gradient(gradient)
-        fun of(text: String): Unrestricted = Text(text)
+        fun list(vararg contents: Listable) = toContent(null, contents.toList())
+        fun list(altText: String, vararg contents: Listable) = toContent(altText.takeIf { it.isNotBlank() }, contents.toList())
 
         // Non-combinable keywords
-        val None get(): Restricted = RestrictedKeyword("none")
-        val Normal get(): Restricted = RestrictedKeyword("normal")
+        val None get() = "none".unsafeCast<Content>()
+        val Normal get() = "normal".unsafeCast<Content>()
 
         // Language / position-dependent keywords
-        val CloseQuote get(): Content = Keyword("close-quote")
-        val NoCloseQuote get(): Content = Keyword("no-close-quote")
-        val NoOpenQuote get(): Content = Keyword("no-open-quote")
-        val OpenQuote get(): Content = Keyword("open-quote")
-
-        // Global
-        val Inherit get(): Content = Keyword("inherit")
-        val Initial get(): Content = Keyword("initial")
-        val Revert get(): Content = Keyword("revert")
-        val Unset get(): Content = Keyword("unset")
+        val CloseQuote get() = "close-quote".unsafeCast<Listable>()
+        val NoCloseQuote get() = "no-close-quote".unsafeCast<Listable>()
+        val NoOpenQuote get() = "no-open-quote".unsafeCast<Listable>()
+        val OpenQuote get() = "open-quote".unsafeCast<Listable>()
     }
 }
 
-fun StyleScope.content(content: Content.Restricted) {
+fun StyleScope.content(content: Content) {
     property("content", content)
 }
 
-fun StyleScope.content(vararg contents: Content.Unrestricted) {
-    property("content", contents.joinToString(" "))
+// Needed temporarily until we can remove the deprecated `vararg` version
+fun StyleScope.content(content: Content.Listable) {
+    content(content.unsafeCast<Content>())
 }
-
-fun StyleScope.content(altText: String, vararg contents: Content.Unrestricted) {
-    property("content", "${contents.joinToString(" ")} / ${altText.wrapQuotesIfNecessary()}")
+// Remove the previous method too after removing this method
+@Deprecated("Use content(Content.list(...)) instead.", ReplaceWith("content(Content.list(*contents))"))
+fun StyleScope.content(vararg contents: Content.Listable) {
+    content(Content.list(*contents))
+}
+@Deprecated("Use content(Content.list(...)) instead.", ReplaceWith("content(Content.list(altText, *contents))"))
+fun StyleScope.content(altText: String, vararg contents: Content.Listable) {
+    content(Content.list(altText, *contents))
 }
 
 /** Convenience function for an extremely common case, setting content to text. */

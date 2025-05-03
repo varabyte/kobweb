@@ -10,7 +10,7 @@ fun Modifier.accentColor(accentColor: AccentColor): Modifier = styleModifier {
 }
 
 fun Modifier.accentColor(color: CSSColorValue): Modifier = styleModifier {
-    accentColor(color)
+    accentColor(AccentColor.of(color))
 }
 
 fun Modifier.color(color: CSSColorValue) = styleModifier {

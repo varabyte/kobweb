@@ -7,6 +7,8 @@ import org.jetbrains.compose.web.css.*
 
 class FontScope internal constructor(private val styleScope: StyleScope) {
     fun family(vararg values: String) = styleScope.fontFamily(*values)
+    fun family(values: List<String>) = family(*values.toTypedArray())
+
     fun size(value: CSSLengthOrPercentageNumericValue) = styleScope.fontSize(value)
     fun size(fontSize: FontSize) = styleScope.fontSize(fontSize)
     fun style(value: FontStyle) = styleScope.fontStyle(value)
@@ -22,6 +24,8 @@ fun Modifier.font(scope: FontScope.() -> Unit) = styleModifier {
 fun Modifier.fontFamily(vararg values: String): Modifier = styleModifier {
     fontFamily(*values)
 }
+
+fun Modifier.fontFamily(values: List<String>) = fontFamily(*values.toTypedArray())
 
 fun Modifier.fontOpticalSizing(value: FontOpticalSizing): Modifier = styleModifier {
     fontOpticalSizing(value)
@@ -41,20 +45,23 @@ fun Modifier.fontStyle(value: FontStyle): Modifier = styleModifier {
 
 class FontVariantScope internal constructor(private val styleScope: StyleScope) {
     fun alternates(alternates: FontVariantAlternates) = styleScope.fontVariantAlternates(alternates)
-    fun alternates(vararg alternates: FontVariantAlternates.ListableValue) =
-        styleScope.fontVariantAlternates(FontVariantAlternates.of(*alternates))
+    fun alternates(vararg alternates: FontVariantAlternates.Listable) =
+        styleScope.fontVariantAlternates(FontVariantAlternates.list(*alternates))
+    fun alternates(alternates: List<FontVariantAlternates.Listable>) = alternates(*alternates.toTypedArray())
 
     fun caps(caps: FontVariantCaps) = styleScope.fontVariantCaps(caps)
 
     fun eastAsian(eastAsian: FontVariantEastAsian) = styleScope.fontVariantEastAsian(eastAsian)
-    fun eastAsian(vararg eastAsians: FontVariantEastAsian.ListableKeyword) =
-        styleScope.fontVariantEastAsian(FontVariantEastAsian.of(*eastAsians))
+    fun eastAsian(vararg eastAsians: FontVariantEastAsian.Listable) =
+        styleScope.fontVariantEastAsian(FontVariantEastAsian.list(*eastAsians))
+    fun eastAsian(eastAsians: List<FontVariantEastAsian.Listable>) = eastAsian(*eastAsians.toTypedArray())
 
     fun emoji(emoji: FontVariantEmoji) = styleScope.fontVariantEmoji(emoji)
 
     fun ligatures(ligatures: FontVariantLigatures) = styleScope.fontVariantLigatures(ligatures)
-    fun ligatures(vararg ligatures: FontVariantLigatures.ListableKeyword) =
-        styleScope.fontVariantLigatures(FontVariantLigatures.of(*ligatures))
+    fun ligatures(vararg ligatures: FontVariantLigatures.Listable) =
+        styleScope.fontVariantLigatures(FontVariantLigatures.list(*ligatures))
+    fun ligatures(ligatures: List<FontVariantLigatures.Listable>) = ligatures(*ligatures.toTypedArray())
 
     fun ligatures(
         common: Boolean? = null,
@@ -71,8 +78,9 @@ class FontVariantScope internal constructor(private val styleScope: StyleScope) 
     )
 
     fun numeric(numeric: FontVariantNumeric) = styleScope.fontVariantNumeric(numeric)
-    fun numeric(vararg numerics: FontVariantNumeric.ListableKeyword) =
-        styleScope.fontVariantNumeric(FontVariantNumeric.of(*numerics))
+    fun numeric(vararg numerics: FontVariantNumeric.Listable) =
+        styleScope.fontVariantNumeric(FontVariantNumeric.list(*numerics))
+    fun numeric(numerics: List<FontVariantNumeric.Listable>) = numeric(*numerics.toTypedArray())
 }
 
 fun Modifier.fontVariant(scope: FontVariantScope.() -> Unit) = styleModifier {
@@ -98,6 +106,8 @@ fun Modifier.fontVariationSettings(value: FontVariationSettings): Modifier = sty
 fun Modifier.fontVariationSettings(vararg axes: FontVariationSettings.Axis): Modifier = styleModifier {
     fontVariationSettings(FontVariationSettings.Axes(*axes))
 }
+
+fun Modifier.fontVariationSettings(axes: List<FontVariationSettings.Axis>): Modifier = fontVariationSettings(*axes.toTypedArray())
 
 fun Modifier.fontWeight(value: FontWeight): Modifier = styleModifier {
     fontWeight(value)

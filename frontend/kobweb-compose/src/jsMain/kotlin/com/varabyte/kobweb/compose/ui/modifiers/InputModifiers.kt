@@ -19,7 +19,7 @@ fun Modifier.caretColor(caretColor: CaretColor) = styleModifier {
 }
 
 fun Modifier.caretColor(color: CSSColorValue) = styleModifier {
-    caretColor(color)
+    caretColor(CaretColor.of(color))
 }
 
 fun Modifier.contentEditable(editable: Boolean) = attrsModifier {

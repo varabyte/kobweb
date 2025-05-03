@@ -236,6 +236,19 @@ class FrontendProcessor(
         }
 
         pageDeclarations += resolver.getSymbolsWithAnnotation(PAGE_FQN).map { it as KSFunctionDeclaration }
+            .also { pages ->
+                pages
+                    .filter { page -> page.hasLayoutAnnotation() }
+                    .map { page -> page to page.getAnnotationsByName(LAYOUT_FQN).first() }
+                    .filter { (_, layout) -> layout.arguments.first().value?.toString().orEmpty().isEmpty() }
+                    .forEach { (page, layout) ->
+                        logger.error(
+                            "@Page method \"${page.qualifiedName!!.asString()}\" cannot apply a `@Layout` annotation without specifying a target path. Please add a valid layout path to the layout annotation or remove it.",
+                            layout
+                        )
+                    }
+            }
+
         initRouteDeclarations += resolver.getSymbolsWithAnnotation(INIT_ROUTE_FQN).map { it as KSFunctionDeclaration }
             .also { initRouteDeclarations ->
                 initRouteDeclarations.forEach { initRouteMethod ->
@@ -656,6 +669,46 @@ class FrontendProcessor(
         }
     }
 
+    private fun reportErrorIfLayoutCycleDetected() {
+        // Detect cycles in layout dependencies
+        fun detectLayoutCycle(
+            decl: KSFunctionDeclaration,
+            path: MutableList<KSFunctionDeclaration> = mutableListOf(),
+            errorCtx: KSFunctionDeclaration = decl
+        ): Boolean {
+            path.add(decl)
+            if (path.size > 1) {
+                if (path.dropLast(1).any { it == decl }) {
+                    if (path.size == 2) {
+                        logger.error(
+                            "Layout \"${decl.simpleName.asString()}\" has a circular dependency with itself.",
+                            errorCtx
+                        )
+                    } else {
+                        // Only report the error if we are the start and end of the cycle; otherwise, just wait, because
+                        // the other layout will trigger this case as well and report the error itself.
+                        if (path.last() == errorCtx) {
+                            logger.error(
+                                "Circular dependency detected: ${path.joinToString(" -> ") { "\"${it.simpleName.asString()}\"" }}",
+                                errorCtx
+                            )
+                        }
+                    }
+                    return true
+                }
+            }
+
+            return layoutsFor[decl]?.let { parentLayout ->
+                val hasChildCycle = detectLayoutCycle(layoutsFor[decl]!!, path, errorCtx)
+                path.removeLast()
+                hasChildCycle
+            } ?: false
+        }
+
+        // Check for cycles starting from each layout
+        layoutsFor.keys.forEach { layout -> detectLayoutCycle(layout) }
+    }
+
     /**
      * Get the finalized metadata acquired over all rounds of processing.
      *
@@ -666,6 +719,8 @@ class FrontendProcessor(
      * passed in when using KSP's [CodeGenerator] to store the data.
      */
     fun getProcessorResult(): Result {
+        reportErrorIfLayoutCycleDetected()
+
         // Use filePath instead of containingFile, because equality doesn't seem to work as expected for KSFile
         val initRoutesMap = initRouteDeclarations.associateBy { it.containingFile!!.filePath }
         val layouts = run {

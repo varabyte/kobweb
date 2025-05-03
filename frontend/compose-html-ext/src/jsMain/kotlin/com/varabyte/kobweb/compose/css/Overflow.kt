@@ -1,42 +1,23 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.Overflow.Mode
 import org.jetbrains.compose.web.css.*
 
-// See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow
-class Overflow private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        // General
-        val Visible get() = Overflow("visible")
-        val Hidden get() = Overflow("hidden")
-        val Clip get() = Overflow("clip")
-        val Scroll get() = Overflow("scroll")
-        val Auto get() = Overflow("auto")
-
-        // Global
-        val Inherit get() = Overflow("inherit")
-        val Initial get() = Overflow("initial")
-        val Revert get() = Overflow("revert")
-        val Unset get() = Overflow("unset")
-    }
+internal sealed interface CssOverflowModeValues<T: StylePropertyValue> {
+    val Visible get() = "visible".unsafeCast<T>()
+    val Hidden get() = "hidden".unsafeCast<T>()
+    val Clip get() = "clip".unsafeCast<T>()
+    val Scroll get() = "scroll".unsafeCast<T>()
+    val Auto get() = "auto".unsafeCast<T>()
 }
 
-// See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-wrap
-class OverflowWrap private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow
+sealed interface Overflow : StylePropertyValue {
+    sealed interface SingleValue : Overflow
+    sealed interface Mode : SingleValue
 
-    companion object {
-        // General
-        val Normal get() = OverflowWrap("normal")
-        val BreakWord get() = OverflowWrap("break-word")
-        val Anywhere get() = OverflowWrap("anywhere")
-
-        // Global
-        val Inherit get() = OverflowWrap("inherit")
-        val Initial get() = OverflowWrap("initial")
-        val Revert get() = OverflowWrap("revert")
-        val Unset get() = OverflowWrap("unset")
+    companion object : CssOverflowModeValues<Mode>, CssGlobalValues<SingleValue> {
+        fun of(x: Mode, y: Mode) = "$x $y".unsafeCast<Overflow>()
     }
 }
 
@@ -54,6 +35,34 @@ fun StyleScope.overflowX(overflowX: Overflow) {
 
 fun StyleScope.overflowY(overflowY: Overflow) {
     property("overflow-y", overflowY)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-block
+sealed interface OverflowBlock : StylePropertyValue {
+    companion object : CssOverflowModeValues<OverflowBlock>, CssGlobalValues<OverflowBlock>
+}
+
+fun StyleScope.overflowBlock(overflowBlock: OverflowBlock) {
+    property("overflow-block", overflowBlock)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-inline
+sealed interface OverflowInline : StylePropertyValue {
+    companion object : CssOverflowModeValues<OverflowInline>, CssGlobalValues<OverflowInline>
+}
+
+fun StyleScope.overflowInline(overflowInline: OverflowInline) {
+    property("overflow-inline", overflowInline)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-wrap
+sealed interface OverflowWrap : StylePropertyValue {
+    companion object : CssGlobalValues<OverflowWrap> {
+        // General
+        val Normal get() = "normal".unsafeCast<OverflowWrap>()
+        val BreakWord get() = "break-word".unsafeCast<OverflowWrap>()
+        val Anywhere get() = "anywhere".unsafeCast<OverflowWrap>()
+    }
 }
 
 fun StyleScope.overflowWrap(overflowWrap: OverflowWrap) {

@@ -2,23 +2,30 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-class TextAlign private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+// https://developer.mozilla.org/en-US/docs/Web/CSS/ruby-position
+sealed interface RubyPosition : StylePropertyValue {
+    companion object : CssGlobalValues<RubyPosition> {
+        // Keyword values
+        val Over get() = "over".unsafeCast<RubyPosition>()
+        val Under get() = "under".unsafeCast<RubyPosition>()
+    }
+}
 
-    companion object {
-        val Left get() = TextAlign("left")
-        val Right get() = TextAlign("right")
-        val Center get() = TextAlign("center")
-        val Justify get() = TextAlign("justify")
-        val JustifyAll get() = TextAlign("justify-all")
-        val Start get() = TextAlign("start")
-        val End get() = TextAlign("end")
-        val MatchParent get() = TextAlign("match-parent")
+fun StyleScope.rubyPosition(rubyPosition: RubyPosition) {
+    property("ruby-position", rubyPosition)
+}
 
-        val Inherit get() = TextAlign("inherit")
-        val Initial get() = TextAlign("initial")
-        val Revert get() = TextAlign("revert")
-        val Unset get() = TextAlign("unset")
+// https://developer.mozilla.org/en-US/docs/Web/CSS/text-align
+sealed interface TextAlign : StylePropertyValue {
+    companion object : CssGlobalValues<TextAlign> {
+        val Left get() = "left".unsafeCast<TextAlign>()
+        val Right get() = "right".unsafeCast<TextAlign>()
+        val Center get() = "center".unsafeCast<TextAlign>()
+        val Justify get() = "justify".unsafeCast<TextAlign>()
+        val JustifyAll get() = "justify-all".unsafeCast<TextAlign>()
+        val Start get() = "start".unsafeCast<TextAlign>()
+        val End get() = "end".unsafeCast<TextAlign>()
+        val MatchParent get() = "match-parent".unsafeCast<TextAlign>()
     }
 }
 
@@ -27,40 +34,27 @@ fun StyleScope.textAlign(textAlign: TextAlign) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-line
-class TextDecorationLine private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        val Underline get() = TextDecorationLine("underline")
-        val Overline get() = TextDecorationLine("overline")
-        val LineThrough get() = TextDecorationLine("line-through")
-        val None get() = TextDecorationLine("none")
-
-        val Inherit get() = TextDecorationLine("inherit")
-        val Initial get() = TextDecorationLine("initial")
-        val Revert get() = TextDecorationLine("revert")
-        val Unset get() = TextDecorationLine("unset")
+sealed interface TextDecorationLine : StylePropertyValue {
+    companion object : CssGlobalValues<TextDecorationLine> {
+        val Underline get() = "underline".unsafeCast<TextDecorationLine>()
+        val Overline get() = "overline".unsafeCast<TextDecorationLine>()
+        val LineThrough get() = "line-through".unsafeCast<TextDecorationLine>()
+        val None get() = "none".unsafeCast<TextDecorationLine>()
     }
 }
 
 fun StyleScope.textDecorationLine(vararg textDecorationLines: TextDecorationLine) {
-    property("text-decoration-line", textDecorationLines.joinToString(" "))
+    if (textDecorationLines.isNotEmpty()) {
+        property("text-decoration-line", textDecorationLines.joinToString(" "))
+    }
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow
-class TextOverflow private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
+sealed interface TextOverflow : StylePropertyValue {
+    companion object : CssGlobalValues<TextOverflow> {
         // Keywords
-        val Clip get() = TextOverflow("clip")
-        val Ellipsis get() = TextOverflow("ellipsis")
-
-        // Global values
-        val Inherit get() = TextOverflow("inherit")
-        val Initial get() = TextOverflow("initial")
-        val Revert get() = TextOverflow("revert")
-        val Unset get() = TextOverflow("unset")
+        val Clip get() = "clip".unsafeCast<TextOverflow>()
+        val Ellipsis get() = "ellipsis".unsafeCast<TextOverflow>()
     }
 }
 
@@ -70,17 +64,34 @@ fun StyleScope.textOverflow(textOverflow: TextOverflow) {
 
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow
-class TextShadow private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface TextShadow : StylePropertyValue {
+    sealed interface Listable : TextShadow
 
-    companion object {
-        val Inherit get() = TextShadow("inherit")
-        val Initial get() = TextShadow("initial")
-        val Revert get() = TextShadow("revert")
-        val Unset get() = TextShadow("unset")
+    companion object : CssGlobalValues<TextShadow> {
+        fun of(
+            offsetX: CSSLengthNumericValue,
+            offsetY: CSSLengthNumericValue,
+            blurRadius: CSSLengthNumericValue? = null,
+            color: CSSColorValue? = null,
+        ) = buildString {
+            append(offsetX)
+            append(" ")
+            append(offsetY)
+            if (blurRadius != null) {
+                append(" ")
+                append(blurRadius)
+            }
+            if (color != null) {
+                append(" ")
+                append(color)
+            }
+        }.unsafeCast<Listable>()
+
+        fun list(vararg shadows: Listable) = shadows.joinToString().unsafeCast<TextShadow>()
     }
 }
 
+@Deprecated("Use `textShadow(TextShadow.of(...))` instead", ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))"))
 class CSSTextShadow(
     val offsetX: CSSLengthNumericValue,
     val offsetY: CSSLengthNumericValue,
@@ -102,39 +113,38 @@ class CSSTextShadow(
     }
 }
 
+fun StyleScope.textShadow(textShadow: TextShadow) {
+    property("text-shadow", textShadow)
+}
+
+@Deprecated("Use `textShadow(TextShadow.of(...))` instead", ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))"))
 fun StyleScope.textShadow(
     offsetX: CSSLengthNumericValue,
     offsetY: CSSLengthNumericValue,
     blurRadius: CSSLengthNumericValue? = null,
     color: CSSColorValue? = null
 ) {
-    textShadow(CSSTextShadow(offsetX, offsetY, blurRadius, color))
+    textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))
 }
 
-fun StyleScope.textShadow(vararg textShadows: CSSTextShadow) {
-    property("text-shadow", textShadows.joinToString())
+// Needed temporarily until we can remove the deprecated `vararg` version
+fun StyleScope.textShadow(textShadow: TextShadow.Listable) {
+    textShadow(textShadow.unsafeCast<TextShadow>())
 }
-
-fun StyleScope.textShadow(textShadow: TextShadow) {
-    property("text-shadow", textShadow)
+// Remove the previous method too after removing this method
+@Deprecated("Use `textShadow(TextShadow.list(...))` instead", ReplaceWith("textShadow(TextShadow.list(*shadows))"))
+fun StyleScope.textShadow(vararg shadows: TextShadow.Listable) {
+    textShadow(TextShadow.list(*shadows))
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-transform
-class TextTransform private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
+sealed interface TextTransform : StylePropertyValue {
+    companion object : CssGlobalValues<TextTransform> {
         // Keywords
-        val None get() = TextTransform("none")
-        val Capitalize get() = TextTransform("capitalize")
-        val Uppercase get() = TextTransform("uppercase")
-        val Lowercase get() = TextTransform("lowercase")
-
-        // Globals
-        val Inherit get() = TextTransform("inherit")
-        val Initial get() = TextTransform("initial")
-        val Revert get() = TextTransform("revert")
-        val Unset get() = TextTransform("unset")
+        val None get() = "none".unsafeCast<TextTransform>()
+        val Capitalize get() = "capitalize".unsafeCast<TextTransform>()
+        val Uppercase get() = "uppercase".unsafeCast<TextTransform>()
+        val Lowercase get() = "lowercase".unsafeCast<TextTransform>()
     }
 }
 
@@ -143,22 +153,14 @@ fun StyleScope.textTransform(textTransform: TextTransform) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
-class UserSelect private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
+sealed interface UserSelect : StylePropertyValue {
+    companion object : CssGlobalValues<UserSelect> {
         // Keyword
-        val None get() = UserSelect("none")
-        val Auto get() = UserSelect("auto")
-        val Text get() = UserSelect("text")
-        val Contain get() = UserSelect("contain")
-        val All get() = UserSelect("all")
-
-        // Global
-        val Inherit get() = UserSelect("inherit")
-        val Initial get() = UserSelect("initial")
-        val Revert get() = UserSelect("revert")
-        val Unset get() = UserSelect("unset")
+        val None get() = "none".unsafeCast<UserSelect>()
+        val Auto get() = "auto".unsafeCast<UserSelect>()
+        val Text get() = "text".unsafeCast<UserSelect>()
+        val Contain get() = "contain".unsafeCast<UserSelect>()
+        val All get() = "all".unsafeCast<UserSelect>()
     }
 }
 
@@ -167,21 +169,14 @@ fun StyleScope.userSelect(userSelect: UserSelect) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/white-space
-class WhiteSpace private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        val Normal get() = WhiteSpace("normal");
-        val NoWrap get() = WhiteSpace("nowrap");
-        val Pre get() = WhiteSpace("pre");
-        val PreWrap get() = WhiteSpace("pre-wrap");
-        val PreLine get() = WhiteSpace("pre-line");
-        val BreakSpaces get() = WhiteSpace("break-spaces");
-
-        val Inherit get() = WhiteSpace("inherit")
-        val Initial get() = WhiteSpace("initial")
-        val Revert get() = WhiteSpace("revert")
-        val Unset get() = WhiteSpace("unset")
+sealed interface WhiteSpace : StylePropertyValue {
+    companion object : CssGlobalValues<WhiteSpace> {
+        val Normal get() = "normal".unsafeCast<WhiteSpace>()
+        val NoWrap get() = "nowrap".unsafeCast<WhiteSpace>()
+        val Pre get() = "pre".unsafeCast<WhiteSpace>()
+        val PreWrap get() = "pre-wrap".unsafeCast<WhiteSpace>()
+        val PreLine get() = "pre-line".unsafeCast<WhiteSpace>()
+        val BreakSpaces get() = "break-spaces".unsafeCast<WhiteSpace>()
     }
 }
 
@@ -190,23 +185,16 @@ fun StyleScope.whiteSpace(whiteSpace: WhiteSpace) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/word-break
-class WordBreak private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        val Normal get() = WordBreak("normal");
-        val BreakAll get() = WordBreak("break-all");
-        val KeepAll get() = WordBreak("keep-all");
+sealed interface WordBreak : StylePropertyValue {
+    companion object : CssGlobalValues<WordBreak> {
+        val Normal get() = "normal".unsafeCast<WordBreak>()
+        val BreakAll get() = "break-all".unsafeCast<WordBreak>()
+        val KeepAll get() = "keep-all".unsafeCast<WordBreak>()
         // BreakWord is intentionally not supported as it has been deprecated:
         // https://developer.mozilla.org/en-US/docs/Web/CSS/word-break#values
         // Instead, use `overflow-wrap: break-word` or `overflow-wrap: break-anywhere`,
         // or possibly `word-break: break-all`
         // val BreakWord get() = WordBreak("break-word");
-
-        val Inherit get() = WordBreak("inherit")
-        val Initial get() = WordBreak("initial")
-        val Revert get() = WordBreak("revert")
-        val Unset get() = WordBreak("unset")
     }
 }
 
@@ -214,21 +202,28 @@ fun StyleScope.wordBreak(wordBreak: WordBreak) {
     property("word-break", wordBreak)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/word-spacing
+sealed interface WordSpacing : StylePropertyValue {
+    companion object : CssGlobalValues<WordSpacing> {
+        // Keyword value
+        val Normal get() = "normal".unsafeCast<WordSpacing>()
+
+        // <length> values
+        fun of(value: CSSLengthNumericValue) = "$value".unsafeCast<WordSpacing>()
+    }
+}
+
+fun StyleScope.wordSpacing(wordSpacing: WordSpacing) {
+    property("word-spacing", wordSpacing)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/writing-mode
-class WritingMode private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
+sealed interface WritingMode : StylePropertyValue {
+    companion object : CssGlobalValues<WritingMode> {
         // Keyword
-        val HorizontalTb get() = WritingMode("horizontal-tb");
-        val VerticalRl get() = WritingMode("vertical-rl");
-        val VerticalLr get() = WritingMode("vertical-lr");
-
-        // Global
-        val Inherit get() = WritingMode("inherit")
-        val Initial get() = WritingMode("initial")
-        val Revert get() = WritingMode("revert")
-        val Unset get() = WritingMode("unset")
+        val HorizontalTb get() = "horizontal-tb".unsafeCast<WritingMode>()
+        val VerticalRl get() = "vertical-rl".unsafeCast<WritingMode>()
+        val VerticalLr get() = "vertical-lr".unsafeCast<WritingMode>()
     }
 }
 

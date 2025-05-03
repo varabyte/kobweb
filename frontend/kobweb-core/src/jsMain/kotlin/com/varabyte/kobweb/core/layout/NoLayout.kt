@@ -5,7 +5,8 @@ import com.varabyte.kobweb.core.Page
 /**
  * An annotation which declares that a [Page]-annotated function is explicitly opting out of using a layout.
  *
- * This can be particularly useful if you applied a layout to all pages under a route but want to opt-out some of them.
+ * This can be particularly useful if you applied a layout to all pages under a package but want to opt-out some of
+ * them.
  *
  * ```
  * // pages/Layout.kt

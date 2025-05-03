@@ -11,9 +11,11 @@ fun Modifier.background(background: Background) = styleModifier {
     background(background)
 }
 
-fun Modifier.background(vararg backgrounds: Background.Repeatable) = styleModifier {
-    background(*backgrounds)
+fun Modifier.background(vararg backgrounds: Background.Listable) = styleModifier {
+    background(Background.list(*backgrounds))
 }
+
+fun Modifier.background(backgrounds: List<Background.Listable>) = background(*backgrounds.toTypedArray())
 
 /**
  * Configure an element's background appearance.
@@ -28,9 +30,12 @@ fun Modifier.background(vararg backgrounds: Background.Repeatable) = styleModifi
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background">background</a>
  */
-fun Modifier.background(color: CSSColorValue?, vararg backgrounds: Background.Repeatable) = styleModifier {
-    background(color, *backgrounds)
+fun Modifier.background(color: CSSColorValue, vararg backgrounds: Background.Listable) = styleModifier {
+    background(Background.list(color, *backgrounds))
 }
+
+fun Modifier.background(color: CSSColorValue, backgrounds: List<Background.Listable>) =
+    background(color, *backgrounds.toTypedArray())
 
 fun Modifier.backgroundAttachment(backgroundAttachment: BackgroundAttachment) = styleModifier {
     backgroundAttachment(backgroundAttachment)
@@ -39,6 +44,12 @@ fun Modifier.backgroundAttachment(backgroundAttachment: BackgroundAttachment) = 
 fun Modifier.backgroundBlendMode(blendMode: BackgroundBlendMode) = styleModifier {
     backgroundBlendMode(blendMode)
 }
+
+fun Modifier.backgroundBlendMode(vararg blendModes: BackgroundBlendMode.Listable) =
+    backgroundBlendMode(BackgroundBlendMode.list(*blendModes))
+
+fun Modifier.backgroundBlendMode(blendModes: List<BackgroundBlendMode.Listable>) =
+    backgroundBlendMode(BackgroundBlendMode.list(*blendModes.toTypedArray()))
 
 fun Modifier.backgroundClip(backgroundClip: BackgroundClip) = styleModifier {
     backgroundClip(backgroundClip)
@@ -77,8 +88,8 @@ fun Modifier.backgroundRepeat(backgroundRepeat: BackgroundRepeat) = styleModifie
 }
 
 fun Modifier.backgroundRepeat(
-    horizontalRepeat: BackgroundRepeat.RepeatStyle,
-    verticalRepeat: BackgroundRepeat.RepeatStyle
+    horizontalRepeat: BackgroundRepeat.Mode,
+    verticalRepeat: BackgroundRepeat.Mode
 ) = styleModifier {
     backgroundRepeat(horizontalRepeat, verticalRepeat)
 }

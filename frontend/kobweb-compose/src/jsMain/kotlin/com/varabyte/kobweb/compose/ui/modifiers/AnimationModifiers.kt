@@ -10,9 +10,11 @@ fun Modifier.animation(animation: Animation) = styleModifier {
     animation(animation)
 }
 
-fun Modifier.animation(vararg animations: Animation.Repeatable) = styleModifier {
-    animation(*animations)
+fun Modifier.animation(vararg animations: Animation.Listable) = styleModifier {
+    animation(Animation.list(*animations))
 }
+
+fun Modifier.animation(animations: List<Animation.Listable>) = animation(*animations.toTypedArray())
 
 fun Modifier.onAnimationEnd(listener: (SyntheticAnimationEvent) -> Unit): Modifier = attrsModifier {
     onAnimationEnd(listener)

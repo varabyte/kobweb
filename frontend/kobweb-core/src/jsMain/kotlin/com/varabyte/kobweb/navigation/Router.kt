@@ -133,6 +133,7 @@ class Router {
     private var activePageMethod by mutableStateOf<PageMethod?>(null)
     private val routeTree = RouteTree<PageMethod>()
     private val interceptors = mutableListOf<RouteInterceptorScope.() -> Unit>()
+    private var scrollRequest by mutableStateOf<(() -> Unit)?>(null)
 
     /**
      * A sequence of all routes registered with this router.
@@ -183,18 +184,21 @@ class Router {
         val route = Route.tryCreate(pathQueryAndFragment)
         return if (route != null) {
             val data = routeTree.createPageData(route, errorPageMethod)
+            val previousRoutePath = this.routeState.value?.path
             activePageMethod = data.pageMethod
             this.route = data.routeInfo
-            
-            val initRouteMethods = mutableListOf<InitRouteMethod>()
-            initRouteForPage[activePageMethod]?.let { initRouteMethods.add(it) }
-            data.pageMethod.parentLayouts.forEach { layoutMethod ->
-                initRouteForLayout[layoutMethod]?.let { initRouteMethods.add(it) }
-            }
 
-            this@Router.pageDataStore.clear()
-            val ctx = InitRouteContext(data.routeInfo, this@Router.pageDataStore)
-            initRouteMethods.forEach { it.invoke(ctx) }
+            if (previousRoutePath != route.path) {
+                val initRouteMethods = mutableListOf<InitRouteMethod>()
+                initRouteForPage[activePageMethod]?.let { initRouteMethods.add(it) }
+                data.pageMethod.parentLayouts.forEach { layoutMethod ->
+                    initRouteForLayout[layoutMethod]?.let { initRouteMethods.add(it) }
+                }
+
+                this@Router.pageDataStore.clear()
+                val ctx = InitRouteContext(data.routeInfo, this@Router.pageDataStore)
+                initRouteMethods.forEach { it.invoke(ctx) }
+            }
 
             true
         } else {
@@ -203,13 +207,13 @@ class Router {
     }
 
     /**
-     * The ancestor layouts for this page (if any), in order from closet to most distance ancestory.
+     * The ancestor layouts for this page (if any), in order from closet to most distance ancestor.
      */
     val PageMethod.parentLayouts: List<LayoutMethod> get() {
         var layoutMethod: LayoutMethod? = layoutIdForPage[this]?.let { layouts[it] }
         return buildList {
             while (layoutMethod != null) {
-                add(0, layoutMethod)
+                add(layoutMethod)
                 layoutMethod = layoutIdForLayout[layoutMethod]?.let { layouts[it] }
             }
         }
@@ -237,6 +241,12 @@ class Router {
             PageContextLocal provides PageContext.instance
         ) {
             pageWrapper {
+                DisposableEffect(scrollRequest) {
+                    scrollRequest?.invoke()
+                    scrollRequest = null
+                    onDispose {  }
+                }
+
                 // If a user navigates between two different dynamic routes, e.g. "/users/a" and "/users/b" for route
                 // "/users/{user}", we want to treat this as a recomposition, since from the user's point of view, they
                 // are different URLs. Query params changing should NOT cause a recomposition though!
@@ -244,7 +254,8 @@ class Router {
                     key(PageContext.instance.route.path) { pageMethod(ctx) }
                 }
 
-                pageMethod.parentLayouts.foldRight(keyedPageMethod) { layout, accum ->
+                // When rendering a page, composition order starts at the top ancestor and works its way down
+                pageMethod.parentLayouts.asReversed().foldRight(keyedPageMethod) { layout, accum ->
                     { ctx -> layout(ctx, accum) }
                 }.invoke(PageContext.instance)
             }
@@ -521,28 +532,17 @@ class Router {
                     }
 
                     if (onNewPage) {
-                        window.scroll(ScrollToOptions(0.0, 0.0, ScrollBehavior.INSTANT))
+                        scrollRequest = {
+                            window.scroll(ScrollToOptions(0.0, 0.0, ScrollBehavior.INSTANT))
+                        }
                     }
                 }
 
                 // Even if the URL hasn't changed, still scroll to the target element if you can. Sometimes a user might
                 // scroll the page and then re-enter the same URL to go back.
                 if (url.contains('#')) {
-                    fun scrollElementIntoView() = document.getElementById(url.substringAfter('#'))?.scrollIntoView()
-                    if (onNewPage) {
-                        // We need to give the page a chance to render first, or else the element with the ID might not
-                        // exist yet.
-                        MutationObserver { mutations, observer ->
-                            mutations.forEach { mutation ->
-                                // Only scroll if elements were added, removals do not signal that the page is rendered.
-                                if (mutation.type == "childList" && mutation.addedNodes.asList().isNotEmpty()) {
-                                    scrollElementIntoView()
-                                    observer.disconnect()
-                                }
-                            }
-                        }.observe(document.body!!, MutationObserverInit(childList = true, subtree = true))
-                    } else {
-                        scrollElementIntoView()
+                    scrollRequest = {
+                        document.getElementById(url.substringAfter('#'))?.scrollIntoView()
                     }
                 }
             }

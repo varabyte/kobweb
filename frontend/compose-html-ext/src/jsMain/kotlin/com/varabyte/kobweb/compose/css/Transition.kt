@@ -5,19 +5,14 @@ import org.jetbrains.compose.web.css.*
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-behavior
-class TransitionBehavior private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface TransitionBehavior : StylePropertyValue {
+    sealed interface Listable : TransitionBehavior
+    companion object : CssGlobalValues<TransitionBehavior> {
+        fun list(vararg behaviors: Listable) = behaviors.joinToString().unsafeCast<TransitionBehavior>()
 
-    companion object {
         // Keywords
-        val AllowDiscrete get() = TransitionBehavior("allow-discrete")
-        val Normal get() = TransitionBehavior("normal")
-
-        // Global values
-        val Inherit get() = TransitionBehavior("inherit")
-        val Initial get() = TransitionBehavior("initial")
-        val Revert get() = TransitionBehavior("revert")
-        val Unset get() = TransitionBehavior("unset")
+        val AllowDiscrete get() = "allow-discrete".unsafeCast<Listable>()
+        val Normal get() = "normal".unsafeCast<Listable>()
     }
 }
 
@@ -25,35 +20,32 @@ fun StyleScope.transitionBehavior(behavior: TransitionBehavior) {
     property("transition-behavior", behavior)
 }
 
-fun StyleScope.transitionBehavior(vararg behaviors: TransitionBehavior) {
-    property("transition-behavior", behaviors.joinToString())
+// Needed temporarily until we can remove the deprecated `vararg` version
+fun StyleScope.transitionBehavior(behavior: TransitionBehavior.Listable) {
+    transitionBehavior(behavior.unsafeCast<TransitionBehavior>())
+}
+// Remove the previous method too after removing this method
+@Deprecated("Use transitionBehavior(TransitionBehavior.list(...)) instead.", ReplaceWith("transitionBehavior(TransitionBehavior.list(*behaviors))"))
+fun StyleScope.transitionBehavior(vararg behaviors: TransitionBehavior.Listable) {
+    transitionBehavior(TransitionBehavior.list(*behaviors))
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-property
-sealed class TransitionProperty private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface TransitionProperty : StylePropertyValue {
+    sealed interface Name : TransitionProperty
 
-    private class Keyword(value: String) : TransitionProperty(value)
-    class Name internal constructor(value: String) : TransitionProperty(value)
-
-    companion object {
+    companion object : CssGlobalValues<TransitionProperty> {
         // Custom
         fun of(customValue: String): Name {
             require(customValue.isNotEmpty() && customValue.none { it.isWhitespace() }) {
                 "Invalid transition property name. A property shouldn't contain any spaces, but got \"$customValue\"."
             }
-            return Name(customValue)
+            return customValue.unsafeCast<Name>()
         }
 
         // Keywords
-        val None: TransitionProperty get() = Keyword("none")
-        val All get() = Name("all") // Essentially a special property name
-
-        // Global values
-        val Inherit: TransitionProperty get() = Keyword("inherit")
-        val Initial: TransitionProperty get() = Keyword("initial")
-        val Revert: TransitionProperty get() = Keyword("revert")
-        val Unset: TransitionProperty get() = Keyword("unset")
+        val None get() = "none".unsafeCast<TransitionProperty>()
+        val All get() = of("all") // Essentially a special property name
     }
 }
 
@@ -61,83 +53,58 @@ fun StyleScope.transitionProperty(property: TransitionProperty) {
     transitionProperty(property.toString())
 }
 
+fun StyleScope.transitionProperty(vararg properties: TransitionProperty.Name) {
+    if (properties.isNotEmpty()) {
+        property("transition-property", properties.joinToString())
+    }
+}
+
 fun StyleScope.transitionProperty(vararg properties: String) {
-    property("transition-property", properties.joinToString())
+    transitionProperty(*properties.map { TransitionProperty.of(it) }.toTypedArray())
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-duration
-/**
- * Special values for Transition Duration Property.
- */
-class TransitionDuration private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        // Global values
-        val Inherit get() = TransitionDuration("inherit")
-        val Initial get() = TransitionDuration("initial")
-        val Revert get() = TransitionDuration("revert")
-        val Unset get() = TransitionDuration("unset")
-    }
-}
-
-fun StyleScope.transitionDuration(duration: TransitionDuration) {
-    property("transition-duration", duration)
-}
-
 fun StyleScope.transitionDuration(vararg durations: CSSTimeNumericValue) {
-    property("transition-duration", durations.joinToString())
+    if (durations.isNotEmpty()) {
+        property("transition-duration", durations.joinToString())
+    }
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-delay
-/**
- * Special values for Transition Delay Property.
- */
-class TransitionDelay private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        // Global values
-        val Inherit get() = TransitionDelay("inherit")
-        val Initial get() = TransitionDelay("initial")
-        val Revert get() = TransitionDelay("revert")
-        val Unset get() = TransitionDelay("unset")
-    }
-}
-
-fun StyleScope.transitionDelay(delay: TransitionDelay) {
-    property("transition-delay", delay)
-}
-
 fun StyleScope.transitionDelay(vararg delays: CSSTimeNumericValue) {
-    property("transition-delay", delays.joinToString())
+    if (delays.isNotEmpty()) {
+        property("transition-delay", delays.joinToString())
+    }
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
 typealias TransitionTimingFunction = AnimationTimingFunction
 
-fun StyleScope.transitionTimingFunction(value: TransitionTimingFunction) {
-    property("transition-timing-function", value)
+fun StyleScope.transitionTimingFunction(timingFunction: TransitionTimingFunction) {
+    property("transition-timing-function", timingFunction)
 }
 
-fun StyleScope.transitionTimingFunction(vararg values: TransitionTimingFunction) {
-    property("transition-timing-function", values.joinToString { it.value })
+fun StyleScope.transitionTimingFunction(vararg timingFunctions: TransitionTimingFunction) {
+    if (timingFunctions.isNotEmpty()) {
+        property("transition-timing-function", timingFunctions.joinToString { it.value })
+    }
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition
-sealed class Transition private constructor(private val value: String) : StylePropertyValue {
-    override fun toString(): String = value
+sealed interface Transition : StylePropertyValue {
+    sealed interface Listable : Transition
 
-    private class Keyword(value: String) : Transition(value)
+    companion object : CssGlobalValues<Transition> {
+        // Keyword
+        val None: Transition get() = "none".unsafeCast<Transition>()
 
-    class Repeatable internal constructor(
-        property: TransitionProperty.Name,
-        duration: CSSTimeNumericValue?,
-        timingFunction: TransitionTimingFunction?,
-        delay: CSSTimeNumericValue?,
-        behavior: TransitionBehavior?,
-    ) : Transition(
-        buildList {
+        fun of(
+            property: TransitionProperty.Name,
+            duration: CSSTimeNumericValue? = null,
+            timingFunction: TransitionTimingFunction? = null,
+            delay: CSSTimeNumericValue? = null,
+            behavior: TransitionBehavior? = null,
+        ) = buildList {
             add(property.toString())
             // https://developer.mozilla.org/en-US/docs/Web/CSS/transition#syntax
             duration?.let { add(it.toString()) }
@@ -149,26 +116,8 @@ sealed class Transition private constructor(private val value: String) : StylePr
                 add(delay.toString())
             }
             behavior?.let { add(it.toString()) }
-        }.joinToString(" ")
-    )
+        }.joinToString(" ").unsafeCast<Listable>()
 
-    companion object {
-        // Keyword
-        val None: Transition get() = Keyword("none")
-
-        // Global Keywords
-        val Inherit: Transition get() = Keyword("inherit")
-        val Initial: Transition get() = Keyword("initial")
-        val Revert: Transition get() = Keyword("revert")
-        val Unset: Transition get() = Keyword("unset")
-
-        fun of(
-            property: TransitionProperty.Name,
-            duration: CSSTimeNumericValue? = null,
-            timingFunction: TransitionTimingFunction? = null,
-            delay: CSSTimeNumericValue? = null,
-            behavior: TransitionBehavior? = null,
-        ): Repeatable = Repeatable(property, duration, timingFunction, delay, behavior)
 
         fun of(
             property: String,
@@ -176,7 +125,9 @@ sealed class Transition private constructor(private val value: String) : StylePr
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null,
             behavior: TransitionBehavior? = null,
-        ): Repeatable = Repeatable(TransitionProperty.of(property), duration, timingFunction, delay, behavior)
+        ) = of(TransitionProperty.of(property), duration, timingFunction, delay, behavior)
+
+        fun list(vararg transitions: Listable) = transitions.joinToString().unsafeCast<Transition>()
 
         /**
          * Specify transition details that should apply to every animatable property on this element.
@@ -186,7 +137,7 @@ sealed class Transition private constructor(private val value: String) : StylePr
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null,
             behavior: TransitionBehavior? = null,
-        ): Repeatable = of(TransitionProperty.All, duration, timingFunction, delay, behavior)
+        ) = of(TransitionProperty.All, duration, timingFunction, delay, behavior)
 
         /**
          * A convenience method for when you want to animate multiple properties with the same values.
@@ -204,8 +155,7 @@ sealed class Transition private constructor(private val value: String) : StylePr
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null,
             behavior: TransitionBehavior? = null,
-        ) = properties.map { property -> Transition.of(property, duration, timingFunction, delay, behavior) }
-            .toTypedArray()
+        ) = properties.map { property -> Transition.of(property, duration, timingFunction, delay, behavior) }.joinToString().unsafeCast<Transition>()
 
         /**
          * A convenience method for when you want to animate multiple properties with the same values.
@@ -223,8 +173,7 @@ sealed class Transition private constructor(private val value: String) : StylePr
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null,
             behavior: TransitionBehavior? = null,
-        ) = properties.map { property -> Transition.of(property, duration, timingFunction, delay, behavior) }
-            .toTypedArray()
+        ): Transition = properties.map { property -> Transition.of(property, duration, timingFunction, delay, behavior) }.joinToString().unsafeCast<Transition>()
     }
 }
 
@@ -232,8 +181,12 @@ fun StyleScope.transition(transition: Transition) {
     property("transition", transition)
 }
 
-fun StyleScope.transition(vararg transitions: Transition.Repeatable) {
-    if (transitions.isNotEmpty()) {
-        property("transition", transitions.joinToString())
-    }
+// Needed temporarily until we can remove the deprecated `vararg` version
+fun StyleScope.transition(transition: Transition.Listable) {
+    transition(transition.unsafeCast<Transition>())
+}
+// Remove the previous method too after removing this method
+@Deprecated("Use transition(Transition.list(...)) instead.", ReplaceWith("transition(Transition.list(*transitions))"))
+fun StyleScope.transition(vararg transitions: Transition.Listable) {
+    transition(Transition.list(*transitions))
 }

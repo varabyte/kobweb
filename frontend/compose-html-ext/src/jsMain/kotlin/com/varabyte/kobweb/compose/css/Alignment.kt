@@ -1,4 +1,5 @@
-@file:Suppress("FunctionName") // Intentionally make some function names look like constructors
+// Intentionally make some function names look like constructors
+@file:Suppress("FunctionName")
 
 package com.varabyte.kobweb.compose.css
 
@@ -52,47 +53,34 @@ private fun OverflowStrategy.toValue(position: StylePropertyValue) = "${name.low
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/align-content
-sealed class AlignContent(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface AlignContent : StylePropertyValue {
+    sealed interface AlignContentPosition : AlignContent
 
-    private class AlignContentKeyword(value: String) : AlignContent(value)
-    class AlignContentPosition internal constructor(value: String) : AlignContent(value)
-
-    private class BaselineAlignment(baselineSet: BaselineSet?) : AlignContent(baselineSet.toValue())
-    private class OverflowAlignment(strategy: OverflowStrategy, position: AlignContentPosition) :
-        AlignContent(strategy.toValue(position))
-
-    companion object {
+    companion object : CssGlobalValues<AlignContent> {
         // Basic
-        val Normal: AlignContent get() = AlignContentKeyword("normal")
+        val Normal get() = "normal".unsafeCast<AlignContent>()
 
         // Positional
-        val Center get() = AlignContentPosition("center")
-        val Start get() = AlignContentPosition("start")
-        val End get() = AlignContentPosition("end")
-        val FlexStart get() = AlignContentPosition("flex-start")
-        val FlexEnd get() = AlignContentPosition("flex-end")
+        val Center get() = "center".unsafeCast<AlignContentPosition>()
+        val Start get() = "start".unsafeCast<AlignContentPosition>()
+        val End get() = "end".unsafeCast<AlignContentPosition>()
+        val FlexStart get() = "flex-start".unsafeCast<AlignContentPosition>()
+        val FlexEnd get() = "flex-end".unsafeCast<AlignContentPosition>()
 
         // Distributed
-        val SpaceBetween: AlignContent get() = AlignContentKeyword("space-between")
-        val SpaceAround: AlignContent get() = AlignContentKeyword("space-around")
-        val SpaceEvenly: AlignContent get() = AlignContentKeyword("space-evenly")
-        val Stretch: AlignContent get() = AlignContentKeyword("stretch")
+        val SpaceBetween get() = "space-between".unsafeCast<AlignContent>()
+        val SpaceAround get() = "space-around".unsafeCast<AlignContent>()
+        val SpaceEvenly get() = "space-evenly".unsafeCast<AlignContent>()
+        val Stretch get() = "stretch".unsafeCast<AlignContent>()
 
         // Baseline
-        val Baseline: AlignContent get() = BaselineAlignment(null)
-        val FirstBaseline: AlignContent get() = BaselineAlignment(BaselineSet.FIRST)
-        val LastBaseline: AlignContent get() = BaselineAlignment(BaselineSet.LAST)
+        val Baseline get() = (null as? BaselineSet?).toValue().unsafeCast<AlignContent>()
+        val FirstBaseline get() = BaselineSet.FIRST.toValue().unsafeCast<AlignContent>()
+        val LastBaseline get() = BaselineSet.LAST.toValue().unsafeCast<AlignContent>()
 
         // Overflow
-        fun Safe(position: AlignContentPosition): AlignContent = OverflowAlignment(OverflowStrategy.SAFE, position)
-        fun Unsafe(position: AlignContentPosition): AlignContent = OverflowAlignment(OverflowStrategy.UNSAFE, position)
-
-        // Global
-        val Inherit: AlignContent get() = AlignContentKeyword("inherit")
-        val Initial: AlignContent get() = AlignContentKeyword("initial")
-        val Revert: AlignContent get() = AlignContentKeyword("revert")
-        val Unset: AlignContent get() = AlignContentKeyword("unset")
+        fun Safe(position: AlignContentPosition) = OverflowStrategy.SAFE.toValue(position).unsafeCast<AlignContent>()
+        fun Unsafe(position: AlignContentPosition) = OverflowStrategy.UNSAFE.toValue(position).unsafeCast<AlignContent>()
     }
 }
 
@@ -111,44 +99,31 @@ fun StyleScope.alignContent(alignContent: AlignContent) {
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/align-items
-sealed class AlignItems private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface AlignItems : StylePropertyValue {
+    sealed interface AlignItemsPosition : AlignItems
 
-    private class AlignItemsKeyword(value: String) : AlignItems(value)
-    class AlignItemsPosition internal constructor(value: String) : AlignItems(value)
-
-    private class BaselineAlignment(baselineSet: BaselineSet?) : AlignItems(baselineSet.toValue())
-    private class OverflowAlignment(strategy: OverflowStrategy, position: AlignItemsPosition) :
-        AlignItems(strategy.toValue(position))
-
-    companion object {
+    companion object : CssGlobalValues<AlignItems> {
         // Basic
-        val Normal: AlignItems get() = AlignItemsKeyword("normal")
-        val Stretch: AlignItems get() = AlignItemsKeyword("stretch")
+        val Normal get() = "normal".unsafeCast<AlignItems>()
+        val Stretch get() = "stretch".unsafeCast<AlignItems>()
 
         // Positional
-        val Center get() = AlignItemsPosition("center")
-        val Start get() = AlignItemsPosition("start")
-        val End get() = AlignItemsPosition("end")
-        val SelfStart get() = AlignItemsPosition("self-start")
-        val SelfEnd get() = AlignItemsPosition("self-end")
-        val FlexStart get() = AlignItemsPosition("flex-start")
-        val FlexEnd get() = AlignItemsPosition("flex-end")
+        val Center get() = "center".unsafeCast<AlignItemsPosition>()
+        val Start get() = "start".unsafeCast<AlignItemsPosition>()
+        val End get() = "end".unsafeCast<AlignItemsPosition>()
+        val SelfStart get() = "self-start".unsafeCast<AlignItemsPosition>()
+        val SelfEnd get() = "self-end".unsafeCast<AlignItemsPosition>()
+        val FlexStart get() = "flex-start".unsafeCast<AlignItemsPosition>()
+        val FlexEnd get() = "flex-end".unsafeCast<AlignItemsPosition>()
 
         // Baseline
-        val Baseline: AlignItems get() = BaselineAlignment(null)
-        val FirstBaseline: AlignItems get() = BaselineAlignment(BaselineSet.FIRST)
-        val LastBaseline: AlignItems get() = BaselineAlignment(BaselineSet.LAST)
+        val Baseline get() = (null as? BaselineSet?).toValue().unsafeCast<AlignItems>()
+        val FirstBaseline get() = BaselineSet.FIRST.toValue().unsafeCast<AlignItems>()
+        val LastBaseline get() = BaselineSet.LAST.toValue().unsafeCast<AlignItems>()
 
         // Overflow
-        fun Safe(position: AlignItemsPosition): AlignItems = OverflowAlignment(OverflowStrategy.SAFE, position)
-        fun Unsafe(position: AlignItemsPosition): AlignItems = OverflowAlignment(OverflowStrategy.UNSAFE, position)
-
-        // Global
-        val Inherit: AlignItems get() = AlignItemsKeyword("inherit")
-        val Initial: AlignItems get() = AlignItemsKeyword("initial")
-        val Revert: AlignItems get() = AlignItemsKeyword("revert")
-        val Unset: AlignItems get() = AlignItemsKeyword("unset")
+        fun Safe(position: AlignItemsPosition): AlignItems = OverflowStrategy.SAFE.toValue(position).unsafeCast<AlignItems>()
+        fun Unsafe(position: AlignItemsPosition): AlignItems = OverflowStrategy.UNSAFE.toValue(position).unsafeCast<AlignItems>()
     }
 }
 
@@ -167,45 +142,32 @@ fun StyleScope.alignItems(alignItems: AlignItems) {
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/align-self
-sealed class AlignSelf private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface AlignSelf : StylePropertyValue {
+    sealed interface AlignSelfPosition : AlignSelf
 
-    private class AlignSelfKeyword(value: String) : AlignSelf(value)
-    class AlignSelfPosition internal constructor(value: String) : AlignSelf(value)
-
-    private class BaselineAlignment(baselineSet: BaselineSet?) : AlignSelf(baselineSet.toValue())
-    private class OverflowAlignment(strategy: OverflowStrategy, position: AlignSelfPosition) :
-        AlignSelf(strategy.toValue(position))
-
-    companion object {
+    companion object : CssGlobalValues<AlignSelf> {
         // Basic
-        val Auto: AlignSelf get() = AlignSelfKeyword("auto")
-        val Normal: AlignSelf get() = AlignSelfKeyword("normal")
-        val Stretch: AlignSelf get() = AlignSelfKeyword("stretch")
+        val Auto get() = "auto".unsafeCast<AlignSelf>()
+        val Normal get() = "normal".unsafeCast<AlignSelf>()
+        val Stretch get() = "stretch".unsafeCast<AlignSelf>()
 
         // Positional
-        val Center get() = AlignSelfPosition("center")
-        val Start get() = AlignSelfPosition("start")
-        val End get() = AlignSelfPosition("end")
-        val SelfStart get() = AlignSelfPosition("self-start")
-        val SelfEnd get() = AlignSelfPosition("self-end")
-        val FlexStart get() = AlignSelfPosition("flex-start")
-        val FlexEnd get() = AlignSelfPosition("flex-end")
+        val Center get() = "center".unsafeCast<AlignSelfPosition>()
+        val Start get() = "start".unsafeCast<AlignSelfPosition>()
+        val End get() = "end".unsafeCast<AlignSelfPosition>()
+        val SelfStart get() = "self-start".unsafeCast<AlignSelfPosition>()
+        val SelfEnd get() = "self-end".unsafeCast<AlignSelfPosition>()
+        val FlexStart get() = "flex-start".unsafeCast<AlignSelfPosition>()
+        val FlexEnd get() = "flex-end".unsafeCast<AlignSelfPosition>()
 
         // Baseline
-        val Baseline: AlignSelf get() = BaselineAlignment(null)
-        val FirstBaseline: AlignSelf get() = BaselineAlignment(BaselineSet.FIRST)
-        val LastBaseline: AlignSelf get() = BaselineAlignment(BaselineSet.LAST)
+        val Baseline get() = (null as? BaselineSet?).toValue().unsafeCast<AlignSelf>()
+        val FirstBaseline get() = BaselineSet.FIRST.toValue().unsafeCast<AlignSelf>()
+        val LastBaseline get() = BaselineSet.LAST.toValue().unsafeCast<AlignSelf>()
 
         // Overflow
-        fun Safe(position: AlignSelfPosition): AlignSelf = OverflowAlignment(OverflowStrategy.SAFE, position)
-        fun Unsafe(position: AlignSelfPosition): AlignSelf = OverflowAlignment(OverflowStrategy.UNSAFE, position)
-
-        // Global
-        val Inherit: AlignSelf get() = AlignSelfKeyword("inherit")
-        val Initial: AlignSelf get() = AlignSelfKeyword("initial")
-        val Revert: AlignSelf get() = AlignSelfKeyword("revert")
-        val Unset: AlignSelf get() = AlignSelfKeyword("unset")
+        fun Safe(position: AlignSelfPosition) = OverflowStrategy.SAFE.toValue(position).unsafeCast<AlignSelf>()
+        fun Unsafe(position: AlignSelfPosition) = OverflowStrategy.UNSAFE.toValue(position).unsafeCast<AlignSelf>()
     }
 }
 
@@ -225,44 +187,32 @@ fun StyleScope.alignSelf(alignSelf: AlignSelf) {
  * it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content
-sealed class JustifyContent private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface JustifyContent : StylePropertyValue {
+    sealed interface JustifyContentPosition : JustifyContent
 
-    private class JustifyContentKeyword(value: String) : JustifyContent(value)
-    class JustifyContentPosition internal constructor(value: String) : JustifyContent(value)
-
-    private class OverflowAlignment(strategy: OverflowStrategy, position: JustifyContentPosition) :
-        JustifyContent(strategy.toValue(position))
-
-    companion object {
+    companion object : CssGlobalValues<JustifyContent> {
         // Basic
-        val Normal: JustifyContent get() = JustifyContentKeyword("normal")
+        val Normal get() = "normal".unsafeCast<JustifyContent>()
 
         // Positional
-        val Center get() = JustifyContentPosition("center")
-        val Start get() = JustifyContentPosition("start")
-        val End get() = JustifyContentPosition("end")
-        val FlexStart get() = JustifyContentPosition("flex-start")
-        val FlexEnd get() = JustifyContentPosition("flex-end")
-        val Left get() = JustifyContentPosition("left")
-        val Right get() = JustifyContentPosition("right")
+        val Center get() = "center".unsafeCast<JustifyContentPosition>()
+        val Start get() = "start".unsafeCast<JustifyContentPosition>()
+        val End get() = "end".unsafeCast<JustifyContentPosition>()
+        val FlexStart get() = "flex-start".unsafeCast<JustifyContentPosition>()
+        val FlexEnd get() = "flex-end".unsafeCast<JustifyContentPosition>()
+        val Left get() = "left".unsafeCast<JustifyContentPosition>()
+        val Right get() = "right".unsafeCast<JustifyContentPosition>()
 
         // Distributed
-        val SpaceBetween: JustifyContent get() = JustifyContentKeyword("space-between")
-        val SpaceAround: JustifyContent get() = JustifyContentKeyword("space-around")
-        val SpaceEvenly: JustifyContent get() = JustifyContentKeyword("space-evenly")
-        val Stretch: JustifyContent get() = JustifyContentKeyword("stretch")
+        val SpaceBetween get() = "space-between".unsafeCast<JustifyContent>()
+        val SpaceAround get() = "space-around".unsafeCast<JustifyContent>()
+        val SpaceEvenly get() = "space-evenly".unsafeCast<JustifyContent>()
+        val Stretch get() = "stretch".unsafeCast<JustifyContent>()
 
         // Overflow
-        fun Safe(position: JustifyContentPosition): JustifyContent = OverflowAlignment(OverflowStrategy.SAFE, position)
-        fun Unsafe(position: JustifyContentPosition): JustifyContent =
-            OverflowAlignment(OverflowStrategy.UNSAFE, position)
-
-        // Global
-        val Inherit: JustifyContent get() = JustifyContentKeyword("inherit")
-        val Initial: JustifyContent get() = JustifyContentKeyword("initial")
-        val Revert: JustifyContent get() = JustifyContentKeyword("revert")
-        val Unset: JustifyContent get() = JustifyContentKeyword("unset")
+        fun Safe(position: JustifyContentPosition) = OverflowStrategy.SAFE.toValue(position).unsafeCast<JustifyContent>()
+        fun Unsafe(position: JustifyContentPosition) =
+            OverflowStrategy.UNSAFE.toValue(position).unsafeCast<JustifyContent>()
     }
 }
 
@@ -281,46 +231,33 @@ fun StyleScope.justifyContent(justifyContent: JustifyContent) {
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-items
-sealed class JustifyItems private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface JustifyItems : StylePropertyValue {
+    sealed interface JustifyItemsPosition : JustifyItems
 
-    private class JustifyItemsKeyword(value: String) : JustifyItems(value)
-    class JustifyItemsPosition internal constructor(value: String) : JustifyItems(value)
-
-    private class BaselineAlignment(baselineSet: BaselineSet?) : JustifyItems(baselineSet.toValue())
-    private class OverflowAlignment(strategy: OverflowStrategy, position: JustifyItemsPosition) :
-        JustifyItems(strategy.toValue(position))
-
-    companion object {
+    companion object : CssGlobalValues<JustifyItems> {
         // Basic
-        val Normal: JustifyItems get() = JustifyItemsKeyword("normal")
-        val Stretch: JustifyItems get() = JustifyItemsKeyword("stretch")
+        val Normal get() = "normal".unsafeCast<JustifyItems>()
+        val Stretch get() = "stretch".unsafeCast<JustifyItems>()
 
         // Positional
-        val Center get() = JustifyItemsPosition("center")
-        val Start get() = JustifyItemsPosition("start")
-        val End get() = JustifyItemsPosition("end")
-        val FlexStart get() = JustifyItemsPosition("flex-start")
-        val FlexEnd get() = JustifyItemsPosition("flex-end")
-        val SelfStart get() = JustifyItemsPosition("self-start")
-        val SelfEnd get() = JustifyItemsPosition("self-end")
-        val Left get() = JustifyItemsPosition("left")
-        val Right get() = JustifyItemsPosition("right")
+        val Center get() = "center".unsafeCast<JustifyItemsPosition>()
+        val Start get() = "start".unsafeCast<JustifyItemsPosition>()
+        val End get() = "end".unsafeCast<JustifyItemsPosition>()
+        val FlexStart get() = "flex-start".unsafeCast<JustifyItemsPosition>()
+        val FlexEnd get() = "flex-end".unsafeCast<JustifyItemsPosition>()
+        val SelfStart get() = "self-start".unsafeCast<JustifyItemsPosition>()
+        val SelfEnd get() = "self-end".unsafeCast<JustifyItemsPosition>()
+        val Left get() = "left".unsafeCast<JustifyItemsPosition>()
+        val Right get() = "right".unsafeCast<JustifyItemsPosition>()
 
         // Baseline
-        val Baseline: JustifyItems get() = BaselineAlignment(null)
-        val FirstBaseline: JustifyItems get() = BaselineAlignment(BaselineSet.FIRST)
-        val LastBaseline: JustifyItems get() = BaselineAlignment(BaselineSet.LAST)
+        val Baseline get() = (null as? BaselineSet?).toValue().unsafeCast<JustifyItems>()
+        val FirstBaseline get() = BaselineSet.FIRST.toValue().unsafeCast<JustifyItems>()
+        val LastBaseline get() = BaselineSet.LAST.toValue().unsafeCast<JustifyItems>()
 
         // Overflow
-        fun Safe(position: JustifyItemsPosition): JustifyItems = OverflowAlignment(OverflowStrategy.SAFE, position)
-        fun Unsafe(position: JustifyItemsPosition): JustifyItems = OverflowAlignment(OverflowStrategy.UNSAFE, position)
-
-        // Global
-        val Inherit: JustifyItems get() = JustifyItemsKeyword("inherit")
-        val Initial: JustifyItems get() = JustifyItemsKeyword("initial")
-        val Revert: JustifyItems get() = JustifyItemsKeyword("revert")
-        val Unset: JustifyItems get() = JustifyItemsKeyword("unset")
+        fun Safe(position: JustifyItemsPosition) = OverflowStrategy.SAFE.toValue(position)
+        fun Unsafe(position: JustifyItemsPosition) = OverflowStrategy.UNSAFE.toValue(position)
     }
 }
 
@@ -339,47 +276,34 @@ fun StyleScope.justifyItems(justifyItems: JustifyItems) {
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-self
-sealed class JustifySelf private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
+sealed interface JustifySelf : StylePropertyValue {
+    sealed interface JustifySelfPosition : JustifySelf
 
-    private class JustifySelfKeyword(value: String) : JustifySelf(value)
-    class JustifySelfPosition internal constructor(value: String) : JustifySelf(value)
-
-    private class BaselineAlignment(baselineSet: BaselineSet?) : JustifySelf(baselineSet.toValue())
-    private class OverflowAlignment(strategy: OverflowStrategy, position: JustifySelfPosition) :
-        JustifySelf(strategy.toValue(position))
-
-    companion object {
+    companion object : CssGlobalValues<JustifySelf> {
         // Basic
-        val Auto: JustifySelf get() = JustifySelfKeyword("auto")
-        val Normal: JustifySelf get() = JustifySelfKeyword("normal")
-        val Stretch: JustifySelf get() = JustifySelfKeyword("stretch")
+        val Auto get() = "auto".unsafeCast<JustifySelf>()
+        val Normal get() = "normal".unsafeCast<JustifySelf>()
+        val Stretch get() = "stretch".unsafeCast<JustifySelf>()
 
-        // Positional
-        val Center get() = JustifySelfPosition("center")
-        val Start get() = JustifySelfPosition("start")
-        val End get() = JustifySelfPosition("end")
-        val SelfStart get() = JustifySelfPosition("self-start")
-        val SelfEnd get() = JustifySelfPosition("self-end")
-        val FlexStart get() = JustifySelfPosition("flex-start")
-        val FlexEnd get() = JustifySelfPosition("flex-end")
-        val Left get() = JustifySelfPosition("left")
-        val Right get() = JustifySelfPosition("right")
+        // Positional  
+        val Center get() = "center".unsafeCast<JustifySelfPosition>()
+        val Start get() = "start".unsafeCast<JustifySelfPosition>()
+        val End get() = "end".unsafeCast<JustifySelfPosition>()
+        val SelfStart get() = "self-start".unsafeCast<JustifySelfPosition>()
+        val SelfEnd get() = "self-end".unsafeCast<JustifySelfPosition>()
+        val FlexStart get() = "flex-start".unsafeCast<JustifySelfPosition>()
+        val FlexEnd get() = "flex-end".unsafeCast<JustifySelfPosition>()
+        val Left get() = "left".unsafeCast<JustifySelfPosition>()
+        val Right get() = "right".unsafeCast<JustifySelfPosition>()
 
         // Baseline
-        val Baseline: JustifySelf get() = BaselineAlignment(null)
-        val FirstBaseline: JustifySelf get() = BaselineAlignment(BaselineSet.FIRST)
-        val LastBaseline: JustifySelf get() = BaselineAlignment(BaselineSet.LAST)
+        val Baseline get() = (null as? BaselineSet?).toValue().unsafeCast<JustifySelf>()
+        val FirstBaseline get() = BaselineSet.FIRST.toValue().unsafeCast<JustifySelf>()
+        val LastBaseline get() = BaselineSet.LAST.toValue().unsafeCast<JustifySelf>()
 
         // Overflow
-        fun Safe(position: JustifySelfPosition): JustifySelf = OverflowAlignment(OverflowStrategy.SAFE, position)
-        fun Unsafe(position: JustifySelfPosition): JustifySelf = OverflowAlignment(OverflowStrategy.UNSAFE, position)
-
-        // Global
-        val Inherit: JustifySelf get() = JustifySelfKeyword("inherit")
-        val Initial: JustifySelf get() = JustifySelfKeyword("initial")
-        val Revert: JustifySelf get() = JustifySelfKeyword("revert")
-        val Unset: JustifySelf get() = JustifySelfKeyword("unset")
+        fun Safe(position: JustifySelfPosition) = OverflowStrategy.SAFE.toValue(position).unsafeCast<JustifySelf>()
+        fun Unsafe(position: JustifySelfPosition) = OverflowStrategy.UNSAFE.toValue(position).unsafeCast<JustifySelf>()
     }
 }
 

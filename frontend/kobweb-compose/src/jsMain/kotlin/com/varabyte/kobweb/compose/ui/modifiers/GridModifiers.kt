@@ -47,6 +47,8 @@ fun Modifier.gridTemplateAreas(vararg rows: String) = styleModifier {
     gridTemplateAreas(*rows)
 }
 
+fun Modifier.gridTemplateAreas(rows: List<String>) = gridTemplateAreas(*rows.toTypedArray())
+
 fun Modifier.grid(block: GridBuilder.() -> Unit) = styleModifier {
     grid(block)
 }

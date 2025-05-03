@@ -2,63 +2,68 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-// See: https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit
-class ObjectFit private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        // Keywords
-        val Contain get() = ObjectFit("contain")
-        val Cover get() = ObjectFit("cover")
-        val Fill get() = ObjectFit("fill")
-        val None get() = ObjectFit("none")
-        val ScaleDown get() = ObjectFit("scale-down")
-
-        // Global values
-        val Inherit get() = ObjectFit("inherit")
-        val Initial get() = ObjectFit("initial")
-        val Revert get() = ObjectFit("revert")
-        val Unset get() = ObjectFit("unset")
-    }
-}
-
-fun StyleScope.objectFit(objectFit: ObjectFit) {
-    property("object-fit", objectFit)
+interface CssBlendModeValues<T: StylePropertyValue> {
+    val Normal: T
+    val Multiply: T
+    val Screen: T
+    val Overlay: T
+    val Darken: T
+    val Lighten: T
+    val ColorDodge: T
+    val ColorBurn: T
+    val HardLight: T
+    val SoftLight: T
+    val Difference: T
+    val Exclusion: T
+    val Hue: T
+    val Saturation: T
+    val Color: T
+    val Luminosity: T
+    val PlusDarker: T
+    val PlusLighter: T
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/mix-blend-mode
-class MixBlendMode private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
+sealed interface MixBlendMode : StylePropertyValue {
+    companion object : CssBlendModeValues<MixBlendMode>, CssGlobalValues<MixBlendMode> {
         // Keywords
-        val Normal get() = MixBlendMode("normal")
-        val Multiply get() = MixBlendMode("multiply")
-        val Screen get() = MixBlendMode("screen")
-        val Overlay get() = MixBlendMode("overlay")
-        val Darken get() = MixBlendMode("darken")
-        val Lighten get() = MixBlendMode("lighten")
-        val ColorDodge get() = MixBlendMode("color-dodge")
-        val ColorBurn get() = MixBlendMode("color-burn")
-        val HardLight get() = MixBlendMode("hard-light")
-        val SoftLight get() = MixBlendMode("soft-light")
-        val Difference get() = MixBlendMode("difference")
-        val Exclusion get() = MixBlendMode("exclusion")
-        val Hue get() = MixBlendMode("hue")
-        val Saturation get() = MixBlendMode("saturation")
-        val Color get() = MixBlendMode("color")
-        val Luminosity get() = MixBlendMode("luminosity")
-        val PlusDarker get() = MixBlendMode("plus-darker")
-        val PlusLighter get() = MixBlendMode("plus-lighter")
-
-        // Global values
-        val Inherit get() = MixBlendMode("inherit")
-        val Initial get() = MixBlendMode("initial")
-        val Revert get() = MixBlendMode("revert")
-        val Unset get() = MixBlendMode("unset")
+        override val Normal get() = "normal".unsafeCast<MixBlendMode>()
+        override val Multiply get() = "multiply".unsafeCast<MixBlendMode>()
+        override val Screen get() = "screen".unsafeCast<MixBlendMode>()
+        override val Overlay get() = "overlay".unsafeCast<MixBlendMode>()
+        override val Darken get() = "darken".unsafeCast<MixBlendMode>()
+        override val Lighten get() = "lighten".unsafeCast<MixBlendMode>()
+        override val ColorDodge get() = "color-dodge".unsafeCast<MixBlendMode>()
+        override val ColorBurn get() = "color-burn".unsafeCast<MixBlendMode>()
+        override val HardLight get() = "hard-light".unsafeCast<MixBlendMode>()
+        override val SoftLight get() = "soft-light".unsafeCast<MixBlendMode>()
+        override val Difference get() = "difference".unsafeCast<MixBlendMode>()
+        override val Exclusion get() = "exclusion".unsafeCast<MixBlendMode>()
+        override val Hue get() = "hue".unsafeCast<MixBlendMode>()
+        override val Saturation get() = "saturation".unsafeCast<MixBlendMode>()
+        override val Color get() = "color".unsafeCast<MixBlendMode>()
+        override val Luminosity get() = "luminosity".unsafeCast<MixBlendMode>()
+        override val PlusDarker get() = "plus-darker".unsafeCast<MixBlendMode>()
+        override val PlusLighter get() = "plus-lighter".unsafeCast<MixBlendMode>()
     }
 }
 
 fun StyleScope.mixBlendMode(blendMode: MixBlendMode) {
     property("mix-blend-mode", blendMode)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit
+sealed interface ObjectFit : StylePropertyValue {
+    companion object : CssGlobalValues<ObjectFit> {
+        // Keywords
+        val Contain get() = "contain".unsafeCast<ObjectFit>()
+        val Cover get() = "cover".unsafeCast<ObjectFit>()
+        val Fill get() = "fill".unsafeCast<ObjectFit>()
+        val None get() = "none".unsafeCast<ObjectFit>()
+        val ScaleDown get() = "scale-down".unsafeCast<ObjectFit>()
+    }
+}
+
+fun StyleScope.objectFit(objectFit: ObjectFit) {
+    property("object-fit", objectFit)
 }

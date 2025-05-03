@@ -6,6 +6,10 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.css.*
 
+fun Modifier.backfaceVisibility(backfaceVisibility: BackfaceVisibility) = styleModifier {
+    backfaceVisibility(backfaceVisibility)
+}
+
 @OptIn(ExperimentalComposeWebApi::class)
 fun Modifier.transform(transformContext: TransformBuilder.() -> Unit) = styleModifier {
     transform(transformContext)

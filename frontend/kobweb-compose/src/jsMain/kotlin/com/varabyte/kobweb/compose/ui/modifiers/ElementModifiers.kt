@@ -13,17 +13,23 @@ fun Modifier.classNames(vararg classes: String) = attrsModifier {
     classes(*classes)
 }
 
-fun Modifier.content(content: Content.Restricted) = styleModifier {
+fun Modifier.classNames(classes: List<String>) = classNames(*classes.toTypedArray())
+
+fun Modifier.content(content: Content) = styleModifier {
     content(content)
 }
 
-fun Modifier.content(vararg contents: Content.Unrestricted) = styleModifier {
-    content(*contents)
+fun Modifier.content(vararg contents: Content.Listable) = styleModifier {
+    content(Content.list(*contents))
 }
 
-fun Modifier.content(altText: String, vararg contents: Content.Unrestricted) = styleModifier {
-    content(altText, *contents)
+fun Modifier.content(contents: List<Content.Listable>) = content(*contents.toTypedArray())
+
+fun Modifier.content(altText: String, vararg contents: Content.Listable) = styleModifier {
+    content(Content.list(altText, *contents))
 }
+
+fun Modifier.content(altText: String, contents: List<Content.Listable>) = content(altText, *contents.toTypedArray())
 
 fun Modifier.content(value: String) = styleModifier {
     content(value)
