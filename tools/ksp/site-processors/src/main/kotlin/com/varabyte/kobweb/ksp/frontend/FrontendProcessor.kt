@@ -273,6 +273,14 @@ class FrontendProcessor(
 
         initRouteDeclarations += resolver.getSymbolsWithAnnotation(INIT_ROUTE_FQN).map { it as KSFunctionDeclaration }
             .also { initRouteDeclarations ->
+                val initRouteDeclarationsPerFile = initRouteDeclarations.groupBy { it.containingFile!!.filePath }
+                initRouteDeclarationsPerFile
+                    .asSequence()
+                    .filter { (_, declarations) -> declarations.size > 1 }
+                    .forEach { (_, declarations) ->
+                        logger.error("Only one @InitRoute method per file is allowed, but found multiple: ${declarations.joinToString { it.simpleName.asString() }}. Please remove all but one.", declarations.first().containingFile)
+                    }
+
                 initRouteDeclarations.forEach { initRouteMethod ->
                     val file = initRouteMethod.containingFile!!
                     val foundPageOrLayout = file.declarations.any { decl ->
