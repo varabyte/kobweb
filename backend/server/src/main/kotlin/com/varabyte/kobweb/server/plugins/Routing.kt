@@ -382,10 +382,20 @@ private suspend fun RoutingContext.serveScriptFiles(
     return true
 }
 
-// Abort early on missing resources, so we don't serve giant html pages simply because someone forgot to
-// add a favicon.ico file, for example.
+// Abort early on missing resources, so we don't serve giant html pages simply because someone requested a favicon.ico
+// file that wasn't found, for example.
 private suspend fun RoutingContext.abortIfNotHtml(): Boolean {
-    val acceptsHtml = call.request.acceptItems().any { it.value == ContentType.Text.Html.toString() }
+    // See also: https://datatracker.ietf.org/doc/html/rfc7231#section-5.3.2
+    val acceptItems = call.request.acceptItems()
+    // Note: Only check the first header item, which indicates intention. (Most normal cases will only have a single
+    // value). Chrome sends "*/*" as the final fallback value when fetching icons, which would get triggered here if we
+    // could not find the icon and if we accepted "*/*" in ANY position.
+    val acceptsHtml = acceptItems.isEmpty() || acceptItems.firstOrNull()?.let {
+        it.value.startsWith(ContentType.Any.toString()) ||
+        it.value.startsWith(ContentType.Text.Any.toString()) ||
+        it.value.startsWith(ContentType.Text.Html.toString())
+    } ?: false
+
     return if (!acceptsHtml) {
         call.respond(HttpStatusCode.NotFound)
         true
