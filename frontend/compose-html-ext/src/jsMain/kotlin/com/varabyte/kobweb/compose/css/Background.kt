@@ -155,8 +155,11 @@ fun StyleScope.backgroundRepeat(horizontal: BackgroundRepeat.Mode, vertical: Bac
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-size
 sealed interface BackgroundSize : StylePropertyValue {
     companion object : CssGlobalValues<BackgroundSize> {
+        /** Set width only; height set to auto */
         fun of(width: CSSLengthOrPercentageNumericValue): BackgroundSize = "$width".unsafeCast<BackgroundSize>()
+        /** Set width only; height set to auto */
         fun of(width: CSSAutoKeyword): BackgroundSize = "$width".unsafeCast<BackgroundSize>()
+
         fun of(width: CSSLengthOrPercentageNumericValue, height: CSSLengthOrPercentageNumericValue): BackgroundSize =
             "$width $height".unsafeCast<BackgroundSize>()
 
