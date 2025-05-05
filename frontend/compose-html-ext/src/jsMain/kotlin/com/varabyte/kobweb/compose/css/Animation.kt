@@ -57,8 +57,11 @@ fun StyleScope.animation(animation: Animation) {
 }
 
 // Needed temporarily until we can remove the deprecated `vararg` version
-fun StyleScope.animation(animation: Animation.Listable) {
-    animation(animation.unsafeCast<Animation>())
+fun StyleScope.animation(animation: Animation.Listable)
+{
+    // Don't cast with "as", that breaks due to our internal unsafeCasting approach
+    val animation: Animation = animation
+    animation(animation)
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use `animation(Animation.list(...))` instead.", ReplaceWith("animation(Animation.list(*animations))"))

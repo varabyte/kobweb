@@ -61,7 +61,9 @@ fun StyleScope.content(content: Content) {
 
 // Needed temporarily until we can remove the deprecated `vararg` version
 fun StyleScope.content(content: Content.Listable) {
-    content(content.unsafeCast<Content>())
+    // Don't cast with "as", that breaks due to our internal unsafeCasting approach
+    val content: Content = content
+    content(content)
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use content(Content.list(...)) instead.", ReplaceWith("content(Content.list(*contents))"))

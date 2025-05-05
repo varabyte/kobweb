@@ -129,7 +129,9 @@ fun StyleScope.textShadow(
 
 // Needed temporarily until we can remove the deprecated `vararg` version
 fun StyleScope.textShadow(textShadow: TextShadow.Listable) {
-    textShadow(textShadow.unsafeCast<TextShadow>())
+    // Don't cast with "as", that breaks due to our internal unsafeCasting approach
+    val textShadow: TextShadow = textShadow
+    textShadow(textShadow)
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use `textShadow(TextShadow.list(...))` instead", ReplaceWith("textShadow(TextShadow.list(*shadows))"))

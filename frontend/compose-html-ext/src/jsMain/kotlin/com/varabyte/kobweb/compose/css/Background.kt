@@ -54,7 +54,9 @@ fun StyleScope.backgroundBlendMode(blendMode: BackgroundBlendMode) {
 
 // Needed temporarily until we can remove the deprecated `vararg` version
 fun StyleScope.backgroundBlendMode(blendMode: BackgroundBlendMode.Listable) {
-    backgroundBlendMode(blendMode.unsafeCast<BackgroundBlendMode>())
+    // Don't cast with "as", that breaks due to our internal unsafeCasting approach
+    val blendMode: BackgroundBlendMode = blendMode
+    backgroundBlendMode(blendMode)
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use `backgroundBlendMode(BackgroundBlendMode.list(...))` instead.", ReplaceWith("backgroundBlendMode(BackgroundBlendMode.list(*blendModes))"))
@@ -272,7 +274,9 @@ fun StyleScope.background(background: Background) {
 
 // Needed temporarily until we can remove the deprecated `vararg` version
 fun StyleScope.background(background: Background.Listable) {
-    background(background.unsafeCast<Background>())
+    // Don't cast with "as", that breaks due to our internal unsafeCasting approach
+    val background: Background = background
+    background(background)
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use `background(Background.list(...))` instead.", ReplaceWith("background(Background.list(*backgrounds))"))

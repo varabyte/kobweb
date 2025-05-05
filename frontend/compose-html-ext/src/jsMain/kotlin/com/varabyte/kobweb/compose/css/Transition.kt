@@ -22,7 +22,9 @@ fun StyleScope.transitionBehavior(behavior: TransitionBehavior) {
 
 // Needed temporarily until we can remove the deprecated `vararg` version
 fun StyleScope.transitionBehavior(behavior: TransitionBehavior.Listable) {
-    transitionBehavior(behavior.unsafeCast<TransitionBehavior>())
+    // Don't cast with "as", that breaks due to our internal unsafeCasting approach
+    val behavior: TransitionBehavior = behavior
+    transitionBehavior(behavior)
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use transitionBehavior(TransitionBehavior.list(...)) instead.", ReplaceWith("transitionBehavior(TransitionBehavior.list(*behaviors))"))
@@ -183,7 +185,9 @@ fun StyleScope.transition(transition: Transition) {
 
 // Needed temporarily until we can remove the deprecated `vararg` version
 fun StyleScope.transition(transition: Transition.Listable) {
-    transition(transition.unsafeCast<Transition>())
+    // Don't cast with "as", that breaks due to our internal unsafeCasting approach
+    val transition: Transition = transition
+    transition(transition)
 }
 // Remove the previous method too after removing this method
 @Deprecated("Use transition(Transition.list(...)) instead.", ReplaceWith("transition(Transition.list(*transitions))"))
