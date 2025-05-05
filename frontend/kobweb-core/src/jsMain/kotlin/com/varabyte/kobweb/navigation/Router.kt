@@ -352,26 +352,31 @@ class Router {
     /**
      * Set a handler to call to render a page when the route is not found.
      *
-     * Using this in your project would look like this:
+     * Kobweb provides a default error page but many sites may wish to customize this.
+     *
+     * Overriding the error page in your project would look like this:
      *
      * ```
      * @InitKobweb
-     * fun initKobweb(ctx: InitKobwebContext) {
-     *   ctx.router.setErrorHandler { errorCode ->
-     *     // NOTE: This callback is a @Composable function
-     *     if (errorCode == 404) {
-     *       // Render a 404 page
-     *     }
+     * fun initErrorPage(ctx: InitKobwebContext) {
+     *   ctx.router.setErrorPage {
+     *     H1 { Text("Page not found!") }
      *   }
      * }
      * ```
      */
-    fun setErrorPage(layoutId: String? = NO_LAYOUT_FQN, pageMethod: PageMethod) {
+    fun setErrorPage(layoutId: String? = NO_LAYOUT_FQN, initRouteMethod: InitRouteMethod? = null, pageMethod: PageMethod) {
         this.errorPageMethod = pageMethod
         if (layoutId == null) {
             layoutIdForPage.remove(errorPageMethod)
         } else {
             layoutIdForPage[errorPageMethod] = layoutId
+        }
+
+        if (initRouteMethod == null) {
+            initRouteForPage.remove(errorPageMethod)
+        } else {
+            initRouteForPage[errorPageMethod] = initRouteMethod
         }
     }
 
