@@ -113,6 +113,19 @@ class FrontendProcessor(
             )
     }
 
+    private fun KSFunctionDeclaration.isPageMethod(resolver: Resolver): Boolean {
+        if (!hasPageAnnotation()) return false
+
+        val pageContextName = resolver.getKSNameFromString(PAGE_CONTEXT_FQN)
+
+        // A valid layout method takes an optional first parameter of type `PageContext` and a final
+        // parameter of type `@Composable () -> Unit`
+        return (
+            ((parameters.size == 1 && parameters[0].type.resolve().declaration.qualifiedName == pageContextName)
+                || parameters.isEmpty())
+            )
+    }
+
     /**
      * Assert that the target [layoutMethodName] is a valid layout method, or log an error (and return null) if not.
      */
@@ -141,8 +154,11 @@ class FrontendProcessor(
         resolver.getSymbolsWithAnnotation(LAYOUT_FQN)
             // Ignore layout annotations attached to files
             .filterIsInstance<KSFunctionDeclaration>()
-            .filter { it.hasPageAnnotation() || it.isLayoutMethod(resolver) }
             .forEach { annotatedFun ->
+                if (!annotatedFun.hasPageAnnotation() && !annotatedFun.isLayoutMethod(resolver)) {
+                    logger.error("`${annotatedFun.qualifiedName!!.asString()}` is tagged with the `@Layout` annotation but takes parameters that aren't allowed for layout methods. It should take (optionally) a PageContext parameter and a composable content callback.", annotatedFun)
+                }
+
                 fileDependencies.add(annotatedFun.containingFile!!)
 
                 if (!annotatedFun.hasPageAnnotation()) {
@@ -237,6 +253,12 @@ class FrontendProcessor(
 
         pageDeclarations += resolver.getSymbolsWithAnnotation(PAGE_FQN).map { it as KSFunctionDeclaration }
             .also { pages ->
+                pages.forEach { page ->
+                    if (!page.isPageMethod(resolver)) {
+                        logger.error("`${page.qualifiedName!!.asString()}` is tagged with the `@Page` annotation but takes parameters that aren't allowed for page methods. It should take (optionally) a PageContext parameter or nothing.", page)
+                    }
+                }
+
                 pages
                     .filter { page -> page.hasLayoutAnnotation() }
                     .map { page -> page to page.getAnnotationsByName(LAYOUT_FQN).first() }
