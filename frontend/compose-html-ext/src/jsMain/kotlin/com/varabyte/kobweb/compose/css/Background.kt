@@ -180,7 +180,7 @@ fun StyleScope.backgroundSize(backgroundSize: BackgroundSize) {
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background
 sealed interface Background : StylePropertyValue {
-    sealed interface Listable
+    sealed interface Listable : Background
 
     companion object : CssGlobalValues<Background> {
         // Keyword
