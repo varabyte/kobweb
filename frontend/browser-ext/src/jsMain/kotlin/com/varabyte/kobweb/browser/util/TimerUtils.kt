@@ -45,6 +45,8 @@ class CancellableActionHandle(id: Int, private var isInterval: Boolean = false) 
     internal var id = id
         private set
 
+    val isCancelled get() = id == 0
+
     fun cancel() {
         if (isInterval) {
             self.clearInterval(id)
@@ -58,6 +60,34 @@ class CancellableActionHandle(id: Int, private var isInterval: Boolean = false) 
         this.id = other.id
         this.isInterval = other.isInterval
     }
+}
+
+interface CancellableIntervalScope {
+    /**
+     * Call this method within an interval handler to prevent the interval from running any additional times.
+     *
+     * For example, here's how you would create a simple composable which types out text, stopping the interval
+     * automatically after the text has finished being typed out:
+     *
+     * ```
+     * @Composable
+     * fun TypedText(
+     *     value: String,
+     *     modifier: Modifier = Modifier,
+     *     keystrokeDelay: Duration = 50.milliseconds
+     * ) {
+     *     var currText by remember { mutableStateOf("") }
+     *     SpanText(currText, modifier, ref = ref {
+     *         window.setInterval(keystrokeDelay) {
+     *             if (currText.length < value.length) {
+     *                 currText += value[currText.length]
+     *             } else cancelInterval()
+     *         }
+     *     })
+     * }
+     * ```
+     */
+    fun cancelInterval()
 }
 
 /**
@@ -91,9 +121,19 @@ fun WindowOrWorkerGlobalScope.setTimeout(timeout: Duration, block: () -> Unit): 
  *
  * @return A [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun WindowOrWorkerGlobalScope.setInterval(delay: Duration, block: () -> Unit): CancellableActionHandle {
-    val id = setInterval(block, delay.inWholeMilliseconds.toInt())
-    return CancellableActionHandle(id, isInterval = true)
+fun WindowOrWorkerGlobalScope.setInterval(delay: Duration, block: CancellableIntervalScope.() -> Unit): CancellableActionHandle {
+    lateinit var cancelHandle: CancellableActionHandle
+    val scope = object : CancellableIntervalScope {
+        override fun cancelInterval() {
+            cancelHandle.cancel()
+        }
+    }
+
+    val id = setInterval({
+        scope.block()
+    }, delay.inWholeMilliseconds.toInt())
+    cancelHandle = CancellableActionHandle(id, isInterval = true)
+    return cancelHandle
 }
 
 /**
@@ -104,13 +144,20 @@ fun WindowOrWorkerGlobalScope.setInterval(delay: Duration, block: () -> Unit): C
  *
  * @return A [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun WindowOrWorkerGlobalScope.setInterval(initialDelay: Duration, delay: Duration, block: () -> Unit): CancellableActionHandle {
-    lateinit var handle: CancellableActionHandle
-    handle = setTimeout(initialDelay) {
-        block()
-        handle.setTo(setInterval(delay, block))
+fun WindowOrWorkerGlobalScope.setInterval(initialDelay: Duration, delay: Duration, block: CancellableIntervalScope.() -> Unit): CancellableActionHandle {
+    lateinit var cancelHandle: CancellableActionHandle
+    val scope = object : CancellableIntervalScope {
+        override fun cancelInterval() {
+            cancelHandle.cancel()
+        }
     }
-    return handle
+    cancelHandle = setTimeout(initialDelay) {
+        scope.block()
+        if (!cancelHandle.isCancelled) {
+            cancelHandle.setTo(setInterval(delay, block))
+        }
+    }
+    return cancelHandle
 }
 
 /**
@@ -122,7 +169,13 @@ fun WindowOrWorkerGlobalScope.setInterval(initialDelay: Duration, delay: Duratio
  *
  * @return A [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun WindowOrWorkerGlobalScope.invokeThenInterval(delay: Duration, block: () -> Unit): CancellableActionHandle {
-    block()
-    return setInterval(delay, block)
+fun WindowOrWorkerGlobalScope.invokeThenInterval(delay: Duration, block: CancellableIntervalScope.() -> Unit): CancellableActionHandle {
+    var shouldContinueInterval = true
+    val scope = object : CancellableIntervalScope {
+        override fun cancelInterval() {
+            shouldContinueInterval = false
+        }
+    }
+    scope.block()
+    return if (shouldContinueInterval) setInterval(delay, block) else CancellableActionHandle.Stub
 }
