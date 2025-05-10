@@ -4,6 +4,7 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.kobweb.compose.css.functions.url
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.truthish.assertThat
 import org.jetbrains.compose.web.css.*
@@ -25,11 +26,11 @@ class StyleModifierTests {
     @Test
     fun verifyBackground() {
         assertThat(modifierToText {
-            Modifier.background(Color.red)
+            Modifier.background(Colors.Red)
         }).isEqualTo("background: red")
 
         assertThat(modifierToText {
-            Modifier.background(Color.blue, Background.of(BackgroundImage.of(url("test.png"))))
+            Modifier.background(Colors.Blue, Background.of(BackgroundImage.of(url("test.png"))))
         }).isEqualTo("background: url(\"test.png\") blue")
 
         assertThat(modifierToText {
@@ -53,7 +54,7 @@ class StyleModifierTests {
         }).isEqualTo("background-clip: content-box")
 
         assertThat(modifierToText {
-            Modifier.backgroundColor(Color.blue)
+            Modifier.backgroundColor(Colors.Blue)
         }).isEqualTo("background-color: blue")
 
         assertThat(modifierToText {
@@ -69,7 +70,7 @@ class StyleModifierTests {
         }).isEqualTo("background-image: url(\"test.png\")")
 
         assertThat(modifierToText {
-            Modifier.backgroundImage(linearGradient(Color.red, Color.green))
+            Modifier.backgroundImage(linearGradient(Colors.Red, Colors.Green))
         }).isEqualTo("background-image: linear-gradient(red, green)")
 
         assertThat(modifierToText {
@@ -109,15 +110,15 @@ class StyleModifierTests {
                 offsetY = 1.px,
                 blurRadius = 3.px,
                 spreadRadius = 1.px,
-                color = Color.gray,
+                color = Colors.Gray,
                 inset = true
             )
         }).isEqualTo("box-shadow: inset 0px 1px 3px 1px gray")
 
         assertThat(modifierToText {
             Modifier.boxShadow(
-                BoxShadow.of(0.px, 1.px, 3.px, 1.px, Color.red),
-                BoxShadow.of(0.px, 1.px, 2.px, 0.px, Color.gray)
+                BoxShadow.of(0.px, 1.px, 3.px, 1.px, Colors.Red),
+                BoxShadow.of(0.px, 1.px, 2.px, 0.px, Colors.Gray)
             )
         }).isEqualTo("box-shadow: 0px 1px 3px 1px red, 0px 1px 2px 0px gray")
 
@@ -130,7 +131,7 @@ class StyleModifierTests {
         }).isEqualTo("box-shadow: unset")
 
         assertThat(modifierToText {
-            Modifier.boxShadow(BoxShadow.of(0.px, 1.px, 3.px, 1.px, Color.gray))
+            Modifier.boxShadow(BoxShadow.of(0.px, 1.px, 3.px, 1.px, Colors.Gray))
         }).isEqualTo("box-shadow: 0px 1px 3px 1px gray")
     }
 
@@ -309,13 +310,13 @@ class StyleModifierTests {
                 Outline.of(
                     OutlineWidth.of(2.px),
                     LineStyle.Dotted,
-                    Color.green
+                    Colors.Green
                 )
             )
         }).isEqualTo("outline: 2px dotted green")
 
         assertThat(modifierToText {
-            Modifier.outline(3.px, LineStyle.Solid, Color.magenta)
+            Modifier.outline(3.px, LineStyle.Solid, Colors.Magenta)
         }).isEqualTo("outline: 3px solid magenta")
 
         assertThat(modifierToText {
@@ -324,7 +325,7 @@ class StyleModifierTests {
 
         assertThat(modifierToText {
             Modifier.outline {
-                color(Color.red)
+                color(Colors.Red)
                 style(LineStyle.Dotted)
                 width(2.px)
             }
@@ -332,7 +333,7 @@ class StyleModifierTests {
 
         assertThat(modifierToText {
             Modifier.outline {
-                color(Color.blue)
+                color(Colors.Blue)
                 width(OutlineWidth.Medium)
             }
         }).isEqualTo("outline-color: blue; outline-width: medium")
@@ -493,11 +494,11 @@ class StyleModifierTests {
         }).isEqualTo("text-overflow: ellipsis")
 
         assertThat(modifierToText {
-            Modifier.textShadow(2.px, 2.px, 2.px, Color.gray)
+            Modifier.textShadow(2.px, 2.px, 2.px, Colors.Gray)
         }).isEqualTo("text-shadow: 2px 2px 2px gray")
 
         assertThat(modifierToText {
-            Modifier.textShadow(TextShadow.of(2.px, 2.px), TextShadow.of(4.px, 4.px, 2.px, Color.red))
+            Modifier.textShadow(TextShadow.of(2.px, 2.px), TextShadow.of(4.px, 4.px, 2.px, Colors.Red))
         }).isEqualTo("text-shadow: 2px 2px, 4px 4px 2px red")
 
         assertThat(modifierToText {
