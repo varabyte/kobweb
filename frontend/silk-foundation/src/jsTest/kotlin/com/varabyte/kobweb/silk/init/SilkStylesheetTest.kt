@@ -50,10 +50,10 @@ class SilkStylesheetTest {
 
         assertThat(rules.map { it.toString() })
             .containsExactly(
-                "div { color:rgb(255, 0, 0); }",
-                "@media (min-width: 48rem) { div { color:rgb(0, 0, 255); } }",
-                "@layer test-layer { span { color:rgb(0, 128, 0); } }",
-                "@layer test-layer { div { color:rgb(0, 255, 255); } }"
+                "div { color:red; }",
+                "@media (min-width: 48rem) { div { color:blue; } }",
+                "@layer test-layer { span { color:green; } }",
+                "@layer test-layer { div { color:cyan; } }"
             )
     }
 
