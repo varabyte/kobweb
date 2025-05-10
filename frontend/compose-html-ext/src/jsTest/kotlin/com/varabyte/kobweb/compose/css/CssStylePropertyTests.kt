@@ -694,7 +694,6 @@ class CssStylePropertyTests {
         assertThat(styleToText { breakInside(BreakInside.Initial) }).isEqualTo("break-inside: initial")
         assertThat(styleToText { breakInside(BreakInside.Revert) }).isEqualTo("break-inside: revert")
         assertThat(styleToText { breakInside(BreakInside.RevertLayer) }).isEqualTo("break-inside: revert-layer")
-        assertThat(styleToText { breakInside(BreakInside.RevertLayer) }).isEqualTo("break-inside: revert-layer")
         assertThat(styleToText { breakInside(BreakInside.Unset) }).isEqualTo("break-inside: unset")
     }
 
@@ -781,7 +780,6 @@ class CssStylePropertyTests {
         assertThat(styleToText { columnCount(ColumnCount.Initial) }).isEqualTo("column-count: initial")
         assertThat(styleToText { columnCount(ColumnCount.Revert) }).isEqualTo("column-count: revert")
         assertThat(styleToText { columnCount(ColumnCount.RevertLayer) }).isEqualTo("column-count: revert-layer")
-        assertThat(styleToText { columnCount(ColumnCount.RevertLayer) }).isEqualTo("column-count: revert-layer")
         assertThat(styleToText { columnCount(ColumnCount.Unset) }).isEqualTo("column-count: unset")
     }
 
@@ -793,7 +791,6 @@ class CssStylePropertyTests {
         assertThat(styleToText { columnFill(ColumnFill.Inherit) }).isEqualTo("column-fill: inherit")
         assertThat(styleToText { columnFill(ColumnFill.Initial) }).isEqualTo("column-fill: initial")
         assertThat(styleToText { columnFill(ColumnFill.Revert) }).isEqualTo("column-fill: revert")
-        assertThat(styleToText { columnFill(ColumnFill.RevertLayer) }).isEqualTo("column-fill: revert-layer")
         assertThat(styleToText { columnFill(ColumnFill.RevertLayer) }).isEqualTo("column-fill: revert-layer")
         assertThat(styleToText { columnFill(ColumnFill.Unset) }).isEqualTo("column-fill: unset")
     }
@@ -807,8 +804,61 @@ class CssStylePropertyTests {
         assertThat(styleToText { columnSpan(ColumnSpan.Initial) }).isEqualTo("column-span: initial")
         assertThat(styleToText { columnSpan(ColumnSpan.Revert) }).isEqualTo("column-span: revert")
         assertThat(styleToText { columnSpan(ColumnSpan.RevertLayer) }).isEqualTo("column-span: revert-layer")
-        assertThat(styleToText { columnSpan(ColumnSpan.RevertLayer) }).isEqualTo("column-span: revert-layer")
         assertThat(styleToText { columnSpan(ColumnSpan.Unset) }).isEqualTo("column-span: unset")
+    }
+
+    @Test
+    fun verifyContain() {
+
+        assertThat(styleToText { contain(Contain.list(Contain.of(Contain.Size), Contain.of(Contain.Paint))) }).isEqualTo("contain: size paint")
+        assertThat(styleToText { contain(Contain.list(Contain.of(Contain.InlineSize), Contain.of(Contain.Layout))) }).isEqualTo("contain: inline-size layout")
+        assertThat(styleToText { contain(Contain.list(Contain.of(Contain.Size), Contain.of(Contain.Layout), Contain.of(Contain.Paint))) }).isEqualTo("contain: size layout paint")
+        assertThat(styleToText { contain(Contain.None) }).isEqualTo("contain: none")
+        assertThat(styleToText { contain(Contain.Strict) }).isEqualTo("contain: strict")
+        assertThat(styleToText { contain(Contain.Content) }).isEqualTo("contain: content")
+        assertThat(styleToText { contain(Contain.Size) }).isEqualTo("contain: size")
+        assertThat(styleToText { contain(Contain.InlineSize) }).isEqualTo("contain: inline-size")
+        assertThat(styleToText { contain(Contain.Layout) }).isEqualTo("contain: layout")
+        assertThat(styleToText { contain(Contain.Style) }).isEqualTo("contain: style")
+        assertThat(styleToText { contain(Contain.Paint) }).isEqualTo("contain: paint")
+
+        assertThat(styleToText { contain(Contain.Inherit) }).isEqualTo("contain: inherit")
+        assertThat(styleToText { contain(Contain.Initial) }).isEqualTo("contain: initial")
+        assertThat(styleToText { contain(Contain.Revert) }).isEqualTo("contain: revert")
+        assertThat(styleToText { contain(Contain.RevertLayer) }).isEqualTo("contain: revert-layer")
+        assertThat(styleToText { contain(Contain.Unset) }).isEqualTo("contain: unset")
+    }
+
+    @Test
+    fun verifyContainIntrinsicBlockSize() {
+
+        assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(1000.px)) }).isEqualTo("contain-intrinsic-block-size: 1000px")
+        assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(10.cssRem)) }).isEqualTo("contain-intrinsic-block-size: 10rem")
+
+        assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(300.px, true)) }).isEqualTo("contain-intrinsic-block-size: auto 300px")
+
+        assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.None) }).isEqualTo("contain-intrinsic-block-size: none")
+        assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.Inherit) }).isEqualTo("contain-intrinsic-block-size: inherit")
+        assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.Initial) }).isEqualTo("contain-intrinsic-block-size: initial")
+        assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.Revert) }).isEqualTo("contain-intrinsic-block-size: revert")
+        assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.RevertLayer) }).isEqualTo("contain-intrinsic-block-size: revert-layer")
+        assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.Unset) }).isEqualTo("contain-intrinsic-block-size: unset")
+    }
+
+    @Test
+    fun verifyContainIntrinsicInlineSize() {
+
+        assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(1000.px)) }).isEqualTo("contain-intrinsic-inline-size: 1000px")
+        assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(10.cssRem)) }).isEqualTo("contain-intrinsic-inline-size: 10rem")
+
+        assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(300.px, true)) }).isEqualTo("contain-intrinsic-inline-size: auto 300px")
+
+        assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.None) }).isEqualTo("contain-intrinsic-inline-size: none")
+        assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.Inherit) }).isEqualTo("contain-intrinsic-inline-size: inherit")
+        assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.Initial) }).isEqualTo("contain-intrinsic-inline-size: initial")
+        assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.Revert) }).isEqualTo("contain-intrinsic-inline-size: revert")
+        assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.RevertLayer) }).isEqualTo("contain-intrinsic-inline-size: revert-layer")
+        assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.Unset) }).isEqualTo("contain-intrinsic-inline-size: unset")
     }
 
     @Test
