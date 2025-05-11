@@ -3,10 +3,16 @@ package com.varabyte.kobweb.compose.ui.graphics
 import com.varabyte.kobweb.compose.css.*
 import org.jetbrains.compose.web.css.*
 import kotlin.math.abs
+import kotlin.math.pow
 import kotlin.math.roundToInt
 
 private fun Float.toColorInt() = (this.coerceIn(0f, 1f) * 255.0f).toInt()
 private fun Int.toColorFloat() = this.and(0xFF) / 255.0f
+
+private fun Float.roundTo(decimalPlaces: Int): Float {
+    val factor = 10f.pow(decimalPlaces)
+    return ((this * factor).roundToInt()) / factor
+}
 
 /**
  * A base class for colors which provides additional functionality on top of the color class included in Compose HTML.
@@ -97,7 +103,7 @@ sealed interface Color : CSSColorValue {
         }
 
         override fun toString(): String {
-            return if (alpha == 0xFF) "rgb($red, $green, $blue)" else "rgba($red, $green, $blue, $alphaf)"
+            return if (alpha == 0xFF) "rgb($red, $green, $blue)" else "rgba($red, $green, $blue, ${alphaf.roundTo(decimalPlaces = 2)})"
         }
 
         override fun equals(other: Any?): Boolean {
@@ -201,10 +207,10 @@ sealed interface Color : CSSColorValue {
         }
 
         override fun toString(): String {
-            // Make sure println doesn't show more than a single decimal point
-            val hueRounded = (hue * 10).roundToInt() / 10f
-            val saturationPercent = (saturation * 1000).roundToInt() / 10f
-            val lightnessPercent = (lightness * 1000).roundToInt() / 10f
+            // One decimal point should be enough precision while avoiding messy hsl strings
+            val hueRounded = hue.roundTo(decimalPlaces = 1)
+            val saturationPercent = (saturation * 100).roundTo(decimalPlaces = 1)
+            val lightnessPercent = (lightness * 100).roundTo(decimalPlaces = 1)
             return if (alpha == 1.0f)
                 "hsl($hueRounded, $saturationPercent%, $lightnessPercent%)"
             else
