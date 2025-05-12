@@ -33,14 +33,14 @@ sealed interface TouchAction : StylePropertyValue {
 
     companion object : CssGlobalValues<TouchAction> {
         @Suppress("FunctionName")
-        private fun _of(vararg touchAction: TouchAction, withPinchZoom: Boolean): TouchAction =
-            (touchAction.toList() + if (withPinchZoom) listOf("pinch-zoom") else emptyList())
+        private fun _of(vararg touchAction: TouchAction, pinchZoom: Boolean): TouchAction =
+            (touchAction.toList() + if (pinchZoom) listOf("pinch-zoom") else emptyList())
                 .joinToString(" ").unsafeCast<TouchAction>()
 
-        fun of(horiz: PanHorizontal, vert: PanVertical, withPinchZoom: Boolean = false) =
-            _of(horiz, vert, withPinchZoom = withPinchZoom)
-        fun of(horiz: PanHorizontal, withPinchZoom: Boolean = false) = _of(horiz, withPinchZoom = withPinchZoom)
-        fun of(vert: PanVertical, withPinchZoom: Boolean = false) = _of(vert, withPinchZoom = withPinchZoom)
+        fun of(horiz: PanHorizontal, vert: PanVertical, pinchZoom: Boolean = false) =
+            _of(horiz, vert, pinchZoom = pinchZoom)
+        fun of(horiz: PanHorizontal, pinchZoom: Boolean = false) = _of(horiz, pinchZoom = pinchZoom)
+        fun of(vert: PanVertical, pinchZoom: Boolean = false) = _of(vert, pinchZoom = pinchZoom)
 
         // Keyword
         val Auto get() = "auto".unsafeCast<TouchAction>()

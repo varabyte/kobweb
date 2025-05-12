@@ -54,10 +54,10 @@ internal sealed interface CssContainIntrinsicValues<T : StylePropertyValue> {
     val None get() = "none".unsafeCast<T>()
 
     /* withAuto <length>  & <length> values */
-    fun of(value: CSSLengthNumericValue, withAuto: Boolean = false) = buildString {
-        if (withAuto) append("auto ")
+    fun of(value: CSSLengthNumericValue, auto: Boolean = false) = buildString {
+        if (auto) append("auto ")
         append(value)
     }.unsafeCast<T>()
 
-    fun Auto(value: CSSLengthNumericValue) = of(value, true)
+    fun Auto(value: CSSLengthNumericValue) = of(value, auto = true)
 }

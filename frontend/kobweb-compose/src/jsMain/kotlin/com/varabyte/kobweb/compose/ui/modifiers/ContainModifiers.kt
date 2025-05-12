@@ -20,14 +20,14 @@ fun Modifier.containIntrinsicBlockSize(containIntrinsicBlockSize: ContainIntrins
     containIntrinsicBlockSize(containIntrinsicBlockSize)
 }
 
-fun Modifier.containIntrinsicBlockSize(length: CSSLengthNumericValue, withAuto: Boolean = false) = styleModifier {
-    containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(length, withAuto))
+fun Modifier.containIntrinsicBlockSize(length: CSSLengthNumericValue, auto: Boolean = false) = styleModifier {
+    containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(length, auto))
 }
 
 fun Modifier.containIntrinsicInlineSize(containIntrinsicInlineSize: ContainIntrinsicInlineSize) = styleModifier {
     containIntrinsicInlineSize(containIntrinsicInlineSize)
 }
 
-fun Modifier.containIntrinsicInlineSize(length: CSSLengthNumericValue, withAuto: Boolean = false) = styleModifier {
-    containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(length, withAuto))
+fun Modifier.containIntrinsicInlineSize(length: CSSLengthNumericValue, auto: Boolean = false) = styleModifier {
+    containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(length, auto))
 }

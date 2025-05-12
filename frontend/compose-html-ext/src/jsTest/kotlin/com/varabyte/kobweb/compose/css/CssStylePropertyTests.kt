@@ -832,7 +832,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(1000.px)) }).isEqualTo("contain-intrinsic-block-size: 1000px")
         assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(10.cssRem)) }).isEqualTo("contain-intrinsic-block-size: 10rem")
 
-        assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(300.px, true)) }).isEqualTo("contain-intrinsic-block-size: auto 300px")
+        assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(300.px, auto = true)) }).isEqualTo("contain-intrinsic-block-size: auto 300px")
         assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.Auto(200.px)) }).isEqualTo("contain-intrinsic-block-size: auto 200px")
 
         assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.None) }).isEqualTo("contain-intrinsic-block-size: none")
@@ -2161,15 +2161,15 @@ class CssStylePropertyTests {
         }).isEqualTo("touch-action: pan-x pan-y")
 
         assertThat(styleToText {
-            touchAction(TouchAction.of(TouchAction.PanX, TouchAction.PanY, withPinchZoom = true))
+            touchAction(TouchAction.of(TouchAction.PanX, TouchAction.PanY, pinchZoom = true))
         }).isEqualTo("touch-action: pan-x pan-y pinch-zoom")
 
         assertThat(styleToText {
-            touchAction(TouchAction.of(TouchAction.PanX, withPinchZoom = true))
+            touchAction(TouchAction.of(TouchAction.PanX, pinchZoom = true))
         }).isEqualTo("touch-action: pan-x pinch-zoom")
 
         assertThat(styleToText {
-            touchAction(TouchAction.of(TouchAction.PanY, withPinchZoom = true))
+            touchAction(TouchAction.of(TouchAction.PanY, pinchZoom = true))
         }).isEqualTo("touch-action: pan-y pinch-zoom")
 
         assertThat(styleToText { touchAction(TouchAction.Inherit) }).isEqualTo("touch-action: inherit")
