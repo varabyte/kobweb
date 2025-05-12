@@ -810,9 +810,9 @@ class CssStylePropertyTests {
     @Test
     fun verifyContain() {
 
-        assertThat(styleToText { contain(Contain.list(Contain.of(Contain.Size), Contain.of(Contain.Paint))) }).isEqualTo("contain: size paint")
-        assertThat(styleToText { contain(Contain.list(Contain.of(Contain.InlineSize), Contain.of(Contain.Layout))) }).isEqualTo("contain: inline-size layout")
-        assertThat(styleToText { contain(Contain.list(Contain.of(Contain.Size), Contain.of(Contain.Layout), Contain.of(Contain.Paint))) }).isEqualTo("contain: size layout paint")
+        assertThat(styleToText { contain(Contain.list(listOf(Contain.Size, Contain.Paint))) }).isEqualTo("contain: size paint")
+        assertThat(styleToText { contain(Contain.list(listOf(Contain.InlineSize, Contain.Layout))) }).isEqualTo("contain: inline-size layout")
+        assertThat(styleToText { contain(Contain.list(listOf(Contain.Size, Contain.Layout, Contain.Paint)))}).isEqualTo("contain: size layout paint")
         assertThat(styleToText { contain(Contain.None) }).isEqualTo("contain: none")
         assertThat(styleToText { contain(Contain.Strict) }).isEqualTo("contain: strict")
         assertThat(styleToText { contain(Contain.Content) }).isEqualTo("contain: content")

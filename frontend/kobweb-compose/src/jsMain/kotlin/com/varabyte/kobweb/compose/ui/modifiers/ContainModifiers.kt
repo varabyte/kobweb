@@ -8,8 +8,8 @@ fun Modifier.contain(contain: Contain) = styleModifier {
     contain(contain)
 }
 
-fun Modifier.contain(vararg values: Contain.Listable) = styleModifier {
-    contain(Contain.list(*values))
+fun Modifier.contain(values: List<Contain.Listable>) = styleModifier {
+    contain(Contain.list(values))
 }
 
 fun Modifier.containIntrinsicBlockSize(containIntrinsicBlockSize: ContainIntrinsicBlockSize) = styleModifier {
