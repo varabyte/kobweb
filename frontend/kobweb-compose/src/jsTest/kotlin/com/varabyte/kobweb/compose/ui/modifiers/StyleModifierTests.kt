@@ -22,7 +22,7 @@ class StyleModifierTests {
 
         return styleScope.properties.entries.joinToString("; ") { (key, value) -> "$key: $value" }
     }
-    
+
     @Test
     fun verifyBackground() {
         assertThat(modifierToText {
@@ -88,7 +88,7 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.backgroundRepeat(BackgroundRepeat.Space, BackgroundRepeat.Round)
         }).isEqualTo("background-repeat: space round")
-    
+
         assertThat(modifierToText {
             Modifier.backgroundSize(BackgroundSize.Contain)
         }).isEqualTo("background-size: contain")
@@ -133,6 +133,84 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.boxShadow(BoxShadow.of(0.px, 1.px, 3.px, 1.px, Colors.Gray))
         }).isEqualTo("box-shadow: 0px 1px 3px 1px gray")
+    }
+
+    @Test
+    fun verifyContain() {
+        assertThat(modifierToText {
+            Modifier.contain(
+                listOf(
+                    Contain.Size,
+                    Contain.Paint
+                )
+            )
+        }).isEqualTo("contain: size paint")
+        assertThat(modifierToText {
+            Modifier.contain(
+                listOf(
+                    Contain.InlineSize,
+                    Contain.Layout
+                )
+            )
+        }).isEqualTo("contain: inline-size layout")
+        assertThat(modifierToText {
+            Modifier.contain(
+                listOf(
+                    Contain.Size,
+                    Contain.Layout,
+                    Contain.Paint
+                )
+            )
+        }).isEqualTo("contain: size layout paint")
+
+        assertThat(modifierToText {
+            Modifier.contain(
+                listOf(
+                    Contain.Size,
+                    Contain.Layout,
+                    Contain.Paint
+                )
+            )
+        }).isEqualTo("contain: size layout paint")
+    }
+
+    @Test
+    fun verifyContainIntrinsicBlockSize() {
+        assertThat(modifierToText {
+            Modifier.containIntrinsicBlockSize(ContainIntrinsicBlockSize.None)
+        }).isEqualTo("contain-intrinsic-block-size: none")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(100.px))
+        }).isEqualTo(
+            "contain-intrinsic-block-size: 100px"
+        )
+        assertThat(modifierToText {
+            Modifier.containIntrinsicBlockSize(
+                ContainIntrinsicBlockSize.of(
+                    100.px,
+                    true
+                )
+            )
+        }).isEqualTo("contain-intrinsic-block-size: auto 100px")
+    }
+
+    @Test
+    fun verifyContainIntrinsicInlineSize() {
+        assertThat(modifierToText {
+            Modifier.containIntrinsicInlineSize(ContainIntrinsicInlineSize.None)
+        })
+            .isEqualTo("contain-intrinsic-inline-size: none")
+        assertThat(modifierToText { Modifier.containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(100.px)) }).isEqualTo(
+            "contain-intrinsic-inline-size: 100px"
+        )
+        assertThat(modifierToText {
+            Modifier.containIntrinsicInlineSize(
+                ContainIntrinsicInlineSize.of(
+                    100.px,
+                    true
+                )
+            )
+        }).isEqualTo("contain-intrinsic-inline-size: auto 100px")
     }
 
     @Test
@@ -263,19 +341,19 @@ class StyleModifierTests {
                 end(20.px)
             }
         }).isEqualTo("padding-block-start: 10px; padding-block-end: 20px")
-    
+
         assertThat(modifierToText {
             Modifier.resize(Resize.Both)
         }).isEqualTo("resize: both")
-    
+
         assertThat(modifierToText {
             Modifier.verticalAlign(VerticalAlign.Middle)
         }).isEqualTo("vertical-align: middle")
-    
+
         assertThat(modifierToText {
             Modifier.verticalAlign(10.px)
         }).isEqualTo("vertical-align: 10px")
-    
+
         assertThat(modifierToText {
             Modifier.zIndex(100)
         }).isEqualTo("z-index: 100")
@@ -529,7 +607,7 @@ class StyleModifierTests {
             Modifier.writingMode(WritingMode.VerticalRl)
         }).isEqualTo("writing-mode: vertical-rl")
     }
-    
+
     @Test
     fun verifyTransform() {
         assertThat(modifierToText {
