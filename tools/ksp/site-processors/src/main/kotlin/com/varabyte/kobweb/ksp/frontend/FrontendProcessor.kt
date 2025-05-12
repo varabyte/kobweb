@@ -786,13 +786,19 @@ class FrontendProcessor(
             if (pageReceiver != layoutContentReceiver) {
                 logger.error(
                     buildString {
-                        append("Function `${funDecl.qualifiedName!!.asString()}` declares receiver `${pageReceiver.qualifiedName!!.asString()}` but targets layout `${layoutData.method.qualifiedName!!.asString()}` that ")
+                        append("Function `${funDecl.qualifiedName!!.asString()}` declares receiver `${pageReceiver.qualifiedName!!.asString()}` but targets layout `${layoutData.method.qualifiedName!!.asString()}` which ")
                         if (layoutContentReceiver == null) {
-                            append("does not provide one")
+                            append("does not declare any receiver on")
                         } else {
-                            append("provides `${layoutContentReceiver.qualifiedName!!.asString()}`")
+                            append("declares `${layoutContentReceiver.qualifiedName!!.asString()}` as the receiver of")
                         }
-                        append(" in its content callback. Please ensure these values match or remove the receiver scope from the function.")
+                        append(" its content callback. ")
+                        if (layoutContentReceiver != null) {
+                            append("Please ensure the receivers match")
+                        } else {
+                            append("Please add a receiver to the layout callback")
+                        }
+                        append(" or remove the receiver scope from the function.")
                     },
                     funDecl
                 )
