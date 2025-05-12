@@ -43,6 +43,7 @@ import com.varabyte.kobweb.ksp.common.getDefaultLayout
 import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.suppresses
+import com.varabyte.kobweb.ksp.util.receiverClass
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobweb.project.frontend.CssStyleEntry
 import com.varabyte.kobweb.project.frontend.CssStyleVariantEntry
@@ -65,14 +66,36 @@ class FrontendProcessor(
     pagesPackage: String,
     private val defaultCssPrefix: String? = null,
 ) : SymbolProcessor {
+
+    class LayoutMethodData(
+        val method: KSFunctionDeclaration,
+        val acceptsContext: Boolean,
+        private val contentCallbackType: KSType,
+    ) {
+        val contentCallbackReceiver get(): KSClassDeclaration? {
+            return contentCallbackType.arguments
+                .firstOrNull()?.type?.resolve()?.declaration
+                ?.let { it as? KSClassDeclaration }
+                ?.takeIf { it.qualifiedName?.asString() != "kotlin.Unit" }
+        }
+
+        override fun equals(other: Any?): Boolean {
+            return other is LayoutMethodData && other.method == method
+        }
+
+        override fun hashCode(): Int {
+            return method.hashCode()
+        }
+    }
+
     private val pageDeclarations = mutableListOf<KSFunctionDeclaration>()
     private val initRouteDeclarations = mutableListOf<KSFunctionDeclaration>()
 
     private val qualifiedPagesPackage = PackageUtils.resolvePackageShortcut(projectGroup, pagesPackage)
 
-    private val layoutMethods = mutableSetOf<KSFunctionDeclaration>()
+    private val layoutMethods = mutableSetOf<LayoutMethodData>()
     private val noLayoutsFor = mutableSetOf<KSFunctionDeclaration>()
-    private val layoutsFor = mutableMapOf<KSFunctionDeclaration, KSFunctionDeclaration>()
+    private val layoutsFor = mutableMapOf<KSFunctionDeclaration, LayoutMethodData>()
     // fqPkg to layout fqn, e.g. "pages.blog" to "com.example.components.layouts.BlogLayout"
     // sorted by length (descending), so more specific packages will be checked before less specific ones
     private val defaultLayouts = mutableMapOf<String, KSFunctionDeclaration>().toSortedMap(compareBy({ -it.length }, { it }))
@@ -97,20 +120,27 @@ class FrontendProcessor(
         return getAnnotationsByName(LAYOUT_FQN).toList().isNotEmpty()
     }
 
-    private fun KSFunctionDeclaration.isLayoutMethod(resolver: Resolver): Boolean {
-        if (!hasLayoutAnnotation()) return false
+    private fun KSFunctionDeclaration.resolveAsLayoutMethod(): LayoutMethodData? {
+        if (!hasLayoutAnnotation()) return null
         // @Layout defined on a @Page means the method is a page, not a layout
-        if (hasPageAnnotation()) return false
+        if (hasPageAnnotation()) return null
 
-        val pageContextName = resolver.getKSNameFromString(PAGE_CONTEXT_FQN)
+        if (parameters.size == 2 && parameters[0].type.resolve().declaration.qualifiedName!!.asString() != PAGE_CONTEXT_FQN) {
+            return null
+        }
 
-        // A valid layout method takes an optional first parameter of type `PageContext` and a final
-        // parameter of type `@Composable () -> Unit`
-        return (
-            ((parameters.size == 2 && parameters[0].type.resolve().declaration.qualifiedName == pageContextName)
-                || parameters.size == 1)
-                && parameters.last().type.resolve().declaration.qualifiedName!!.asString() == "kotlin.Function0"
+        val contentCallbackTypeMaybe = parameters.lastOrNull()?.type?.resolve()
+
+        val contentCallbackDeclaration = (contentCallbackTypeMaybe?.declaration as? KSClassDeclaration)
+            ?.takeIf { it.qualifiedName!!.asString() in setOf("kotlin.Function0", "kotlin.Function1") }
+
+        return if (contentCallbackDeclaration != null) {
+            LayoutMethodData(
+                this,
+                acceptsContext = parameters.size == 2,
+                contentCallbackTypeMaybe,
             )
+        } else null
     }
 
     private fun KSFunctionDeclaration.isPageMethod(resolver: Resolver): Boolean {
@@ -129,12 +159,22 @@ class FrontendProcessor(
     /**
      * Assert that the target [layoutMethodName] is a valid layout method, or log an error (and return null) if not.
      */
-    private fun Resolver.checkLayoutMethod(context: KSNode, layoutMethodName: KSName): KSFunctionDeclaration? {
+    private fun Resolver.checkLayoutMethod(context: KSNode, layoutMethodName: KSName): LayoutMethodData? {
         val matchesByName = getFunctionDeclarationsByName(layoutMethodName, includeTopLevel = true)
-        return matchesByName
-            .singleOrNull { it.isLayoutMethod(this) }
-            .also { layoutMethod ->
-                if (layoutMethod == null) {
+
+        return matchesByName.asSequence()
+            .mapNotNull { it -> it.resolveAsLayoutMethod() }
+            .toList()
+            .let { matches ->
+                if (matches.size > 1) {
+                    logger.error("Found multiple definitions for layout method \"${layoutMethodName.asString()}\" [${matches.joinToString { it.method.containingFile!!.filePath }}]. Did you accidentally copy/paste another layout and forget to change the name?", context)
+                    null
+                } else {
+                    matches.firstOrNull()
+                }
+            }
+            .also { layoutData ->
+                if (layoutData == null) {
                     logger.error(buildString {
                         append("@Layout(\"${layoutMethodName.asString()}\") does not reference a valid layout method.")
 
@@ -155,18 +195,19 @@ class FrontendProcessor(
             // Ignore layout annotations attached to files
             .filterIsInstance<KSFunctionDeclaration>()
             .forEach { annotatedFun ->
-                if (!annotatedFun.hasPageAnnotation() && !annotatedFun.isLayoutMethod(resolver)) {
+                val layoutMethodData = annotatedFun.resolveAsLayoutMethod()
+                if (!annotatedFun.hasPageAnnotation() && layoutMethodData == null) {
                     logger.error("`${annotatedFun.qualifiedName!!.asString()}` is tagged with the `@Layout` annotation but takes parameters that aren't allowed for layout methods. It should take (optionally) a PageContext parameter and a composable content callback.", annotatedFun)
                 }
 
                 fileDependencies.add(annotatedFun.containingFile!!)
 
-                if (!annotatedFun.hasPageAnnotation()) {
+                if (layoutMethodData != null) {
                     if (annotatedFun.annotations.none { it.shortName.asString() == "Composable" }) {
                         logger.warn("`fun ${annotatedFun.qualifiedName!!.asString()}` annotated with @Layout must also be @Composable.", annotatedFun)
                     }
 
-                    layoutMethods += annotatedFun
+                    layoutMethods += layoutMethodData
                 }
 
                 annotatedFun.getAnnotationsByName(LAYOUT_FQN).first().arguments.first().value?.toString().orEmpty()
@@ -236,8 +277,8 @@ class FrontendProcessor(
                 LAYOUT_FQN,
                 logger
             )?.let { (pkg, layoutFqn) ->
-                resolver.checkLayoutMethod(file, resolver.getKSNameFromString(layoutFqn))?.let { layoutMethod ->
-                    defaultLayouts[pkg] = layoutMethod
+                resolver.checkLayoutMethod(file, resolver.getKSNameFromString(layoutFqn))?.let { layoutData ->
+                    defaultLayouts[pkg] = layoutData.method
                     fileDependencies.add(file)
                 }
             }
@@ -729,7 +770,7 @@ class FrontendProcessor(
             }
 
             return layoutsFor[decl]?.let { parentLayout ->
-                val hasChildCycle = detectLayoutCycle(layoutsFor[decl]!!, path, errorCtx)
+                val hasChildCycle = detectLayoutCycle(layoutsFor[decl]!!.method, path, errorCtx)
                 path.removeLast()
                 hasChildCycle
             } ?: false
@@ -737,6 +778,28 @@ class FrontendProcessor(
 
         // Check for cycles starting from each layout
         layoutsFor.keys.forEach { layout -> detectLayoutCycle(layout) }
+    }
+
+    private fun assertReceiverCompatibleWithLayout(funDecl: KSFunctionDeclaration, layoutData: LayoutMethodData): Boolean {
+        funDecl.receiverClass?.let { pageReceiver ->
+            val layoutContentReceiver = layoutData.contentCallbackReceiver
+            if (pageReceiver != layoutContentReceiver) {
+                logger.error(
+                    buildString {
+                        append("Function `${funDecl.qualifiedName!!.asString()}` declares receiver `${pageReceiver.qualifiedName!!.asString()}` but targets layout `${layoutData.method.qualifiedName!!.asString()}` that ")
+                        if (layoutContentReceiver == null) {
+                            append("does not provide one")
+                        } else {
+                            append("provides `${layoutContentReceiver.qualifiedName!!.asString()}`")
+                        }
+                        append(" in its content callback. Please ensure these values match or remove the receiver scope from the function.")
+                    },
+                    funDecl
+                )
+                return false
+            }
+        }
+        return true
     }
 
     /**
@@ -754,23 +817,38 @@ class FrontendProcessor(
         // Use filePath instead of containingFile, because equality doesn't seem to work as expected for KSFile
         val initRoutesMap = initRouteDeclarations.associateBy { it.containingFile!!.filePath }
         val layouts = run {
-            layoutMethods.map { layout ->
+            layoutMethods.mapNotNull { layoutData ->
+                val layoutMethod = layoutData.method
+
+                val parentLayoutData = layoutsFor[layoutMethod]
+                if (parentLayoutData != null && !assertReceiverCompatibleWithLayout(layoutMethod, parentLayoutData)) {
+                    return@mapNotNull null
+                }
+
                 LayoutEntry(
-                    layout.qualifiedName!!.asString(),
-                    acceptsContext = layout.parameters.size == 2,
-                    parentLayoutFqn = layoutsFor[layout]?.qualifiedName?.asString(),
-                    initRouteFqn = initRoutesMap[layout.containingFile!!.filePath]?.qualifiedName?.asString()
+                    layoutMethod.qualifiedName!!.asString(),
+                    acceptsContext = layoutData.acceptsContext,
+                    parentLayoutFqn = parentLayoutData?.method?.qualifiedName?.asString(),
+                    initRouteFqn = initRoutesMap[layoutMethod.containingFile!!.filePath]?.qualifiedName?.asString(),
+                    contentReceiverFqn = layoutData.contentCallbackReceiver?.qualifiedName?.asString(),
+                    receiverFqn = layoutMethod.receiverClass?.qualifiedName?.asString(),
                 )
             }
         }
 
         val pages = pageDeclarations.mapNotNull { annotatedFun ->
-            processPagesFun(
-                annotatedFun = annotatedFun,
-                layoutFqn = if (noLayoutsFor.contains(annotatedFun)) NO_LAYOUT_FQN else (layoutsFor[annotatedFun]?.qualifiedName?.asString()
+            val layoutFqn = if (noLayoutsFor.contains(annotatedFun)) NO_LAYOUT_FQN else {
+                val layoutData = layoutsFor[annotatedFun]
+                if (layoutData != null && !assertReceiverCompatibleWithLayout(annotatedFun, layoutData)) return@mapNotNull null
+                (layoutData?.method?.qualifiedName?.asString()
                     ?: defaultLayouts.asSequence().mapNotNull { (pkg, layoutMethod) ->
                         layoutMethod.takeIf { annotatedFun.packageName.asString().startsWith(pkg) }
-                    }.firstOrNull()?.qualifiedName?.asString()),
+                    }.firstOrNull()?.qualifiedName?.asString())
+            }
+
+            processPagesFun(
+                annotatedFun = annotatedFun,
+                layoutFqn = layoutFqn,
                 initRoutes = initRoutesMap,
                 qualifiedPagesPackage = qualifiedPagesPackage,
                 packageMappings = packageMappings,

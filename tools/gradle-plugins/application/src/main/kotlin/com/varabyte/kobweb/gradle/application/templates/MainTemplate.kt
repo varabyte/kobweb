@@ -1,9 +1,17 @@
 package com.varabyte.kobweb.gradle.application.templates
 
+import com.squareup.kotlinpoet.AnnotationSpec
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.LambdaTypeName
+import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeVariableName
+import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.withIndent
 import com.varabyte.kobweb.common.navigation.BasePath
 import com.varabyte.kobweb.gradle.application.BuildTarget
@@ -17,6 +25,12 @@ enum class SilkSupport {
     FOUNDATION,
     FULL,
 }
+
+// We may have some pages and/or layouts we import which have a receiver scope, and to call those without causing a
+// compile error, you need to import the method explicitly. However, we worry about name collisions (e.g. two pages with
+// the same name but different packes), so to ensure the final import is globally unique, just encode the fqn as a
+// single, ugly large method name.
+private fun String.fqnToUniqueMethodName() = "_${this.replace('.', '_')}"
 
 fun createMainFunction(
     appFrontendData: AppFrontendData,
@@ -38,7 +52,6 @@ fun createMainFunction(
 
     buildSet {
         val defaultImports = listOf(
-            "androidx.compose.runtime.CompositionLocalProvider",
             "$KOBWEB_GROUP.core.AppGlobals",
             "$KOBWEB_GROUP.navigation.remove",
             "$KOBWEB_GROUP.navigation.BasePath",
@@ -70,9 +83,75 @@ fun createMainFunction(
         frontendData.cssStyles.mapNotNull { it.import }.forEach { add(it) }
         frontendData.cssStyleVariants.mapNotNull { it.import }.forEach { add(it) }
         frontendData.keyframesList.mapNotNull { it.import }.forEach { add(it) }
-
     }.sorted().forEach { import ->
         fileBuilder.addImport(import.substringBeforeLast('.'), import.substringAfterLast('.'))
+    }
+
+    // Import all layout and page names directly, e.g. "import a.b.c.Page as _a_b_c_Page", which allows us to work with
+    // the occasional page/layout that receives a scope (scope extending methods need to be imported explicitly to use
+    // them).
+    (frontendData.layouts.map { it.fqn } + frontendData.pages.map { it.fqn }).toSortedSet().forEach { fqn ->
+        fileBuilder.addAliasedImport(
+            MemberName(fqn.substringBeforeLast('.'), fqn.substringAfterLast('.')),
+            fqn.fqnToUniqueMethodName()
+        )
+    }
+
+    // Set up CompositionLocal machinery to support layouts indirectly passing data down to children.
+    if (frontendData.layouts.any { it.contentReceiverFqn != null || it.receiverFqn != null } || frontendData.pages.any { it.receiverFqn != null }) {
+        val anyClass = ClassName("kotlin", "Any")
+        val nullableAnyClass = anyClass.copy(nullable = true)
+        val composableClass = ClassName("androidx.compose.runtime", "Composable")
+        fileBuilder.addProperty(
+            PropertySpec.builder(
+                "LayoutScopeLocal",
+                ClassName("androidx.compose.runtime", "ProvidableCompositionLocal")
+                    .parameterizedBy(nullableAnyClass)
+            )
+                .initializer(
+                    "%T<%T> { null }",
+                    ClassName("androidx.compose.runtime", "compositionLocalOf"),
+                    nullableAnyClass,
+                )
+                .addModifiers(KModifier.PRIVATE)
+                .build()
+        )
+
+        fileBuilder.addFunction(
+            FunSpec.builder("currentLayoutScope")
+                .addAnnotation(composableClass)
+                .addModifiers(KModifier.PRIVATE)
+                .addTypeVariable(TypeVariableName("T", anyClass))
+                .returns(TypeVariableName("T"))
+                .addCode(
+                    """
+                    @Suppress("UNCHECKED_CAST")
+                    return LayoutScopeLocal.current as? T
+                        ?: error(%S)
+                    """.trimIndent(),
+                    "Unexpected between Page/Layout scope and the parent Layout which it is providing it. Please report this issue to the Kobweb developers."
+                )
+                .build()
+        )
+
+        fileBuilder.addFunction(
+            FunSpec.builder("provideLayoutScope")
+                .addAnnotation(composableClass)
+                .addModifiers(KModifier.PRIVATE)
+                .addTypeVariable(TypeVariableName("T", anyClass))
+                .addParameter("layoutScope", TypeVariableName("T"))
+                .addParameter(
+                    "content",
+                    LambdaTypeName.get(returnType = Unit::class.asTypeName())
+                        .copy(annotations = listOf(AnnotationSpec.builder(composableClass).build()))
+                )
+                .addCode(
+                    """
+                    androidx.compose.runtime.CompositionLocalProvider(LayoutScopeLocal provides layoutScope, content = content)
+                    """.trimIndent()
+                )
+                .build()
+        )
     }
 
     // region debug-only functions
@@ -98,11 +177,11 @@ fun createMainFunction(
                         val status = document.getElementById("status")!!
                         var lastVersion: Int? = null
                         var shouldReload = false
-    
+
                         val warningIcon = status.children[0]!!
                         val spinnerIcon = status.children[1]!!
                         val statusText = status.children[2]!!
-        
+
                         status.addEventListener("transitionend", {
                             if (status.hasClass("fade-out")) {
                                 status.removeClass("fade-out")
@@ -111,7 +190,7 @@ fun createMainFunction(
                                 }
                             }
                         })
-    
+
                         val eventSource = EventSource("/api/kobweb-status", EventSourceInit(true))
                         eventSource.addEventListener("version", { evt ->
                             val version = (evt as MessageEvent).data.toString().toInt()
@@ -132,7 +211,7 @@ fun createMainFunction(
                                 }
                             }
                         })
-    
+
                         eventSource.addEventListener("status", { evt ->
                             val values: dynamic = JSON.parse<Any>((evt as MessageEvent).data.toString())
                             val text = values.text as String
@@ -148,7 +227,7 @@ fun createMainFunction(
                                 }
                             }
                         })
-    
+
                         eventSource.onerror = { eventSource.close() }
                     """.trimIndent()
                 ).build()
@@ -187,11 +266,34 @@ fun createMainFunction(
                                     append(", initRouteMethod = { ctx -> ${entry.initRouteFqn}(ctx) }")
                                 }
                                 append(") { pageCtx, pageMethod -> ")
-                                append("${entry.fqn}(")
+
+                                if (entry.receiverFqn != null) {
+                                    append("currentLayoutScope<${entry.receiverFqn}>().apply { ")
+                                }
+
+                                append("${entry.fqn.fqnToUniqueMethodName()}(")
                                 if (entry.acceptsContext) {
                                     append("pageCtx")
                                 }
-                                append(") { pageMethod(pageCtx) } }")
+                                append(") { ")
+
+                                if (entry.contentReceiverFqn != null) {
+                                    append("provideLayoutScope(this) {")
+                                }
+
+                                append("pageMethod(pageCtx)")
+
+                                if (entry.contentReceiverFqn != null) {
+                                    append(" }")
+                                }
+
+                                append(" }")
+
+                                if (entry.receiverFqn != null) {
+                                    append(" }")
+                                }
+
+                                append(" }")
                             }
                         )
                     }
@@ -211,11 +313,22 @@ fun createMainFunction(
                                 if (entry.acceptsContext) {
                                     append("pageCtx -> ")
                                 }
-                                append("${entry.fqn}(")
+
+                                if (entry.receiverFqn != null) {
+                                    append("currentLayoutScope<${entry.receiverFqn}>().apply { ")
+                                }
+
+                                append("${entry.fqn.fqnToUniqueMethodName()}(")
                                 if (entry.acceptsContext) {
                                     append("pageCtx")
                                 }
-                                append(") }")
+                                append(")")
+
+                                if (entry.receiverFqn != null) {
+                                    append(" }")
+                                }
+
+                                append(" }")
                             }
                         )
                     }

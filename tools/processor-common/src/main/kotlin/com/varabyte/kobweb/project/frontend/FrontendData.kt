@@ -104,6 +104,12 @@ class KeyframesEntry(val fqcn: String, val name: String, val import: String? = n
  *   a nested layout).
  * @property initRouteFqn The fully qualified name of a method associated with this layout that should be called before
  *   the current page is composed.
+ * @property contentReceiverFqn The fully qualified name of a class that, if set, is used to scope the content
+ *   parameter, e.g. `content: @Composable LayoutScope.() -> Unit`. If set, a page or child layout can only use this
+ *   layout if they don't specify a receiver scope themselves OR if their receiver scope matches,
+ *   e.g. `@Page LocalScope.TestPage() { ... }`
+ * @property receiverFqn The fully qualified name of the receiver class for this method. If set, then this can only
+ *   reference a parent layout that has a matching [contentReceiverFqn].
  */
 @Serializable
 class LayoutEntry(
@@ -111,6 +117,8 @@ class LayoutEntry(
     val acceptsContext: Boolean,
     val parentLayoutFqn: String? = null,
     val initRouteFqn: String? = null,
+    val contentReceiverFqn: String? = null,
+    val receiverFqn: String? = null,
 )
 
 /**
@@ -125,6 +133,8 @@ class LayoutEntry(
  * @param layoutFqn The fully qualified name of the parent layout method for this page.
  * @property initRouteFqn The fully qualified name of a method associated with this layout that should be called before
  *   the current page is composed.
+ * @property receiverFqn The fully qualified name of the receiver class for this method. If set, then this can only
+ *   reference a parent layout that has a matching [LayoutEntry.contentReceiverFqn].
  */
 @Serializable
 class PageEntry(
@@ -133,6 +143,7 @@ class PageEntry(
     val acceptsContext: Boolean = false,
     val layoutFqn: String? = null,
     val initRouteFqn: String? = null,
+    val receiverFqn: String? = null,
 )
 
 /**
