@@ -2,7 +2,7 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-internal interface CssBreakValues<T: StylePropertyValue> {
+internal sealed interface CssBreakValues<T: StylePropertyValue> {
     // Generic break values
     val Auto get() = "auto".unsafeCast<T>()
     val Avoid get() = "avoid".unsafeCast<T>()
