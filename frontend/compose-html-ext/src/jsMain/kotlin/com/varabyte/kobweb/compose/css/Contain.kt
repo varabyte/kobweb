@@ -19,7 +19,7 @@ sealed interface Contain : StylePropertyValue {
         val Paint: Listable get() = "paint".unsafeCast<Listable>()
 
         /* Multiple keywords */
-        fun list(values: List<Listable>): Contain = values.joinToString(" ").unsafeCast<Contain>()
+        fun list(vararg values: Listable): Contain = values.joinToString(" ").unsafeCast<Contain>()
     }
 }
 

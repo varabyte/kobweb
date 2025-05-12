@@ -809,10 +809,8 @@ class CssStylePropertyTests {
 
     @Test
     fun verifyContain() {
-
-        assertThat(styleToText { contain(Contain.list(listOf(Contain.Size, Contain.Paint))) }).isEqualTo("contain: size paint")
-        assertThat(styleToText { contain(Contain.list(listOf(Contain.InlineSize, Contain.Layout))) }).isEqualTo("contain: inline-size layout")
-        assertThat(styleToText { contain(Contain.list(listOf(Contain.Size, Contain.Layout, Contain.Paint)))}).isEqualTo("contain: size layout paint")
+        assertThat(styleToText { contain(Contain.list(Contain.Size, Contain.Paint)) }).isEqualTo("contain: size paint")
+        assertThat(styleToText { contain(Contain.list(Contain.InlineSize, Contain.Layout)) }).isEqualTo("contain: inline-size layout")
         assertThat(styleToText { contain(Contain.None) }).isEqualTo("contain: none")
         assertThat(styleToText { contain(Contain.Strict) }).isEqualTo("contain: strict")
         assertThat(styleToText { contain(Contain.Content) }).isEqualTo("contain: content")
@@ -831,11 +829,11 @@ class CssStylePropertyTests {
 
     @Test
     fun verifyContainIntrinsicBlockSize() {
-
         assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(1000.px)) }).isEqualTo("contain-intrinsic-block-size: 1000px")
         assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(10.cssRem)) }).isEqualTo("contain-intrinsic-block-size: 10rem")
 
         assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(300.px, true)) }).isEqualTo("contain-intrinsic-block-size: auto 300px")
+        assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.Auto(200.px)) }).isEqualTo("contain-intrinsic-block-size: auto 200px")
 
         assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.None) }).isEqualTo("contain-intrinsic-block-size: none")
         assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.Inherit) }).isEqualTo("contain-intrinsic-block-size: inherit")
@@ -852,6 +850,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(10.cssRem)) }).isEqualTo("contain-intrinsic-inline-size: 10rem")
 
         assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(300.px, true)) }).isEqualTo("contain-intrinsic-inline-size: auto 300px")
+        assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.Auto(200.px)) }).isEqualTo("contain-intrinsic-inline-size: auto 200px")
 
         assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.None) }).isEqualTo("contain-intrinsic-inline-size: none")
         assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.Inherit) }).isEqualTo("contain-intrinsic-inline-size: inherit")

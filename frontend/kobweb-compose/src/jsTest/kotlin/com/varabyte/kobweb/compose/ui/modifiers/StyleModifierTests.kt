@@ -138,44 +138,16 @@ class StyleModifierTests {
     @Test
     fun verifyContain() {
         assertThat(modifierToText {
-            Modifier.contain(
-                listOf(
-                    Contain.Size,
-                    Contain.Paint
-                )
-            )
+            Modifier.contain(Contain.Strict)
+        }).isEqualTo("contain: strict")
+
+        assertThat(modifierToText {
+            Modifier.contain(Contain.Size, Contain.Paint)
         }).isEqualTo("contain: size paint")
         assertThat(modifierToText {
-            Modifier.contain(
-                listOf(
-                    Contain.InlineSize,
-                    Contain.Layout
-                )
-            )
-        }).isEqualTo("contain: inline-size layout")
-        assertThat(modifierToText {
-            Modifier.contain(
-                listOf(
-                    Contain.Size,
-                    Contain.Layout,
-                    Contain.Paint
-                )
-            )
+            Modifier.contain(listOf(Contain.Size, Contain.Layout, Contain.Paint))
         }).isEqualTo("contain: size layout paint")
 
-        assertThat(modifierToText {
-            Modifier.contain(
-                listOf(
-                    Contain.Size,
-                    Contain.Layout,
-                    Contain.Paint
-                )
-            )
-        }).isEqualTo("contain: size layout paint")
-    }
-
-    @Test
-    fun verifyContainIntrinsicBlockSize() {
         assertThat(modifierToText {
             Modifier.containIntrinsicBlockSize(ContainIntrinsicBlockSize.None)
         }).isEqualTo("contain-intrinsic-block-size: none")
@@ -185,17 +157,9 @@ class StyleModifierTests {
             "contain-intrinsic-block-size: 100px"
         )
         assertThat(modifierToText {
-            Modifier.containIntrinsicBlockSize(
-                ContainIntrinsicBlockSize.of(
-                    100.px,
-                    true
-                )
-            )
+            Modifier.containIntrinsicBlockSize(100.px, true)
         }).isEqualTo("contain-intrinsic-block-size: auto 100px")
-    }
 
-    @Test
-    fun verifyContainIntrinsicInlineSize() {
         assertThat(modifierToText {
             Modifier.containIntrinsicInlineSize(ContainIntrinsicInlineSize.None)
         })
@@ -204,12 +168,7 @@ class StyleModifierTests {
             "contain-intrinsic-inline-size: 100px"
         )
         assertThat(modifierToText {
-            Modifier.containIntrinsicInlineSize(
-                ContainIntrinsicInlineSize.of(
-                    100.px,
-                    true
-                )
-            )
+            Modifier.containIntrinsicInlineSize(100.px, true)
         }).isEqualTo("contain-intrinsic-inline-size: auto 100px")
     }
 

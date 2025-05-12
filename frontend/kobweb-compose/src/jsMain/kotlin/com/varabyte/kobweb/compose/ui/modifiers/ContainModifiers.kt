@@ -8,22 +8,26 @@ fun Modifier.contain(contain: Contain) = styleModifier {
     contain(contain)
 }
 
+fun Modifier.contain(vararg values: Contain.Listable) = styleModifier {
+    contain(Contain.list(*values))
+}
+
 fun Modifier.contain(values: List<Contain.Listable>) = styleModifier {
-    contain(Contain.list(values))
+    contain(Contain.list(*values.toTypedArray()))
 }
 
 fun Modifier.containIntrinsicBlockSize(containIntrinsicBlockSize: ContainIntrinsicBlockSize) = styleModifier {
     containIntrinsicBlockSize(containIntrinsicBlockSize)
 }
 
-fun Modifier.containIntrinsicBlockSize(length: CSSLengthNumericValue, auto: Boolean = false) = styleModifier {
-    containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(length, auto))
+fun Modifier.containIntrinsicBlockSize(length: CSSLengthNumericValue, withAuto: Boolean = false) = styleModifier {
+    containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(length, withAuto))
 }
 
 fun Modifier.containIntrinsicInlineSize(containIntrinsicInlineSize: ContainIntrinsicInlineSize) = styleModifier {
     containIntrinsicInlineSize(containIntrinsicInlineSize)
 }
 
-fun Modifier.containIntrinsicInlineSize(length: CSSLengthNumericValue, auto: Boolean = false) = styleModifier {
-    containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(length, auto))
+fun Modifier.containIntrinsicInlineSize(length: CSSLengthNumericValue, withAuto: Boolean = false) = styleModifier {
+    containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(length, withAuto))
 }
