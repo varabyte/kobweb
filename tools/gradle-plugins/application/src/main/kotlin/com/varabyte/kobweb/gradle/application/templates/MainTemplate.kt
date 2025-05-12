@@ -253,85 +253,108 @@ fun createMainFunction(
                 )
                 addStatement("BasePath.set(\"$basePath\")")
                 addStatement("val router = Router()")
+
                 addStatement("$KOBWEB_GROUP.core.init.initKobweb(router) { ctx ->")
                 withIndent {
                     frontendData.layouts.sortedBy { it.fqn }.forEach { entry ->
-                        addStatement(
-                            buildString {
-                                append("ctx.router.registerLayout(\"${entry.fqn}\"")
-                                if (entry.parentLayoutFqn != null) {
-                                    append(", parentLayoutId = \"${entry.parentLayoutFqn}\"")
-                                }
-                                if (entry.initRouteFqn != null) {
-                                    append(", initRouteMethod = { ctx -> ${entry.initRouteFqn}(ctx) }")
-                                }
-                                append(") { pageCtx, pageMethod -> ")
+                        addStatement("ctx.router.registerLayout(")
+                        withIndent {
+                            addStatement("%S,", entry.fqn)
 
-                                if (entry.receiverFqn != null) {
-                                    append("currentLayoutScope<${entry.receiverFqn}>().apply { ")
-                                }
-
-                                append("${entry.fqn.fqnToUniqueMethodName()}(")
-                                if (entry.acceptsContext) {
-                                    append("pageCtx")
-                                }
-                                append(") { ")
-
-                                if (entry.contentReceiverFqn != null) {
-                                    append("provideLayoutScope(this) {")
-                                }
-
-                                append("pageMethod(pageCtx)")
-
-                                if (entry.contentReceiverFqn != null) {
-                                    append(" }")
-                                }
-
-                                append(" }")
-
-                                if (entry.receiverFqn != null) {
-                                    append(" }")
-                                }
-
-                                append(" }")
+                            entry.parentLayoutFqn?.let {
+                                addStatement("parentLayoutId = %S,", it)
                             }
-                        )
+
+                            entry.initRouteFqn?.let {
+                                addStatement("initRouteMethod = { ctx ->")
+                                withIndent {
+                                    addStatement("%L(ctx)", it)
+                                }
+                                addStatement("},")
+                            }
+                        }
+                        addStatement(") { pageCtx, pageMethod -> ")
+
+                        withIndent {
+                            entry.receiverFqn?.let {
+                                addStatement("currentLayoutScope<%L>().apply {", it)
+                                indent()
+                            }
+
+                            addStatement(buildString {
+                                append("%L")
+                                if (entry.acceptsContext) {
+                                    append("(pageCtx)")
+                                }
+                                append(" {")
+                            }, entry.fqn.fqnToUniqueMethodName())
+
+                            withIndent {
+                                entry.contentReceiverFqn?.let {
+                                    addStatement("provideLayoutScope(this) {")
+                                    indent()
+                                }
+
+                                addStatement("pageMethod(pageCtx)")
+
+                                entry.contentReceiverFqn?.let {
+                                    unindent()
+                                    addStatement("}")
+                                }
+                            }
+
+                            addStatement("}")
+
+                            entry.receiverFqn?.let {
+                                unindent()
+                                addStatement("}")
+                            }
+                        }
+
+                        addStatement("}")
                     }
 
                     frontendData.pages.sortedBy { it.route }.forEach { entry ->
-                        addStatement(
-                            buildString {
-                                append("ctx.router.register(\"${entry.route}\"")
-                                if (entry.layoutFqn != null) {
-                                    append(", layoutId = \"${entry.layoutFqn}\"")
-                                }
-                                if (entry.initRouteFqn != null) {
-                                    append(", initRouteMethod = { ctx -> ${entry.initRouteFqn}(ctx) }")
-                                }
-                                append(") { ")
+                        addStatement("ctx.router.register(")
+                        withIndent {
+                            addStatement("%S,", entry.route)
 
-                                if (entry.acceptsContext) {
-                                    append("pageCtx -> ")
+                            entry.layoutFqn?.let {
+                                addStatement("layoutId = %S,", it)
+                            }
+                            entry.initRouteFqn?.let {
+                                addStatement("initRouteMethod = { ctx ->")
+                                withIndent {
+                                    addStatement("%L(ctx)", it)
                                 }
+                                addStatement("},")
+                            }
+                        }
+                        addStatement(") { pageCtx -> ")
 
-                                if (entry.receiverFqn != null) {
-                                    append("currentLayoutScope<${entry.receiverFqn}>().apply { ")
-                                }
+                        withIndent {
+                            entry.receiverFqn?.let {
+                                addStatement("currentLayoutScope<%L>().apply {", it)
+                                indent()
+                            }
 
-                                append("${entry.fqn.fqnToUniqueMethodName()}(")
+                            addStatement(buildString {
+                                append("%L(")
                                 if (entry.acceptsContext) {
                                     append("pageCtx")
                                 }
                                 append(")")
+                            }, entry.fqn.fqnToUniqueMethodName())
 
-                                if (entry.receiverFqn != null) {
-                                    append(" }")
-                                }
-
-                                append(" }")
+                            entry.receiverFqn?.let {
+                                unindent()
+                                addStatement("}")
                             }
-                        )
+                        }
+
+                        addStatement("}")
                     }
+
                     redirects.sortedBy { it.to }.forEach { entry ->
                         addStatement("""ctx.router.registerRedirect("${entry.from}", "${entry.to}")""")
                     }
