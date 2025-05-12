@@ -95,9 +95,6 @@ class InitKobwebEntry(val fqn: String, val acceptsContext: Boolean)
 @Serializable
 class KeyframesEntry(val fqcn: String, val name: String, val import: String? = null)
 
-@Serializable
-class DefaultLayoutEntry(val fqn: String, val route: String)
-
 /**
  * Information about a method in the user's code targeted by a `@Layout` annotation.
  *
