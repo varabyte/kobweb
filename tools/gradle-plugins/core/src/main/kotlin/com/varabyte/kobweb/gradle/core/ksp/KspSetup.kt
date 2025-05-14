@@ -23,7 +23,12 @@ import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.gradle.language.jvm.tasks.ProcessResources
 
-fun Project.applyKspPlugin() = pluginManager.apply(KspGradleSubplugin::class.java)
+fun Project.applyKspPlugin() {
+    pluginManager.apply(KspGradleSubplugin::class.java)
+    // There's a bug with how KSP2 handles annotation arguments that we're waiting on a fix for, which they themselves
+    // are waiting on a fix in the K2 compiler for. See also: https://github.com/google/ksp/issues/2356
+    kspExtension.useKsp2.set(false)
+}
 
 fun Project.setKspMode(mode: ProcessorMode) = addKspArguments(KSP_PROCESSOR_MODE_KEY to mode.name)
 
