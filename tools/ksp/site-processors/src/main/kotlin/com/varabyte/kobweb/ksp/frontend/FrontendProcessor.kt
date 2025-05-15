@@ -55,6 +55,7 @@ import com.varabyte.kobweb.project.frontend.LayoutEntry
 import com.varabyte.kobweb.project.frontend.assertValid
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlin.collections.firstOrNull
 
 @OptIn(KspExperimental::class)
 class FrontendProcessor(
@@ -164,15 +165,7 @@ class FrontendProcessor(
 
         return matchesByName.asSequence()
             .mapNotNull { it -> it.resolveAsLayoutMethod() }
-            .toList()
-            .let { matches ->
-                if (matches.size > 1) {
-                    logger.error("Found multiple definitions for layout method \"${layoutMethodName.asString()}\" [${matches.joinToString { it.method.containingFile!!.filePath }}]. Did you accidentally copy/paste another layout and forget to change the name?", context)
-                    null
-                } else {
-                    matches.firstOrNull()
-                }
-            }
+            .singleOrNull()
             .also { layoutData ->
                 if (layoutData == null) {
                     logger.error(buildString {
@@ -183,7 +176,7 @@ class FrontendProcessor(
                         } else if (matchesByName.any()) {
                             append(" Please check that the @Layout method takes the expected arguments (optionally, a PageContext, and a composable lambda).")
                         } else {
-                            append(" No methods with that name were found. Please check the spelling.")
+                            append(" No methods with that name were found. Please check the spelling of the path.")
                         }
                     }, context)
                 }
@@ -206,6 +199,11 @@ class FrontendProcessor(
                     if (annotatedFun.annotations.none { it.shortName.asString() == "Composable" }) {
                         logger.warn("`fun ${annotatedFun.qualifiedName!!.asString()}` annotated with @Layout must also be @Composable.", annotatedFun)
                     }
+
+                    layoutMethods.firstOrNull { it.method.qualifiedName!!.asString() == layoutMethodData.method.qualifiedName!!.asString() }
+                        ?.let { conflictingLayoutMethod ->
+                            logger.error("Found multiple definitions for layout method \"${layoutMethodData.method.qualifiedName!!.asString()}\". Did you accidentally copy/paste another layout and forget to change the name?", annotatedFun)
+                        }
 
                     layoutMethods += layoutMethodData
                 }
