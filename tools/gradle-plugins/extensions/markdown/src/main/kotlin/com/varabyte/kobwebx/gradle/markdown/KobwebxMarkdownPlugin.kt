@@ -81,6 +81,13 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
                 kotlin.srcDir(convertTask.map { it.getGenDir()})
                 kotlin.srcDir(processTask.map { it.getGenSrcDir() })
                 resources.srcDir(processTask.map { it.getGenResPublicDir() })
+
+                // Plugin version and artifact version will always be the same
+                this::class.java.`package`.implementationVersion?.let { kobwebVersion ->
+                    dependencies {
+                        implementation("com.varabyte.kobwebx:kobwebx-markdown:$kobwebVersion")
+                    }
+                }
             }
         }
     }

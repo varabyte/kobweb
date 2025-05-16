@@ -86,6 +86,12 @@ class KobwebPublishPlugin : Plugin<Project> {
             apply("org.jetbrains.dokka")
         }
 
+        project.tasks.withType(Jar::class.java).configureEach {
+            manifest {
+                attributes["Implementation-Version"] = project.version
+            }
+        }
+
         val dokkaHtmlTask = project.tasks.named<DokkaGenerateTask>("dokkaGeneratePublicationHtml")
         project.tasks.register<Jar>(DOKKA_HTML_JAR_TASK_NAME) {
             dependsOn(dokkaHtmlTask)
