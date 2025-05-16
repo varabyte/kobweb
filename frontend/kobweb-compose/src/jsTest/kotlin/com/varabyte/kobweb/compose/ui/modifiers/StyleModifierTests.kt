@@ -173,6 +173,28 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifyDirection(){
+        assertThat(modifierToText {
+            Modifier.direction(Direction.Rtl)
+        }).isEqualTo("direction: rtl")
+
+        assertThat(modifierToText {
+            Modifier.direction(Direction.Ltr)
+        }).isEqualTo("direction: ltr")
+    }
+
+    @Test
+    fun verifyEmptyCells() {
+        assertThat(modifierToText {
+            Modifier.emptyCells(EmptyCells.Show)
+        }).isEqualTo("empty-cells: show")
+
+        assertThat(modifierToText {
+            Modifier.emptyCells(EmptyCells.Hide)
+        }).isEqualTo("empty-cells: hide")
+    }
+
+    @Test
     fun verifyLayout() {
         assertThat(modifierToText {
             Modifier.aspectRatio(1.5)
@@ -338,6 +360,17 @@ class StyleModifierTests {
                 end(20.px)
             }
         }).isEqualTo("margin-inline-end: 20px")
+    }
+
+    @Test
+    fun verifyOrphans() {
+        assertThat(modifierToText {
+            Modifier.orphans(2)
+        }).isEqualTo("orphans: 2")
+
+        assertThat(modifierToText {
+            Modifier.orphans(Orphans.Inherit)
+        }).isEqualTo("orphans: inherit")
     }
 
     @Test

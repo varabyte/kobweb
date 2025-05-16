@@ -957,6 +957,31 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyDirection() {
+        assertThat(styleToText { direction(Direction.Ltr) }).isEqualTo("direction: ltr")
+        assertThat(styleToText { direction(Direction.Rtl) }).isEqualTo("direction: rtl")
+
+        // Global
+        assertThat(styleToText { direction(Direction.Inherit) }).isEqualTo("direction: inherit")
+        assertThat(styleToText { direction(Direction.Initial) }).isEqualTo("direction: initial")
+        assertThat(styleToText { direction(Direction.Revert) }).isEqualTo("direction: revert")
+        assertThat(styleToText { direction(Direction.RevertLayer) }).isEqualTo("direction: revert-layer")
+        assertThat(styleToText { direction(Direction.Unset) }).isEqualTo("direction: unset")
+    }
+
+    @Test
+    fun verifyEmptyCells() {
+        assertThat(styleToText { emptyCells(EmptyCells.Show) }).isEqualTo("empty-cells: show")
+        assertThat(styleToText { emptyCells(EmptyCells.Hide) }).isEqualTo("empty-cells: hide")
+        // Global
+        assertThat(styleToText { emptyCells(EmptyCells.Inherit) }).isEqualTo("empty-cells: inherit")
+        assertThat(styleToText { emptyCells(EmptyCells.Initial) }).isEqualTo("empty-cells: initial")
+        assertThat(styleToText { emptyCells(EmptyCells.Revert) }).isEqualTo("empty-cells: revert")
+        assertThat(styleToText { emptyCells(EmptyCells.RevertLayer) }).isEqualTo("empty-cells: revert-layer")
+        assertThat(styleToText { emptyCells(EmptyCells.Unset) }).isEqualTo("empty-cells: unset")
+    }
+
+    @Test
     fun verifyFilter() {
         assertThat(styleToText { filter(Filter.None) }).isEqualTo("filter: none")
 
@@ -1767,6 +1792,17 @@ class CssStylePropertyTests {
         assertThat(styleToText { objectFit(ObjectFit.Revert) }).isEqualTo("object-fit: revert")
         assertThat(styleToText { objectFit(ObjectFit.RevertLayer) }).isEqualTo("object-fit: revert-layer")
         assertThat(styleToText { objectFit(ObjectFit.Unset) }).isEqualTo("object-fit: unset")
+    }
+
+    @Test
+    fun verifyOrphans(){
+        assertThat(styleToText { orphans(Orphans.of(2)) }).isEqualTo("orphans: 2")
+        //Global
+        assertThat(styleToText { orphans(Orphans.Inherit) }).isEqualTo("orphans: inherit")
+        assertThat(styleToText { orphans(Orphans.Initial) }).isEqualTo("orphans: initial")
+        assertThat(styleToText { orphans(Orphans.Revert) }).isEqualTo("orphans: revert")
+        assertThat(styleToText { orphans(Orphans.RevertLayer) }).isEqualTo("orphans: revert-layer")
+        assertThat(styleToText { orphans(Orphans.Unset) }).isEqualTo("orphans: unset")
     }
 
     @Test
