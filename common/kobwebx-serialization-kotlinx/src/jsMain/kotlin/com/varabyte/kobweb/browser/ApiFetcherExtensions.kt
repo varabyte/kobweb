@@ -8,6 +8,7 @@ import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import org.w3c.fetch.RequestRedirect
+import kotlin.collections.orEmpty
 
 /**
  * Call GET on a target API path with [R] as the expected return type.
@@ -50,6 +51,8 @@ suspend inline fun <reified R> ApiFetcher.tryGet(
 /**
  * Call POST on a target API path with [R] as the expected return type.
  *
+ * You can set [R] to `Unit` if this request doesn't expect a response body.
+ *
  * See also [tryPost], which will return null if the request fails for any reason.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
@@ -59,41 +62,66 @@ suspend inline fun <reified R> ApiFetcher.tryGet(
  */
 suspend inline fun <reified B, reified R> ApiFetcher.post(
     apiPath: String,
+    body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
-    body: B? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
     responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
-    return post(
+    val responseBytes = post(
         apiPath,
-        if (body == null) headers else (mapOf("Content-type" to "application/json") + headers.orEmpty()),
-        body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
+        body,
+        mapOf("Content-type" to "application/json") + headers.orEmpty(),
         redirect,
         abortController,
-        responseDeserializer
+        bodySerializer
+    )
+
+    if (R::class == Unit::class) return Unit as R
+
+    return Json.decodeFromString(responseDeserializer, responseBytes.decodeToString())
+}
+
+/**
+ * A serialize-friendly version of [post] that expects a body but does not expect a serialized response.
+ */
+suspend inline fun <reified B> ApiFetcher.post(
+    apiPath: String,
+    body: B,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
+    redirect: RequestRedirect? = FetchDefaults.Redirect,
+    abortController: AbortController? = null,
+    bodySerializer: SerializationStrategy<B> = serializer(),
+): ByteArray {
+    return post(
+        apiPath,
+        mapOf("Content-type" to "application/json") + headers.orEmpty(),
+        Json.encodeToString(bodySerializer, body).encodeToByteArray(),
+        redirect,
+        abortController
     )
 }
 
 /**
- * A serialize-friendly version of [post] that doesn't put any type constraints on the body.
- *
- * This is useful if your request doesn't require a body to be included, so there shouldn't be a need to specify a
- * body type constraint in that case, or if it is easier to use a custom, handcrafted byte array message instead.
+ * A serialize-friendly version of [post] that has no body but expects a serialized response.
  */
 suspend inline fun <reified R> ApiFetcher.post(
     apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
-    body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseDeserializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer(),
 ): R {
-    return Json.decodeFromString(
-        responseDeserializer,
-        post(apiPath, headers, body, redirect, abortController).decodeToString()
+    val responseBytes = post(
+        apiPath,
+        headers,
+        body = null,
+        redirect,
+        abortController
     )
+
+    return Json.decodeFromString(responseDeserializer, responseBytes.decodeToString())
 }
 
 /**
@@ -107,100 +135,146 @@ suspend inline fun <reified R> ApiFetcher.post(
  */
 suspend inline fun <reified B, reified R> ApiFetcher.tryPost(
     apiPath: String,
+    body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
-    body: B? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
     responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
-    return tryPost(
+    val responseBytes = tryPost(
         apiPath,
-        if (body == null) headers else (mapOf("Content-type" to "application/json") + headers.orEmpty()),
-        body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
+        body,
+        mapOf("Content-type" to "application/json") + headers.orEmpty(),
         redirect,
         abortController,
-        responseDeserializer
+        bodySerializer,
+    )
+
+    if (responseBytes == null) return null
+    if (R::class == Unit::class) return Unit as R
+
+    return Json.decodeFromString(responseDeserializer, responseBytes.decodeToString())
+}
+
+/**
+ * A serialize-friendly version of [tryPost] that expects a body but does not expect a serialized response.
+ */
+suspend inline fun <reified B> ApiFetcher.tryPost(
+    apiPath: String,
+    body: B,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
+    redirect: RequestRedirect? = FetchDefaults.Redirect,
+    abortController: AbortController? = null,
+    bodySerializer: SerializationStrategy<B> = serializer(),
+): ByteArray? {
+    return tryPost(
+        apiPath,
+        headers,
+        Json.encodeToString(bodySerializer, body).encodeToByteArray(),
+        redirect,
+        abortController,
     )
 }
 
 /**
- * A serialize-friendly version of [tryPost] that doesn't put any type constraints on the body.
- *
- * This is useful if your request doesn't require a body to be included, so there shouldn't be a need to specify a
- * body type constraint in that case, or if it is easier to use a custom, handcrafted byte array message instead.
+ * A serialize-friendly version of [tryPost] that has no body but expects a serialized response.
  */
 suspend inline fun <reified R> ApiFetcher.tryPost(
     apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
-    body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseDeserializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer(),
 ): R? {
-    return tryPost(
+    val responseBytes = tryPost(
         apiPath,
         headers,
-        body,
+        body = null,
         redirect,
-        abortController,
+        abortController
     )
-        ?.let { Json.decodeFromString(responseDeserializer, it.decodeToString()) }
+
+    if (responseBytes == null) return null
+
+    return Json.decodeFromString(responseDeserializer, responseBytes.decodeToString())
 }
 
+
 /**
- * Call PUT on a target API path with [B] as the body type and [R] as the expected return type.
+ * Call PUT on a target API path with [R] as the expected return type.
+ *
+ * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
  * See also [tryPut], which will return null if the request fails for any reason.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
  * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- * [bodySerializer].
+ *  [bodySerializer].
  */
 suspend inline fun <reified B, reified R> ApiFetcher.put(
     apiPath: String,
+    body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
-    body: B? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
     responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
-    return put(
+    val responseBytes = put(
         apiPath,
-        if (body == null) headers else (mapOf("Content-type" to "application/json") + headers.orEmpty()),
-        body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
+        body,
+        mapOf("Content-type" to "application/json") + headers.orEmpty(),
         redirect,
         abortController,
-        responseDeserializer,
+        bodySerializer
+    )
+
+    if (R::class == Unit::class) return Unit as R
+
+    return Json.decodeFromString(responseDeserializer, responseBytes.decodeToString())
+}
+
+/**
+ * A serialize-friendly version of [put] that expects a body but does not expect a serialized response.
+ */
+suspend inline fun <reified B> ApiFetcher.put(
+    apiPath: String,
+    body: B,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
+    redirect: RequestRedirect? = FetchDefaults.Redirect,
+    abortController: AbortController? = null,
+    bodySerializer: SerializationStrategy<B> = serializer(),
+): ByteArray {
+    return put(
+        apiPath,
+        mapOf("Content-type" to "application/json") + headers.orEmpty(),
+        Json.encodeToString(bodySerializer, body).encodeToByteArray(),
+        redirect,
+        abortController
     )
 }
 
 /**
- * A serialize-friendly version of [put] that doesn't put any type constraints on the body.
- *
- * This is useful if your request doesn't require a body to be included, so there shouldn't be a need to specify a
- * body type constraint in that case, or if it is easier to use a custom, handcrafted byte array message instead.
+ * A serialize-friendly version of [put] that has no body but expects a serialized response.
  */
 suspend inline fun <reified R> ApiFetcher.put(
     apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
-    body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseDeserializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer(),
 ): R {
-    return Json.decodeFromString(
-        responseDeserializer,
-        put(
-            apiPath,
-            headers,
-            body,
-            redirect,
-            abortController,
-        ).decodeToString()
+    val responseBytes = put(
+        apiPath,
+        headers,
+        body = null,
+        redirect,
+        abortController
     )
+
+    return Json.decodeFromString(responseDeserializer, responseBytes.decodeToString())
 }
 
 /**
@@ -210,104 +284,149 @@ suspend inline fun <reified R> ApiFetcher.put(
  * be true for debug builds and false for release builds.
  *
  * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- * [bodySerializer].
+ *  [bodySerializer].
  */
 suspend inline fun <reified B, reified R> ApiFetcher.tryPut(
     apiPath: String,
+    body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
-    body: B? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
     responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
-    return tryPut(
+    val responseBytes = tryPut(
         apiPath,
-        if (body == null) headers else (mapOf("Content-type" to "application/json") + headers.orEmpty()),
-        body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
+        body,
+        mapOf("Content-type" to "application/json") + headers.orEmpty(),
         redirect,
         abortController,
-        responseDeserializer
+        bodySerializer,
+    )
+
+    if (responseBytes == null) return null
+    if (R::class == Unit::class) return Unit as R
+
+    return Json.decodeFromString(responseDeserializer, responseBytes.decodeToString())
+}
+
+/**
+ * A serialize-friendly version of [tryPut] that expects a body but does not expect a serialized response.
+ */
+suspend inline fun <reified B> ApiFetcher.tryPut(
+    apiPath: String,
+    body: B,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
+    redirect: RequestRedirect? = FetchDefaults.Redirect,
+    abortController: AbortController? = null,
+    bodySerializer: SerializationStrategy<B> = serializer(),
+): ByteArray? {
+    return tryPut(
+        apiPath,
+        headers,
+        Json.encodeToString(bodySerializer, body).encodeToByteArray(),
+        redirect,
+        abortController,
     )
 }
 
 /**
- * A serialize-friendly version of [tryPut] that doesn't put any type constraints on the body.
- *
- * This is useful if your request doesn't require a body to be included, so there shouldn't be a need to specify a
- * body type constraint in that case, or if it is easier to use a custom, handcrafted byte array message instead.
+ * A serialize-friendly version of [tryPut] that has no body but expects a serialized response.
  */
 suspend inline fun <reified R> ApiFetcher.tryPut(
     apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
-    body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseDeserializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer(),
 ): R? {
-    return tryPut(
+    val responseBytes = tryPut(
         apiPath,
         headers,
-        body,
+        body = null,
         redirect,
-        abortController,
+        abortController
     )
-        ?.let { Json.decodeFromString(responseDeserializer, it.decodeToString()) }
+
+    if (responseBytes == null) return null
+
+    return Json.decodeFromString(responseDeserializer, responseBytes.decodeToString())
 }
 
 /**
- * Call PATCH on a target API path with [B] as the body type and [R] as the expected return type.
+ * Call PATCH on a target API path with [R] as the expected return type.
+ *
+ * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
  * See also [tryPatch], which will return null if the request fails for any reason.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
  * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- * [bodySerializer].
+ *  [bodySerializer].
  */
 suspend inline fun <reified B, reified R> ApiFetcher.patch(
     apiPath: String,
+    body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
-    body: B? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
     responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
-    return patch(
+    val responseBytes = patch(
         apiPath,
-        if (body == null) headers else (mapOf("Content-type" to "application/json") + headers.orEmpty()),
-        body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
+        body,
+        mapOf("Content-type" to "application/json") + headers.orEmpty(),
         redirect,
         abortController,
-        responseDeserializer,
+        bodySerializer
+    )
+
+    if (R::class == Unit::class) return Unit as R
+
+    return Json.decodeFromString(responseDeserializer, responseBytes.decodeToString())
+}
+
+/**
+ * A serialize-friendly version of [patch] that expects a body but does not expect a serialized response.
+ */
+suspend inline fun <reified B> ApiFetcher.patch(
+    apiPath: String,
+    body: B,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
+    redirect: RequestRedirect? = FetchDefaults.Redirect,
+    abortController: AbortController? = null,
+    bodySerializer: SerializationStrategy<B> = serializer(),
+): ByteArray {
+    return patch(
+        apiPath,
+        mapOf("Content-type" to "application/json") + headers.orEmpty(),
+        Json.encodeToString(bodySerializer, body).encodeToByteArray(),
+        redirect,
+        abortController
     )
 }
 
 /**
- * A serialize-friendly version of [patch] that doesn't put any type constraints on the body.
- *
- * This is useful if your request doesn't require a body to be included, so there shouldn't be a need to specify a
- * body type constraint in that case, or if it is easier to use a custom, handcrafted byte array message instead.
+ * A serialize-friendly version of [patch] that has no body but expects a serialized response.
  */
 suspend inline fun <reified R> ApiFetcher.patch(
     apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
-    body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseDeserializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer(),
 ): R {
-    return Json.decodeFromString(
-        responseDeserializer,
-        patch(
-            apiPath,
-            headers,
-            body,
-            redirect,
-            abortController,
-        ).decodeToString()
+    val responseBytes = patch(
+        apiPath,
+        headers,
+        body = null,
+        redirect,
+        abortController
     )
+
+    return Json.decodeFromString(responseDeserializer, responseBytes.decodeToString())
 }
 
 /**
@@ -317,53 +436,79 @@ suspend inline fun <reified R> ApiFetcher.patch(
  * be true for debug builds and false for release builds.
  *
  * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- * [bodySerializer].
+ *  [bodySerializer].
  */
 suspend inline fun <reified B, reified R> ApiFetcher.tryPatch(
     apiPath: String,
+    body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
-    body: B? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
     responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
-    return tryPatch(
+    val responseBytes = tryPatch(
         apiPath,
-        if (body == null) headers else (mapOf("Content-type" to "application/json") + headers.orEmpty()),
-        body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
+        body,
+        mapOf("Content-type" to "application/json") + headers.orEmpty(),
         redirect,
         abortController,
-        responseDeserializer,
+        bodySerializer,
+    )
+
+    if (responseBytes == null) return null
+    if (R::class == Unit::class) return Unit as R
+
+    return Json.decodeFromString(responseDeserializer, responseBytes.decodeToString())
+}
+
+/**
+ * A serialize-friendly version of [tryPatch] that expects a body but does not expect a serialized response.
+ */
+suspend inline fun <reified B> ApiFetcher.tryPatch(
+    apiPath: String,
+    body: B,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
+    redirect: RequestRedirect? = FetchDefaults.Redirect,
+    abortController: AbortController? = null,
+    bodySerializer: SerializationStrategy<B> = serializer(),
+): ByteArray? {
+    return tryPatch(
+        apiPath,
+        headers,
+        Json.encodeToString(bodySerializer, body).encodeToByteArray(),
+        redirect,
+        abortController,
     )
 }
 
 /**
- * A serialize-friendly version of [tryPatch] that doesn't put any type constraints on the body.
- *
- * This is useful if your request doesn't require a body to be included, so there shouldn't be a need to specify a
- * body type constraint in that case, or if it is easier to use a custom, handcrafted byte array message instead.
+ * A serialize-friendly version of [tryPatch] that has no body but expects a serialized response.
  */
 suspend inline fun <reified R> ApiFetcher.tryPatch(
     apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
-    body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseDeserializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer(),
 ): R? {
-    return tryPatch(
+    val responseBytes = tryPatch(
         apiPath,
         headers,
-        body,
+        body = null,
         redirect,
-        abortController,
+        abortController
     )
-        ?.let { Json.decodeFromString(responseDeserializer, it.decodeToString()) }
+
+    if (responseBytes == null) return null
+
+    return Json.decodeFromString(responseDeserializer, responseBytes.decodeToString())
 }
 
 /**
  * Call DELETE on a target API path with [R] as the expected return type.
+ *
+ * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
  * See also [tryDelete], which will return null if the request fails for any reason.
  *
@@ -374,27 +519,37 @@ suspend inline fun <reified R> ApiFetcher.delete(
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseDeserializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer(),
 ): R {
-    return Json.decodeFromString(
-        responseDeserializer,
-        delete(apiPath, headers, redirect, abortController).decodeToString()
+    val responseBytes = delete(
+        apiPath,
+        headers,
+        redirect,
+        abortController
     )
+
+    return Json.decodeFromString(responseDeserializer, responseBytes.decodeToString())
 }
 
 /**
- * Like [delete], but returns null if the request failed for any reason.
- *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * A serialize-friendly version of [tryDelete].
  */
 suspend inline fun <reified R> ApiFetcher.tryDelete(
     apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseDeserializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer(),
 ): R? {
-    return tryDelete(apiPath, headers, redirect, abortController)
-        ?.let { Json.decodeFromString(responseDeserializer, it.decodeToString()) }
+    val responseBytes = tryDelete(
+        apiPath,
+        headers,
+        redirect,
+        abortController
+    )
+
+    if (responseBytes == null) return null
+
+    return Json.decodeFromString(responseDeserializer, responseBytes.decodeToString())
 }
+
