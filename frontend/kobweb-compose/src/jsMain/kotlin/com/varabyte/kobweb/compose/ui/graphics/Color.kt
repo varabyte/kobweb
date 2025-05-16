@@ -249,60 +249,60 @@ sealed interface Color : CSSColorValue {
 
         fun rgb(value: Int): Rgb = RawRgb(0xFF.shl(24).or(value))
         fun argb(value: Int): Rgb = RawRgb(value)
-        fun argb(value: Long) = argb(value.toInRangeInt())
+        fun argb(value: Long): Rgb = argb(value.toInRangeInt())
 
-        fun rgba(value: Int) = run {
+        fun rgba(value: Int): Rgb = run {
             // Convert RRGGBBAA to AARRGGBB
             val alpha = value.and(0xFF).shl(24)
             val rgb = value.shr(8)
             argb(alpha.or(rgb))
         }
-        fun rgba(value: Long) = rgba(value.toInRangeInt())
+        fun rgba(value: Long): Rgb = rgba(value.toInRangeInt())
 
-        fun rgb(r: Int, g: Int, b: Int) = rgba(r, g, b, 0xFF)
-        fun rgba(r: Int, g: Int, b: Int, a: Int) = RawRgb(
+        fun rgb(r: Int, g: Int, b: Int): Rgb = rgba(r, g, b, 0xFF)
+        fun rgba(r: Int, g: Int, b: Int, a: Int): Rgb = RawRgb(
             r.and(0xFF).shl(16)
                 .or(g.and(0xFF).shl(8))
                 .or(b.and(0xFF).shl(0))
                 .or(a.and(0xFF).shl(24))
         )
 
-        fun argb(a: Int, r: Int, g: Int, b: Int) = rgba(r, g, b, a)
+        fun argb(a: Int, r: Int, g: Int, b: Int): Rgb = rgba(r, g, b, a)
 
-        fun rgb(r: Float, g: Float, b: Float) = rgb(r.toColorInt(), g.toColorInt(), b.toColorInt())
-        fun rgba(r: Float, g: Float, b: Float, a: Float) =
+        fun rgb(r: Float, g: Float, b: Float): Rgb = rgb(r.toColorInt(), g.toColorInt(), b.toColorInt())
+        fun rgba(r: Float, g: Float, b: Float, a: Float): Rgb =
             rgba(r.toColorInt(), g.toColorInt(), b.toColorInt(), a.toColorInt())
 
-        fun argb(a: Float, r: Float, g: Float, b: Float) = rgba(r, g, b, a)
+        fun argb(a: Float, r: Float, g: Float, b: Float): Rgb = rgba(r, g, b, a)
 
-        fun rgba(r: Int, g: Int, b: Int, a: Float) = rgba(r, g, b, a.toColorInt())
-        fun argb(a: Float, r: Int, g: Int, b: Int) = rgba(r, g, b, a)
+        fun rgba(r: Int, g: Int, b: Int, a: Float): Rgb = rgba(r, g, b, a.toColorInt())
+        fun argb(a: Float, r: Int, g: Int, b: Int): Rgb = rgba(r, g, b, a)
 
-        fun hsl(h: Int, s: Float, l: Float) = hsl(h.toFloat(), s, l)
-        fun hsla(h: Int, s: Float, l: Float, a: Float) = hsla(h.toFloat(), s, l, a)
-        fun hsl(h: Float, s: Float, l: Float) = Hsl(h, s, l, 1f)
-        fun hsla(h: Float, s: Float, l: Float, a: Float) = Hsl(h, s, l, a)
+        fun hsl(h: Int, s: Float, l: Float): Hsl = hsl(h.toFloat(), s, l)
+        fun hsla(h: Int, s: Float, l: Float, a: Float): Hsl = hsla(h.toFloat(), s, l, a)
+        fun hsl(h: Float, s: Float, l: Float): Hsl = Hsl(h, s, l, 1f)
+        fun hsla(h: Float, s: Float, l: Float, a: Float): Hsl = Hsl(h, s, l, a)
 
         // Provide convenience methods for CSS value parameter types
 
-        fun rgb(r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue) = rgba(r, g, b, 1f)
-        fun rgba(r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue, a: CSSPercentageValue) =
+        fun rgb(r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue): Rgb = rgba(r, g, b, 1f)
+        fun rgba(r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue, a: CSSPercentageValue): Rgb =
             rgba(r.value / 100f, g.value / 100f, b.value / 100f, a.value / 100f)
 
-        fun rgba(r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue, a: Float) =
+        fun rgba(r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue, a: Float): Rgb =
             rgba(r.value / 100f, g.value / 100f, b.value / 100f, a)
 
-        fun argb(a: CSSPercentageValue, r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue) =
+        fun argb(a: CSSPercentageValue, r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue): Rgb =
             argb(a.value / 100f, r.value / 100f, g.value / 100f, b.value / 100f)
 
-        fun argb(a: Float, r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue) =
+        fun argb(a: Float, r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue): Rgb =
             argb(a, r.value / 100f, g.value / 100f, b.value / 100f)
 
-        fun hsl(h: CSSAngleValue, s: CSSPercentageValue, l: CSSPercentageValue) = hsla(h, s, l, 1f)
-        fun hsla(h: CSSAngleValue, s: CSSPercentageValue, l: CSSPercentageValue, alpha: Float) =
+        fun hsl(h: CSSAngleValue, s: CSSPercentageValue, l: CSSPercentageValue): Hsl = hsla(h, s, l, 1f)
+        fun hsla(h: CSSAngleValue, s: CSSPercentageValue, l: CSSPercentageValue, alpha: Float): Hsl =
             hsla(h.toDegrees(), s.value / 100f, l.value / 100f, alpha)
 
-        fun hsla(h: CSSAngleValue, s: CSSPercentageValue, l: CSSPercentageValue, alpha: CSSPercentageValue) =
+        fun hsla(h: CSSAngleValue, s: CSSPercentageValue, l: CSSPercentageValue, alpha: CSSPercentageValue): Hsl =
             hsla(h, s, l, alpha.value / 100f)
     }
 }
