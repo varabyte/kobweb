@@ -13,3 +13,15 @@ sealed interface Widows : StylePropertyValue {
 fun StyleScope.widows(widows: Widows) {
     property("widows", widows)
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/orphans
+sealed interface Orphans : StylePropertyValue {
+    companion object : CssGlobalValues<Orphans> {
+        /* <integer> values */
+        fun of(value: Int) = value.unsafeCast<Orphans>()
+    }
+}
+
+fun StyleScope.orphans(orphans: Orphans) {
+    property("orphans", orphans)
+}

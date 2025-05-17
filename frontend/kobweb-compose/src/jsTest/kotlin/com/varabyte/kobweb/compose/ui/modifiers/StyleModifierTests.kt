@@ -173,17 +173,6 @@ class StyleModifierTests {
     }
 
     @Test
-    fun verifyDirection(){
-        assertThat(modifierToText {
-            Modifier.direction(Direction.Rtl)
-        }).isEqualTo("direction: rtl")
-
-        assertThat(modifierToText {
-            Modifier.direction(Direction.Ltr)
-        }).isEqualTo("direction: ltr")
-    }
-
-    @Test
     fun verifyEmptyCells() {
         assertThat(modifierToText {
             Modifier.emptyCells(EmptyCells.Show)

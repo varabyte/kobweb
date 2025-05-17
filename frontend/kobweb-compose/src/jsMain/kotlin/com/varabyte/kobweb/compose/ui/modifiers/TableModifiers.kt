@@ -7,3 +7,7 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 fun Modifier.captionSide(captionSide: CaptionSide): Modifier = styleModifier {
     captionSide(captionSide)
 }
+
+fun Modifier.emptyCells(emptyCells: EmptyCells) = styleModifier {
+    emptyCells(emptyCells)
+}

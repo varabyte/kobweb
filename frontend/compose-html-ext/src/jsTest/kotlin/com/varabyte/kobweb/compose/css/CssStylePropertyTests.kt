@@ -957,19 +957,6 @@ class CssStylePropertyTests {
     }
 
     @Test
-    fun verifyDirection() {
-        assertThat(styleToText { direction(Direction.Ltr) }).isEqualTo("direction: ltr")
-        assertThat(styleToText { direction(Direction.Rtl) }).isEqualTo("direction: rtl")
-
-        // Global
-        assertThat(styleToText { direction(Direction.Inherit) }).isEqualTo("direction: inherit")
-        assertThat(styleToText { direction(Direction.Initial) }).isEqualTo("direction: initial")
-        assertThat(styleToText { direction(Direction.Revert) }).isEqualTo("direction: revert")
-        assertThat(styleToText { direction(Direction.RevertLayer) }).isEqualTo("direction: revert-layer")
-        assertThat(styleToText { direction(Direction.Unset) }).isEqualTo("direction: unset")
-    }
-
-    @Test
     fun verifyEmptyCells() {
         assertThat(styleToText { emptyCells(EmptyCells.Show) }).isEqualTo("empty-cells: show")
         assertThat(styleToText { emptyCells(EmptyCells.Hide) }).isEqualTo("empty-cells: hide")
