@@ -11,3 +11,11 @@ fun Modifier.widows(widows: Widows) = styleModifier {
 fun Modifier.widows(numLines: Int) = styleModifier {
     widows(Widows.of(numLines))
 }
+
+fun Modifier.orphans(orphans: Orphans) = styleModifier {
+    orphans(orphans)
+}
+
+fun Modifier.orphans(value: Int) = styleModifier {
+    orphans(Orphans.of(value))
+}
