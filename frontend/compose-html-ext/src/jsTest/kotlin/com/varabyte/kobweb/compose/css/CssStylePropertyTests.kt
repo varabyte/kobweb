@@ -1559,6 +1559,20 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyLineBreak() {
+        assertThat(styleToText { lineBreak(LineBreak.Auto) }).isEqualTo("line-break: auto")
+        assertThat(styleToText { lineBreak(LineBreak.Strict) }).isEqualTo("line-break: strict")
+        assertThat(styleToText { lineBreak(LineBreak.Normal) }).isEqualTo("line-break: normal")
+        assertThat(styleToText { lineBreak(LineBreak.AnyWhere) }).isEqualTo("line-break: anywhere")
+        assertThat(styleToText { lineBreak(LineBreak.Loose) }).isEqualTo("line-break: loose")
+
+        assertThat(styleToText { lineBreak(LineBreak.Inherit) }).isEqualTo("line-break: inherit")
+        assertThat(styleToText { lineBreak(LineBreak.Initial) }).isEqualTo("line-break: initial")
+        assertThat(styleToText { lineBreak(LineBreak.Revert) }).isEqualTo("line-break: revert")
+        assertThat(styleToText { lineBreak(LineBreak.RevertLayer) }).isEqualTo("line-break: revert-layer")
+        assertThat(styleToText { lineBreak(LineBreak.Unset) }).isEqualTo("line-break: unset")
+    }
+    @Test
     fun verifyLineHeight() {
         assertThat(styleToText { lineHeight(LineHeight.Normal) }).isEqualTo("line-height: normal")
 
@@ -1875,6 +1889,18 @@ class CssStylePropertyTests {
         assertThat(styleToText { overflowInline(OverflowInline.Unset) }).isEqualTo("overflow-inline: unset")
     }
 
+    @Test
+    fun verifyOverflowScrollBehavior() {
+        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.Auto) }).isEqualTo("overflow-scroll-behavior: auto")
+        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.Contain) }).isEqualTo("overflow-scroll-behavior: contain")
+        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.None) }).isEqualTo("overflow-scroll-behavior: contain")
+
+        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.Inherit) }).isEqualTo("overflow-scroll-behavior: inherit")
+        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.Initial) }).isEqualTo("overflow-scroll-behavior: initial")
+        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.Revert) }).isEqualTo("overflow-scroll-behavior: revert")
+        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.RevertLayer) }).isEqualTo("overflow-scroll-behavior: revert-layer")
+        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.Unset) }).isEqualTo("overflow-scroll-behavior: unset")
+    }
     @Test
     fun verifyOverflowWrap() {
         assertThat(styleToText { overflowWrap(OverflowWrap.Normal) }).isEqualTo("overflow-wrap: normal")

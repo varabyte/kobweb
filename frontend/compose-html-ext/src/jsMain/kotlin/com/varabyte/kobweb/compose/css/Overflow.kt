@@ -55,6 +55,25 @@ fun StyleScope.overflowInline(overflowInline: OverflowInline) {
     property("overflow-inline", overflowInline)
 }
 
+sealed interface OverflowScrollBehavior : StylePropertyValue {
+
+    sealed interface Listable : OverflowScrollBehavior
+    companion object : CssGlobalValues<OverflowScrollBehavior> {
+
+        /* Keyword values */
+        val Auto: OverflowScrollBehavior get() = "auto".unsafeCast<OverflowScrollBehavior>()
+        val Contain: OverflowScrollBehavior get() = "contain".unsafeCast<OverflowScrollBehavior>()
+        val None: OverflowScrollBehavior get() = "none".unsafeCast<OverflowScrollBehavior>()
+
+        /* Two values */
+        fun list(vararg values: Listable) = values.joinToString(" ").unsafeCast<OverflowScrollBehavior>()
+    }
+}
+
+fun StyleScope.overflowScrollBehavior(overflowScrollBehavior: OverflowScrollBehavior) {
+    property("overscroll-behavior", overflowScrollBehavior)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-wrap
 sealed interface OverflowWrap : StylePropertyValue {
     companion object : CssGlobalValues<OverflowWrap> {

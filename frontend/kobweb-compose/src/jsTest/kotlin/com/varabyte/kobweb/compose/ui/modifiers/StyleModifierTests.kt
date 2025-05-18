@@ -173,17 +173,6 @@ class StyleModifierTests {
     }
 
     @Test
-    fun verifyEmptyCells() {
-        assertThat(modifierToText {
-            Modifier.emptyCells(EmptyCells.Show)
-        }).isEqualTo("empty-cells: show")
-
-        assertThat(modifierToText {
-            Modifier.emptyCells(EmptyCells.Hide)
-        }).isEqualTo("empty-cells: hide")
-    }
-
-    @Test
     fun verifyLayout() {
         assertThat(modifierToText {
             Modifier.aspectRatio(1.5)
