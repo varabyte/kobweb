@@ -1890,18 +1890,6 @@ class CssStylePropertyTests {
     }
 
     @Test
-    fun verifyOverflowScrollBehavior() {
-        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.Auto) }).isEqualTo("overflow-scroll-behavior: auto")
-        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.Contain) }).isEqualTo("overflow-scroll-behavior: contain")
-        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.None) }).isEqualTo("overflow-scroll-behavior: contain")
-
-        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.Inherit) }).isEqualTo("overflow-scroll-behavior: inherit")
-        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.Initial) }).isEqualTo("overflow-scroll-behavior: initial")
-        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.Revert) }).isEqualTo("overflow-scroll-behavior: revert")
-        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.RevertLayer) }).isEqualTo("overflow-scroll-behavior: revert-layer")
-        assertThat(styleToText { overflowScrollBehavior(OverflowScrollBehavior.Unset) }).isEqualTo("overflow-scroll-behavior: unset")
-    }
-    @Test
     fun verifyOverflowWrap() {
         assertThat(styleToText { overflowWrap(OverflowWrap.Normal) }).isEqualTo("overflow-wrap: normal")
         assertThat(styleToText { overflowWrap(OverflowWrap.BreakWord) }).isEqualTo("overflow-wrap: break-word")

@@ -30,18 +30,6 @@ fun Modifier.overflowInline(overflowInline: OverflowInline) = styleModifier {
     overflowInline(overflowInline)
 }
 
-fun Modifier.overflowScrollBehavior(overflowScrollBehavior: OverflowScrollBehavior) = styleModifier {
-    overflowScrollBehavior(overflowScrollBehavior)
-}
-
-fun Modifier.overflowScrollBehavior(vararg values: OverflowScrollBehavior.Listable) = styleModifier {
-    overflowScrollBehavior(OverflowScrollBehavior.list(*values))
-}
-
-fun Modifier.overflowScrollBehavior(values: List<OverflowScrollBehavior.Listable>) = styleModifier {
-    overflowScrollBehavior(OverflowScrollBehavior.list(*values.toTypedArray()))
-}
-
 fun Modifier.overflowWrap(overflowWrap: OverflowWrap) = styleModifier {
     overflowWrap(overflowWrap)
 }
