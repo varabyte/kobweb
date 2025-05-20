@@ -568,6 +568,21 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifyTextUnderlineOffset() {
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(TextUnderlineOffset.Auto)
+        }).isEqualTo("text-underline-offset: auto")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(TextUnderlineOffset.of(0.1.em))
+        }).isEqualTo("text-underline-offset: 0.1em")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(TextUnderlineOffset.of(20.percent))
+        }).isEqualTo("text-underline-offset: 20%")
+    }
+
+    @Test
     fun verifyTransform() {
         assertThat(modifierToText {
             Modifier.backfaceVisibility(BackfaceVisibility.Hidden)

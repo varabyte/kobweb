@@ -33,6 +33,35 @@ fun StyleScope.textAlign(textAlign: TextAlign) {
     property("text-align", textAlign)
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-align-last
+sealed interface TextAlignLast : StylePropertyValue {
+    companion object : CssGlobalValues<TextAlignLast> {
+        val Auto get() = "auto".unsafeCast<TextAlignLast>()
+        val Start get() = "start".unsafeCast<TextAlignLast>()
+        val End get() = "end".unsafeCast<TextAlignLast>()
+        val Left get() = "left".unsafeCast<TextAlignLast>()
+        val Right get() = "right".unsafeCast<TextAlignLast>()
+        val Center get() = "center".unsafeCast<TextAlignLast>()
+        val Justify get() = "justify".unsafeCast<TextAlignLast>()
+    }
+}
+
+fun StyleScope.textAlignLast(textAlignLast: TextAlignLast) {
+    property("text-align-last", textAlignLast)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-combine-upright
+sealed interface TextCombineUpright : StylePropertyValue {
+    companion object : CssGlobalValues<TextCombineUpright> {
+        val None get() = "none".unsafeCast<TextCombineUpright>()
+        val All get() = "all".unsafeCast<TextCombineUpright>()
+    }
+}
+
+fun StyleScope.textCombineUpright(textCombineUpright: TextCombineUpright) {
+    property("text-combine-upright", textCombineUpright)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-line
 sealed interface TextDecorationLine : StylePropertyValue {
     companion object : CssGlobalValues<TextDecorationLine> {
@@ -49,6 +78,52 @@ fun StyleScope.textDecorationLine(vararg textDecorationLines: TextDecorationLine
     }
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-skip-ink
+sealed interface TextDecorationSkipInk: StylePropertyValue {
+
+    companion object: CssGlobalValues<TextDecorationSkipInk> {
+
+        val Auto get() = "auto".unsafeCast<TextDecorationSkipInk>()
+        val None get() = "none".unsafeCast<TextDecorationSkipInk>()
+    }
+}
+
+fun StyleScope.textDecorationSkipInk(textDecorationSkipInk: TextDecorationSkipInk) {
+    property("text-decoration-skip-ink", textDecorationSkipInk)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-position
+sealed interface TextEmphasisPosition: StylePropertyValue {
+
+    sealed interface Listable: TextEmphasisPosition
+
+    companion object: CssGlobalValues<TextEmphasisPosition> {
+
+        fun of(value: String) = value.unsafeCast<Listable>()
+
+        fun list(vararg values: Listable) = values.joinToString(" ").unsafeCast<TextEmphasisPosition>()
+    }
+}
+
+fun StyleScope.textEmphasisPosition(textEmphasisPosition: TextEmphasisPosition) {
+    property("text-emphasis-position", textEmphasisPosition)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-orientation
+sealed interface TextOrientation: StylePropertyValue {
+    companion object: CssGlobalValues<TextOrientation> {
+        val Mixed get() = "mixed".unsafeCast<TextOrientation>()
+        val Upright get() = "upright".unsafeCast<TextOrientation>()
+        val SidewaysRight get() = "sideways-right".unsafeCast<TextOrientation>()
+        val Sideways get() = "sideways".unsafeCast<TextOrientation>()
+        val UseGlyphOrientation get() = "use-glyph-orientation".unsafeCast<TextOrientation>()
+    }
+}
+
+fun StyleScope.textOrientation(textOrientation: TextOrientation) {
+    property("text-orientation", textOrientation)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow
 sealed interface TextOverflow : StylePropertyValue {
     companion object : CssGlobalValues<TextOverflow> {
@@ -62,6 +137,21 @@ fun StyleScope.textOverflow(textOverflow: TextOverflow) {
     property("text-overflow", textOverflow)
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-rendering
+sealed interface TextRendering: StylePropertyValue {
+
+    companion object: CssGlobalValues<TextRendering> {
+
+        val Auto get() = "auto".unsafeCast<TextRendering>()
+        val OptimizeSpeed get() = "optimizeSpeed".unsafeCast<TextRendering>()
+        val OptimizeLegibility get() = "optimizeLegibility".unsafeCast<TextRendering>()
+        val GeometricPrecision get() = "geometricPrecision".unsafeCast<TextRendering>()
+    }
+}
+
+fun StyleScope.textRendering(textRendering: TextRendering) {
+    property("text-rendering", textRendering)
+}
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow
 sealed interface TextShadow : StylePropertyValue {
@@ -152,6 +242,41 @@ sealed interface TextTransform : StylePropertyValue {
 
 fun StyleScope.textTransform(textTransform: TextTransform) {
     property("text-transform", textTransform)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-underline-offset
+sealed interface TextUnderlineOffset: StylePropertyValue {
+
+    companion object: CssGlobalValues<TextUnderlineOffset> {
+
+        val Auto get() = "auto".unsafeCast<TextUnderlineOffset>()
+
+        fun of(value: CSSLengthOrPercentageNumericValue) = value.unsafeCast<TextUnderlineOffset>()
+    }
+}
+
+fun StyleScope.textUnderlineOffset(textUnderlineOffset: TextUnderlineOffset) {
+    property("text-underline-offset", textUnderlineOffset)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-underline-position
+sealed interface TextUnderlinePosition: StylePropertyValue {
+
+    sealed interface Listable: TextUnderlinePosition
+
+    companion object: CssGlobalValues<TextUnderlinePosition> {
+
+        val Auto get() = "auto".unsafeCast<Listable>()
+        val Under get() = "under".unsafeCast<Listable>()
+        val Left get() = "left".unsafeCast<Listable>()
+        val Right get() = "right".unsafeCast<Listable>()
+
+        fun list(vararg values: Listable) = values.joinToString(" ").unsafeCast<TextUnderlinePosition>()
+    }
+}
+
+fun StyleScope.textUnderlinePosition(textUnderlinePosition: TextUnderlinePosition) {
+    property("text-underline-position", textUnderlinePosition)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
