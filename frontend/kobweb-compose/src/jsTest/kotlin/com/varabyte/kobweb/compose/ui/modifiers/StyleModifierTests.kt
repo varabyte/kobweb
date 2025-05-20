@@ -95,6 +95,21 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifyBlockSize() {
+        assertThat(modifierToText {
+            Modifier.blockSize(BlockSize.FitContent)
+        }).isEqualTo("block-size: fit-content")
+
+        assertThat(modifierToText {
+            Modifier.blockSize(BlockSize.of(20.px))
+        }).isEqualTo("block-size: 20px")
+
+        assertThat(modifierToText {
+            Modifier.blockSize(BlockSize.of(20.percent))
+        }).isEqualTo("block-size: 20%")
+    }
+
+    @Test
     fun verifyBox() {
         assertThat(modifierToText {
             Modifier.boxDecorationBreak(BoxDecorationBreak.Clone)

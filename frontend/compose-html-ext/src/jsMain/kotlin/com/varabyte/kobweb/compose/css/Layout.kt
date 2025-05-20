@@ -27,6 +27,26 @@ fun StyleScope.aspectRatio(aspectRatio: AspectRatio) {
     property("aspect-ratio", aspectRatio)
 }
 
+//See: https://developer.mozilla.org/en-US/docs/Web/CSS/block-size
+sealed interface BlockSize: StylePropertyValue {
+
+    companion object: CssGlobalValues<BlockSize> {
+
+        // Length or percentage values
+        fun of(value: CSSLengthOrPercentageNumericValue) = value.unsafeCast<BlockSize>()
+
+        // Keyword values
+        val MaxContent get() = "max-content".unsafeCast<BlockSize>()
+        val MinContent get() = "min-content".unsafeCast<BlockSize>()
+        val FitContent get() = "fit-content".unsafeCast<BlockSize>()
+        val Auto get() = "auto".unsafeCast<BlockSize>()
+    }
+}
+
+fun StyleScope.blockSize(blockSize: BlockSize) {
+    property("block-size", blockSize)
+}
+
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/clear
 sealed interface Clear : StylePropertyValue {
     companion object : CssGlobalValues<Clear> {
