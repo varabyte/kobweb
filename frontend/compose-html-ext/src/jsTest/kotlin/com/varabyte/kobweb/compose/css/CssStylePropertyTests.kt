@@ -1448,6 +1448,12 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyHyphenateCharacter() {
+        assertThat(styleToText { hyphenateCharacter(HyphenateCharacter.Auto) }).isEqualTo("hyphenate-character: auto")
+        assertThat(styleToText { hyphenateCharacter(HyphenateCharacter.of("-")) }).isEqualTo("hyphenate-character: \"-\"")
+    }
+
+    @Test
     fun verifyIsolation() {
         assertThat(styleToText { isolation(Isolation.Auto) }).isEqualTo("isolation: auto")
         assertThat(styleToText { isolation(Isolation.Isolate) }).isEqualTo("isolation: isolate")

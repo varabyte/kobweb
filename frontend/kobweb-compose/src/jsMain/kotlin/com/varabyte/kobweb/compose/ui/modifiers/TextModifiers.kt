@@ -13,6 +13,14 @@ fun Modifier.dir(dirType: DirType) = attrsModifier {
     dir(dirType)
 }
 
+fun Modifier.hyphenateCharacter(hyphenateCharacter: HyphenateCharacter) = styleModifier {
+    hyphenateCharacter(hyphenateCharacter)
+}
+
+fun Modifier.hyphenateCharacter(value:String) = styleModifier {
+    hyphenateCharacter(HyphenateCharacter.of(value))
+}
+
 fun Modifier.lang(value: String) = attrsModifier {
     lang(value)
 }

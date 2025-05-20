@@ -2,6 +2,22 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/hyphenate-character
+sealed interface HyphenateCharacter: StylePropertyValue {
+    companion object {
+        val Auto get() = "auto".unsafeCast<HyphenateCharacter>()
+
+        fun of(value:String) = buildString {
+            append("\"")
+            append(value)
+            append("\"")
+        }.unsafeCast<HyphenateCharacter>()
+    }
+}
+
+fun StyleScope.hyphenateCharacter(hyphenateCharacter: HyphenateCharacter) {
+    property("hyphenate-character", hyphenateCharacter)
+}
 // https://developer.mozilla.org/en-US/docs/Web/CSS/ruby-position
 sealed interface RubyPosition : StylePropertyValue {
     companion object : CssGlobalValues<RubyPosition> {

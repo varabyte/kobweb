@@ -173,6 +173,17 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifyHyphenateCharacter() {
+        assertThat(modifierToText {
+            Modifier.hyphenateCharacter(HyphenateCharacter.Auto)
+        }).isEqualTo("hyphenate-character: auto")
+
+        assertThat(modifierToText {
+            Modifier.hyphenateCharacter("-")
+        }).isEqualTo("hyphenate-character: \"-\"")
+    }
+
+    @Test
     fun verifyLayout() {
         assertThat(modifierToText {
             Modifier.aspectRatio(1.5)
