@@ -16,7 +16,6 @@ import java.io.File
  */
 abstract class KobwebTaskListener : BuildService<KobwebTaskListener.Parameters>, OperationCompletionListener {
     interface Parameters : BuildServiceParameters {
-        var isKobwebStartBuild: Boolean
         var kobwebStartTaskName: String
 
         // take a `File` instead of a `Path` as parameters must be serializable
@@ -42,8 +41,6 @@ abstract class KobwebTaskListener : BuildService<KobwebTaskListener.Parameters>,
     var isServerRunning = ServerStateFile(kobwebFolder).content?.isRunning() ?: false
 
     override fun onFinish(event: FinishEvent) {
-        if (!parameters.isKobwebStartBuild) return
-
         val taskName = event.descriptor.name.substringAfterLast(":")
         val taskFailed = event.result is FailureResult
 
