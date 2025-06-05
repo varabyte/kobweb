@@ -227,7 +227,10 @@ class KobwebApplicationPlugin @Inject constructor(
                 // Tasks may include a project prefix (e.g. `site:kobwebStart`), so we compare just the base task name
                 parameters.isKobwebStartBuild = project.gradle.startParameter.taskNames
                     .any { it.substringAfterLast(':') == kobwebStartTask.name }
-                parameters.kobwebFolderFile = kobwebFolder.path.toFile()
+                project.gradle.taskGraph.whenReady {
+                    parameters.kobwebFolderFile = (allTasks.firstOrNull { it is KobwebStartTask }?.project ?: project)
+                        .kobwebFolder.path.toFile()
+                }
             }
         buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
 
