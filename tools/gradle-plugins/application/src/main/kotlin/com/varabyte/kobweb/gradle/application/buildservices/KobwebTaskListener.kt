@@ -16,14 +16,17 @@ import java.io.File
  */
 abstract class KobwebTaskListener : BuildService<KobwebTaskListener.Parameters>, OperationCompletionListener {
     interface Parameters : BuildServiceParameters {
-        var kobwebStartTaskName: String
-
         // take a `File` instead of a `Path` as parameters must be serializable
-        var kobwebFolderFile: File
+        /**
+         * A map of fully qualified paths of `kobwebStart` tasks with their corresponding Kobweb folder.
+         *
+         * This should only contain tasks that will run in the current build.
+         */
+        var kobwebFolderFiles: Map<String, File>
     }
 
-    val kobwebFolder = KobwebFolder(parameters.kobwebFolderFile.toPath())
-    var isBuilding = false
+    private val kobwebFolders = parameters.kobwebFolderFiles.mapValues { (_, file) -> KobwebFolder(file.toPath()) }
+    private var isBuilding = false
 
     // NOTE: When a project uses an `includeBuild` for a plugin that needs to be built only after the kobweb application
     // plugin is applied, the tasks for building that plugin will be caught by this TaskListener, and thus the code
@@ -38,34 +41,39 @@ abstract class KobwebTaskListener : BuildService<KobwebTaskListener.Parameters>,
     //     id("<includeBuild plugin>") apply false
     // }
     // Warning: The above approach may cause unnecessary builds depending on project setup, use at your own discretion.
-    var isServerRunning = ServerStateFile(kobwebFolder).content?.isRunning() ?: false
+    private val runningServers = mutableSetOf<String>().apply {
+        kobwebFolders.forEach { (startTask, folder) ->
+            if (ServerStateFile(folder).content?.isRunning() == true)
+                add(startTask)
+        }
+    }
 
     override fun onFinish(event: FinishEvent) {
-        val taskName = event.descriptor.name.substringAfterLast(":")
         val taskFailed = event.result is FailureResult
-
-        if (isServerRunning) {
-            val serverRequestsFile = ServerRequestsFile(kobwebFolder)
-            if (taskFailed) {
-                serverRequestsFile.enqueueRequest(
-                    ServerRequest.SetStatus(
-                        "Failed.",
-                        isError = true,
-                        timeoutMs = 500
-                    )
-                )
-            } else {
-                if (taskName == parameters.kobwebStartTaskName) {
-                    serverRequestsFile.enqueueRequest(ServerRequest.ClearStatus())
-                    serverRequestsFile.enqueueRequest(ServerRequest.IncrementVersion())
-                } else if (!isBuilding) {
-                    serverRequestsFile.enqueueRequest(ServerRequest.SetStatus("Building..."))
-                    isBuilding = true
+        if (!taskFailed && !isBuilding) {
+            isBuilding = true
+            kobwebFolders.forEach { (startTask, kobwebFolder) ->
+                if (startTask in runningServers) {
+                    ServerRequestsFile(kobwebFolder)
+                        .enqueueRequest(ServerRequest.SetStatus("Building..."))
                 }
             }
-        } else {
-            if (!taskFailed && taskName == parameters.kobwebStartTaskName) {
-                isServerRunning = true
+        }
+
+        kobwebFolders.forEach { (startTask, kobwebFolder) ->
+            val isStartTask = event.descriptor.name == startTask
+            if (startTask in runningServers) {
+                val serverRequestsFile = ServerRequestsFile(kobwebFolder)
+                if (taskFailed) {
+                    serverRequestsFile.enqueueRequest(
+                        ServerRequest.SetStatus("Failed.", isError = true, timeoutMs = 500)
+                    )
+                } else if (isStartTask) {
+                    serverRequestsFile.enqueueRequest(ServerRequest.ClearStatus())
+                    serverRequestsFile.enqueueRequest(ServerRequest.IncrementVersion())
+                }
+            } else if (!taskFailed && isStartTask) {
+                runningServers += startTask
             }
         }
     }
