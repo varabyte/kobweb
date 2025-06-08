@@ -9,7 +9,7 @@ sealed interface LineBreak : StylePropertyValue {
         val Loose: LineBreak get() = "loose".unsafeCast<LineBreak>()
         val Normal: LineBreak get() = "normal".unsafeCast<LineBreak>()
         val Strict: LineBreak get() = "strict".unsafeCast<LineBreak>()
-        val AnyWhere: LineBreak get() = "anywhere".unsafeCast<LineBreak>()
+        val Anywhere: LineBreak get() = "anywhere".unsafeCast<LineBreak>()
     }
 }
 

@@ -2,19 +2,7 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-// https://developer.mozilla.org/en-US/docs/Web/CSS/widows
-sealed interface Widows : StylePropertyValue {
-    companion object : CssGlobalValues<Widows> {
-        // <integer> values
-        fun of(numLines: Int) = "$numLines".unsafeCast<Widows>()
-    }
-}
-
-fun StyleScope.widows(widows: Widows) {
-    property("widows", widows)
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/CSS/orphans
+//See: https://developer.mozilla.org/en-US/docs/Web/CSS/orphans
 sealed interface Orphans : StylePropertyValue {
     companion object : CssGlobalValues<Orphans> {
         /* <integer> values */
@@ -24,4 +12,16 @@ sealed interface Orphans : StylePropertyValue {
 
 fun StyleScope.orphans(orphans: Orphans) {
     property("orphans", orphans)
+}
+
+//See: https://developer.mozilla.org/en-US/docs/Web/CSS/widows
+sealed interface Widows : StylePropertyValue {
+    companion object : CssGlobalValues<Widows> {
+        // <integer> values
+        fun of(numLines: Int) = "$numLines".unsafeCast<Widows>()
+    }
+}
+
+fun StyleScope.widows(widows: Widows) {
+    property("widows", widows)
 }

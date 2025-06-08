@@ -1563,7 +1563,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { lineBreak(LineBreak.Auto) }).isEqualTo("line-break: auto")
         assertThat(styleToText { lineBreak(LineBreak.Strict) }).isEqualTo("line-break: strict")
         assertThat(styleToText { lineBreak(LineBreak.Normal) }).isEqualTo("line-break: normal")
-        assertThat(styleToText { lineBreak(LineBreak.AnyWhere) }).isEqualTo("line-break: anywhere")
+        assertThat(styleToText { lineBreak(LineBreak.Anywhere) }).isEqualTo("line-break: anywhere")
         assertThat(styleToText { lineBreak(LineBreak.Loose) }).isEqualTo("line-break: loose")
 
         assertThat(styleToText { lineBreak(LineBreak.Inherit) }).isEqualTo("line-break: inherit")
