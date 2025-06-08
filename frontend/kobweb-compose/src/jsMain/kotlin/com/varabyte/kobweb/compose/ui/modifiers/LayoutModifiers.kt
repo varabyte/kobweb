@@ -17,14 +17,6 @@ fun Modifier.aspectRatio(ratio: AspectRatio): Modifier = styleModifier {
     aspectRatio(ratio)
 }
 
-fun Modifier.blockSize(blockSize: BlockSize) = styleModifier {
-    blockSize(blockSize)
-}
-
-fun Modifier.blockSize(value: CSSLengthOrPercentageNumericValue) = styleModifier {
-    blockSize(BlockSize.of(value))
-}
-
 fun Modifier.clear(clear: Clear) = styleModifier {
     clear(clear)
 }

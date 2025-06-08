@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.kobweb.compose.css.functions.url
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -92,21 +93,6 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.backgroundSize(BackgroundSize.Contain)
         }).isEqualTo("background-size: contain")
-    }
-
-    @Test
-    fun verifyBlockSize() {
-        assertThat(modifierToText {
-            Modifier.blockSize(BlockSize.FitContent)
-        }).isEqualTo("block-size: fit-content")
-
-        assertThat(modifierToText {
-            Modifier.blockSize(BlockSize.of(20.px))
-        }).isEqualTo("block-size: 20px")
-
-        assertThat(modifierToText {
-            Modifier.blockSize(BlockSize.of(20.percent))
-        }).isEqualTo("block-size: 20%")
     }
 
     @Test

@@ -69,10 +69,6 @@ fun Modifier.textOverflow(textOverflow: TextOverflow): Modifier = styleModifier 
     textOverflow(textOverflow)
 }
 
-fun Modifier.textRendering(textRendering: TextRendering) = styleModifier {
-    textRendering(textRendering)
-}
-
 fun Modifier.textShadow(
     offsetX: CSSLengthNumericValue,
     offsetY: CSSLengthNumericValue,
@@ -113,14 +109,6 @@ fun Modifier.textUnderlineOffset(textUnderlineOffset: TextUnderlineOffset) = sty
 
 fun Modifier.textUnderlinePosition(textUnderlinePosition: TextUnderlinePosition) = styleModifier {
     textUnderlinePosition(textUnderlinePosition)
-}
-
-fun Modifier.textUnderlinePosition(vararg values: TextUnderlinePosition.Listable) = styleModifier {
-    textUnderlinePosition(TextUnderlinePosition.list(*values))
-}
-
-fun Modifier.textUnderlinePosition(values: List<TextUnderlinePosition.Listable>) = styleModifier {
-    textUnderlinePosition(TextUnderlinePosition.list(*values.toTypedArray()))
 }
 
 fun Modifier.whiteSpace(whiteSpace: WhiteSpace): Modifier = styleModifier {
