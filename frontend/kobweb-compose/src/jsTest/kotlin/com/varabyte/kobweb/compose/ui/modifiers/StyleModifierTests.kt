@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.kobweb.compose.css.functions.url
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -170,6 +171,17 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.containIntrinsicInlineSize(100.px, auto = true)
         }).isEqualTo("contain-intrinsic-inline-size: auto 100px")
+    }
+
+    @Test
+    fun verifyHyphenateCharacter() {
+        assertThat(modifierToText {
+            Modifier.hyphenateCharacter(HyphenateCharacter.Auto)
+        }).isEqualTo("hyphenate-character: auto")
+
+        assertThat(modifierToText {
+            Modifier.hyphenateCharacter("-")
+        }).isEqualTo("hyphenate-character: \"-\"")
     }
 
     @Test
@@ -565,6 +577,21 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.writingMode(WritingMode.VerticalRl)
         }).isEqualTo("writing-mode: vertical-rl")
+    }
+
+    @Test
+    fun verifyTextUnderlineOffset() {
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(TextUnderlineOffset.Auto)
+        }).isEqualTo("text-underline-offset: auto")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(TextUnderlineOffset.of(0.1.em))
+        }).isEqualTo("text-underline-offset: 0.1em")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(TextUnderlineOffset.of(20.percent))
+        }).isEqualTo("text-underline-offset: 20%")
     }
 
     @Test

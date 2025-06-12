@@ -1,6 +1,20 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.browser.util.wrapQuotesIfNecessary
 import org.jetbrains.compose.web.css.*
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/hyphenate-character
+sealed interface HyphenateCharacter : StylePropertyValue {
+    companion object {
+        val Auto get() = "auto".unsafeCast<HyphenateCharacter>()
+
+        fun of(value: String) = value.wrapQuotesIfNecessary().unsafeCast<HyphenateCharacter>()
+    }
+}
+
+fun StyleScope.hyphenateCharacter(hyphenateCharacter: HyphenateCharacter) {
+    property("hyphenate-character", hyphenateCharacter)
+}
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/ruby-position
 sealed interface RubyPosition : StylePropertyValue {
@@ -33,6 +47,35 @@ fun StyleScope.textAlign(textAlign: TextAlign) {
     property("text-align", textAlign)
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-align-last
+sealed interface TextAlignLast : StylePropertyValue {
+    companion object : CssGlobalValues<TextAlignLast> {
+        val Auto get() = "auto".unsafeCast<TextAlignLast>()
+        val Start get() = "start".unsafeCast<TextAlignLast>()
+        val End get() = "end".unsafeCast<TextAlignLast>()
+        val Left get() = "left".unsafeCast<TextAlignLast>()
+        val Right get() = "right".unsafeCast<TextAlignLast>()
+        val Center get() = "center".unsafeCast<TextAlignLast>()
+        val Justify get() = "justify".unsafeCast<TextAlignLast>()
+    }
+}
+
+fun StyleScope.textAlignLast(textAlignLast: TextAlignLast) {
+    property("text-align-last", textAlignLast)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-combine-upright
+sealed interface TextCombineUpright : StylePropertyValue {
+    companion object : CssGlobalValues<TextCombineUpright> {
+        val None get() = "none".unsafeCast<TextCombineUpright>()
+        val All get() = "all".unsafeCast<TextCombineUpright>()
+    }
+}
+
+fun StyleScope.textCombineUpright(textCombineUpright: TextCombineUpright) {
+    property("text-combine-upright", textCombineUpright)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-line
 sealed interface TextDecorationLine : StylePropertyValue {
     companion object : CssGlobalValues<TextDecorationLine> {
@@ -49,6 +92,54 @@ fun StyleScope.textDecorationLine(vararg textDecorationLines: TextDecorationLine
     }
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-skip-ink
+sealed interface TextDecorationSkipInk : StylePropertyValue {
+
+    companion object : CssGlobalValues<TextDecorationSkipInk> {
+
+        val Auto get() = "auto".unsafeCast<TextDecorationSkipInk>()
+        val None get() = "none".unsafeCast<TextDecorationSkipInk>()
+        val All get() = "all".unsafeCast<TextDecorationSkipInk>()
+    }
+}
+
+fun StyleScope.textDecorationSkipInk(textDecorationSkipInk: TextDecorationSkipInk) {
+    property("text-decoration-skip-ink", textDecorationSkipInk)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-position
+sealed interface TextEmphasisPosition : StylePropertyValue {
+
+    companion object : CssGlobalValues<TextEmphasisPosition> {
+
+        val Auto get() = "auto".unsafeCast<TextEmphasisPosition>()
+        val Over get() = "over".unsafeCast<TextEmphasisPosition>()
+        val Under get() = "under".unsafeCast<TextEmphasisPosition>()
+        val Right get() = "right".unsafeCast<TextEmphasisPosition>()
+        val Left get() = "left".unsafeCast<TextEmphasisPosition>()
+
+        fun list(horizontal: TextEmphasisPosition, vertical: TextEmphasisPosition) =
+            "$horizontal $vertical".unsafeCast<TextEmphasisPosition>()
+    }
+}
+
+fun StyleScope.textEmphasisPosition(textEmphasisPosition: TextEmphasisPosition) {
+    property("text-emphasis-position", textEmphasisPosition)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-orientation
+sealed interface TextOrientation : StylePropertyValue {
+    companion object : CssGlobalValues<TextOrientation> {
+        val Mixed get() = "mixed".unsafeCast<TextOrientation>()
+        val Upright get() = "upright".unsafeCast<TextOrientation>()
+        val Sideways get() = "sideways".unsafeCast<TextOrientation>()
+    }
+}
+
+fun StyleScope.textOrientation(textOrientation: TextOrientation) {
+    property("text-orientation", textOrientation)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow
 sealed interface TextOverflow : StylePropertyValue {
     companion object : CssGlobalValues<TextOverflow> {
@@ -61,7 +152,6 @@ sealed interface TextOverflow : StylePropertyValue {
 fun StyleScope.textOverflow(textOverflow: TextOverflow) {
     property("text-overflow", textOverflow)
 }
-
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow
 sealed interface TextShadow : StylePropertyValue {
@@ -91,7 +181,10 @@ sealed interface TextShadow : StylePropertyValue {
     }
 }
 
-@Deprecated("Use `textShadow(TextShadow.of(...))` instead", ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))"))
+@Deprecated(
+    "Use `textShadow(TextShadow.of(...))` instead",
+    ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))")
+)
 class CSSTextShadow(
     val offsetX: CSSLengthNumericValue,
     val offsetY: CSSLengthNumericValue,
@@ -117,7 +210,10 @@ fun StyleScope.textShadow(textShadow: TextShadow) {
     property("text-shadow", textShadow)
 }
 
-@Deprecated("Use `textShadow(TextShadow.of(...))` instead", ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))"))
+@Deprecated(
+    "Use `textShadow(TextShadow.of(...))` instead",
+    ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))")
+)
 fun StyleScope.textShadow(
     offsetX: CSSLengthNumericValue,
     offsetY: CSSLengthNumericValue,
@@ -133,6 +229,7 @@ fun StyleScope.textShadow(textShadow: TextShadow.Listable) {
     val textShadow: TextShadow = textShadow
     textShadow(textShadow)
 }
+
 // Remove the previous method too after removing this method
 @Deprecated("Use `textShadow(TextShadow.list(...))` instead", ReplaceWith("textShadow(TextShadow.list(*shadows))"))
 fun StyleScope.textShadow(vararg shadows: TextShadow.Listable) {
@@ -152,6 +249,39 @@ sealed interface TextTransform : StylePropertyValue {
 
 fun StyleScope.textTransform(textTransform: TextTransform) {
     property("text-transform", textTransform)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-underline-offset
+sealed interface TextUnderlineOffset : StylePropertyValue {
+
+    companion object : CssGlobalValues<TextUnderlineOffset> {
+
+        val Auto get() = "auto".unsafeCast<TextUnderlineOffset>()
+
+        fun of(value: CSSLengthOrPercentageNumericValue) = value.unsafeCast<TextUnderlineOffset>()
+    }
+}
+
+fun StyleScope.textUnderlineOffset(textUnderlineOffset: TextUnderlineOffset) {
+    property("text-underline-offset", textUnderlineOffset)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-underline-position
+//Updated one: https://www.w3.org/TR/css-text-decor-4/#text-underline-position-property
+sealed interface TextUnderlinePosition : StylePropertyValue {
+
+    companion object : CssGlobalValues<TextUnderlinePosition> {
+
+        val Auto get() = "auto".unsafeCast<TextUnderlinePosition>()
+        val FromFont get() = "from-font".unsafeCast<TextUnderlinePosition>()
+        val Under get() = "under".unsafeCast<TextUnderlinePosition>()
+        val Left get() = "left".unsafeCast<TextUnderlinePosition>()
+        val Right get() = "right".unsafeCast<TextUnderlinePosition>()
+    }
+}
+
+fun StyleScope.textUnderlinePosition(textUnderlinePosition: TextUnderlinePosition) {
+    property("text-underline-position", textUnderlinePosition)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
