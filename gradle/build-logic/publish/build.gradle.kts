@@ -3,11 +3,12 @@ plugins {
 }
 
 group = "com.varabyte.kobweb.gradle"
-version = "1.0.0-SNAPSHOT"
+version = libs.versions.kobweb.get()
 
 dependencies {
     implementation(libs.dokka.plugin) // dokka used to generate javadoc jars for kotlin multiplatform projects
     implementation(libs.kotlin.multiplatform.plugin)
+    implementation(libs.vanniktech.publish.plugin)
 }
 
 gradlePlugin {

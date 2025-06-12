@@ -7,9 +7,9 @@ on:
         type: boolean
         description: "Repository: GCloud"
         default: true
-      repo-sonatype:
+      repo-maven-central:
         type: boolean
-        description: "Repository: Sonatype"
+        description: "Repository: Maven Central"
         default: true
       repo-gradle-portal:
         type: boolean
@@ -21,8 +21,10 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # See: https://docs.gradle.org/current/userguide/signing_plugin.html#sec:in-memory-keys
-      ORG_GRADLE_PROJECT_signingKey: ${{ secrets.VARABYTE_SIGNING_KEY }}
+      # See: https://vanniktech.github.io/gradle-maven-publish-plugin/central/#secrets
+      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.VARABYTE_SIGNING_KEY }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.VARABYTE_SIGNING_KEY_ID }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.VARABYTE_SIGNING_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v4
@@ -52,9 +54,9 @@ jobs:
         if: inputs.repo-gcloud
         run: ./gradlew publishAllPublicationsToGCloudMavenRepository
 
-      - name: Publish Kobweb artifacts (Sonatype)
-        if: inputs.repo-sonatype
-        run: ./gradlew publishAllPublicationsToSonatypeMavenRepository
+      - name: Publish Kobweb artifacts (Maven Central)
+        if: inputs.repo-maven-central
+        run: ./gradlew publishAllPublicationsToMavenCentralRepository
 
       - name: Publish Kobweb artifacts (Gradle Plugin Portal)
         if: inputs.repo-gradle-portal

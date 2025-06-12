@@ -19,6 +19,7 @@ logback = "1.5.15"
 playwright = "1.50.0"
 shadow = "8.3.0"
 truthish = "1.0.2"
+vanniktech-publish = "0.32.0"
 
 [libraries]
 commonmark-core = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
@@ -58,6 +59,7 @@ ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.re
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 playwright = { module = "com.microsoft.playwright:playwright", version.ref = "playwright" }
 truthish = { module = "com.varabyte.truthish:truthish", version.ref = "truthish" }
+vanniktech-publish-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "vanniktech-publish" }
 
 [bundles]
 commonmark = ["commonmark-core", "commonmark-autolink", "commonmark-tables", "commonmark-tasklist"]
@@ -87,3 +89,4 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+vanniktech-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech-publish" }
