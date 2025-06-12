@@ -154,7 +154,7 @@ class WorkerProcessor(
 
                 private val ioSerializer = $workerFactoryType().createIOSerializer()
 
-                private val worker = Worker("${KOBWEB_PUBLIC_WORKER_ROOT}/$outputPath").apply {
+                private val worker = Worker("/${KOBWEB_PUBLIC_WORKER_ROOT}/$outputPath").apply {
                     onmessage = { e ->
                         val json = e.data.unsafeCast<Json>()
                         val outputDeserialized = try {
