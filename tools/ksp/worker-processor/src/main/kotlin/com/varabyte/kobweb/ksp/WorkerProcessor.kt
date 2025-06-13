@@ -177,7 +177,11 @@ class WorkerProcessor(
                     val inputSerialized = try {
                         ioSerializer.serializeInput(input)
                     } catch (e: Throwable) {
-                        null
+                        console.warn(buildString {
+                            append("Unable to serialize argument when calling `${workerClassName}.postInput($inputType)`, ignoring the call.")
+                            e.message?.let { append("\nException: ${'$'}it") }
+                        })
+                        null   
                     }
                     if (inputSerialized != null) {
                         worker.postMessage(
@@ -216,11 +220,14 @@ class WorkerProcessor(
                         val ioSerializer = factory.createIOSerializer()
                         val strategy = factory.createStrategy(object : OutputDispatcher<$outputType> {
                             override fun invoke(output: $outputType, transferables: Transferables) {
-                                // If `IOSerializer` throws, that means the message was invalid. Ignore it.
                                 val outputSerialized = try {
                                     ioSerializer.serializeOutput(output)
                                 } catch (e: Throwable) {
-                                    null
+                                    console.warn(buildString {
+                                        append("Unable to serialize argument when calling `${workerFactoryInfo.classDeclaration.simpleName.asString()}.postOutput($outputType)`, ignoring the call.")
+                                        e.message?.let { append("\nException: ${'$'}it") }
+                                    })
+                                    null   
                                 }
                                 if (outputSerialized != null) {
                                     self.postMessage(
