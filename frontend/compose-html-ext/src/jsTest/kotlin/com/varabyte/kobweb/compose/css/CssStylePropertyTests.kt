@@ -957,6 +957,18 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyEmptyCells() {
+        assertThat(styleToText { emptyCells(EmptyCells.Show) }).isEqualTo("empty-cells: show")
+        assertThat(styleToText { emptyCells(EmptyCells.Hide) }).isEqualTo("empty-cells: hide")
+        // Global
+        assertThat(styleToText { emptyCells(EmptyCells.Inherit) }).isEqualTo("empty-cells: inherit")
+        assertThat(styleToText { emptyCells(EmptyCells.Initial) }).isEqualTo("empty-cells: initial")
+        assertThat(styleToText { emptyCells(EmptyCells.Revert) }).isEqualTo("empty-cells: revert")
+        assertThat(styleToText { emptyCells(EmptyCells.RevertLayer) }).isEqualTo("empty-cells: revert-layer")
+        assertThat(styleToText { emptyCells(EmptyCells.Unset) }).isEqualTo("empty-cells: unset")
+    }
+
+    @Test
     fun verifyFilter() {
         assertThat(styleToText { filter(Filter.None) }).isEqualTo("filter: none")
 
@@ -1547,6 +1559,20 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyLineBreak() {
+        assertThat(styleToText { lineBreak(LineBreak.Auto) }).isEqualTo("line-break: auto")
+        assertThat(styleToText { lineBreak(LineBreak.Strict) }).isEqualTo("line-break: strict")
+        assertThat(styleToText { lineBreak(LineBreak.Normal) }).isEqualTo("line-break: normal")
+        assertThat(styleToText { lineBreak(LineBreak.Anywhere) }).isEqualTo("line-break: anywhere")
+        assertThat(styleToText { lineBreak(LineBreak.Loose) }).isEqualTo("line-break: loose")
+
+        assertThat(styleToText { lineBreak(LineBreak.Inherit) }).isEqualTo("line-break: inherit")
+        assertThat(styleToText { lineBreak(LineBreak.Initial) }).isEqualTo("line-break: initial")
+        assertThat(styleToText { lineBreak(LineBreak.Revert) }).isEqualTo("line-break: revert")
+        assertThat(styleToText { lineBreak(LineBreak.RevertLayer) }).isEqualTo("line-break: revert-layer")
+        assertThat(styleToText { lineBreak(LineBreak.Unset) }).isEqualTo("line-break: unset")
+    }
+    @Test
     fun verifyLineHeight() {
         assertThat(styleToText { lineHeight(LineHeight.Normal) }).isEqualTo("line-height: normal")
 
@@ -1767,6 +1793,17 @@ class CssStylePropertyTests {
         assertThat(styleToText { objectFit(ObjectFit.Revert) }).isEqualTo("object-fit: revert")
         assertThat(styleToText { objectFit(ObjectFit.RevertLayer) }).isEqualTo("object-fit: revert-layer")
         assertThat(styleToText { objectFit(ObjectFit.Unset) }).isEqualTo("object-fit: unset")
+    }
+
+    @Test
+    fun verifyOrphans(){
+        assertThat(styleToText { orphans(Orphans.of(2)) }).isEqualTo("orphans: 2")
+        //Global
+        assertThat(styleToText { orphans(Orphans.Inherit) }).isEqualTo("orphans: inherit")
+        assertThat(styleToText { orphans(Orphans.Initial) }).isEqualTo("orphans: initial")
+        assertThat(styleToText { orphans(Orphans.Revert) }).isEqualTo("orphans: revert")
+        assertThat(styleToText { orphans(Orphans.RevertLayer) }).isEqualTo("orphans: revert-layer")
+        assertThat(styleToText { orphans(Orphans.Unset) }).isEqualTo("orphans: unset")
     }
 
     @Test
