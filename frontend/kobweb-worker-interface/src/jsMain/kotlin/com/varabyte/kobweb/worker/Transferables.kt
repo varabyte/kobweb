@@ -13,7 +13,6 @@ import org.khronos.webgl.Uint8ClampedArray
 import org.w3c.dom.ImageBitmap
 import org.w3c.dom.ImageData
 import org.w3c.dom.MessagePort
-import kotlin.collections.set
 import kotlin.js.Json
 import kotlin.js.json
 
@@ -120,7 +119,7 @@ class Transferables private constructor(
         }
 
         @Suppress("FunctionName") // private helper method
-        private fun _add(key: String, value: Any) = _add(key, suffix = "", value)
+        private fun _add(key: String, value: Any) = _add(key, suffix = null, value)
 
         fun add(key: String, value: ArrayBuffer) = _add(key, value)
         fun add(key: String, value: MessagePort) = _add(key, value)
