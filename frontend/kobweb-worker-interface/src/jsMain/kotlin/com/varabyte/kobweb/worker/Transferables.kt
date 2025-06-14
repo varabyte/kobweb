@@ -13,7 +13,6 @@ import org.khronos.webgl.Uint8ClampedArray
 import org.w3c.dom.ImageBitmap
 import org.w3c.dom.ImageData
 import org.w3c.dom.MessagePort
-import kotlin.collections.set
 import kotlin.js.Json
 import kotlin.js.json
 
@@ -26,7 +25,13 @@ import kotlin.js.json
 private const val TRANSFERABLE_KEYS_KEY = "_transferableKeys"
 private const val EXTRA_KEYS_KEY = "_extraKeys"
 
-private fun suffixedKey(key: String, suffix: String?) = key + suffix?.let { "_$it" }.orEmpty()
+private fun suffixedKey(key: String, suffix: String): String {
+    return if (suffix.isEmpty()) {
+        key
+    } else {
+        "${key}_$suffix"
+    }
+}
 
 /**
  * Transferables are special objects which are allowed to be moved between threads, rather than copied.
@@ -112,7 +117,7 @@ class Transferables private constructor(
         // Note: Suffix specified separately from key, so we can show the user a better error message that doesn't leak
         // the internal suffix to the user.
         @Suppress("FunctionName") // private helper method
-        private fun _add(key: String, suffix: String?, value: Any): Builder {
+        private fun _add(key: String, suffix: String, value: Any): Builder {
             if (transferables.put(suffixedKey(key, suffix), value) != null) {
                 error("Transferable with key \"$key\" was added twice")
             }
