@@ -25,13 +25,7 @@ import kotlin.js.json
 private const val TRANSFERABLE_KEYS_KEY = "_transferableKeys"
 private const val EXTRA_KEYS_KEY = "_extraKeys"
 
-private fun suffixedKey(key: String, suffix: String): String {
-    return if (suffix.isEmpty()) {
-        key
-    } else {
-        "${key}_$suffix"
-    }
-}
+private fun suffixedKey(key: String, suffix: String?) = key + suffix?.let { "_$it" }.orEmpty()
 
 /**
  * Transferables are special objects which are allowed to be moved between threads, rather than copied.
@@ -117,7 +111,7 @@ class Transferables private constructor(
         // Note: Suffix specified separately from key, so we can show the user a better error message that doesn't leak
         // the internal suffix to the user.
         @Suppress("FunctionName") // private helper method
-        private fun _add(key: String, suffix: String, value: Any): Builder {
+        private fun _add(key: String, suffix: String?, value: Any): Builder {
             if (transferables.put(suffixedKey(key, suffix), value) != null) {
                 error("Transferable with key \"$key\" was added twice")
             }
@@ -125,7 +119,7 @@ class Transferables private constructor(
         }
 
         @Suppress("FunctionName") // private helper method
-        private fun _add(key: String, value: Any) = _add(key, suffix = "", value)
+        private fun _add(key: String, value: Any) = _add(key, suffix = null, value)
 
         fun add(key: String, value: ArrayBuffer) = _add(key, value)
         fun add(key: String, value: MessagePort) = _add(key, value)
