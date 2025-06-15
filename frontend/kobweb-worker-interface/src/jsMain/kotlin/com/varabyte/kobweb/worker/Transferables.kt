@@ -23,7 +23,7 @@ import kotlin.js.json
  * then query out later.
  */
 private const val TRANSFERABLE_KEYS_KEY = "_transferableKeys"
-private const val EXTRA_KEYS_KEY = "_extraKeys"
+private const val METADATA_KEYS_KEY = "_metadataKeys"
 
 private fun suffixedKey(key: String, suffix: String?) = key + suffix?.let { "_$it" }.orEmpty()
 
@@ -67,12 +67,12 @@ private fun suffixedKey(key: String, suffix: String?) = key + suffix?.let { "_$i
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects">Transferable objects</a>
  *
  * @property transferables A map of names to transferable objects.
- * @property extras A map of additional values describe metadata around the transferable objects but are not themselves
- *   transferable. These should be limited to primitive values, such as ints or strings.
+ * @property metadata A map of additional values describing metadata around the transferable objects but are not
+ *   themselves transferable. These should be limited to primitive values, such as ints or strings.
  */
 class Transferables private constructor(
     private val transferables: Map<String, Any>,
-    private val extras: Map<String, Any>
+    private val metadata: Map<String, Any>
 ) {
     companion object {
         val Empty = Transferables(emptyMap(), emptyMap())
@@ -89,24 +89,24 @@ class Transferables private constructor(
          */
         fun fromJson(json: Json): Transferables {
             val transferableNames = json[TRANSFERABLE_KEYS_KEY]?.unsafeCast<Array<String>>() ?: return Empty
-            val extraNames = json[EXTRA_KEYS_KEY]?.unsafeCast<Array<String>>() ?: return Empty
+            val metadataNames = json[METADATA_KEYS_KEY]?.unsafeCast<Array<String>>() ?: return Empty
 
             val transferables = mutableMapOf<String, Any>()
             for (name in transferableNames) {
                 transferables[name] = json[name]!!
             }
 
-            val extras = mutableMapOf<String, Any>()
-            for (name in extraNames) {
-                extras[name] = json[name]!!
+            val metadata = mutableMapOf<String, Any>()
+            for (name in metadataNames) {
+                metadata[name] = json[name]!!
             }
-            return Transferables(transferables, extras)
+            return Transferables(transferables, metadata)
         }
     }
 
     class Builder {
         private val transferables = mutableMapOf<String, Any>()
-        private val extras = mutableMapOf<String, Any>()
+        private val metadata = mutableMapOf<String, Any>()
 
         // Note: Suffix specified separately from key, so we can show the user a better error message that doesn't leak
         // the internal suffix to the user.
@@ -145,12 +145,12 @@ class Transferables private constructor(
         fun add(key: String, value: Float64Array) = _add(key, "Float64Array", value.buffer)
         fun add(key: String, value: ImageData) {
             _add(key, "ImageData_buffer", value.data.buffer)
-            extras[suffixedKey(key, "ImageData_width")] = value.width
-            extras[suffixedKey(key, "ImageData_height")] = value.height
+            metadata[suffixedKey(key, "ImageData_width")] = value.width
+            metadata[suffixedKey(key, "ImageData_height")] = value.height
         }
         // endregion
 
-        fun build() = Transferables(transferables, extras)
+        fun build() = Transferables(transferables, metadata)
     }
 
     /**
@@ -196,8 +196,8 @@ class Transferables private constructor(
 
     fun getImageData(key: String): ImageData? {
         val buffer = get<ArrayBuffer>(suffixedKey(key, "ImageData_buffer")) ?: return null
-        val width = extras[suffixedKey(key, "ImageData_width")] as? Int ?: return null
-        val height = extras[suffixedKey(key, "ImageData_height")] as? Int ?: return null
+        val width = metadata[suffixedKey(key, "ImageData_width")] as? Int ?: return null
+        val height = metadata[suffixedKey(key, "ImageData_height")] as? Int ?: return null
 
         return ImageData(Uint8ClampedArray(buffer), width, height)
     }
@@ -205,8 +205,8 @@ class Transferables private constructor(
     fun toJson(): Json {
         return json(
             TRANSFERABLE_KEYS_KEY to transferables.keys.toTypedArray(),
-            EXTRA_KEYS_KEY to extras.keys.toTypedArray(),
-            *(transferables.entries.map { it.toPair() }.toTypedArray() + extras.entries.map { it.toPair() }
+            METADATA_KEYS_KEY to metadata.keys.toTypedArray(),
+            *(transferables.entries.map { it.toPair() }.toTypedArray() + metadata.entries.map { it.toPair() }
                 .toTypedArray())
         )
     }
