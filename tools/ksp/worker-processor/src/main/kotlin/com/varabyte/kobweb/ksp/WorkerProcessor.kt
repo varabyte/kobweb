@@ -143,7 +143,7 @@ class WorkerProcessor(
                 """
             ${workerPackage.takeIf { it.isNotEmpty() }?.let { "package $it" } ?: ""}
 
-            import com.varabyte.kobweb.worker.Transferables
+            import com.varabyte.kobweb.worker.Attachments
             import com.varabyte.kobweb.worker.WorkerContext
             import org.w3c.dom.Worker
             import kotlin.js.Json
@@ -167,13 +167,13 @@ class WorkerProcessor(
                             null
                         }
                         if (outputDeserialized != null) {
-                            val ctx = WorkerContext(Transferables.fromJson(json))
+                            val ctx = WorkerContext(Attachments.fromJson(json))
                             ctx.onOutput(outputDeserialized)
                         }
                     }
                 }
 
-                override fun postInput(input: $inputType, transferables: Transferables) {
+                override fun postInput(input: $inputType, attachments: Attachments) {
                     val inputSerialized = try {
                         ioSerializer.serializeInput(input)
                     } catch (e: Throwable) {
@@ -181,12 +181,12 @@ class WorkerProcessor(
                             append("Unable to serialize argument when calling `${workerClassName}.postInput($inputType)`, ignoring the call.")
                             e.message?.let { append("\nException: ${'$'}it") }
                         })
-                        null   
+                        null
                     }
                     if (inputSerialized != null) {
                         worker.postMessage(
-                            json("_input" to inputSerialized).add(transferables.toJson()),
-                            transferables.toValues()
+                            json("_input" to inputSerialized).add(attachments.toJson()),
+                            attachments.toValues()
                         )
                     }
                 }
@@ -207,9 +207,9 @@ class WorkerProcessor(
             // language=kotlin
             writer.write(
                 """
+                    import com.varabyte.kobweb.worker.Attachments
                     import com.varabyte.kobweb.worker.InputMessage
                     import com.varabyte.kobweb.worker.OutputDispatcher
-                    import com.varabyte.kobweb.worker.Transferables
                     import kotlin.js.Json
                     import kotlin.js.json
 
@@ -219,7 +219,7 @@ class WorkerProcessor(
                         val factory = ${workerFactoryInfo.classDeclaration.qualifiedName!!.asString()}()
                         val ioSerializer = factory.createIOSerializer()
                         val strategy = factory.createStrategy(object : OutputDispatcher<$outputType> {
-                            override fun invoke(output: $outputType, transferables: Transferables) {
+                            override fun invoke(output: $outputType, attachments: Attachments) {
                                 val outputSerialized = try {
                                     ioSerializer.serializeOutput(output)
                                 } catch (e: Throwable) {
@@ -231,8 +231,8 @@ class WorkerProcessor(
                                 }
                                 if (outputSerialized != null) {
                                     self.postMessage(
-                                        json("_output" to outputSerialized).add(transferables.toJson()),
-                                        transferables.toValues()
+                                        json("_output" to outputSerialized).add(attachments.toJson()),
+                                        attachments.toValues()
                                     )
                                 }
                             }
@@ -249,8 +249,8 @@ class WorkerProcessor(
                                 null
                             }
                             if (inputDeserialized != null) {
-                                val transferables = Transferables.fromJson(json)
-                                strategy.onInput(InputMessage(inputDeserialized, transferables))
+                                val attachments = Attachments.fromJson(json)
+                                strategy.onInput(InputMessage(inputDeserialized, attachments))
                             }
                         }
                     }
