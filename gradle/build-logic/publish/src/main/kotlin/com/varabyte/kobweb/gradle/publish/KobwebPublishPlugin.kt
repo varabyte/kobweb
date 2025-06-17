@@ -81,16 +81,8 @@ val TaskContainer.dokkaHtmlJar: Provider<Jar>
 class KobwebPublishPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply {
-            apply("org.gradle.maven-publish")
-            apply("org.gradle.signing")
             apply("org.jetbrains.dokka")
-        }
-
-        val dokkaHtmlTask = project.tasks.named<DokkaGenerateTask>("dokkaGeneratePublicationHtml")
-        project.tasks.register<Jar>(DOKKA_HTML_JAR_TASK_NAME) {
-            dependsOn(dokkaHtmlTask)
-            from(dokkaHtmlTask.flatMap { it.outputDirectory })
-            archiveClassifier.set("javadoc")
+            apply("com.vanniktech.maven.publish")
         }
 
         project.configureDokka()

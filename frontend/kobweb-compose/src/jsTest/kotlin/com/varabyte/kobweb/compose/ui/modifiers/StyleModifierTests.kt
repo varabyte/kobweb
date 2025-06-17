@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.kobweb.compose.css.functions.url
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -338,6 +339,17 @@ class StyleModifierTests {
                 end(20.px)
             }
         }).isEqualTo("margin-inline-end: 20px")
+    }
+
+    @Test
+    fun verifyOrphans() {
+        assertThat(modifierToText {
+            Modifier.orphans(2)
+        }).isEqualTo("orphans: 2")
+
+        assertThat(modifierToText {
+            Modifier.orphans(Orphans.Inherit)
+        }).isEqualTo("orphans: inherit")
     }
 
     @Test
