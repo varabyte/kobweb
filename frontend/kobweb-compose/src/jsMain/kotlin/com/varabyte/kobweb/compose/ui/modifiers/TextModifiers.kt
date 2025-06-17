@@ -29,6 +29,10 @@ fun Modifier.letterSpacing(value: CSSLengthNumericValue) = styleModifier {
     letterSpacing(value)
 }
 
+fun Modifier.lineBreak(lineBreak: LineBreak) = styleModifier {
+    lineBreak(lineBreak)
+}
+
 fun Modifier.rubyPosition(rubyPosition: RubyPosition) = styleModifier {
     rubyPosition(rubyPosition)
 }

@@ -16,6 +16,21 @@ fun StyleScope.hyphenateCharacter(hyphenateCharacter: HyphenateCharacter) {
     property("hyphenate-character", hyphenateCharacter)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/line-break
+sealed interface LineBreak : StylePropertyValue {
+    companion object : CssGlobalValues<LineBreak> {
+        val Auto: LineBreak get() = "auto".unsafeCast<LineBreak>()
+        val Loose: LineBreak get() = "loose".unsafeCast<LineBreak>()
+        val Normal: LineBreak get() = "normal".unsafeCast<LineBreak>()
+        val Strict: LineBreak get() = "strict".unsafeCast<LineBreak>()
+        val Anywhere: LineBreak get() = "anywhere".unsafeCast<LineBreak>()
+    }
+}
+
+fun StyleScope.lineBreak(lineBreak: LineBreak) {
+    property("line-break", lineBreak)
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/CSS/ruby-position
 sealed interface RubyPosition : StylePropertyValue {
     companion object : CssGlobalValues<RubyPosition> {

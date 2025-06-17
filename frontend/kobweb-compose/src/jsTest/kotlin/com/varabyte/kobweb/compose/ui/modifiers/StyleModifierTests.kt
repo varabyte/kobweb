@@ -353,6 +353,17 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifyOrphans() {
+        assertThat(modifierToText {
+            Modifier.orphans(2)
+        }).isEqualTo("orphans: 2")
+
+        assertThat(modifierToText {
+            Modifier.orphans(Orphans.Inherit)
+        }).isEqualTo("orphans: inherit")
+    }
+
+    @Test
     fun verifyOutline() {
         assertThat(modifierToText {
             Modifier.outline(
