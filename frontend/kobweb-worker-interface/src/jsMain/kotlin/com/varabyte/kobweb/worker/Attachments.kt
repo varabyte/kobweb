@@ -133,13 +133,9 @@ class Attachments private constructor(
         private val transferables = mutableMapOf<String, Any>()
         private val metadata = mutableMapOf<String, Any>()
 
-        private fun MutableMap<String, Any>.add(key: String, value: Any): Builder {
-            return add(key, suffix = null, value)
-        }
-
-        private fun MutableMap<String, Any>.add(key: String, suffix: String?, value: Any): Builder {
-            if (this.put(suffixedKey(key, suffix), value) != null) {
-                error("Attachment with key \"$key\" was added twice.")
+        private fun MutableMap<String, Any>.add(key: String, type: String, value: Any): Builder {
+            if (this.put(suffixedKey(key, type), value) != null) {
+                error("Attachment with key \"$key\" was added twice for the same type ($type).")
             }
             return this@Builder
         }
@@ -183,9 +179,9 @@ class Attachments private constructor(
 
         // region transferables
 
-        fun add(key: String, value: ArrayBuffer) = transferables.add(key, value)
-        fun add(key: String, value: MessagePort) = transferables.add(key, value)
-        fun add(key: String, value: ImageBitmap) = transferables.add(key, value)
+        fun add(key: String, value: ArrayBuffer) = transferables.add(key, "ArrayBuffer", value)
+        fun add(key: String, value: MessagePort) = transferables.add(key, "MessagePort", value)
+        fun add(key: String, value: ImageBitmap) = transferables.add(key, "ImageBitmap", value)
         // TODO: There are more official types that are supported, see
         //  https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects#supported_objects
         //  However, they aren't currently available in the Kotlin/JS stdlib, so if people ask for their support, we
@@ -246,9 +242,9 @@ class Attachments private constructor(
 
     // region transferables
 
-    fun getArrayBuffer(key: String) = transferables.get<ArrayBuffer>(key)
-    fun getMessagePort(key: String) = transferables.get<MessagePort>(key)
-    fun getImageBitmap(key: String) = transferables.get<ImageBitmap>(key)
+    fun getArrayBuffer(key: String) = transferables.get<ArrayBuffer>(suffixedKey(key, "ArrayBuffer"))
+    fun getMessagePort(key: String) = transferables.get<MessagePort>(suffixedKey(key, "MessagePort"))
+    fun getImageBitmap(key: String) = transferables.get<ImageBitmap>(suffixedKey(key, "ImageBitmap"))
 
     // endregion
 
