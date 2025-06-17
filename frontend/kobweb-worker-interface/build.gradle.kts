@@ -10,6 +10,12 @@ kotlin {
     js {
         browser()
     }
+
+    sourceSets {
+        jsMain.dependencies {
+            api(projects.common.frameworkAnnotations) // api or else opt-in message won't be shown
+        }
+    }
 }
 
 kobwebPublication {

@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.worker
 
+import com.varabyte.kobweb.framework.annotations.DelicateApi
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Float32Array
 import org.khronos.webgl.Float64Array
@@ -174,7 +175,6 @@ class Attachments private constructor(
 //        fun add(key: String, value: VideoFrame) = cloneables.add(key, "VideoFrame", value)
 //        fun add(key: String, value: WebTransportError) = cloneables.add(key, "WebTransportError", value)
 
-
         // endregion
 
         // region transferables
@@ -209,6 +209,34 @@ class Attachments private constructor(
             metadata[suffixedKey(key, "ImageData_height")] = value.height
         }
         // endregion
+
+        // region misc
+
+        /**
+         * Add raw JSON as an attachment.
+         *
+         * Raw JSON attachment support is provided as an escape hatch if somehow we don't support a type that you need
+         * to send into our out of a web worker. Please consider filing a bug with the team so we can expand our API
+         * instead.
+         *
+         * Also, be sure to review
+         * the [web worker documentation](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) to check
+         * that the values you are sending are supported as an accepted value (many are not!)
+         *
+         * @param transferables If provided, this should be set to one or more object instances which ALSO exist
+         *   somewhere inside the raw JSON object AND should be
+         *   a [transferable object](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects).
+         */
+        @DelicateApi("Attaching raw json should not be required and is fragile. Please review header docs for more details and consider reaching out to the Kobweb team for reasons why you had to use this in your project.")
+        fun add(key: String, value: Json, transferables: List<Any> = emptyList()) {
+            cloneables.add(key, "Json", value)
+            transferables.forEachIndexed { i, transferable ->
+                // NOTE: We'll never fetch this out again by key, but we need to add it into the transferables map so
+                // that they will get included in `toValues`. So we come up with a name that is unique just so we can
+                // get it into the map.
+                this.transferables.add(key, "Json_Transferable_$i", transferable)
+            }
+        }
 
         fun build() = Attachments(cloneables, transferables, metadata)
     }
@@ -279,6 +307,14 @@ class Attachments private constructor(
 
     // endregion
 
+    // region misc
+
+    // NOTE: This is technically a delicate API but since we already annotate add(json), it seems like overkill to
+    // require users to suppress it for `getJson` as well.
+    fun getJson(key: String) = cloneables.get<Json>(suffixedKey(key, "Json"))
+
+    // endregion
+
     fun toJson(): Json {
         return json(
             CLONEABLE_NAMES_KEY to cloneables.keys.toTypedArray(),
@@ -290,6 +326,6 @@ class Attachments private constructor(
     }
 
     fun toValues(): Array<Any> {
-        return transferables.values.toTypedArray()
+        return transferables.values.toSet().toTypedArray()
     }
 }
