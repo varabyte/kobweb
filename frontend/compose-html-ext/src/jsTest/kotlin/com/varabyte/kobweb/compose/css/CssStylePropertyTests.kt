@@ -2088,6 +2088,18 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyTableLayout() {
+        assertThat(styleToText { tableLayout(TableLayout.Auto) }).isEqualTo("table-layout: auto")
+        assertThat(styleToText { tableLayout(TableLayout.Fixed) }).isEqualTo("table-layout: fixed")
+
+        assertThat(styleToText { tableLayout(TableLayout.Inherit) }).isEqualTo("table-layout: inherit")
+        assertThat(styleToText { tableLayout(TableLayout.Initial) }).isEqualTo("table-layout: initial")
+        assertThat(styleToText { tableLayout(TableLayout.Revert) }).isEqualTo("table-layout: revert")
+        assertThat(styleToText { tableLayout(TableLayout.RevertLayer) }).isEqualTo("table-layout: revert-layer")
+        assertThat(styleToText { tableLayout(TableLayout.Unset) }).isEqualTo("table-layout: unset")
+    }
+
+    @Test
     fun verifyTextAlign() {
         assertThat(styleToText { textAlign(TextAlign.Left) }).isEqualTo("text-align: left")
         assertThat(styleToText { textAlign(TextAlign.Right) }).isEqualTo("text-align: right")

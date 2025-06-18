@@ -11,3 +11,7 @@ fun Modifier.captionSide(captionSide: CaptionSide): Modifier = styleModifier {
 fun Modifier.emptyCells(emptyCells: EmptyCells) = styleModifier {
     emptyCells(emptyCells)
 }
+
+fun Modifier.tableLayout(tableLayout: TableLayout) = styleModifier {
+    tableLayout(tableLayout)
+}
