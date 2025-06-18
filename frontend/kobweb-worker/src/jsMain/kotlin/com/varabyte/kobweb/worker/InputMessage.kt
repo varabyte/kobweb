@@ -9,5 +9,9 @@ package com.varabyte.kobweb.worker
  */
 class InputMessage<I>(
     val input: I,
-    val transferables: Transferables,
-)
+    val attachments: Attachments,
+) {
+    @Suppress("DEPRECATION")
+    @Deprecated("Property has migrated to `attachments` instead.", ReplaceWith("attachments"))
+    val transferables: Transferables = attachments
+}

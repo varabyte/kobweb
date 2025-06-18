@@ -30,12 +30,12 @@ abstract class WorkerStrategy<I> {
     abstract fun onInput(inputMessage: InputMessage<I>)
 }
 
-class WorkerStrategyContext(val self: DedicatedWorkerGlobalScope, val transferables: Transferables)
+class WorkerStrategyContext(val self: DedicatedWorkerGlobalScope, val attachments: Attachments)
 
 /**
  * Convenience method to create a [WorkerStrategy] from a lambda.
  */
 fun <I> WorkerStrategy(handleInput: WorkerStrategyContext.(I) -> Unit) = object : WorkerStrategy<I>() {
     override fun onInput(inputMessage: InputMessage<I>) =
-        WorkerStrategyContext(self, inputMessage.transferables).handleInput(inputMessage.input)
+        WorkerStrategyContext(self, inputMessage.attachments).handleInput(inputMessage.input)
 }
