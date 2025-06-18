@@ -2182,6 +2182,19 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyTextIndent() {
+        assertThat(styleToText { textIndent(TextIndent.of(3.mm)) }).isEqualTo("text-indent: 3mm")
+        assertThat(styleToText { textIndent(TextIndent.of(40.px)) }).isEqualTo("text-indent: 40px")
+        assertThat(styleToText { textIndent(TextIndent.of(15.percent)) }).isEqualTo("text-indent: 15%")
+
+        assertThat(styleToText { textIndent(TextIndent.Inherit) }).isEqualTo("text-indent: inherit")
+        assertThat(styleToText { textIndent(TextIndent.Initial) }).isEqualTo("text-indent: initial")
+        assertThat(styleToText { textIndent(TextIndent.Revert) }).isEqualTo("text-indent: revert")
+        assertThat(styleToText { textIndent(TextIndent.RevertLayer) }).isEqualTo("text-indent: revert-layer")
+        assertThat(styleToText { textIndent(TextIndent.Unset) }).isEqualTo("text-indent: unset")
+    }
+
+    @Test
     fun verifyTextOrientation() {
         assertThat(styleToText { textOrientation(TextOrientation.Mixed) }).isEqualTo("text-orientation: mixed")
         assertThat(styleToText { textOrientation(TextOrientation.Upright) }).isEqualTo("text-orientation: upright")

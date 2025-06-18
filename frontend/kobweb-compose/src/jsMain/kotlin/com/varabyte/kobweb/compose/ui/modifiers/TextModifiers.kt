@@ -73,6 +73,14 @@ fun Modifier.textEmphasisPosition(vertical: TextEmphasisPosition.Vertical,horizo
     textEmphasisPosition(TextEmphasisPosition.of(vertical, horizontal))
 }
 
+fun Modifier.textIndent(value: CSSLengthNumericValue) = styleModifier {
+    textIndent(TextIndent.of(value))
+}
+
+fun Modifier.textIndent(value: CSSPercentageValue) = styleModifier {
+    textIndent(TextIndent.of(value))
+}
+
 fun Modifier.textOrientation(textOrientation: TextOrientation) = styleModifier {
     textOrientation(textOrientation)
 }

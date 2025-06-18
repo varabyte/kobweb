@@ -155,6 +155,22 @@ fun StyleScope.textEmphasisPosition(textEmphasisPosition: TextEmphasisPosition) 
     property("text-emphasis-position", textEmphasisPosition)
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-indent
+sealed interface TextIndent : StylePropertyValue {
+    companion object : CssGlobalValues<TextIndent> {
+        /* Not Supported by many browsers
+        val Hanging get() = "hanging".unsafeCast<KeyWord>()
+        val EachLine get() = "each-line".unsafeCast<KeyWord>()
+        */
+        fun of(value: CSSLengthNumericValue) = value.unsafeCast<TextIndent>()
+        fun of(value: CSSPercentageValue) = value.unsafeCast<TextIndent>()
+    }
+}
+
+fun StyleScope.textIndent(textIndent: TextIndent) {
+    property("text-indent", textIndent)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-orientation
 sealed interface TextOrientation : StylePropertyValue {
     companion object : CssGlobalValues<TextOrientation> {

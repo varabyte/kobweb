@@ -606,6 +606,19 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifyTextIndent() {
+        assertThat(modifierToText {
+            Modifier.textIndent(25.px)
+        }).isEqualTo("text-indent: 25px")
+        assertThat(modifierToText {
+            Modifier.textIndent(25.em)
+        }).isEqualTo("text-indent: 25em")
+        assertThat(modifierToText {
+            Modifier.textIndent(15.percent)
+        }).isEqualTo("text-indent: 15%")
+    }
+
+    @Test
     fun verifyTextUnderlineOffset() {
         assertThat(modifierToText {
             Modifier.textUnderlineOffset(TextUnderlineOffset.Auto)
