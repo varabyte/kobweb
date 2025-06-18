@@ -109,7 +109,6 @@ fun StyleScope.textDecorationLine(vararg textDecorationLines: TextDecorationLine
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-skip-ink
 sealed interface TextDecorationSkipInk : StylePropertyValue {
-
     companion object : CssGlobalValues<TextDecorationSkipInk> {
 
         val Auto get() = "auto".unsafeCast<TextDecorationSkipInk>()
@@ -127,7 +126,6 @@ fun StyleScope.textDecorationSkipInk(textDecorationSkipInk: TextDecorationSkipIn
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-position
 sealed interface TextEmphasisPosition : StylePropertyValue {
-
     sealed interface Vertical : TextEmphasisPosition {
         companion object {
             val Right get() = "right".unsafeCast<Vertical>()
@@ -283,7 +281,6 @@ fun StyleScope.textTransform(textTransform: TextTransform) {
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-underline-offset
 sealed interface TextUnderlineOffset : StylePropertyValue {
-
     companion object : CssGlobalValues<TextUnderlineOffset> {
         val Auto get() = "auto".unsafeCast<TextUnderlineOffset>()
 
@@ -298,7 +295,6 @@ fun StyleScope.textUnderlineOffset(textUnderlineOffset: TextUnderlineOffset) {
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-underline-position
 //Updated one: https://www.w3.org/TR/css-text-decor-4/#text-underline-position-property
 sealed interface TextUnderlinePosition : StylePropertyValue {
-
     sealed interface Horizontal : TextUnderlinePosition {
         companion object {
             val FromFont get() = "from-font".unsafeCast<Horizontal>()
