@@ -226,7 +226,7 @@ sealed interface TextShadow : StylePropertyValue {
 }
 
 @Deprecated(
-    "Use `textShadow(TextShadow.of(...))` instead",
+    "Use `textShadow(TextShadow.list(...))` instead",
     ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))")
 )
 class CSSTextShadow(
@@ -254,10 +254,7 @@ fun StyleScope.textShadow(textShadow: TextShadow) {
     property("text-shadow", textShadow)
 }
 
-@Deprecated(
-    "Use `textShadow(TextShadow.of(...))` instead",
-    ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))")
-)
+@Deprecated("Use `textShadow(TextShadow.of(...))` instead", ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))"))
 fun StyleScope.textShadow(
     offsetX: CSSLengthNumericValue,
     offsetY: CSSLengthNumericValue,
@@ -275,7 +272,7 @@ fun StyleScope.textShadow(textShadow: TextShadow.Listable) {
 }
 
 // Remove the previous method too after removing this method
-@Deprecated("Use `textShadow(TextShadow.of(...))` instead", ReplaceWith("textShadow(TextShadow.of(*shadows))"))
+@Deprecated("Use `textShadow(TextShadow.list(...))` instead", ReplaceWith("textShadow(TextShadow.list(*shadows))"))
 fun StyleScope.textShadow(vararg shadows: TextShadow.Listable) {
     textShadow(TextShadow.list(*shadows))
 }
