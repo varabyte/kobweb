@@ -2157,7 +2157,6 @@ class CssStylePropertyTests {
     fun verifyTextDecorationSkipInk() {
         assertThat(styleToText { textDecorationSkipInk(TextDecorationSkipInk.None) }).isEqualTo("text-decoration-skip-ink: none")
         assertThat(styleToText { textDecorationSkipInk(TextDecorationSkipInk.Auto) }).isEqualTo("text-decoration-skip-ink: auto")
-        assertThat(styleToText { textDecorationSkipInk(TextDecorationSkipInk.All) }).isEqualTo("text-decoration-skip-ink: all")
 
         assertThat(styleToText { textDecorationSkipInk(TextDecorationSkipInk.Inherit) }).isEqualTo("text-decoration-skip-ink: inherit")
         assertThat(styleToText { textDecorationSkipInk(TextDecorationSkipInk.Initial) }).isEqualTo("text-decoration-skip-ink: initial")
@@ -2168,12 +2167,12 @@ class CssStylePropertyTests {
     @Test
     fun verifyTextEmphasisPosition() {
         assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Auto) }).isEqualTo("text-emphasis-position: auto")
-        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Over) }).isEqualTo("text-emphasis-position: over")
-        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Under) }).isEqualTo("text-emphasis-position: under")
-        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Left) }).isEqualTo("text-emphasis-position: left")
-        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Right) }).isEqualTo("text-emphasis-position: right")
-        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.list(TextEmphasisPosition.Over, TextEmphasisPosition.Right)) }).isEqualTo("text-emphasis-position: over right")
-        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.list(TextEmphasisPosition.Left, TextEmphasisPosition.Over)) }).isEqualTo("text-emphasis-position: left over")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Horizontal.Over) }).isEqualTo("text-emphasis-position: over")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Horizontal.Under) }).isEqualTo("text-emphasis-position: under")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Vertical.Left) }).isEqualTo("text-emphasis-position: left")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Vertical.Right) }).isEqualTo("text-emphasis-position: right")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.of(TextEmphasisPosition.Horizontal.Over, TextEmphasisPosition.Vertical.Right)) }).isEqualTo("text-emphasis-position: over right")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.of(TextEmphasisPosition.Vertical.Left, TextEmphasisPosition.Horizontal.Over)) }).isEqualTo("text-emphasis-position: left over")
 
         assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Inherit) }).isEqualTo("text-emphasis-position: inherit")
         assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Initial) }).isEqualTo("text-emphasis-position: initial")
@@ -2489,10 +2488,10 @@ class CssStylePropertyTests {
     @Test
     fun verifyTextUnderlinePosition() {
         assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Auto) }).isEqualTo("text-underline-position: auto")
-        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Left) }).isEqualTo("text-underline-position: left")
-        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Right) }).isEqualTo("text-underline-position: right")
-        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Under) }).isEqualTo("text-underline-position: under")
-        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.FromFont) }).isEqualTo("text-underline-position: from-font")
+        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Vertical.Left) }).isEqualTo("text-underline-position: left")
+        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Vertical.Right) }).isEqualTo("text-underline-position: right")
+        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Horizontal.Under) }).isEqualTo("text-underline-position: under")
+        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Horizontal.FromFont) }).isEqualTo("text-underline-position: from-font")
 
         assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Inherit) }).isEqualTo("text-underline-position: inherit")
         assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Initial) }).isEqualTo("text-underline-position: initial")

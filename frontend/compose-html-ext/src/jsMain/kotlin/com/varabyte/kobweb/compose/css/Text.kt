@@ -5,7 +5,7 @@ import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/hyphenate-character
 sealed interface HyphenateCharacter : StylePropertyValue {
-    companion object {
+    companion object: CssGlobalValues<HyphenateCharacter> {
         val Auto get() = "auto".unsafeCast<HyphenateCharacter>()
 
         fun of(value: String) = value.wrapQuotesIfNecessary().unsafeCast<HyphenateCharacter>()
@@ -114,7 +114,10 @@ sealed interface TextDecorationSkipInk : StylePropertyValue {
 
         val Auto get() = "auto".unsafeCast<TextDecorationSkipInk>()
         val None get() = "none".unsafeCast<TextDecorationSkipInk>()
-        val All get() = "all".unsafeCast<TextDecorationSkipInk>()
+        /** All is not supported by most browsers
+        https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-skip-ink#browser_compatibility
+         */
+        //val All get() = "all".unsafeCast<TextDecorationSkipInk>()
     }
 }
 
@@ -125,16 +128,28 @@ fun StyleScope.textDecorationSkipInk(textDecorationSkipInk: TextDecorationSkipIn
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-position
 sealed interface TextEmphasisPosition : StylePropertyValue {
 
+    sealed interface Vertical : TextEmphasisPosition {
+        companion object {
+            val Right get() = "right".unsafeCast<Vertical>()
+            val Left get() = "left".unsafeCast<Vertical>()
+        }
+    }
+
+    sealed interface Horizontal : TextEmphasisPosition {
+        companion object {
+            val Over get() = "over".unsafeCast<Horizontal>()
+            val Under get() = "under".unsafeCast<Horizontal>()
+        }
+    }
+
     companion object : CssGlobalValues<TextEmphasisPosition> {
-
         val Auto get() = "auto".unsafeCast<TextEmphasisPosition>()
-        val Over get() = "over".unsafeCast<TextEmphasisPosition>()
-        val Under get() = "under".unsafeCast<TextEmphasisPosition>()
-        val Right get() = "right".unsafeCast<TextEmphasisPosition>()
-        val Left get() = "left".unsafeCast<TextEmphasisPosition>()
 
-        fun list(horizontal: TextEmphasisPosition, vertical: TextEmphasisPosition) =
+        fun of(horizontal: Horizontal, vertical: Vertical) =
             "$horizontal $vertical".unsafeCast<TextEmphasisPosition>()
+
+        fun of(vertical: Vertical, horizontal: Horizontal) =
+            "$vertical $horizontal".unsafeCast<TextEmphasisPosition>()
     }
 }
 
@@ -246,7 +261,7 @@ fun StyleScope.textShadow(textShadow: TextShadow.Listable) {
 }
 
 // Remove the previous method too after removing this method
-@Deprecated("Use `textShadow(TextShadow.list(...))` instead", ReplaceWith("textShadow(TextShadow.list(*shadows))"))
+@Deprecated("Use `textShadow(TextShadow.of(...))` instead", ReplaceWith("textShadow(TextShadow.of(*shadows))"))
 fun StyleScope.textShadow(vararg shadows: TextShadow.Listable) {
     textShadow(TextShadow.list(*shadows))
 }
@@ -270,7 +285,6 @@ fun StyleScope.textTransform(textTransform: TextTransform) {
 sealed interface TextUnderlineOffset : StylePropertyValue {
 
     companion object : CssGlobalValues<TextUnderlineOffset> {
-
         val Auto get() = "auto".unsafeCast<TextUnderlineOffset>()
 
         fun of(value: CSSLengthOrPercentageNumericValue) = value.unsafeCast<TextUnderlineOffset>()
@@ -285,13 +299,29 @@ fun StyleScope.textUnderlineOffset(textUnderlineOffset: TextUnderlineOffset) {
 //Updated one: https://www.w3.org/TR/css-text-decor-4/#text-underline-position-property
 sealed interface TextUnderlinePosition : StylePropertyValue {
 
-    companion object : CssGlobalValues<TextUnderlinePosition> {
+    sealed interface Horizontal : TextUnderlinePosition {
+        companion object {
+            val FromFont get() = "from-font".unsafeCast<Horizontal>()
+            val Under get() = "under".unsafeCast<Horizontal>()
+        }
 
+    }
+
+    sealed interface Vertical : TextUnderlinePosition {
+        companion object {
+            val Left get() = "left".unsafeCast<Vertical>()
+            val Right get() = "right".unsafeCast<Vertical>()
+        }
+    }
+
+    companion object : CssGlobalValues<TextUnderlinePosition> {
         val Auto get() = "auto".unsafeCast<TextUnderlinePosition>()
-        val FromFont get() = "from-font".unsafeCast<TextUnderlinePosition>()
-        val Under get() = "under".unsafeCast<TextUnderlinePosition>()
-        val Left get() = "left".unsafeCast<TextUnderlinePosition>()
-        val Right get() = "right".unsafeCast<TextUnderlinePosition>()
+
+        fun of(horizontal: Horizontal, vertical: Vertical) =
+            "$horizontal $vertical".unsafeCast<TextUnderlinePosition>()
+
+        fun of(vertical: Vertical, horizontal: Horizontal) =
+            "$vertical $horizontal".unsafeCast<TextUnderlinePosition>()
     }
 }
 

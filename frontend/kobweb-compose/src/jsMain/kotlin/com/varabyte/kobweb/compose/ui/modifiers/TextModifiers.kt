@@ -65,6 +65,14 @@ fun Modifier.textEmphasisPosition(textEmphasisPosition: TextEmphasisPosition) = 
     textEmphasisPosition(textEmphasisPosition)
 }
 
+fun Modifier.textEmphasisPosition(horizontal: TextEmphasisPosition.Horizontal, vertical: TextEmphasisPosition.Vertical) = styleModifier {
+    textEmphasisPosition(TextEmphasisPosition.of(horizontal, vertical))
+}
+
+fun Modifier.textEmphasisPosition(vertical: TextEmphasisPosition.Vertical,horizontal: TextEmphasisPosition.Horizontal) = styleModifier {
+    textEmphasisPosition(TextEmphasisPosition.of(vertical, horizontal))
+}
+
 fun Modifier.textOrientation(textOrientation: TextOrientation) = styleModifier {
     textOrientation(textOrientation)
 }
@@ -113,6 +121,20 @@ fun Modifier.textUnderlineOffset(textUnderlineOffset: TextUnderlineOffset) = sty
 
 fun Modifier.textUnderlinePosition(textUnderlinePosition: TextUnderlinePosition) = styleModifier {
     textUnderlinePosition(textUnderlinePosition)
+}
+
+fun Modifier.textUnderlinePosition(
+    horizontal: TextUnderlinePosition.Horizontal,
+    vertical: TextUnderlinePosition.Vertical
+) = styleModifier {
+    textUnderlinePosition(TextUnderlinePosition.of(horizontal, vertical))
+}
+
+fun Modifier.textUnderlinePosition(
+    vertical: TextUnderlinePosition.Vertical,
+    horizontal: TextUnderlinePosition.Horizontal
+) = styleModifier {
+    textUnderlinePosition(TextUnderlinePosition.of(vertical, horizontal))
 }
 
 fun Modifier.whiteSpace(whiteSpace: WhiteSpace): Modifier = styleModifier {

@@ -591,6 +591,21 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifyTextEmphasisPosition() {
+        assertThat(modifierToText {
+            Modifier.textEmphasisPosition(TextEmphasisPosition.Auto)
+        }).isEqualTo("text-emphasis-position: auto")
+
+        assertThat(modifierToText {
+            Modifier.textEmphasisPosition(TextEmphasisPosition.Horizontal.Over, TextEmphasisPosition.Vertical.Left)
+        }).isEqualTo("text-emphasis-position: over left")
+
+        assertThat(modifierToText {
+            Modifier.textEmphasisPosition(TextEmphasisPosition.Vertical.Right, TextEmphasisPosition.Horizontal.Under)
+        }).isEqualTo("text-emphasis-position: right under")
+    }
+
+    @Test
     fun verifyTextUnderlineOffset() {
         assertThat(modifierToText {
             Modifier.textUnderlineOffset(TextUnderlineOffset.Auto)
@@ -603,6 +618,21 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.textUnderlineOffset(TextUnderlineOffset.of(20.percent))
         }).isEqualTo("text-underline-offset: 20%")
+    }
+
+    @Test
+    fun verifyTextUnderlinePosition() {
+        assertThat(modifierToText {
+            Modifier.textUnderlinePosition(TextUnderlinePosition.Auto)
+        }).isEqualTo("text-underline-position: auto")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlinePosition(TextUnderlinePosition.Horizontal.Under, TextUnderlinePosition.Vertical.Left)
+        }).isEqualTo("text-underline-position: under left")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlinePosition(TextUnderlinePosition.Vertical.Right, TextUnderlinePosition.Horizontal.FromFont)
+        }).isEqualTo("text-underline-position: right from-font")
     }
 
     @Test
