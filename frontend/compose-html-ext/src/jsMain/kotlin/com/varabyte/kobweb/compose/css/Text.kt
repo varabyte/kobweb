@@ -5,7 +5,7 @@ import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/hyphenate-character
 sealed interface HyphenateCharacter : StylePropertyValue {
-    companion object: CssGlobalValues<HyphenateCharacter> {
+    companion object : CssGlobalValues<HyphenateCharacter> {
         val Auto get() = "auto".unsafeCast<HyphenateCharacter>()
 
         fun of(value: String) = value.wrapQuotesIfNecessary().unsafeCast<HyphenateCharacter>()
@@ -162,8 +162,7 @@ sealed interface TextIndent : StylePropertyValue {
         val Hanging get() = "hanging".unsafeCast<KeyWord>()
         val EachLine get() = "each-line".unsafeCast<KeyWord>()
         */
-        fun of(value: CSSLengthNumericValue) = value.unsafeCast<TextIndent>()
-        fun of(value: CSSPercentageValue) = value.unsafeCast<TextIndent>()
+        fun of(value: CSSLengthOrPercentageNumericValue) = value.unsafeCast<TextIndent>()
     }
 }
 
@@ -254,7 +253,10 @@ fun StyleScope.textShadow(textShadow: TextShadow) {
     property("text-shadow", textShadow)
 }
 
-@Deprecated("Use `textShadow(TextShadow.of(...))` instead", ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))"))
+@Deprecated(
+    "Use `textShadow(TextShadow.of(...))` instead",
+    ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))")
+)
 fun StyleScope.textShadow(
     offsetX: CSSLengthNumericValue,
     offsetY: CSSLengthNumericValue,
