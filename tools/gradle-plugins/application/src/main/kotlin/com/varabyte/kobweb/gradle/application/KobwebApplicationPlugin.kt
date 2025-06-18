@@ -222,13 +222,18 @@ class KobwebApplicationPlugin @Inject constructor(
 
         val taskListenerService = project.gradle.sharedServices
             .registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {
-                parameters.kobwebStartTaskName = kobwebStartTask.name
-                // Tasks may include a project prefix (e.g. `site:kobwebStart`), so we compare just the base task name
-                parameters.isKobwebStartBuild = project.gradle.startParameter.taskNames
-                    .any { it.substringAfterLast(':') == kobwebStartTask.name }
-                parameters.kobwebFolderFile = kobwebFolder.path.toFile()
+                project.gradle.taskGraph.whenReady {
+                    parameters.kobwebFolderFiles = allTasks
+                        .filter { it is KobwebStartTask }
+                        .associate { it.path to it.project.kobwebFolder.path.toFile() }
+                }
             }
-        buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
+        // Tasks may include a project prefix (e.g. `site:kobwebStart`), so we compare just the base task name
+        val isKobwebStartBuild = project.gradle.startParameter.taskNames
+            .any { it.substringAfterLast(':') == kobwebStartTask.name }
+        if (isKobwebStartBuild) {
+            buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
+        }
 
         project.tasks.withType<KotlinWebpack>().configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
