@@ -32,3 +32,15 @@ sealed interface EmptyCells : StylePropertyValue {
 fun StyleScope.emptyCells(emptyCells: EmptyCells) {
     property("empty-cells", emptyCells)
 }
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/table-layout
+sealed interface TableLayout: StylePropertyValue {
+    companion object: CssGlobalValues<TableLayout> {
+        val Auto get() = "auto".unsafeCast<TableLayout>()
+        val Fixed get() = "fixed".unsafeCast<TableLayout>()
+    }
+}
+
+fun StyleScope.tableLayout(tableLayout: TableLayout) {
+    property("table-layout", tableLayout)
+}
