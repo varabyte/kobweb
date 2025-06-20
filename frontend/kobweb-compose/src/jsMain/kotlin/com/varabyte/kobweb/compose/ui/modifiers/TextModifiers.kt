@@ -13,6 +13,14 @@ fun Modifier.dir(dirType: DirType) = attrsModifier {
     dir(dirType)
 }
 
+fun Modifier.hyphenateCharacter(hyphenateCharacter: HyphenateCharacter) = styleModifier {
+    hyphenateCharacter(hyphenateCharacter)
+}
+
+fun Modifier.hyphenateCharacter(value:String) = styleModifier {
+    hyphenateCharacter(HyphenateCharacter.of(value))
+}
+
 fun Modifier.lang(value: String) = attrsModifier {
     lang(value)
 }
@@ -37,8 +45,40 @@ fun Modifier.textAlign(textAlign: TextAlign): Modifier = styleModifier {
     textAlign(textAlign)
 }
 
+fun Modifier.textAlignLast(textAlignLast: TextAlignLast) = styleModifier {
+    textAlignLast(textAlignLast)
+}
+
+fun Modifier.textCombineUpright(textCombineUpright: TextCombineUpright) = styleModifier {
+    textCombineUpright(textCombineUpright)
+}
+
 fun Modifier.textDecorationLine(textDecorationLine: TextDecorationLine): Modifier = styleModifier {
     textDecorationLine(textDecorationLine)
+}
+
+fun Modifier.textDecorationSkipInk(textDecorationSkipInk: TextDecorationSkipInk) = styleModifier {
+    textDecorationSkipInk(textDecorationSkipInk)
+}
+
+fun Modifier.textEmphasisPosition(textEmphasisPosition: TextEmphasisPosition) = styleModifier {
+    textEmphasisPosition(textEmphasisPosition)
+}
+
+fun Modifier.textEmphasisPosition(horizontal: TextEmphasisPosition.Horizontal, vertical: TextEmphasisPosition.Vertical) = styleModifier {
+    textEmphasisPosition(TextEmphasisPosition.of(horizontal, vertical))
+}
+
+fun Modifier.textEmphasisPosition(vertical: TextEmphasisPosition.Vertical,horizontal: TextEmphasisPosition.Horizontal) = styleModifier {
+    textEmphasisPosition(TextEmphasisPosition.of(vertical, horizontal))
+}
+
+fun Modifier.textIndent(value: CSSLengthOrPercentageNumericValue) = styleModifier {
+    textIndent(TextIndent.of(value))
+}
+
+fun Modifier.textOrientation(textOrientation: TextOrientation) = styleModifier {
+    textOrientation(textOrientation)
 }
 
 fun Modifier.textOverflow(textOverflow: TextOverflow): Modifier = styleModifier {
@@ -73,6 +113,32 @@ fun Modifier.textShadow(textShadow: TextShadow): Modifier = styleModifier {
 
 fun Modifier.textTransform(textTransform: TextTransform): Modifier = styleModifier {
     textTransform(textTransform)
+}
+
+fun Modifier.textUnderlineOffset(value: CSSLengthOrPercentageNumericValue) = styleModifier {
+    textUnderlineOffset(TextUnderlineOffset.of(value))
+}
+
+fun Modifier.textUnderlineOffset(textUnderlineOffset: TextUnderlineOffset) = styleModifier {
+    textUnderlineOffset(textUnderlineOffset)
+}
+
+fun Modifier.textUnderlinePosition(textUnderlinePosition: TextUnderlinePosition) = styleModifier {
+    textUnderlinePosition(textUnderlinePosition)
+}
+
+fun Modifier.textUnderlinePosition(
+    horizontal: TextUnderlinePosition.Horizontal,
+    vertical: TextUnderlinePosition.Vertical
+) = styleModifier {
+    textUnderlinePosition(TextUnderlinePosition.of(horizontal, vertical))
+}
+
+fun Modifier.textUnderlinePosition(
+    vertical: TextUnderlinePosition.Vertical,
+    horizontal: TextUnderlinePosition.Horizontal
+) = styleModifier {
+    textUnderlinePosition(TextUnderlinePosition.of(vertical, horizontal))
 }
 
 fun Modifier.whiteSpace(whiteSpace: WhiteSpace): Modifier = styleModifier {
