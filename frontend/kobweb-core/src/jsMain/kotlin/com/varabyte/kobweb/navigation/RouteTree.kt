@@ -40,9 +40,6 @@ internal fun RouteTree<PageMethod>.createPageData(route: Route, errorPageMethod:
     return PageData(
         pageMethod,
         // Update RouteInfo with the latest path, just in case a redirect happened
-        RouteInfo(
-            Route(resolved.toRouteString(), route.queryParams, route.fragment),
-            dynamicParams
-        )
+        RouteInfo(route.copy(resolved.toRouteString()), dynamicParams)
     )
 }

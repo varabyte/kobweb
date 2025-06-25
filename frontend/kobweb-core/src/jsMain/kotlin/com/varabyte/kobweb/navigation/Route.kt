@@ -1,5 +1,7 @@
 package com.varabyte.kobweb.navigation
 
+import com.varabyte.kobweb.browser.uri.decodeURIComponent
+import com.varabyte.kobweb.browser.uri.encodeURIComponent
 import org.w3c.dom.url.URL
 
 class RouteException(value: String) :
@@ -13,6 +15,8 @@ class RouteException(value: String) :
  */
 class Route(pathQueryAndFragment: String) {
     /**
+     * Create a route using piecemeal components instead of passing in a giant URL string.
+     *
      * @param path The value "/a/b/c" in route "/a/b/c?p=q&s=t#xyz". The leading slash is optional.
      * @param queryParams The map { "p" = "q"; "s" = "t" } in route "/a/b/c?p=q&s=t#xyz". Can be empty to indicate no
      *   params. Additionally, map *values* can be empty to indicate key-only parameters like "?p&s"
@@ -45,7 +49,7 @@ class Route(pathQueryAndFragment: String) {
         fun isRoute(path: String) = tryCreate(path) != null
         fun tryCreate(path: String) = try {
             Route(path)
-        } catch (ex: RouteException) {
+        } catch (_: RouteException) {
             null
         }
 
@@ -67,7 +71,7 @@ class Route(pathQueryAndFragment: String) {
         val isValidRoute = try {
             URL(pathQueryAndFragment)
             false // If here, we have a value like "https://a/b/c", bad!
-        } catch (ex: Throwable) {
+        } catch (_: Throwable) {
             true // If here, we have a value like "/a/b/c", good!
         }
 
@@ -78,8 +82,11 @@ class Route(pathQueryAndFragment: String) {
 
     private val url = URL(pathQueryAndFragment, "http://unused.com")
 
+    /** The path part of the original URL (i.e. the part without query parameters or a fragment) */
     val path: String
+    /** The query parameters of the original URL (decoded, in case originally URL encoded) */
     val queryParams: Map<String, String>
+    /** The fragment of the original URL (decoded, in case originally URL encoded) */
     val fragment: String?
 
     init {
@@ -100,10 +107,24 @@ class Route(pathQueryAndFragment: String) {
                 // 3) Value with equal sign in it: `url?id=aj3=zk50i&...`
                 val keyValue = queryParam.split('=', limit = 2)
                 val key = keyValue[0]
-                this[key] = keyValue.elementAtOrNull(1) ?: ""
+                this[key] = keyValue.elementAtOrNull(1)?.let { decodeURIComponent(it) } ?: ""
             }
         }
-        fragment = url.hash.takeIf { it.startsWith("#") }?.removePrefix("#")
+        fragment = url.hash.takeIf { it.startsWith("#") }?.removePrefix("#")?.let { decodeURIComponent(it) }
+    }
+
+    /**
+     * Make a copy of this Route, optionally changing one or more of its components.
+     *
+     * For example, `route.copy("newpath")` will create a route with a new path but keeping the same query parameters
+     * and fragments as before, if any were present.
+     */
+    fun copy(
+        path: String = this.path,
+        queryParams: Map<String, String> = this.queryParams,
+        fragment: String? = this.fragment,
+    ): Route {
+        return Route(path, queryParams, fragment)
     }
 
     override fun toString() = "$path${url.search}${url.hash}"
