@@ -10,6 +10,7 @@ import com.varabyte.kobweb.gradle.application.extensions.server
 import com.varabyte.kobweb.gradle.application.ksp.kspBackendFile
 import com.varabyte.kobweb.gradle.application.ksp.kspFrontendFile
 import com.varabyte.kobweb.gradle.application.tasks.KobwebBrowserCacheIdTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebCacheAppBackendDataTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCacheAppFrontendDataTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopySupplementalResourcesTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyTask
@@ -377,12 +378,17 @@ class KobwebApplicationPlugin @Inject constructor(
                 }
             }
 
+            val kobwebCacheAppBackendDataTask = project.tasks.register<KobwebCacheAppBackendDataTask>("kobwebCacheAppBackendData") {
+                appBackendMetadataFile.set(project.kspBackendFile(jvmTarget))
+                compileClasspath.from(project.configurations.named(jvmTarget.compileClasspath))
+                appDataFile.set(this.kobwebCacheFile("appData.json"))
+            }
+
             val kobwebGenApisFactoryTask = project.tasks
                 .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock.app)
 
             kobwebGenApisFactoryTask.configure {
-                kspGenFile.set(project.kspBackendFile(jvmTarget))
-                compileClasspath.from(project.configurations.named(jvmTarget.compileClasspath))
+                appDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
             }
 
             project.kspExcludedSources.from(kobwebGenApisFactoryTask)
