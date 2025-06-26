@@ -498,9 +498,12 @@ abstract class AppBlock @Inject constructor(
         internal abstract val traceConfig: Property<TraceConfig>
 
         /**
-         * If true, hide the warning shown about using a fullstack layout when it probably isn't necessary.
+         * If true, hide the warning shown about using an incorrect export layout.
+         *
+         * The user will see a warning if they choose a static layout for a project that has a backend OR a fullstack
+         * layout on a site without one.
          */
-        abstract val suppressFullstackLayoutWarning: Property<Boolean>
+        abstract val suppressLayoutWarning: Property<Boolean>
 
         /**
          * If true, hide the warning shown the projects that don't define a root route.
@@ -538,7 +541,7 @@ abstract class AppBlock @Inject constructor(
         init {
             browser.convention(Browser.Chromium)
             includeSourceMap.convention(true)
-            suppressFullstackLayoutWarning.convention(false)
+            suppressLayoutWarning.convention(false)
             suppressNoRootWarning.convention(false)
         }
     }

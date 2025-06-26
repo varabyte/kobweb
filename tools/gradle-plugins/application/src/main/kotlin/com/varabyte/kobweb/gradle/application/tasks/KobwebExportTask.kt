@@ -188,12 +188,17 @@ abstract class KobwebExportTask @Inject constructor(
                 }
             }
 
-        if (siteLayout.isFullstack && !exportBlock.suppressFullstackLayoutWarning.get()) {
+        if (!exportBlock.suppressLayoutWarning.get()) {
             val appBackendData =
-                    appBackendDataFile.orNull?.asFile?.let { Json.decodeFromString<AppBackendData>(it.readText()) }
+                appBackendDataFile.orNull?.asFile?.let { Json.decodeFromString<AppBackendData>(it.readText()) }
             val isBackendDataPresent = appBackendData?.isEmpty()?.not() ?: false
-            if (!isBackendDataPresent) {
-                logger.warn("w: You are exporting using a fullstack layout but your site doesn't have a backend. We recommend using `kobweb export --layout static` instead. Please read https://kobweb.varabyte.com/docs/concepts/foundation/exporting#static-layout-vs-full-stack-sites for more information about this choice. You can add `kobweb.app.export.suppressFullstackLayoutWarning.set(true)` to your build script to make this warning go away.")
+
+            val warningCommon = "Please read https://kobweb.varabyte.com/docs/concepts/foundation/exporting#static-layout-vs-full-stack-sites for more information about this choice. You can also add `kobweb.app.export.suppressLayoutWarning.set(true)` to your build script to make this warning go away."
+
+            if (siteLayout.isFullstack && !isBackendDataPresent) {
+                logger.warn("w: You are exporting using a fullstack layout, but we detected your site doesn't have a backend. We recommend using `kobweb export --layout static` instead. $warningCommon")
+            } else if (siteLayout.isStatic && isBackendDataPresent) {
+                logger.warn("w: You are exporting using a static layout, but we detected your site has a backend. We recommend using `kobweb export --layout fullstack` instead. $warningCommon")
             }
         }
 
