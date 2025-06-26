@@ -14,14 +14,17 @@ class BackendData(
     val initMethods: List<InitApiEntry> = emptyList(),
     val apiMethods: List<ApiEntry> = emptyList(),
     val apiStreamMethods: List<ApiStreamEntry> = emptyList(),
-)
+) {
+    fun isEmpty() = initMethods.isEmpty() && apiMethods.isEmpty() && apiStreamMethods.isEmpty()
+}
 
 @Serializable
 class AppBackendData(
     val apiInterceptorMethod: ApiInterceptorEntry? = null,
     val backendData: BackendData = BackendData(),
-)
-
+) {
+    fun isEmpty() = apiInterceptorMethod == null && backendData.isEmpty()
+}
 
 /**
  * Merge multiple [BackendData] objects together.

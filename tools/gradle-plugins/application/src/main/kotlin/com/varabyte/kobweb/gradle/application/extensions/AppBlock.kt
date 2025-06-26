@@ -498,6 +498,11 @@ abstract class AppBlock @Inject constructor(
         internal abstract val traceConfig: Property<TraceConfig>
 
         /**
+         * If true, hide the warning shown about using a fullstack layout when it probably isn't necessary.
+         */
+        abstract val suppressFullstackLayoutWarning: Property<Boolean>
+
+        /**
          * If true, hide the warning shown the projects that don't define a root route.
          */
         abstract val suppressNoRootWarning: Property<Boolean>
@@ -533,6 +538,7 @@ abstract class AppBlock @Inject constructor(
         init {
             browser.convention(Browser.Chromium)
             includeSourceMap.convention(true)
+            suppressFullstackLayoutWarning.convention(false)
             suppressNoRootWarning.convention(false)
         }
     }

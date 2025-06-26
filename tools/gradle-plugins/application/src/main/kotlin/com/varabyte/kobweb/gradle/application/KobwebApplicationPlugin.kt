@@ -343,7 +343,7 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             kobwebExportTask.configure {
-                appDataFile.set(kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile })
+                appFrontendDataFile.set(kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile })
                 publicPath.set(kobwebBlock.publicPath)
                 publicResources.from(kobwebBlock.publicPath.map { publicPath ->
                     project.getResourceSources(jsTarget).map { srcDirSet ->
@@ -389,6 +389,10 @@ class KobwebApplicationPlugin @Inject constructor(
 
             kobwebGenApisFactoryTask.configure {
                 appDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
+            }
+
+            kobwebExportTask.configure {
+                appBackendDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
             }
 
             project.kspExcludedSources.from(kobwebGenApisFactoryTask)
