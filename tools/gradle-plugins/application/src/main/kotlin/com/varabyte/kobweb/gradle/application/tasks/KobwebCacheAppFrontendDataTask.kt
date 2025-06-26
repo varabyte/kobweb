@@ -18,15 +18,16 @@ import org.gradle.api.tasks.TaskAction
 
 // NOTE: This task in meant as an internal API so it does not inherit from KobwebTask
 /**
- * Collect all app data from the current site and all library dependencies, writing the result to [appDataFile].
+ * Collect all frontend app data from the current site and all library dependencies, writing the result to
+ * [appDataFile].
  *
  * This is done so that multiple tasks can read the same values from a single, cached file. Those tasks should take
  * `appDataFile` as an input and then deserialize it in their execute method:
  *
  * ```
  * // Configuring the task
- * myAppDataUsingTask.configure {
- *   appDataFile.set(kobwebCacheAppDataTask.flatMap { it.appDataFile })
+ * myFrontendAppDataUsingTask.configure {
+ *   appDataFile.set(kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile })
  * }
  *
  * // Inside the task
@@ -35,7 +36,7 @@ import org.gradle.api.tasks.TaskAction
  *
  * @TaskAction
  * fun execute() {
- *   val appData = Json.decodeFromString<AppData>(appDataFile.get().asFile.readText())
+ *   val appData = Json.decodeFromString<AppFrontendData>(appDataFile.get().asFile.readText())
  *   // ...
  * }
  * ```
@@ -43,7 +44,7 @@ import org.gradle.api.tasks.TaskAction
 abstract class KobwebCacheAppFrontendDataTask : DefaultTask() {
     init {
         description =
-            "Search the project and merge all app data, saving it into a file, at which point it can be looked up by downstream tasks that need it."
+            "Search the project and merge all app frontend data, saving it into a file, at which point it can be looked up by downstream tasks that need it."
     }
 
     @get:InputFile
