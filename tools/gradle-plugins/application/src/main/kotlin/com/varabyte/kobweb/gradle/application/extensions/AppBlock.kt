@@ -166,12 +166,6 @@ abstract class AppBlock @Inject constructor(
             }
         }
 
-        @Deprecated("`routePrefix` changed to `basePath` as that name is more consistent with what other web frameworks use.",
-            ReplaceWith("basePath")
-        )
-        @get:Internal
-        val routePrefix get() = basePath
-
         /**
          * A list of element builders to add to the `<head>` of the generated `index.html` file.
          *
@@ -585,7 +579,7 @@ abstract class AppBlock @Inject constructor(
         cleanUrls.convention(true)
         genDir.convention(baseGenDir.map { "$it/app" })
 
-        extensions.create<IndexBlock>("index", BasePath(conf.site.basePathOrRoutePrefix))
+        extensions.create<IndexBlock>("index", BasePath(conf.site.basePath))
         extensions.create<ServerBlock>("server")
         extensions.create<ExportBlock>("export", kobwebFolder)
     }

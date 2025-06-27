@@ -42,7 +42,7 @@ class KobwebExportConfInputs(
 ) {
     constructor(kobwebConf: KobwebConf) : this(
         siteRoot = kobwebConf.server.files.prod.siteRoot,
-        basePath = kobwebConf.site.basePathOrRoutePrefix,
+        basePath = kobwebConf.site.basePath,
         script = kobwebConf.server.files.prod.script,
         api = kobwebConf.server.files.dev.api,
     )

@@ -46,14 +46,13 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.name
-import java.lang.StackTraceElement as JavaStackTraceElement // Needed to disambiguate from ktor `StackTraceElement`
 
 /** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose by chance. */
 private const val KOBWEB_PARAMS = "kobweb-params"
 
 // A version of `stackTraceToString` that stops including traces once it hits a certain condition. This is a good way
 // to filter out traces that are not relevant to the user.
-private fun Throwable.stackTraceToString(includeUntil: (JavaStackTraceElement) -> Boolean): String {
+private fun Throwable.stackTraceToString(includeUntil: (StackTraceElement) -> Boolean): String {
     return buildString {
         var currThrowable: Throwable? = this@stackTraceToString
         var lastThrowable: Throwable? = null
@@ -116,7 +115,7 @@ val Site.basePathNormalized: String
         // prefix "a/b" and the user visits "a/b/nested/page", that means the local file we're going to serve is
         // "nested/page.html"
         // We remove any slashes here as it results in cleaner code as most routing code adds the slashes explicitly anyway
-        return basePathOrRoutePrefix.removePrefix("/").removeSuffix("/")
+        return basePath.removePrefix("/").removeSuffix("/")
     }
 
 private fun RequestConnectionPoint.toRequestConnectionDetails() = Request.Connection.Details(
