@@ -16,11 +16,8 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.INSTANT
-import org.w3c.dom.MutationObserver
-import org.w3c.dom.MutationObserverInit
 import org.w3c.dom.ScrollBehavior
 import org.w3c.dom.ScrollToOptions
-import org.w3c.dom.asList
 import org.w3c.dom.url.URL
 import org.w3c.xhr.XMLHttpRequest
 
@@ -274,7 +271,7 @@ class Router {
         // The following line handles cases where the user passed in just query params / a fragment without a path
         // e.g. "#test" -> "/currpage#test" if the current page is "https://yoursite.com/currpage"
         // as well as relative routes, ensuring the final version is a full path that begins with a leading slash.
-        val hrefResolved = Route.fromUrl(URL(this, window.location.href)).toString()
+        val hrefResolved = Route.fromUrl(URL(Route.normalizeSlashes(this), window.location.href)).toString()
 
         // By design, whether a site has a base path or not should be invisible to the user. So here, we remove a
         // prefix if it is present only to put it back again (in the case that we removed it) after the interceptors
@@ -285,20 +282,8 @@ class Router {
         return BasePath.prependIf(hadPrefix, interceptors.fold(Route(withoutPrefix).toString()) { acc, intercept ->
             val interceptor = RouteInterceptorScope(acc)
             interceptor.intercept()
-            interceptor.pathQueryAndFragment
+            Route.normalizeSlashes(interceptor.pathQueryAndFragment)
         })
-    }
-
-    /**
-     * Split a URL into its path part and the rest of the URL.
-     *
-     * For example, `/path?query#fragment` would return `/path` and `?query#fragment`.
-     *
-     * If there are neither query parameters nor a fragment, the second part will be an empty string.
-     */
-    private fun String.partitionPath(): Pair<String, String> {
-        val pathPart = this.substringBefore('?').substringBefore('#')
-        return pathPart to this.removePrefix(pathPart)
     }
 
     fun registerLayout(layoutId: String, parentLayoutId: String? = null, initRouteMethod: InitRouteMethod? = null, layoutMethod: LayoutMethod) {
@@ -462,7 +447,7 @@ class Router {
             // Next, we check a common edge case where the site has registered "slug" and the user typed "slug/"
             // OR vice versa ("slug/" and user typed "slug"). Let's help the user find the right place.
             run {
-                val (pathPart, queryAndFragmentPart) = pathQueryAndFragment.partitionPath()
+                val (pathPart, queryAndFragmentPart) = Route.partition(pathQueryAndFragment)
 
                 // Unlikely but if user never defines a root page, `isRegistered("/")` will return false. We don't want
                 // to add or remove slashes in that case!
@@ -488,7 +473,7 @@ class Router {
             // "documents/external.md". So we ask the server if it's there. If so, we treat this navigation as "handled"
             // and kick off a request to the server to download the file.
             run {
-                val (pathPart, _) = pathQueryAndFragment.partitionPath()
+                val (pathPart, _) = Route.partition(pathQueryAndFragment)
 
                 if (!routeTree.isRegistered(pathPart)) {
                     val xhr = XMLHttpRequest()
@@ -521,7 +506,7 @@ class Router {
             // *just in case* it changed, but keep the query parameters / fragment parts the same as before.
             // So if we visit "blah.com/old-page#hash?a=b" and get redirected, the final URL will be
             // "blah.com/new-page#hash?a=b"
-            pathQueryAndFragment = PageContext.instance.route.path + pathQueryAndFragment.partitionPath().second
+            pathQueryAndFragment = PageContext.instance.route.path + Route.partition(pathQueryAndFragment).second
 
             // Update URL to match page we navigated to
             "${window.location.origin}$pathQueryAndFragment".let { url ->

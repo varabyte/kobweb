@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.navigation
 
 import com.varabyte.kobweb.browser.uri.decodeURIComponent
-import com.varabyte.kobweb.browser.uri.encodeURIComponent
 import org.w3c.dom.url.URL
 
 class RouteException(value: String) :
@@ -14,6 +13,8 @@ class RouteException(value: String) :
  * e.g. "mailto:account@site.com", it will throw an exception
  */
 class Route(pathQueryAndFragment: String) {
+    private val pathQueryAndFragment = normalizeSlashes(pathQueryAndFragment)
+
     /**
      * Create a route using piecemeal components instead of passing in a giant URL string.
      *
@@ -45,6 +46,39 @@ class Route(pathQueryAndFragment: String) {
         })
 
     companion object {
+        /**
+         * Split a route into a pairing of its path part and query params / fragments part
+         *
+         * ```
+         * "path" -> "path" to ""
+         * "path?key=value" -> "path" to "?key=value"
+         * "path#frag" -> "path" to "#frag"
+         * "path?key=value#frag" -> "path" to "?key=value#frag"
+         * "path#frag?key=value" -> "path" to "#frag?key=value"
+         * ```
+         */
+        fun partition(pathQueryAndFragment: String): Pair<String, String> {
+            val pathPart = pathQueryAndFragment.substringBefore('?').substringBefore('#')
+            return pathPart to pathQueryAndFragment.removePrefix(pathPart)
+        }
+
+        /**
+         * Remove any unnecessary slashes from a URL.
+         *
+         * For example, normalizing "https://///example.com///a//b///c//" will return "https://example.com/a/b/c/".
+         *
+         * This is useful because occasionally a user may add an extra slash unintentionally as a typo. Passing such a
+         * string into the URL class will result in an exception at construction time.
+         */
+        fun normalizeSlashes(url: String): String {
+            val (origin, rest) = url.split("://", limit = 2).let { splitResult ->
+                if (splitResult.size == 1) "" to splitResult[0] else "${splitResult[0]}://" to splitResult[1].trimStart('/')
+            }
+
+            val (path, queryAndFragment) = partition(rest)
+            return "$origin${path.replace(Regex("//+"), "/")}$queryAndFragment"
+        }
+
         /** Returns true if a route, i.e. a path without an origin */
         fun isRoute(path: String) = tryCreate(path) != null
         fun tryCreate(path: String) = try {
@@ -69,7 +103,7 @@ class Route(pathQueryAndFragment: String) {
         // construct an ungrounded URL without a base URL. In other words, we WANT an exception to happen here.
         // Otherwise, it means our incoming value has a domain which breaks the assumptions and intention of this class
         val isValidRoute = try {
-            URL(pathQueryAndFragment)
+            URL(this.pathQueryAndFragment)
             false // If here, we have a value like "https://a/b/c", bad!
         } catch (_: Throwable) {
             true // If here, we have a value like "/a/b/c", good!
@@ -80,7 +114,7 @@ class Route(pathQueryAndFragment: String) {
         }
     }
 
-    private val url = URL(pathQueryAndFragment, "http://unused.com")
+    private val url = URL(this.pathQueryAndFragment, "http://unused.com")
 
     /** The path part of the original URL (i.e. the part without query parameters or a fragment) */
     val path: String
@@ -90,7 +124,7 @@ class Route(pathQueryAndFragment: String) {
     val fragment: String?
 
     init {
-        val isAbsolute = pathQueryAndFragment.startsWith("/")
+        val isAbsolute = this.pathQueryAndFragment.startsWith("/")
 
         // We use the URL class to avoid doing complex URL resolution logic (e.g. handling ".." and other relative
         // operations). We pass in a dummy base because without it, URL rejects relative paths.
