@@ -235,7 +235,7 @@ class Router {
     @Composable
     fun renderActivePage(pageWrapper: @Composable (@Composable () -> Unit) -> Unit = { it() }) {
         val pageMethod = activePageMethod
-            ?: error("Call 'navigateTo' at least once before calling 'renderActivePage'")
+            ?: error("Make sure you have visited a page (via `navigateTo` or `tryRoutingTo`) at least once before calling 'renderActivePage'")
 
         CompositionLocalProvider(
             PageContextLocal provides PageContext.instance
