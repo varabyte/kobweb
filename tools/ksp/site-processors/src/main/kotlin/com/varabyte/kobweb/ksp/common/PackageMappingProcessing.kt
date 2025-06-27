@@ -4,6 +4,7 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFile
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.util.RouteUtils
+import com.varabyte.kobweb.ksp.util.getArgumentValue
 
 // pair corresponds to (current package, override)
 // in theory should only be one, but we'll return a sequence just in case
@@ -18,8 +19,7 @@ fun getPackageMappings(
     return file.getAnnotationsByName(packageMappingFqn).mapNotNull { packageMappingAnnotation ->
         val currPackage = file.packageName.asString()
         if (currPackage.startsWith(qualifiedPagesPackage)) {
-            val override = packageMappingAnnotation.arguments.first().value!!.let {
-                val value = it.toString()
+            val override = packageMappingAnnotation.getArgumentValue()!!.let { value ->
                 val dynamicRouteSegment = DynamicRouteSegment.tryCreate(value)
                 if (dynamicRouteSegment != null && dynamicRouteSegment.isInferred) {
                     if (dynamicRouteSegment.isCatchAll) {
