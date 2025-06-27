@@ -597,11 +597,11 @@ class StyleModifierTests {
         }).isEqualTo("text-emphasis-position: auto")
 
         assertThat(modifierToText {
-            Modifier.textEmphasisPosition(TextEmphasisPosition.Horizontal.Over, TextEmphasisPosition.Vertical.Left)
+            Modifier.textEmphasisPosition(TextEmphasisPosition.Over, TextEmphasisPosition.Left)
         }).isEqualTo("text-emphasis-position: over left")
 
         assertThat(modifierToText {
-            Modifier.textEmphasisPosition(TextEmphasisPosition.Vertical.Right, TextEmphasisPosition.Horizontal.Under)
+            Modifier.textEmphasisPosition(TextEmphasisPosition.Right, TextEmphasisPosition.Under)
         }).isEqualTo("text-emphasis-position: right under")
     }
 
@@ -640,11 +640,11 @@ class StyleModifierTests {
         }).isEqualTo("text-underline-position: auto")
 
         assertThat(modifierToText {
-            Modifier.textUnderlinePosition(TextUnderlinePosition.Horizontal.Under, TextUnderlinePosition.Vertical.Left)
+            Modifier.textUnderlinePosition(TextUnderlinePosition.Under, TextUnderlinePosition.Left)
         }).isEqualTo("text-underline-position: under left")
 
         assertThat(modifierToText {
-            Modifier.textUnderlinePosition(TextUnderlinePosition.Vertical.Right, TextUnderlinePosition.Horizontal.FromFont)
+            Modifier.textUnderlinePosition(TextUnderlinePosition.Right, TextUnderlinePosition.FromFont)
         }).isEqualTo("text-underline-position: right from-font")
     }
 

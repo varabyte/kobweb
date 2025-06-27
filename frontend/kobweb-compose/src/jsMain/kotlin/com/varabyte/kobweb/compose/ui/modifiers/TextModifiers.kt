@@ -65,12 +65,12 @@ fun Modifier.textEmphasisPosition(textEmphasisPosition: TextEmphasisPosition) = 
     textEmphasisPosition(textEmphasisPosition)
 }
 
-fun Modifier.textEmphasisPosition(horizontal: TextEmphasisPosition.Horizontal, vertical: TextEmphasisPosition.Vertical) = styleModifier {
-    textEmphasisPosition(TextEmphasisPosition.of(horizontal, vertical))
+fun Modifier.textEmphasisPosition(firstPosition: TextEmphasisPosition.Horizontal, secondPosition: TextEmphasisPosition.Vertical) = styleModifier {
+    textEmphasisPosition(TextEmphasisPosition.of(firstPosition, secondPosition))
 }
 
-fun Modifier.textEmphasisPosition(vertical: TextEmphasisPosition.Vertical,horizontal: TextEmphasisPosition.Horizontal) = styleModifier {
-    textEmphasisPosition(TextEmphasisPosition.of(vertical, horizontal))
+fun Modifier.textEmphasisPosition(firstPosition: TextEmphasisPosition.Vertical, secondPosition: TextEmphasisPosition.Horizontal) = styleModifier {
+    textEmphasisPosition(TextEmphasisPosition.of(firstPosition, secondPosition))
 }
 
 fun Modifier.textIndent(value: CSSLengthOrPercentageNumericValue) = styleModifier {
@@ -128,17 +128,17 @@ fun Modifier.textUnderlinePosition(textUnderlinePosition: TextUnderlinePosition)
 }
 
 fun Modifier.textUnderlinePosition(
-    horizontal: TextUnderlinePosition.Horizontal,
-    vertical: TextUnderlinePosition.Vertical
+    firstPosition: TextUnderlinePosition.Horizontal,
+    secondPosition: TextUnderlinePosition.Vertical
 ) = styleModifier {
-    textUnderlinePosition(TextUnderlinePosition.of(horizontal, vertical))
+    textUnderlinePosition(TextUnderlinePosition.of(firstPosition, secondPosition))
 }
 
 fun Modifier.textUnderlinePosition(
-    vertical: TextUnderlinePosition.Vertical,
-    horizontal: TextUnderlinePosition.Horizontal
+    firstPosition: TextUnderlinePosition.Vertical,
+    secondPosition: TextUnderlinePosition.Horizontal
 ) = styleModifier {
-    textUnderlinePosition(TextUnderlinePosition.of(vertical, horizontal))
+    textUnderlinePosition(TextUnderlinePosition.of(firstPosition, secondPosition))
 }
 
 fun Modifier.whiteSpace(whiteSpace: WhiteSpace): Modifier = styleModifier {
