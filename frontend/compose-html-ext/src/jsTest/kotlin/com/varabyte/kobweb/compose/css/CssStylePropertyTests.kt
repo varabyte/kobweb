@@ -1460,6 +1460,12 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyHyphenateCharacter() {
+        assertThat(styleToText { hyphenateCharacter(HyphenateCharacter.Auto) }).isEqualTo("hyphenate-character: auto")
+        assertThat(styleToText { hyphenateCharacter(HyphenateCharacter.of("-")) }).isEqualTo("hyphenate-character: \"-\"")
+    }
+
+    @Test
     fun verifyIsolation() {
         assertThat(styleToText { isolation(Isolation.Auto) }).isEqualTo("isolation: auto")
         assertThat(styleToText { isolation(Isolation.Isolate) }).isEqualTo("isolation: isolate")
@@ -2144,6 +2150,34 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyTextAlignLast() {
+        assertThat(styleToText { textAlignLast(TextAlignLast.Left) }).isEqualTo("text-align-last: left")
+        assertThat(styleToText { textAlignLast(TextAlignLast.Right) }).isEqualTo("text-align-last: right")
+        assertThat(styleToText { textAlignLast(TextAlignLast.Center) }).isEqualTo("text-align-last: center")
+        assertThat(styleToText { textAlignLast(TextAlignLast.Justify) }).isEqualTo("text-align-last: justify")
+        assertThat(styleToText { textAlignLast(TextAlignLast.Start) }).isEqualTo("text-align-last: start")
+        assertThat(styleToText { textAlignLast(TextAlignLast.End) }).isEqualTo("text-align-last: end")
+
+        assertThat(styleToText { textAlignLast(TextAlignLast.Inherit) }).isEqualTo("text-align-last: inherit")
+        assertThat(styleToText { textAlignLast(TextAlignLast.Initial) }).isEqualTo("text-align-last: initial")
+        assertThat(styleToText { textAlignLast(TextAlignLast.Revert) }).isEqualTo("text-align-last: revert")
+        assertThat(styleToText { textAlignLast(TextAlignLast.RevertLayer) }).isEqualTo("text-align-last: revert-layer")
+        assertThat(styleToText { textAlignLast(TextAlignLast.Unset) }).isEqualTo("text-align-last: unset")
+    }
+
+    @Test
+    fun verifyTextCombineUpright() {
+        assertThat(styleToText { textCombineUpright(TextCombineUpright.All) }).isEqualTo("text-combine-upright: all")
+        assertThat(styleToText { textCombineUpright(TextCombineUpright.None) }).isEqualTo("text-combine-upright: none")
+
+        assertThat(styleToText { textCombineUpright(TextCombineUpright.Inherit) }).isEqualTo("text-combine-upright: inherit")
+        assertThat(styleToText { textCombineUpright(TextCombineUpright.Initial) }).isEqualTo("text-combine-upright: initial")
+        assertThat(styleToText { textCombineUpright(TextCombineUpright.Revert) }).isEqualTo("text-combine-upright: revert")
+        assertThat(styleToText { textCombineUpright(TextCombineUpright.RevertLayer) }).isEqualTo("text-combine-upright: revert-layer")
+        assertThat(styleToText { textCombineUpright(TextCombineUpright.Unset) }).isEqualTo("text-combine-upright: unset")
+    }
+
+    @Test
     fun verifyTextDecorationLine() {
         assertThat(styleToText { textDecorationLine(TextDecorationLine.Underline) }).isEqualTo("text-decoration-line: underline")
         assertThat(styleToText { textDecorationLine(TextDecorationLine.Overline) }).isEqualTo("text-decoration-line: overline")
@@ -2155,6 +2189,60 @@ class CssStylePropertyTests {
         assertThat(styleToText { textDecorationLine(TextDecorationLine.Revert) }).isEqualTo("text-decoration-line: revert")
         assertThat(styleToText { textDecorationLine(TextDecorationLine.RevertLayer) }).isEqualTo("text-decoration-line: revert-layer")
         assertThat(styleToText { textDecorationLine(TextDecorationLine.Unset) }).isEqualTo("text-decoration-line: unset")
+    }
+
+    @Test
+    fun verifyTextDecorationSkipInk() {
+        assertThat(styleToText { textDecorationSkipInk(TextDecorationSkipInk.None) }).isEqualTo("text-decoration-skip-ink: none")
+        assertThat(styleToText { textDecorationSkipInk(TextDecorationSkipInk.Auto) }).isEqualTo("text-decoration-skip-ink: auto")
+
+        assertThat(styleToText { textDecorationSkipInk(TextDecorationSkipInk.Inherit) }).isEqualTo("text-decoration-skip-ink: inherit")
+        assertThat(styleToText { textDecorationSkipInk(TextDecorationSkipInk.Initial) }).isEqualTo("text-decoration-skip-ink: initial")
+        assertThat(styleToText { textDecorationSkipInk(TextDecorationSkipInk.Revert) }).isEqualTo("text-decoration-skip-ink: revert")
+        assertThat(styleToText { textDecorationSkipInk(TextDecorationSkipInk.RevertLayer) }).isEqualTo("text-decoration-skip-ink: revert-layer")
+        assertThat(styleToText { textDecorationSkipInk(TextDecorationSkipInk.Unset) }).isEqualTo("text-decoration-skip-ink: unset")
+    }
+    @Test
+    fun verifyTextEmphasisPosition() {
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Auto) }).isEqualTo("text-emphasis-position: auto")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Over) }).isEqualTo("text-emphasis-position: over")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Under) }).isEqualTo("text-emphasis-position: under")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Left) }).isEqualTo("text-emphasis-position: left")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Right) }).isEqualTo("text-emphasis-position: right")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.of(TextEmphasisPosition.Over, TextEmphasisPosition.Right)) }).isEqualTo("text-emphasis-position: over right")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.of(TextEmphasisPosition.Left, TextEmphasisPosition.Over)) }).isEqualTo("text-emphasis-position: left over")
+
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Inherit) }).isEqualTo("text-emphasis-position: inherit")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Initial) }).isEqualTo("text-emphasis-position: initial")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Revert) }).isEqualTo("text-emphasis-position: revert")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.RevertLayer) }).isEqualTo("text-emphasis-position: revert-layer")
+        assertThat(styleToText { textEmphasisPosition(TextEmphasisPosition.Unset) }).isEqualTo("text-emphasis-position: unset")
+    }
+
+    @Test
+    fun verifyTextIndent() {
+        assertThat(styleToText { textIndent(TextIndent.of(3.mm)) }).isEqualTo("text-indent: 3mm")
+        assertThat(styleToText { textIndent(TextIndent.of(40.px)) }).isEqualTo("text-indent: 40px")
+        assertThat(styleToText { textIndent(TextIndent.of(15.percent)) }).isEqualTo("text-indent: 15%")
+
+        assertThat(styleToText { textIndent(TextIndent.Inherit) }).isEqualTo("text-indent: inherit")
+        assertThat(styleToText { textIndent(TextIndent.Initial) }).isEqualTo("text-indent: initial")
+        assertThat(styleToText { textIndent(TextIndent.Revert) }).isEqualTo("text-indent: revert")
+        assertThat(styleToText { textIndent(TextIndent.RevertLayer) }).isEqualTo("text-indent: revert-layer")
+        assertThat(styleToText { textIndent(TextIndent.Unset) }).isEqualTo("text-indent: unset")
+    }
+
+    @Test
+    fun verifyTextOrientation() {
+        assertThat(styleToText { textOrientation(TextOrientation.Mixed) }).isEqualTo("text-orientation: mixed")
+        assertThat(styleToText { textOrientation(TextOrientation.Upright) }).isEqualTo("text-orientation: upright")
+        assertThat(styleToText { textOrientation(TextOrientation.Sideways) }).isEqualTo("text-orientation: sideways")
+
+        assertThat(styleToText { textOrientation(TextOrientation.Inherit) }).isEqualTo("text-orientation: inherit")
+        assertThat(styleToText { textOrientation(TextOrientation.Initial) }).isEqualTo("text-orientation: initial")
+        assertThat(styleToText { textOrientation(TextOrientation.Revert) }).isEqualTo("text-orientation: revert")
+        assertThat(styleToText { textOrientation(TextOrientation.RevertLayer) }).isEqualTo("text-orientation: revert-layer")
+        assertThat(styleToText { textOrientation(TextOrientation.Unset) }).isEqualTo("text-orientation: unset")
     }
 
     @Test
@@ -2430,6 +2518,37 @@ class CssStylePropertyTests {
         assertThat(styleToText { transitionProperty(TransitionProperty.Revert) }).isEqualTo("transition-property: revert")
         assertThat(styleToText { transitionProperty(TransitionProperty.RevertLayer) }).isEqualTo("transition-property: revert-layer")
         assertThat(styleToText { transitionProperty(TransitionProperty.Unset) }).isEqualTo("transition-property: unset")
+    }
+
+    @Test
+    fun verifyTextUnderlineOffset() {
+
+        assertThat(styleToText { textUnderlineOffset(TextUnderlineOffset.Auto) }).isEqualTo("text-underline-offset: auto")
+        assertThat(styleToText { textUnderlineOffset(TextUnderlineOffset.of(0.1.em)) }).isEqualTo("text-underline-offset: 0.1em")
+        assertThat(styleToText { textUnderlineOffset(TextUnderlineOffset.of(3.px)) }).isEqualTo("text-underline-offset: 3px")
+
+        assertThat(styleToText { textUnderlineOffset(TextUnderlineOffset.of(20.percent)) }).isEqualTo("text-underline-offset: 20%")
+
+        assertThat(styleToText { textUnderlineOffset(TextUnderlineOffset.Inherit) }).isEqualTo("text-underline-offset: inherit")
+        assertThat(styleToText { textUnderlineOffset(TextUnderlineOffset.Initial) }).isEqualTo("text-underline-offset: initial")
+        assertThat(styleToText { textUnderlineOffset(TextUnderlineOffset.Revert) }).isEqualTo("text-underline-offset: revert")
+        assertThat(styleToText { textUnderlineOffset(TextUnderlineOffset.RevertLayer) }).isEqualTo("text-underline-offset: revert-layer")
+        assertThat(styleToText { textUnderlineOffset(TextUnderlineOffset.Unset) }).isEqualTo("text-underline-offset: unset")
+    }
+
+    @Test
+    fun verifyTextUnderlinePosition() {
+        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Auto) }).isEqualTo("text-underline-position: auto")
+        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Left) }).isEqualTo("text-underline-position: left")
+        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Right) }).isEqualTo("text-underline-position: right")
+        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Under) }).isEqualTo("text-underline-position: under")
+        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.FromFont) }).isEqualTo("text-underline-position: from-font")
+
+        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Inherit) }).isEqualTo("text-underline-position: inherit")
+        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Initial) }).isEqualTo("text-underline-position: initial")
+        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Revert) }).isEqualTo("text-underline-position: revert")
+        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.RevertLayer) }).isEqualTo("text-underline-position: revert-layer")
+        assertThat(styleToText { textUnderlinePosition(TextUnderlinePosition.Unset) }).isEqualTo("text-underline-position: unset")
     }
 
     @Test

@@ -174,6 +174,17 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifyHyphenateCharacter() {
+        assertThat(modifierToText {
+            Modifier.hyphenateCharacter(HyphenateCharacter.Auto)
+        }).isEqualTo("hyphenate-character: auto")
+
+        assertThat(modifierToText {
+            Modifier.hyphenateCharacter("-")
+        }).isEqualTo("hyphenate-character: \"-\"")
+    }
+
+    @Test
     fun verifyLayout() {
         assertThat(modifierToText {
             Modifier.aspectRatio(1.5)
@@ -595,6 +606,64 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.writingMode(WritingMode.VerticalRl)
         }).isEqualTo("writing-mode: vertical-rl")
+    }
+
+    @Test
+    fun verifyTextEmphasisPosition() {
+        assertThat(modifierToText {
+            Modifier.textEmphasisPosition(TextEmphasisPosition.Auto)
+        }).isEqualTo("text-emphasis-position: auto")
+
+        assertThat(modifierToText {
+            Modifier.textEmphasisPosition(TextEmphasisPosition.Over, TextEmphasisPosition.Left)
+        }).isEqualTo("text-emphasis-position: over left")
+
+        assertThat(modifierToText {
+            Modifier.textEmphasisPosition(TextEmphasisPosition.Right, TextEmphasisPosition.Under)
+        }).isEqualTo("text-emphasis-position: right under")
+    }
+
+    @Test
+    fun verifyTextIndent() {
+        assertThat(modifierToText {
+            Modifier.textIndent(25.px)
+        }).isEqualTo("text-indent: 25px")
+        assertThat(modifierToText {
+            Modifier.textIndent(25.em)
+        }).isEqualTo("text-indent: 25em")
+        assertThat(modifierToText {
+            Modifier.textIndent(15.percent)
+        }).isEqualTo("text-indent: 15%")
+    }
+
+    @Test
+    fun verifyTextUnderlineOffset() {
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(TextUnderlineOffset.Auto)
+        }).isEqualTo("text-underline-offset: auto")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(TextUnderlineOffset.of(0.1.em))
+        }).isEqualTo("text-underline-offset: 0.1em")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(TextUnderlineOffset.of(20.percent))
+        }).isEqualTo("text-underline-offset: 20%")
+    }
+
+    @Test
+    fun verifyTextUnderlinePosition() {
+        assertThat(modifierToText {
+            Modifier.textUnderlinePosition(TextUnderlinePosition.Auto)
+        }).isEqualTo("text-underline-position: auto")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlinePosition(TextUnderlinePosition.Under, TextUnderlinePosition.Left)
+        }).isEqualTo("text-underline-position: under left")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlinePosition(TextUnderlinePosition.Right, TextUnderlinePosition.FromFont)
+        }).isEqualTo("text-underline-position: right from-font")
     }
 
     @Test
