@@ -299,8 +299,8 @@ fun StyleScope.textUnderlineOffset(textUnderlineOffset: TextUnderlineOffset) {
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-underline-position
 //Updated one: https://www.w3.org/TR/css-text-decor-4/#text-underline-position-property
 sealed interface TextUnderlinePosition : StylePropertyValue {
-    sealed interface Horizontal : TextEmphasisPosition
-    sealed interface Vertical : TextEmphasisPosition
+    sealed interface Horizontal : TextUnderlinePosition
+    sealed interface Vertical : TextUnderlinePosition
     companion object : CssGlobalValues<TextUnderlinePosition> {
         val Auto get() = "auto".unsafeCast<TextUnderlinePosition>()
         val FromFont get() = "from-font".unsafeCast<Vertical>()
@@ -308,7 +308,7 @@ sealed interface TextUnderlinePosition : StylePropertyValue {
         val Left get() = "left".unsafeCast<Horizontal>()
         val Right get() = "right".unsafeCast<Horizontal>()
 
-        fun of(firstPosition: TextEmphasisPosition, secondPosition: TextEmphasisPosition) =
+        fun of(firstPosition: TextUnderlinePosition, secondPosition: TextUnderlinePosition) =
             "$firstPosition $secondPosition".unsafeCast<TextUnderlinePosition>()
     }
 }
