@@ -543,18 +543,18 @@ private fun Application.configureDevRouting(
                 val swallowExceptionHandler = CoroutineExceptionHandler { _, _ -> }
                 withContext(Dispatchers.IO + swallowExceptionHandler) {
                     var lastVersion: Int? = null
-                    var lastStatus: String? = null
+                    var lastStatusText: String? = null
                     while (true) {
                         if (lastVersion != globals.version) {
                             lastVersion = globals.version
                             send(event = "version", data = lastVersion.toString())
                         }
 
-                        if (lastStatus != globals.status) {
-                            lastStatus = globals.status
+                        if (lastStatusText != globals.status.text) {
+                            lastStatusText = globals.status.text
                             val statusData = mapOf(
-                                "text" to globals.status.orEmpty(),
-                                "isError" to globals.isStatusError.toString(),
+                                "text" to globals.status.text.orEmpty(),
+                                "isError" to globals.status.isError.toString(),
                             )
                             send(event = "status", data = Json.encodeToString(statusData))
                         }
