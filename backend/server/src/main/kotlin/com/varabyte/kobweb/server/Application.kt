@@ -115,15 +115,17 @@ suspend fun main() {
         },
     )
 
+    val appProperties = AppProperties.fromManifest()
+
     val globals = ServerGlobals()
     val siteLayout = SiteLayout.get()
     val events = EventDispatcher()
     val engine = embeddedServer(Netty, port) {
         log.info("Initializing server engine for Kobweb project \"${conf.site.title}\"")
 
-        configureRouting(env, siteLayout, conf, globals, events)
+        configureRouting(appProperties, env, siteLayout, conf, globals, events)
         configureSerialization()
-        configureHTTP(env, conf)
+        configureHTTP(appProperties, env, conf)
 
         val loader = ServiceLoader.load(KobwebServerPlugin::class.java, pluginClassloader)
         loader.forEach { kobwebServerPlugin -> kobwebServerPlugin.configure(this) }
@@ -141,7 +143,7 @@ suspend fun main() {
     val serverState = ServerState(
         env,
         port,
-        ProcessHandle.current().pid()
+        ProcessHandle.current().pid(),
     )
     stateFile.content = serverState
 

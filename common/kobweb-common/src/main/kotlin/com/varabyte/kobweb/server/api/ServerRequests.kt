@@ -5,6 +5,7 @@ import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.io.KobwebWritableTextFile
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.jetbrains.annotations.ApiStatus
 
 // Keep all children classes even if they can be objects; we may update them later
 @Suppress("CanSealedSubClassBeObject")
@@ -33,6 +34,7 @@ sealed class ServerRequest {
      */
     @Serializable
     @SerialName("PauseClientEvents")
+    @ApiStatus.AvailableSince("0.23.0")
     class PauseClientEvents : ServerRequest()
 
     /**
@@ -45,6 +47,7 @@ sealed class ServerRequest {
      */
     @Serializable
     @SerialName("ResumeClientEvents")
+    @ApiStatus.AvailableSince("0.23.0")
     class ResumeClientEvents : ServerRequest()
 
     /**

@@ -16,6 +16,7 @@ import com.varabyte.kobweb.common.text.prefixIfNot
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.conf.Server.Redirect
 import com.varabyte.kobweb.project.conf.Site
+import com.varabyte.kobweb.server.AppProperties
 import com.varabyte.kobweb.server.ServerGlobals
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.SiteLayout
@@ -77,6 +78,7 @@ private fun Throwable.stackTraceToString(includeUntil: (StackTraceElement) -> Bo
 }
 
 fun Application.configureRouting(
+    appProperties: AppProperties,
     env: ServerEnvironment,
     siteLayout: SiteLayout,
     conf: KobwebConf,
@@ -94,7 +96,7 @@ fun Application.configureRouting(
     when {
         siteLayout.isFullstack -> {
             when (env) {
-                ServerEnvironment.DEV -> configureFullstackDevRouting(conf, globals, events, logger)
+                ServerEnvironment.DEV -> configureFullstackDevRouting(appProperties, conf, globals, events, logger)
                 ServerEnvironment.PROD -> configureFullstackProdRouting(conf, events, logger)
             }
         }
@@ -102,7 +104,7 @@ fun Application.configureRouting(
         else -> {
             check(siteLayout.isStatic)
             when (env) {
-                ServerEnvironment.DEV -> configureStaticDevRouting(conf, globals, logger)
+                ServerEnvironment.DEV -> configureStaticDevRouting(appProperties, conf, globals, logger)
                 ServerEnvironment.PROD -> configureStaticProdRouting(conf)
             }
         }
@@ -523,6 +525,7 @@ private fun Path?.createApiJar(
 }
 
 private fun Application.configureDevRouting(
+    appProperties: AppProperties,
     apiJar: ApiJarFile?,
     conf: KobwebConf,
     globals: ServerGlobals,
@@ -568,6 +571,10 @@ private fun Application.configureDevRouting(
         }
         val basePath = conf.site.basePathNormalized
 
+        get("/api/kobweb-version") {
+            call.respondText(appProperties.kobwebVersion)
+        }
+
         if (apiJar != null) {
             configureApiRouting(ServerEnvironment.DEV, apiJar, basePath, logger)
             setupStreaming(ServerEnvironment.DEV, this@configureDevRouting, conf, apiJar, logger)
@@ -583,6 +590,7 @@ private fun Application.configureDevRouting(
 }
 
 private fun Application.configureFullstackDevRouting(
+    appProperties: AppProperties,
     conf: KobwebConf,
     globals: ServerGlobals,
     events: EventDispatcher,
@@ -596,7 +604,7 @@ private fun Application.configureFullstackDevRouting(
             events,
             conf.server.nativeLibraries.associate { it.name to it.path })
 
-    configureDevRouting(apiJar, conf, globals, logger)
+    configureDevRouting(appProperties, apiJar, conf, globals, logger)
 }
 
 private fun Application.configureFullstackProdRouting(
@@ -676,11 +684,12 @@ private fun Application.configureFullstackProdRouting(
 // mode may seem to work fine but might not actually work when exported. However, we still do this as it lets users
 // iterate on a static layout project while failing fast if they accidentally try using API routes or API streams.
 private fun Application.configureStaticDevRouting(
+    appProperties: AppProperties,
     conf: KobwebConf,
     globals: ServerGlobals,
     logger: Logger
 ) {
-    configureDevRouting(null, conf, globals, logger)
+    configureDevRouting(appProperties, null, conf, globals, logger)
 }
 
 
