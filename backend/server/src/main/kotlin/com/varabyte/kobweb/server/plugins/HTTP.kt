@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.server.plugins
 
 import com.varabyte.kobweb.project.conf.KobwebConf
+import com.varabyte.kobweb.server.AppProperties
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -10,10 +11,9 @@ import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.forwardedheaders.*
-import kotlin.math.log
 import kotlin.time.Duration.Companion.days
 
-fun Application.configureHTTP(env: ServerEnvironment, conf: KobwebConf) {
+fun Application.configureHTTP(appProperties: AppProperties, env: ServerEnvironment, conf: KobwebConf) {
     val logger = log
 
     install(DefaultHeaders) {
@@ -26,16 +26,7 @@ fun Application.configureHTTP(env: ServerEnvironment, conf: KobwebConf) {
         // See also: build.gradle.kts where it sets the version
         // See also: the implementation for io.ktor.server.plugins.defaultheaders.DefaultHeaders that we're essentially
         //   overriding here.
-        Application::class.java.classLoader.getResource("META-INF/MANIFEST.MF")?.let { manifest ->
-            manifest.openStream().use { inputString ->
-                val properties = java.util.Properties()
-                properties.load(inputString)
-                val version: String? = properties.getProperty("Ktor-Version")
-                if (version != null) {
-                    header(HttpHeaders.Server, "Ktor/$version")
-                }
-            }
-        }
+        header(HttpHeaders.Server, "Ktor/${appProperties.ktorVersion}")
     }
 
     install(ForwardedHeaders)

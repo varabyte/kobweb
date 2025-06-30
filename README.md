@@ -1,9 +1,9 @@
-[![version: 0.22.0](https://img.shields.io/badge/kobweb-0.22.0-blue)](COMPATIBILITY.md)
+[![version: 0.23.0](https://img.shields.io/badge/kobweb-0.23.0-blue)](COMPATIBILITY.md)
 [![version: 0.9.18](https://img.shields.io/badge/kobweb_cli-0.9.18-blue)](https://github.com/varabyte/kobweb-cli)
 <br>
-[![kotlin: 2.1.21](https://img.shields.io/badge/kotlin-2.1.21-blue?logo=kotlin)](COMPATIBILITY.md)
+[![kotlin: 2.2.0](https://img.shields.io/badge/kotlin-2.2.0-blue?logo=kotlin)](COMPATIBILITY.md)
 [![compose: 1.8.0](https://img.shields.io/badge/compose-1.8.0-blue?logo=jetpackcompose)](COMPATIBILITY.md)
-[![ktor: 3.1.0](https://img.shields.io/badge/ktor-3.1.0-blue)](https://ktor.io/)
+[![ktor: 3.2.0](https://img.shields.io/badge/ktor-3.2.0-blue)](https://ktor.io/)
 <br>
 <a href="https://kobweb.varabyte.com/docs">
 ![User Guide docs](https://img.shields.io/badge/User_Guide-royalblue?logo=readthedocs)
@@ -391,7 +391,7 @@ to try using a snapshot build (a dev build, essentially).
 
 Snapshots are, by design, not supported in either Maven Central nor the Gradle Plugin Portal. Therefore, we host all
 plugin and library artifacts in a separate official snapshot repository (at
-`https://s01.oss.sonatype.org/content/repositories/snapshots/`). As a result, you will have to declare this repository
+`https://central.sonatype.com/repository/maven-snapshots/`). As a result, you will have to declare this repository
 for both plugin *and* library blocks.
 
 An easy way to enable this is by adding the following block of code into your `settings.gradle.kts` file:

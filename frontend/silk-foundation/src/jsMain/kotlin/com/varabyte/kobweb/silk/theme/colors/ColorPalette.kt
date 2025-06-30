@@ -298,32 +298,3 @@ object ColorPalettes {
         override val _900 = Color.rgb(0x263238)
     }
 }
-
-@Deprecated("Use `ColorPalette` instead. We are moving away from `ColorScheme` because that represents a different concept in CSS. See also: https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme", ReplaceWith("ColorPalette"))
-typealias ColorScheme = ColorPalette
-
-@Suppress("DEPRECATION")
-@Deprecated("Use `ColorPalettes` instead. We are moving away from `ColorSchemes` because a color scheme represents a different concept in CSS. See also: https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme", ReplaceWith("ColorPalettes"))
-object ColorSchemes {
-    /** A color scheme which ranges from near white (_50) to near black (_900). */
-    val Monochrome = ColorPalettes.Monochrome as ColorScheme
-    val Red = ColorPalettes.Red as ColorScheme
-    val Pink = ColorPalettes.Pink as ColorScheme
-    val Purple = ColorPalettes.Purple as ColorScheme
-    val DeepPurple = ColorPalettes.DeepPurple as ColorScheme
-    val Indigo = ColorPalettes.Indigo as ColorScheme
-    val Blue = ColorPalettes.Blue as ColorScheme
-    val LightBlue = ColorPalettes.LightBlue as ColorScheme
-    val Cyan = ColorPalettes.Cyan as ColorScheme
-    val Teal = ColorPalettes.Teal as ColorScheme
-    val Green = ColorPalettes.Green as ColorScheme
-    val LightGreen = ColorPalettes.LightGreen as ColorScheme
-    val Lime = ColorPalettes.Lime as ColorScheme
-    val Yellow = ColorPalettes.Yellow as ColorScheme
-    val Amber = ColorPalettes.Amber as ColorScheme
-    val Orange = ColorPalettes.Orange as ColorScheme
-    val DeepOrange = ColorPalettes.DeepOrange as ColorScheme
-    val Brown = ColorPalettes.Brown as ColorScheme
-    val Gray = ColorPalettes.Gray as ColorScheme
-    val BlueGray = ColorPalettes.BlueGray as ColorScheme
-}
