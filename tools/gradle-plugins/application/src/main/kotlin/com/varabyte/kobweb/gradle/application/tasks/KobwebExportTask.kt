@@ -9,6 +9,7 @@ import com.varabyte.kobweb.common.navigation.BasePath
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
+import com.varabyte.kobweb.project.backend.AppBackendData
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.frontend.AppFrontendData
 import com.varabyte.kobweb.server.api.ServerStateFile
@@ -41,7 +42,7 @@ class KobwebExportConfInputs(
 ) {
     constructor(kobwebConf: KobwebConf) : this(
         siteRoot = kobwebConf.server.files.prod.siteRoot,
-        basePath = kobwebConf.site.basePathOrRoutePrefix,
+        basePath = kobwebConf.site.basePath,
         script = kobwebConf.server.files.prod.script,
         api = kobwebConf.server.files.dev.api,
     )
@@ -53,7 +54,12 @@ abstract class KobwebExportTask @Inject constructor(
     @get:Input val siteLayout: SiteLayout,
 ) : KobwebTask("Export the Kobweb project into a static site") {
     @get:InputFile
-    abstract val appDataFile: RegularFileProperty
+    abstract val appFrontendDataFile: RegularFileProperty
+
+    // NOTE: Will be null if no JVM target is declared
+    @get:Optional
+    @get:InputFile
+    abstract val appBackendDataFile: RegularFileProperty
 
     @get:Input
     abstract val publicPath: Property<String>
@@ -171,7 +177,7 @@ abstract class KobwebExportTask @Inject constructor(
         // Sever should be running since "kobwebStart" is a prerequisite for this task
         val port = ServerStateFile(kobwebApplication.kobwebFolder).content!!.port
 
-        val frontendData = Json.decodeFromString<AppFrontendData>(appDataFile.get().asFile.readText()).frontendData
+        val frontendData = Json.decodeFromString<AppFrontendData>(appFrontendDataFile.get().asFile.readText()).frontendData
             .also { data ->
                 data.pages.toList().let { entries ->
                     if (entries.isEmpty()) {
@@ -181,6 +187,20 @@ abstract class KobwebExportTask @Inject constructor(
                     }
                 }
             }
+
+        if (!exportBlock.suppressLayoutWarning.get()) {
+            val appBackendData =
+                appBackendDataFile.orNull?.asFile?.let { Json.decodeFromString<AppBackendData>(it.readText()) }
+            val isBackendDataPresent = appBackendData?.isEmpty()?.not() ?: false
+
+            val warningCommon = "Please read https://kobweb.varabyte.com/docs/concepts/foundation/exporting#static-layout-vs-full-stack-sites for more information about this choice. You can also add `kobweb.app.export.suppressLayoutWarning.set(true)` to your build script to make this warning go away."
+
+            if (siteLayout.isFullstack && !isBackendDataPresent) {
+                logger.warn("w: You are exporting using a fullstack layout, but we detected your site doesn't have a backend. We recommend using `kobweb export --layout static` instead. $warningCommon")
+            } else if (siteLayout.isStatic && isBackendDataPresent) {
+                logger.warn("w: You are exporting using a static layout, but we detected your site has a backend. We recommend using `kobweb export --layout fullstack` instead. $warningCommon")
+            }
+        }
 
         val (pagesRoot, resourcesRoot, systemRoot) = when {
             siteLayout.isFullstack -> Triple("pages", "resources", "system").map { getSiteDir().resolve(it) }

@@ -10,6 +10,7 @@ import com.varabyte.kobweb.gradle.application.extensions.server
 import com.varabyte.kobweb.gradle.application.ksp.kspBackendFile
 import com.varabyte.kobweb.gradle.application.ksp.kspFrontendFile
 import com.varabyte.kobweb.gradle.application.tasks.KobwebBrowserCacheIdTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebCacheAppBackendDataTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCacheAppFrontendDataTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopySupplementalResourcesTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyTask
@@ -95,14 +96,6 @@ class KobwebApplicationPlugin @Inject constructor(
                 throw GradleException("Missing conf.yaml file from Kobweb folder. Did you delete it?")
             }
             content!!
-        }
-        @Suppress("DEPRECATION")
-        if (kobwebConf.site.routePrefix.isNotEmpty()) {
-            if (kobwebConf.site.basePath.isEmpty()) {
-                project.logger.warn("w: This project is setting `routePrefix` in `.kobweb/conf.yaml`. Please rename `routePrefix` to `basePath`. We are conforming to a standard name used by many other web frameworks.")
-            } else {
-                project.logger.warn("w: This project is setting `routePrefix` in `.kobweb/conf.yaml` in addition to `basePath`. This value is unused in this case and should be removed.")
-            }
         }
 
         val kobwebBlock = project.kobwebBlock
@@ -222,13 +215,18 @@ class KobwebApplicationPlugin @Inject constructor(
 
         val taskListenerService = project.gradle.sharedServices
             .registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {
-                parameters.kobwebStartTaskName = kobwebStartTask.name
-                // Tasks may include a project prefix (e.g. `site:kobwebStart`), so we compare just the base task name
-                parameters.isKobwebStartBuild = project.gradle.startParameter.taskNames
-                    .any { it.substringAfterLast(':') == kobwebStartTask.name }
-                parameters.kobwebFolderFile = kobwebFolder.path.toFile()
+                project.gradle.taskGraph.whenReady {
+                    parameters.kobwebFolderFiles = allTasks
+                        .filter { it is KobwebStartTask }
+                        .associate { it.path to it.project.kobwebFolder.path.toFile() }
+                }
             }
-        buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
+        // Tasks may include a project prefix (e.g. `site:kobwebStart`), so we compare just the base task name
+        val isKobwebStartBuild = project.gradle.startParameter.taskNames
+            .any { it.substringAfterLast(':') == kobwebStartTask.name }
+        if (isKobwebStartBuild) {
+            buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
+        }
 
         project.tasks.withType<KotlinWebpack>().configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
@@ -274,7 +272,7 @@ class KobwebApplicationPlugin @Inject constructor(
             val kobwebGenSiteEntryTask = project.tasks.register<KobwebGenerateSiteEntryTask>(
                 "kobwebGenSiteEntry",
                 appBlock,
-                kobwebConf.site.basePathOrRoutePrefix,
+                kobwebConf.site.basePath,
                 buildTarget,
                 KobwebGenSiteEntryConfInputs(kobwebConf),
             )
@@ -342,7 +340,7 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             kobwebExportTask.configure {
-                appDataFile.set(kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile })
+                appFrontendDataFile.set(kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile })
                 publicPath.set(kobwebBlock.publicPath)
                 publicResources.from(kobwebBlock.publicPath.map { publicPath ->
                     project.getResourceSources(jsTarget).map { srcDirSet ->
@@ -377,12 +375,21 @@ class KobwebApplicationPlugin @Inject constructor(
                 }
             }
 
+            val kobwebCacheAppBackendDataTask = project.tasks.register<KobwebCacheAppBackendDataTask>("kobwebCacheAppBackendData") {
+                appBackendMetadataFile.set(project.kspBackendFile(jvmTarget))
+                compileClasspath.from(project.configurations.named(jvmTarget.compileClasspath))
+                appDataFile.set(this.kobwebCacheFile("appData.json"))
+            }
+
             val kobwebGenApisFactoryTask = project.tasks
                 .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock.app)
 
             kobwebGenApisFactoryTask.configure {
-                kspGenFile.set(project.kspBackendFile(jvmTarget))
-                compileClasspath.from(project.configurations.named(jvmTarget.compileClasspath))
+                appDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
+            }
+
+            kobwebExportTask.configure {
+                appBackendDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
             }
 
             project.kspExcludedSources.from(kobwebGenApisFactoryTask)

@@ -9,7 +9,6 @@ import com.varabyte.kobweb.common.data.DataSize.Companion.mebibytes
 import com.varabyte.kobweb.common.time.DurationSerializer
 import com.varabyte.kobweb.common.yaml.nonStrictDefault
 import com.varabyte.kobweb.project.KobwebFolder
-import com.varabyte.kobweb.project.conf.Server.Logging.Level
 import com.varabyte.kobweb.project.io.KobwebReadableTextFile
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -26,14 +25,8 @@ import kotlin.time.Duration.Companion.seconds
 @Serializable
 class Site(
     val title: String,
-    @Deprecated("`routePrefix` changed to `basePath` as that name is more consistent with what other web frameworks use.")
-    val routePrefix: String = "",
     val basePath: String = "",
-) {
-    /** Temporary fallback until we can remove routePrefix */
-    @Suppress("DEPRECATION")
-    val basePathOrRoutePrefix get() = basePath.takeIf { it.isNotEmpty() } ?: routePrefix
-}
+)
 
 @Serializable
 class Server(

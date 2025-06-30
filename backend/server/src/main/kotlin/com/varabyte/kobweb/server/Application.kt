@@ -115,15 +115,17 @@ suspend fun main() {
         },
     )
 
+    val appProperties = AppProperties.fromManifest()
+
     val globals = ServerGlobals()
     val siteLayout = SiteLayout.get()
     val events = EventDispatcher()
     val engine = embeddedServer(Netty, port) {
         log.info("Initializing server engine for Kobweb project \"${conf.site.title}\"")
 
-        configureRouting(env, siteLayout, conf, globals, events)
+        configureRouting(appProperties, env, siteLayout, conf, globals, events)
         configureSerialization()
-        configureHTTP(env, conf)
+        configureHTTP(appProperties, env, conf)
 
         val loader = ServiceLoader.load(KobwebServerPlugin::class.java, pluginClassloader)
         loader.forEach { kobwebServerPlugin -> kobwebServerPlugin.configure(this) }
@@ -141,30 +143,49 @@ suspend fun main() {
     val serverState = ServerState(
         env,
         port,
-        ProcessHandle.current().pid()
+        ProcessHandle.current().pid(),
     )
     stateFile.content = serverState
 
     var shouldStop = false
+    var pausedCopy: ServerGlobals? = null
+    fun targetGlobals() = pausedCopy ?: globals
+    fun ServerGlobals.StatusMessage.isTimedOut() = System.currentTimeMillis() > timeout
     while (!shouldStop) {
         requestsFile.removeRequests().forEach { request ->
             when (request) {
                 is ServerRequest.Stop -> shouldStop = true
-                is ServerRequest.IncrementVersion -> globals.version++
+                is ServerRequest.PauseClientEvents -> {
+                    if (pausedCopy == null) {
+                        pausedCopy = ServerGlobals(globals)
+                        globals.status.clear() // If we happen to be showing a message when paused, cancel it!
+                    }
+                }
+                is ServerRequest.ResumeClientEvents -> {
+                    if (pausedCopy != null) {
+                        globals.set(pausedCopy)
+                        if (globals.status.isTimedOut()) globals.status.clear()
+                        pausedCopy = null
+                    }
+                }
+                is ServerRequest.IncrementVersion -> {
+                    targetGlobals().version++
+                }
                 is ServerRequest.SetStatus -> {
-                    globals.status = request.message
-                    globals.isStatusError = request.isError
-                    globals.timeout = request.timeoutMs?.let { System.currentTimeMillis() + it } ?: Long.MAX_VALUE
+                    targetGlobals().status.apply {
+                        text = request.message
+                        isError = request.isError
+                        timeout = request.timeoutMs?.let { System.currentTimeMillis() + it } ?: Long.MAX_VALUE
+                    }
                 }
 
                 is ServerRequest.ClearStatus -> {
-                    globals.status = null
-                    globals.isStatusError = false
-                    globals.timeout = Long.MAX_VALUE
+                    targetGlobals().status.clear()
                 }
             }
         }
-        if (globals.status != null && System.currentTimeMillis() > globals.timeout) {
+
+        if (globals.status.text != null && globals.status.isTimedOut()) {
             requestsFile.enqueueRequest(ServerRequest.ClearStatus())
         }
 
