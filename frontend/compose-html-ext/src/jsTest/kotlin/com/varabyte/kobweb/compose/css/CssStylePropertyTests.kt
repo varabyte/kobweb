@@ -74,19 +74,21 @@ class CssStylePropertyTests {
         }).isEqualTo("animation: 1s ease-in infinite both animate-forever")
 
         assertThat(styleToText {
-            animation(Animation.list(
-                Animation.of(
-                    "slide-in",
-                    duration = 3.s,
-                    timingFunction = AnimationTimingFunction.Linear,
-                ),
-                Animation.of(
-                    "slide-out",
-                    duration = 3.s,
-                    timingFunction = AnimationTimingFunction.EaseOut,
-                    delay = 5.s
+            animation(
+                Animation.list(
+                    Animation.of(
+                        "slide-in",
+                        duration = 3.s,
+                        timingFunction = AnimationTimingFunction.Linear,
+                    ),
+                    Animation.of(
+                        "slide-out",
+                        duration = 3.s,
+                        timingFunction = AnimationTimingFunction.EaseOut,
+                        delay = 5.s
+                    )
                 )
-            ))
+            )
         }).isEqualTo("animation: 3s linear slide-in, 3s ease-out 5s slide-out")
 
         assertThat(styleToText { animation(Animation.None) }).isEqualTo("animation: none")
@@ -252,7 +254,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { backgroundAttachment(BackgroundAttachment.RevertLayer) }).isEqualTo("background-attachment: revert-layer")
         assertThat(styleToText { backgroundAttachment(BackgroundAttachment.Unset) }).isEqualTo("background-attachment: unset")
     }
-    
+
     @Test
     fun verifyBackgroundBlendMode() {
         assertThat(styleToText { backgroundBlendMode(BackgroundBlendMode.Normal) }).isEqualTo("background-blend-mode: normal")
@@ -409,11 +411,13 @@ class CssStylePropertyTests {
         }).isEqualTo("background: left 0% top 0% / 100px")
 
         assertThat(styleToText {
-            background(Background.list(
-                Color.magenta,
-                Background.of(BackgroundImage.of(CSSUrl("test1.png"))),
-                Background.of(BackgroundImage.of(CSSUrl("test2.png")))
-            ))
+            background(
+                Background.list(
+                    Color.magenta,
+                    Background.of(BackgroundImage.of(CSSUrl("test1.png"))),
+                    Background.of(BackgroundImage.of(CSSUrl("test2.png")))
+                )
+            )
         }).isEqualTo("background: url(\"test2.png\"), url(\"test1.png\") magenta")
 
         assertThat(styleToText { background(Background.None) }).isEqualTo("background: none")
@@ -426,6 +430,93 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyBorderBlockColor() {
+        assertThat(styleToText { borderBlockColor(BorderBlockColor.Inherit) }).isEqualTo("border-block-color: inherit")
+        assertThat(styleToText { borderBlockColor(BorderBlockColor.Initial) }).isEqualTo("border-block-color: initial")
+        assertThat(styleToText { borderBlockColor(BorderBlockColor.Revert) }).isEqualTo("border-block-color: revert")
+        assertThat(styleToText { borderBlockColor(BorderBlockColor.RevertLayer) }).isEqualTo("border-block-color: revert-layer")
+        assertThat(styleToText { borderBlockColor(BorderBlockColor.Unset) }).isEqualTo("border-block-color: unset")
+    }
+
+    @Test
+    fun verifyBorderBlockEndColor() {
+        assertThat(styleToText { borderBlockEndColor(BorderBlockEndColor.Inherit) }).isEqualTo("border-block-end-color: inherit")
+        assertThat(styleToText { borderBlockEndColor(BorderBlockEndColor.Initial) }).isEqualTo("border-block-end-color: initial")
+        assertThat(styleToText { borderBlockEndColor(BorderBlockEndColor.Revert) }).isEqualTo("border-block-end-color: revert")
+        assertThat(styleToText { borderBlockEndColor(BorderBlockEndColor.RevertLayer) }).isEqualTo("border-block-end-color: revert-layer")
+        assertThat(styleToText { borderBlockEndColor(BorderBlockEndColor.Unset) }).isEqualTo("border-block-end-color: unset")
+    }
+
+    @Test
+    fun verifyBorderBlockEndStyle() {
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.None) }).isEqualTo("border-block-end-style: none")
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.Hidden) }).isEqualTo("border-block-end-style: hidden")
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.Dotted) }).isEqualTo("border-block-end-style: dotted")
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.Dashed) }).isEqualTo("border-block-end-style: dashed")
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.Solid) }).isEqualTo("border-block-end-style: solid")
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.Double) }).isEqualTo("border-block-end-style: double")
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.Groove) }).isEqualTo("border-block-end-style: groove")
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.Ridge) }).isEqualTo("border-block-end-style: ridge")
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.Inset) }).isEqualTo("border-block-end-style: inset")
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.Outset) }).isEqualTo("border-block-end-style: outset")
+
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.Inherit) }).isEqualTo("border-block-end-style: inherit")
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.Initial) }).isEqualTo("border-block-end-style: initial")
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.Revert) }).isEqualTo("border-block-end-style: revert")
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.RevertLayer) }).isEqualTo("border-block-end-style: revert-layer")
+        assertThat(styleToText { borderBlockEndStyle(BorderBlockEndStyle.Unset) }).isEqualTo("border-block-end-style: unset")
+    }
+
+    @Test
+    fun verifyBorderBlockStartColor() {
+        assertThat(styleToText { borderBlockStartColor(BorderBlockStartColor.Inherit) }).isEqualTo("border-block-start-color: inherit")
+        assertThat(styleToText { borderBlockStartColor(BorderBlockStartColor.Initial) }).isEqualTo("border-block-start-color: initial")
+        assertThat(styleToText { borderBlockStartColor(BorderBlockStartColor.Revert) }).isEqualTo("border-block-start-color: revert")
+        assertThat(styleToText { borderBlockStartColor(BorderBlockStartColor.RevertLayer) }).isEqualTo("border-block-start-color: revert-layer")
+        assertThat(styleToText { borderBlockStartColor(BorderBlockStartColor.Unset) }).isEqualTo("border-block-start-color: unset")
+    }
+
+    @Test
+    fun verifyBorderBlockStartStyle() {
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.None) }).isEqualTo("border-block-start-style: none")
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.Hidden) }).isEqualTo("border-block-start-style: hidden")
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.Dotted) }).isEqualTo("border-block-start-style: dotted")
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.Dashed) }).isEqualTo("border-block-start-style: dashed")
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.Solid) }).isEqualTo("border-block-start-style: solid")
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.Double) }).isEqualTo("border-block-start-style: double")
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.Groove) }).isEqualTo("border-block-start-style: groove")
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.Ridge) }).isEqualTo("border-block-start-style: ridge")
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.Inset) }).isEqualTo("border-block-start-style: inset")
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.Outset) }).isEqualTo("border-block-start-style: outset")
+
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.Inherit) }).isEqualTo("border-block-start-style: inherit")
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.Initial) }).isEqualTo("border-block-start-style: initial")
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.Revert) }).isEqualTo("border-block-start-style: revert")
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.RevertLayer) }).isEqualTo("border-block-start-style: revert-layer")
+        assertThat(styleToText { borderBlockStartStyle(BorderBlockStartStyle.Unset) }).isEqualTo("border-block-start-style: unset")
+    }
+
+    @Test
+    fun verifyBorderBlockStyle() {
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.None) }).isEqualTo("border-block-style: none")
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.Hidden) }).isEqualTo("border-block-style: hidden")
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.Dotted) }).isEqualTo("border-block-style: dotted")
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.Dashed) }).isEqualTo("border-block-style: dashed")
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.Solid) }).isEqualTo("border-block-style: solid")
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.Double) }).isEqualTo("border-block-style: double")
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.Groove) }).isEqualTo("border-block-style: groove")
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.Ridge) }).isEqualTo("border-block-style: ridge")
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.Inset) }).isEqualTo("border-block-style: inset")
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.Outset) }).isEqualTo("border-block-style: outset")
+
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.Inherit) }).isEqualTo("border-block-style: inherit")
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.Initial) }).isEqualTo("border-block-style: initial")
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.Revert) }).isEqualTo("border-block-style: revert")
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.RevertLayer) }).isEqualTo("border-block-style: revert-layer")
+        assertThat(styleToText { borderBlockStyle(BorderBlockStyle.Unset) }).isEqualTo("border-block-style: unset")
+    }
+
+    @Test
     fun verifyBorderCollapse() {
         assertThat(styleToText { borderCollapse(BorderCollapse.Separate) }).isEqualTo("border-collapse: separate")
         assertThat(styleToText { borderCollapse(BorderCollapse.Collapse) }).isEqualTo("border-collapse: collapse")
@@ -435,6 +526,93 @@ class CssStylePropertyTests {
         assertThat(styleToText { borderCollapse(BorderCollapse.Revert) }).isEqualTo("border-collapse: revert")
         assertThat(styleToText { borderCollapse(BorderCollapse.RevertLayer) }).isEqualTo("border-collapse: revert-layer")
         assertThat(styleToText { borderCollapse(BorderCollapse.Unset) }).isEqualTo("border-collapse: unset")
+    }
+
+    @Test
+    fun verifyBorderInlineColor() {
+        assertThat(styleToText { borderInlineColor(BorderInlineColor.Inherit) }).isEqualTo("border-inline-color: inherit")
+        assertThat(styleToText { borderInlineColor(BorderInlineColor.Initial) }).isEqualTo("border-inline-color: initial")
+        assertThat(styleToText { borderInlineColor(BorderInlineColor.Revert) }).isEqualTo("border-inline-color: revert")
+        assertThat(styleToText { borderInlineColor(BorderInlineColor.RevertLayer) }).isEqualTo("border-inline-color: revert-layer")
+        assertThat(styleToText { borderInlineColor(BorderInlineColor.Unset) }).isEqualTo("border-inline-color: unset")
+    }
+
+    @Test
+    fun verifyBorderInlineStyle() {
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.None) }).isEqualTo("border-inline-style: none")
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.Hidden) }).isEqualTo("border-inline-style: hidden")
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.Dotted) }).isEqualTo("border-inline-style: dotted")
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.Dashed) }).isEqualTo("border-inline-style: dashed")
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.Solid) }).isEqualTo("border-inline-style: solid")
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.Double) }).isEqualTo("border-inline-style: double")
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.Groove) }).isEqualTo("border-inline-style: groove")
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.Ridge) }).isEqualTo("border-inline-style: ridge")
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.Inset) }).isEqualTo("border-inline-style: inset")
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.Outset) }).isEqualTo("border-inline-style: outset")
+
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.Inherit) }).isEqualTo("border-inline-style: inherit")
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.Initial) }).isEqualTo("border-inline-style: initial")
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.Revert) }).isEqualTo("border-inline-style: revert")
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.RevertLayer) }).isEqualTo("border-inline-style: revert-layer")
+        assertThat(styleToText { borderInlineStyle(BorderInlineStyle.Unset) }).isEqualTo("border-inline-style: unset")
+    }
+
+    @Test
+    fun verifyBorderInlineEndColor() {
+        assertThat(styleToText { borderInlineEndColor(BorderInlineEndColor.Inherit) }).isEqualTo("border-inline-end-color: inherit")
+        assertThat(styleToText { borderInlineEndColor(BorderInlineEndColor.Initial) }).isEqualTo("border-inline-end-color: initial")
+        assertThat(styleToText { borderInlineEndColor(BorderInlineEndColor.Revert) }).isEqualTo("border-inline-end-color: revert")
+        assertThat(styleToText { borderInlineEndColor(BorderInlineEndColor.RevertLayer) }).isEqualTo("border-inline-end-color: revert-layer")
+        assertThat(styleToText { borderInlineEndColor(BorderInlineEndColor.Unset) }).isEqualTo("border-inline-end-color: unset")
+    }
+
+    @Test
+    fun verifyBorderInlineEndStyle() {
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.None) }).isEqualTo("border-inline-end-style: none")
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.Hidden) }).isEqualTo("border-inline-end-style: hidden")
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.Dotted) }).isEqualTo("border-inline-end-style: dotted")
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.Dashed) }).isEqualTo("border-inline-end-style: dashed")
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.Solid) }).isEqualTo("border-inline-end-style: solid")
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.Double) }).isEqualTo("border-inline-end-style: double")
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.Groove) }).isEqualTo("border-inline-end-style: groove")
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.Ridge) }).isEqualTo("border-inline-end-style: ridge")
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.Inset) }).isEqualTo("border-inline-end-style: inset")
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.Outset) }).isEqualTo("border-inline-end-style: outset")
+
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.Inherit) }).isEqualTo("border-inline-end-style: inherit")
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.Initial) }).isEqualTo("border-inline-end-style: initial")
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.Revert) }).isEqualTo("border-inline-end-style: revert")
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.RevertLayer) }).isEqualTo("border-inline-end-style: revert-layer")
+        assertThat(styleToText { borderInlineEndStyle(BorderInlineEndStyle.Unset) }).isEqualTo("border-inline-end-style: unset")
+    }
+
+    @Test
+    fun verifyBorderInlineStartColor() {
+        assertThat(styleToText { borderInlineStartColor(BorderInlineStartColor.Inherit) }).isEqualTo("border-inline-start-color: inherit")
+        assertThat(styleToText { borderInlineStartColor(BorderInlineStartColor.Initial) }).isEqualTo("border-inline-start-color: initial")
+        assertThat(styleToText { borderInlineStartColor(BorderInlineStartColor.Revert) }).isEqualTo("border-inline-start-color: revert")
+        assertThat(styleToText { borderInlineStartColor(BorderInlineStartColor.RevertLayer) }).isEqualTo("border-inline-start-color: revert-layer")
+        assertThat(styleToText { borderInlineStartColor(BorderInlineStartColor.Unset) }).isEqualTo("border-inline-start-color: unset")
+    }
+
+    @Test
+    fun verifyBorderInlineStartStyle() {
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.None) }).isEqualTo("border-inline-start-style: none")
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.Hidden) }).isEqualTo("border-inline-start-style: hidden")
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.Dotted) }).isEqualTo("border-inline-start-style: dotted")
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.Dashed) }).isEqualTo("border-inline-start-style: dashed")
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.Solid) }).isEqualTo("border-inline-start-style: solid")
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.Double) }).isEqualTo("border-inline-start-style: double")
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.Groove) }).isEqualTo("border-inline-start-style: groove")
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.Ridge) }).isEqualTo("border-inline-start-style: ridge")
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.Inset) }).isEqualTo("border-inline-start-style: inset")
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.Outset) }).isEqualTo("border-inline-start-style: outset")
+
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.Inherit) }).isEqualTo("border-inline-start-style: inherit")
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.Initial) }).isEqualTo("border-inline-start-style: initial")
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.Revert) }).isEqualTo("border-inline-start-style: revert")
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.RevertLayer) }).isEqualTo("border-inline-start-style: revert-layer")
+        assertThat(styleToText { borderInlineStartStyle(BorderInlineStartStyle.Unset) }).isEqualTo("border-inline-start-style: unset")
     }
 
     @Test
@@ -504,9 +682,11 @@ class CssStylePropertyTests {
 
     @Test
     fun verifyBorderImageSource() {
-        assertThat(styleToText { borderImageSource(
-            BorderImageSource.of(CSSUrl("test.png"))
-        ) }).isEqualTo("border-image-source: url(\"test.png\")")
+        assertThat(styleToText {
+            borderImageSource(
+                BorderImageSource.of(CSSUrl("test.png"))
+            )
+        }).isEqualTo("border-image-source: url(\"test.png\")")
 
         assertThat(styleToText { borderImageSource(BorderImageSource.None) }).isEqualTo("border-image-source: none")
 
@@ -599,10 +779,12 @@ class CssStylePropertyTests {
         }).isEqualTo("box-shadow: inset 2px 3px 4px 5px red")
 
         assertThat(styleToText {
-            boxShadow(BoxShadow.list(
-                BoxShadow.of(2.px, 3.px),
-                BoxShadow.of(4.px, 5.px, blurRadius = 6.px)
-            ))
+            boxShadow(
+                BoxShadow.list(
+                    BoxShadow.of(2.px, 3.px),
+                    BoxShadow.of(4.px, 5.px, blurRadius = 6.px)
+                )
+            )
         }).isEqualTo("box-shadow: 2px 3px, 4px 5px 6px")
 
         assertThat(styleToText { boxShadow(BoxShadow.None) }).isEqualTo("box-shadow: none")
@@ -713,7 +895,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { captionSide(CaptionSide.RevertLayer) }).isEqualTo("caption-side: revert-layer")
         assertThat(styleToText { captionSide(CaptionSide.Unset) }).isEqualTo("caption-side: unset")
     }
-    
+
     @Test
     fun verifyCaretColor() {
         assertThat(styleToText { caretColor(CaretColor.Auto) }).isEqualTo("caret-color: auto")
@@ -742,7 +924,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { clear(Clear.RevertLayer) }).isEqualTo("clear: revert-layer")
         assertThat(styleToText { clear(Clear.Unset) }).isEqualTo("clear: unset")
     }
-    
+
     @Test
     fun verifyColorScheme() {
         assertThat(styleToText { colorScheme(ColorScheme.Normal) }).isEqualTo("color-scheme: normal")
@@ -810,7 +992,14 @@ class CssStylePropertyTests {
     @Test
     fun verifyContain() {
         assertThat(styleToText { contain(Contain.list(Contain.Size, Contain.Paint)) }).isEqualTo("contain: size paint")
-        assertThat(styleToText { contain(Contain.list(Contain.InlineSize, Contain.Layout)) }).isEqualTo("contain: inline-size layout")
+        assertThat(styleToText {
+            contain(
+                Contain.list(
+                    Contain.InlineSize,
+                    Contain.Layout
+                )
+            )
+        }).isEqualTo("contain: inline-size layout")
         assertThat(styleToText { contain(Contain.None) }).isEqualTo("contain: none")
         assertThat(styleToText { contain(Contain.Strict) }).isEqualTo("contain: strict")
         assertThat(styleToText { contain(Contain.Content) }).isEqualTo("contain: content")
@@ -832,7 +1021,14 @@ class CssStylePropertyTests {
         assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(1000.px)) }).isEqualTo("contain-intrinsic-block-size: 1000px")
         assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(10.cssRem)) }).isEqualTo("contain-intrinsic-block-size: 10rem")
 
-        assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(300.px, auto = true)) }).isEqualTo("contain-intrinsic-block-size: auto 300px")
+        assertThat(styleToText {
+            containIntrinsicBlockSize(
+                ContainIntrinsicBlockSize.of(
+                    300.px,
+                    auto = true
+                )
+            )
+        }).isEqualTo("contain-intrinsic-block-size: auto 300px")
         assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.Auto(200.px)) }).isEqualTo("contain-intrinsic-block-size: auto 200px")
 
         assertThat(styleToText { containIntrinsicBlockSize(ContainIntrinsicBlockSize.None) }).isEqualTo("contain-intrinsic-block-size: none")
@@ -849,7 +1045,14 @@ class CssStylePropertyTests {
         assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(1000.px)) }).isEqualTo("contain-intrinsic-inline-size: 1000px")
         assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(10.cssRem)) }).isEqualTo("contain-intrinsic-inline-size: 10rem")
 
-        assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(300.px, true)) }).isEqualTo("contain-intrinsic-inline-size: auto 300px")
+        assertThat(styleToText {
+            containIntrinsicInlineSize(
+                ContainIntrinsicInlineSize.of(
+                    300.px,
+                    true
+                )
+            )
+        }).isEqualTo("contain-intrinsic-inline-size: auto 300px")
         assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.Auto(200.px)) }).isEqualTo("contain-intrinsic-inline-size: auto 200px")
 
         assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.None) }).isEqualTo("contain-intrinsic-inline-size: none")
@@ -865,8 +1068,24 @@ class CssStylePropertyTests {
         // Combinable types
         assertThat(styleToText { content(Content.of("Some text")) }).isEqualTo("content: \"Some text\"")
         assertThat(styleToText { content(Content.of(CSSUrl("test.png"))) }).isEqualTo("content: url(\"test.png\")")
-        assertThat(styleToText { content(Content.of(linearGradient(Color.red, Color.green))) }).isEqualTo("content: linear-gradient(red, green)")
-        assertThat(styleToText { content(Content.of(CSSUrl("test.png"), "alt-text")) }).isEqualTo("content: url(\"test.png\") / \"alt-text\"")
+        assertThat(styleToText {
+            content(
+                Content.of(
+                    linearGradient(
+                        Color.red,
+                        Color.green
+                    )
+                )
+            )
+        }).isEqualTo("content: linear-gradient(red, green)")
+        assertThat(styleToText {
+            content(
+                Content.of(
+                    CSSUrl("test.png"),
+                    "alt-text"
+                )
+            )
+        }).isEqualTo("content: url(\"test.png\") / \"alt-text\"")
 
         assertThat(styleToText {
             content(Content.list(Content.of("Some text"), Content.of(CSSUrl("test.png"))))
@@ -895,7 +1114,14 @@ class CssStylePropertyTests {
 
         // Convenience conversion methods
         assertThat(styleToText { content(CSSUrl("test.png").toContent()) }).isEqualTo("content: url(\"test.png\")")
-        assertThat(styleToText { content(linearGradient(Color.red, Color.blue).toContent()) }).isEqualTo("content: linear-gradient(red, blue)")
+        assertThat(styleToText {
+            content(
+                linearGradient(
+                    Color.red,
+                    Color.blue
+                ).toContent()
+            )
+        }).isEqualTo("content: linear-gradient(red, blue)")
     }
 
     @Test
@@ -1017,7 +1243,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { float(CSSFloat.RevertLayer) }).isEqualTo("float: revert-layer")
         assertThat(styleToText { float(CSSFloat.Unset) }).isEqualTo("float: unset")
     }
-    
+
     @Test
     fun verifyFontOpticalSizing() {
         assertThat(styleToText { fontOpticalSizing(FontOpticalSizing.Auto) }).isEqualTo("font-optical-sizing: auto")
@@ -1261,29 +1487,31 @@ class CssStylePropertyTests {
 
     @Test
     fun verifyFontVariationSettings() {
-         assertThat(styleToText { fontVariationSettings(FontVariationSettings.Normal) })
-             .isEqualTo("font-variation-settings: normal")
+        assertThat(styleToText { fontVariationSettings(FontVariationSettings.Normal) })
+            .isEqualTo("font-variation-settings: normal")
 
-         assertThat(styleToText { fontVariationSettings(FontVariationSettings.Axis("wght", 400)) })
-             .isEqualTo("font-variation-settings: \"wght\" 400")
+        assertThat(styleToText { fontVariationSettings(FontVariationSettings.Axis("wght", 400)) })
+            .isEqualTo("font-variation-settings: \"wght\" 400")
 
-         assertThat(styleToText { fontVariationSettings(
-             FontVariationSettings.Axes(
-                 FontVariationSettings.Axis("wght", 400),
-                 FontVariationSettings.Axis("slnt", 0)
-             )
-         ) }).isEqualTo("font-variation-settings: \"wght\" 400, \"slnt\" 0")
+        assertThat(styleToText {
+            fontVariationSettings(
+                FontVariationSettings.Axes(
+                    FontVariationSettings.Axis("wght", 400),
+                    FontVariationSettings.Axis("slnt", 0)
+                )
+            )
+        }).isEqualTo("font-variation-settings: \"wght\" 400, \"slnt\" 0")
 
-         assertThat(styleToText { fontVariationSettings(FontVariationSettings.Inherit) })
-             .isEqualTo("font-variation-settings: inherit")
-         assertThat(styleToText { fontVariationSettings(FontVariationSettings.Initial) })
-             .isEqualTo("font-variation-settings: initial")
-         assertThat(styleToText { fontVariationSettings(FontVariationSettings.Revert) })
-             .isEqualTo("font-variation-settings: revert")
-         assertThat(styleToText { fontVariationSettings(FontVariationSettings.RevertLayer) })
-             .isEqualTo("font-variation-settings: revert-layer")
-         assertThat(styleToText { fontVariationSettings(FontVariationSettings.Unset) })
-             .isEqualTo("font-variation-settings: unset")
+        assertThat(styleToText { fontVariationSettings(FontVariationSettings.Inherit) })
+            .isEqualTo("font-variation-settings: inherit")
+        assertThat(styleToText { fontVariationSettings(FontVariationSettings.Initial) })
+            .isEqualTo("font-variation-settings: initial")
+        assertThat(styleToText { fontVariationSettings(FontVariationSettings.Revert) })
+            .isEqualTo("font-variation-settings: revert")
+        assertThat(styleToText { fontVariationSettings(FontVariationSettings.RevertLayer) })
+            .isEqualTo("font-variation-settings: revert-layer")
+        assertThat(styleToText { fontVariationSettings(FontVariationSettings.Unset) })
+            .isEqualTo("font-variation-settings: unset")
     }
 
     @Test
@@ -1339,29 +1567,31 @@ class CssStylePropertyTests {
 
     @Test
     fun verifyGrid() {
-        assertThat(styleToText { grid {
-            // empty
-        } }).isEqualTo("display: grid")
+        assertThat(styleToText {
+            grid {
+                // empty
+            }
+        }).isEqualTo("display: grid")
 
         assertThat(styleToText {
             grid {
-               columns { size(40.px); size(1.fr); repeat(3) { size(200.px) } }
-               rows { repeat(2) { size(1.fr) } }
-               auto { columns { size(50.px) } }
+                columns { size(40.px); size(1.fr); repeat(3) { size(200.px) } }
+                rows { repeat(2) { size(1.fr) } }
+                auto { columns { size(50.px) } }
             }
         }).isEqualTo("display: grid; grid-template-columns: 40px 1fr repeat(3, 200px); grid-template-rows: repeat(2, 1fr); grid-auto-columns: 50px")
 
         assertThat(styleToText {
             grid {
-               columns { lineNames("a", "b"); repeat(3) { size(1.fr) }; lineNames("y", "z") }
-               auto { rows { minmax(100.px, auto) } }
+                columns { lineNames("a", "b"); repeat(3) { size(1.fr) }; lineNames("y", "z") }
+                auto { rows { minmax(100.px, auto) } }
             }
         }).isEqualTo("display: grid; grid-template-columns: [a b] repeat(3, 1fr) [y z]; grid-auto-rows: minmax(100px, auto)")
 
         assertThat(styleToText {
             grid {
-               columns { repeat(autoFit) { size(10.percent) } }
-               rows { repeat(autoFill) { size(50.px) } }
+                columns { repeat(autoFit) { size(10.percent) } }
+                rows { repeat(autoFill) { size(50.px) } }
             }
         }).isEqualTo("display: grid; grid-template-columns: repeat(auto-fit, 10%); grid-template-rows: repeat(auto-fill, 50px)")
 
@@ -1572,6 +1802,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { lineBreak(LineBreak.RevertLayer) }).isEqualTo("line-break: revert-layer")
         assertThat(styleToText { lineBreak(LineBreak.Unset) }).isEqualTo("line-break: unset")
     }
+
     @Test
     fun verifyLineHeight() {
         assertThat(styleToText { lineHeight(LineHeight.Normal) }).isEqualTo("line-height: normal")
@@ -1666,7 +1897,13 @@ class CssStylePropertyTests {
             listStyle(ListStyle.of(ListStyleType.Circle, ListStylePosition.Outside))
         }).isEqualTo("list-style: circle outside")
         assertThat(styleToText {
-            listStyle(ListStyle.of(ListStyleType.Square, ListStylePosition.Inside, ListStyleImage.of(CSSUrl("test.png"))))
+            listStyle(
+                ListStyle.of(
+                    ListStyleType.Square,
+                    ListStylePosition.Inside,
+                    ListStyleImage.of(CSSUrl("test.png"))
+                )
+            )
         }).isEqualTo("list-style: square inside url(\"test.png\")")
 
         assertThat(styleToText { listStyle(ListStyle.None) }).isEqualTo("list-style: none")
@@ -1796,7 +2033,7 @@ class CssStylePropertyTests {
     }
 
     @Test
-    fun verifyOrphans(){
+    fun verifyOrphans() {
         assertThat(styleToText { orphans(Orphans.of(2)) }).isEqualTo("orphans: 2")
         //Global
         assertThat(styleToText { orphans(Orphans.Inherit) }).isEqualTo("orphans: inherit")
@@ -1850,7 +2087,14 @@ class CssStylePropertyTests {
         assertThat(styleToText { overflow(Overflow.Clip) }).isEqualTo("overflow: clip")
         assertThat(styleToText { overflow(Overflow.Scroll) }).isEqualTo("overflow: scroll")
         assertThat(styleToText { overflow(Overflow.Auto) }).isEqualTo("overflow: auto")
-        assertThat(styleToText { overflow(Overflow.of(Overflow.Visible, Overflow.Hidden)) }).isEqualTo("overflow: visible hidden")
+        assertThat(styleToText {
+            overflow(
+                Overflow.of(
+                    Overflow.Visible,
+                    Overflow.Hidden
+                )
+            )
+        }).isEqualTo("overflow: visible hidden")
 
         assertThat(styleToText { overflow(Overflow.Inherit) }).isEqualTo("overflow: inherit")
         assertThat(styleToText { overflow(Overflow.Initial) }).isEqualTo("overflow: initial")
@@ -1956,7 +2200,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { pointerEvents(PointerEvents.RevertLayer) }).isEqualTo("pointer-events: revert-layer")
         assertThat(styleToText { pointerEvents(PointerEvents.Unset) }).isEqualTo("pointer-events: unset")
     }
-    
+
     @Test
     fun verifyResize() {
         assertThat(styleToText { resize(Resize.None) }).isEqualTo("resize: none")
@@ -2146,10 +2390,12 @@ class CssStylePropertyTests {
         }).isEqualTo("text-shadow: 2px 3px 4px red")
 
         assertThat(styleToText {
-            textShadow(TextShadow.list(
-                TextShadow.of(2.px, 3.px, 4.px, Color.red),
-                TextShadow.of(4.px, 5.px, 6.px, Color.blue)
-            ))
+            textShadow(
+                TextShadow.list(
+                    TextShadow.of(2.px, 3.px, 4.px, Color.red),
+                    TextShadow.of(4.px, 5.px, 6.px, Color.blue)
+                )
+            )
         }).isEqualTo("text-shadow: 2px 3px 4px red, 4px 5px 6px blue")
 
         assertThat(styleToText { textShadow(TextShadow.Inherit) }).isEqualTo("text-shadow: inherit")
@@ -2172,7 +2418,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { textTransform(TextTransform.RevertLayer) }).isEqualTo("text-transform: revert-layer")
         assertThat(styleToText { textTransform(TextTransform.Unset) }).isEqualTo("text-transform: unset")
     }
-    
+
     @Test
     fun verifyTop() {
         assertThat(styleToText { top(Top.of(10.px)) }).isEqualTo("top: 10px")
@@ -2491,7 +2737,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { willChange(WillChange.ScrollPosition) }).isEqualTo("will-change: scroll-position")
         assertThat(styleToText { willChange(WillChange.Contents) }).isEqualTo("will-change: contents")
 
-        assertThat(styleToText { willChange(WillChange.of("left","top")) }).isEqualTo("will-change: left, top")
+        assertThat(styleToText { willChange(WillChange.of("left", "top")) }).isEqualTo("will-change: left, top")
 
         assertThat(styleToText { willChange(WillChange.Inherit) }).isEqualTo("will-change: inherit")
         assertThat(styleToText { willChange(WillChange.Initial) }).isEqualTo("will-change: initial")
