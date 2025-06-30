@@ -25,6 +25,7 @@ import com.varabyte.kobweb.ksp.frontend.FrontendProcessor
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.resolveQualifiedName
 import com.varabyte.kobweb.ksp.symbol.suppresses
+import com.varabyte.kobweb.ksp.util.getArgumentValue
 import com.varabyte.kobweb.project.backend.ApiEntry
 import com.varabyte.kobweb.project.backend.ApiStreamEntry
 import com.varabyte.kobweb.project.backend.BackendData
@@ -203,7 +204,7 @@ private fun processApiFun(
     val apiAnnotation = annotatedFun.getAnnotationsByName(API_FQN).first()
     val currPackage = annotatedFun.packageName.asString()
     val file = annotatedFun.containingFile ?: error("Symbol does not come from a source file")
-    val routeOverride = apiAnnotation.arguments.first().value?.toString()?.takeIf { it.isNotBlank() }
+    val routeOverride = apiAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }
 
     return if (routeOverride?.startsWith("/") == true || currPackage.startsWith(qualifiedApiPackage)) {
         val resolvedRoute = processRoute(

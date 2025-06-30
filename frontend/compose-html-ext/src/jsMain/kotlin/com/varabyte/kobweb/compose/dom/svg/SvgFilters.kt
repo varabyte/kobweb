@@ -62,7 +62,7 @@ interface SvgFilterInput1Attrs<T : SVGElement> : AttrsScope<T> {
      * Kotlin since `in` is an official keyword.
      *
      * @param resultName The name of the result of a previous filter.
-     * @see [FilterPrimitiveAttrs.result]
+     * @see [SvgFilterPrimitiveAttrs.result]
      */
     fun in1(resultName: String) {
         `in`(resultName)
@@ -70,7 +70,7 @@ interface SvgFilterInput1Attrs<T : SVGElement> : AttrsScope<T> {
 
     /**
      * @param resultName The name of the result of a previous filter.
-     * @see [FilterPrimitiveAttrs.result]
+     * @see [SvgFilterPrimitiveAttrs.result]
      */
     fun `in`(resultName: String) {
         attr("in", resultName)
@@ -86,7 +86,7 @@ interface SvgFilterInput2Attrs<T : SVGElement> : SvgFilterInput1Attrs<T> {
     /**
      * Input is passed the result of a previous filter.
      *
-     * @see [FilterPrimitiveAttrs.result]
+     * @see [SvgFilterPrimitiveAttrs.result]
      */
     fun in2(resultName: String) {
         attr("in2", resultName)

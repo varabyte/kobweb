@@ -3,6 +3,7 @@ package com.varabyte.kobweb.ksp.common
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFile
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
+import com.varabyte.kobweb.ksp.util.getArgumentValue
 import com.varabyte.kobweb.project.common.PackageUtils
 
 // pair corresponds to (current package, override)
@@ -33,7 +34,7 @@ fun getDefaultLayout(
     logger: KSPLogger,
 ): Pair<String, String>? {
     return file.getAnnotationsByName(layoutAnnotationFqn).singleOrNull()?.let { layoutAnnotation ->
-        val layoutTarget = layoutAnnotation.arguments.first().value?.toString().orEmpty().takeIf { it.isNotEmpty() }
+        val layoutTarget = layoutAnnotation.getArgumentValue()?.takeIf { it.isNotEmpty() }
         val currPackage = file.packageName.asString()
         if (layoutTarget == null) {
             logger.warn(

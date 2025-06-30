@@ -1,9 +1,11 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
+import com.varabyte.kobweb.ksp.KOBWEB_METADATA_BACKEND
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
-import com.varabyte.kobweb.project.frontend.AppFrontendData
-import com.varabyte.kobweb.project.frontend.FrontendData
+import com.varabyte.kobweb.project.backend.AppBackendData
+import com.varabyte.kobweb.project.backend.BackendData
+import com.varabyte.kobweb.project.backend.merge
 import com.varabyte.kobweb.project.frontend.merge
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -18,7 +20,7 @@ import org.gradle.api.tasks.TaskAction
 
 // NOTE: This task in meant as an internal API so it does not inherit from KobwebTask
 /**
- * Collect all frontend app data from the current site and all library dependencies, writing the result to
+ * Collect all backend app data from the current site and all library dependencies, writing the result to
  * [appDataFile].
  *
  * This is done so that multiple tasks can read the same values from a single, cached file. Those tasks should take
@@ -26,8 +28,8 @@ import org.gradle.api.tasks.TaskAction
  *
  * ```
  * // Configuring the task
- * myFrontendAppDataUsingTask.configure {
- *   appDataFile.set(kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile })
+ * myBackendAppDataUsingTask.configure {
+ *   appDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
  * }
  *
  * // Inside the task
@@ -36,19 +38,19 @@ import org.gradle.api.tasks.TaskAction
  *
  * @TaskAction
  * fun execute() {
- *   val appData = Json.decodeFromString<AppFrontendData>(appDataFile.get().asFile.readText())
+ *   val appData = Json.decodeFromString<AppBackendData>(appDataFile.get().asFile.readText())
  *   // ...
  * }
  * ```
  */
-abstract class KobwebCacheAppFrontendDataTask : DefaultTask() {
+abstract class KobwebCacheAppBackendDataTask : DefaultTask() {
     init {
         description =
-            "Search the project and merge all app frontend data, saving it into a file, at which point it can be looked up by downstream tasks that need it."
+            "Search the project and merge all backend app data, saving it into a file, at which point it can be looked up by downstream tasks that need it."
     }
 
     @get:InputFile
-    abstract val appFrontendMetadataFile: RegularFileProperty
+    abstract val appBackendMetadataFile: RegularFileProperty
 
     @get:InputFiles
     abstract val compileClasspath: ConfigurableFileCollection
@@ -58,17 +60,17 @@ abstract class KobwebCacheAppFrontendDataTask : DefaultTask() {
 
     @TaskAction
     fun execute() {
-        val appFrontendData = Json.decodeFromString<AppFrontendData>(appFrontendMetadataFile.get().asFile.readText())
-        val mergedFrontendData = buildList {
-            add(appFrontendData.frontendData)
+        val appBackendData = Json.decodeFromString<AppBackendData>(appBackendMetadataFile.get().asFile.readText())
+        val mergedBackendData = buildList {
+            add(appBackendData.backendData)
             compileClasspath.forEach { file ->
-                file.searchZipFor(KOBWEB_METADATA_FRONTEND) { bytes ->
-                    add(Json.decodeFromString<FrontendData>(bytes.decodeToString()))
+                file.searchZipFor(KOBWEB_METADATA_BACKEND) { bytes ->
+                    add(Json.decodeFromString<BackendData>(bytes.decodeToString()))
                 }
             }
         }
             .merge(throwError = { throw GradleException(it) })
 
-        appDataFile.get().asFile.writeText(Json.encodeToString(AppFrontendData(appFrontendData.appEntry, mergedFrontendData)))
+        appDataFile.get().asFile.writeText(Json.encodeToString(AppBackendData(appBackendData.apiInterceptorMethod, mergedBackendData)))
     }
 }

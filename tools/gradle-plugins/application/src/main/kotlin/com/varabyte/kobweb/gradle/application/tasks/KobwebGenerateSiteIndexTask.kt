@@ -49,7 +49,7 @@ class KobwebGenIndexConfInputs(
 ) {
     constructor(kobwebConf: KobwebConf) : this(
         title = kobwebConf.site.title,
-        basePath = kobwebConf.site.basePathOrRoutePrefix,
+        basePath = kobwebConf.site.basePath,
         script = kobwebConf.server.files.dev.script
     )
 }

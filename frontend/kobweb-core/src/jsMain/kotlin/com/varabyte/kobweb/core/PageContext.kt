@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.core
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.browser.uri.decodeURIComponent
 import com.varabyte.kobweb.core.data.Data
 import com.varabyte.kobweb.navigation.Route
 import com.varabyte.kobweb.navigation.Router
@@ -8,6 +9,8 @@ import kotlinx.browser.window
 
 class RouteInfo internal constructor(
     private val route: Route,
+    dynamicParams: Map<String, String>
+) {
     /**
      * Params extracted either from the URL's dynamic route
      *
@@ -21,12 +24,15 @@ class RouteInfo internal constructor(
      *
      * will generate a mapping of "user" to 123 and "post" to 11.
      *
+     * If any captured part of the original URL was encoded, e.g. "/users/john%20doe", it will be decoded when queried
+     * here.
+     *
      * Note that you are generally encouraged to use [params] instead. However, this property is provided for cases
      * where perhaps you want to explicitly exclude query params from the list of results. For example, checking if
      * this value is not empty is a quick way to determine if the current route is, indeed, a dynamic one.
      */
-    val dynamicParams: Map<String, String>
-) {
+    val dynamicParams = dynamicParams.mapValues { (_, value) -> decodeURIComponent(value) }
+
     /**
      * The origin of the current page.
      *

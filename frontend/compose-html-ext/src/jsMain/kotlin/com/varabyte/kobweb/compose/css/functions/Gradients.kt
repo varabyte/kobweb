@@ -166,20 +166,6 @@ fun linearGradient(
     add(to)
 }
 
-@Deprecated(
-    "The arguments have been reordered to accept the colors first, as this order is more suited to adding additional optional arguments across the different method variants in a consistent way.",
-    ReplaceWith("linearGradient(from, to, dir)")
-)
-fun linearGradient(dir: LinearGradient.Direction, from: CSSColorValue, to: CSSColorValue) =
-    linearGradient(from, to, dir)
-
-@Deprecated(
-    "The arguments have been reordered to accept the colors first, as this order is more suited to adding additional optional arguments across the different method variants in a consistent way.",
-    ReplaceWith("linearGradient(from, to, angle)")
-)
-fun linearGradient(angle: CSSAngleNumericValue, from: CSSColorValue, to: CSSColorValue) =
-    linearGradient(from, to, angle)
-
 fun repeatingLinearGradient(
     dir: LinearGradient.Direction,
     interpolation: ColorInterpolationMethod? = null,
@@ -320,13 +306,6 @@ fun radialGradient(
     add(to)
 }
 
-@Deprecated(
-    "The arguments have been reordered to accept the colors first, as this order is more suited to adding additional optional arguments across the different method variants in a consistent way.",
-    ReplaceWith("radialGradient(from, to, shape, position)")
-)
-fun radialGradient(shape: RadialGradient.Shape, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) =
-    radialGradient(from, to, shape, position)
-
 fun repeatingRadialGradient(
     shape: RadialGradient.Shape?,
     position: CSSPosition? = null,
@@ -414,13 +393,6 @@ fun conicGradient(
     add(from)
     add(to)
 }
-
-@Deprecated(
-    "The arguments have been reordered to accept the colors first, as this order is more suited to adding additional optional arguments across the different method variants in a consistent way.",
-    ReplaceWith("conicGradient(from, to, angle, position)")
-)
-fun conicGradient(angle: CSSAngleNumericValue, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) =
-    conicGradient(from, to, angle, position)
 
 fun repeatingConicGradient(
     angle: CSSAngleNumericValue?,

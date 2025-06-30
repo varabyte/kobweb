@@ -7,6 +7,7 @@ import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.DynamicRouteSegment
 import com.varabyte.kobweb.ksp.common.processRoute
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
+import com.varabyte.kobweb.ksp.util.getArgumentValue
 import com.varabyte.kobweb.ksp.util.receiverClass
 import com.varabyte.kobweb.project.frontend.PageEntry
 
@@ -31,7 +32,7 @@ fun processPagesFun(
     }
 
     val currPackage = annotatedFun.packageName.asString()
-    val routeOverride = pageAnnotation.arguments.first().value?.toString()?.takeIf { it.isNotBlank() }
+    val routeOverride = pageAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }
 
     if (routeOverride?.startsWith("/") == true || currPackage.startsWith(qualifiedPagesPackage)) {
         // To maintain the general association between the file name and the slug, we reject route overrides which use

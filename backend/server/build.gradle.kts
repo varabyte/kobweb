@@ -31,6 +31,7 @@ application {
 
 tasks.withType<ShadowJar>().configureEach {
     manifest {
+        attributes["Kobweb-Version"] = version
         // Custom ktor version attribute to work around ktor's own way of getting the version that breaks when we
         // build our fat jar. See also HTTP.kt where we read this attribute.
         attributes["Ktor-Version"] = libs.versions.ktor.get()

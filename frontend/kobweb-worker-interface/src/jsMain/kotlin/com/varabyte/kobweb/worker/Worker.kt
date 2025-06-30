@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.worker
 
-class WorkerContext(val transferables: Transferables)
+class WorkerContext(val attachments: Attachments)
 
 /**
  * Interface for a Kobweb worker.
@@ -24,7 +24,7 @@ interface Worker<I, O> {
     /**
      * Send a message to the worker.
      */
-    fun postInput(input: I, transferables: Transferables = Transferables.Empty)
+    fun postInput(input: I, attachments: Attachments = Attachments.Empty)
 
     /**
      * Immediately terminate the worker, interrupting any processing it might still be doing.

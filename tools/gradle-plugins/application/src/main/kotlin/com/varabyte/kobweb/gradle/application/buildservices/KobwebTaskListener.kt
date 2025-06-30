@@ -12,19 +12,38 @@ import org.gradle.tooling.events.OperationCompletionListener
 import java.io.File
 
 /**
- * A build service which listens to task states and communicates information to a running Kobweb server about them
+ * A class to hold information about a Kobweb project that is being built.
+ *
+ * @param startTask The fully qualified name of the task that starts the Kobweb server (e.g. `:site:kobwebStart`).
+ * @param kobwebFolder The [KobwebFolder] instance representing the project's `.kobweb` folder.
+ */
+private class KobwebSiteProject(
+    val startTask: String,
+    val kobwebFolder: KobwebFolder,
+) {
+    val serverRequestsFile = ServerRequestsFile(kobwebFolder)
+}
+
+/**
+ * A build service which listens to task states and communicates information to running Kobweb servers about them.
  */
 abstract class KobwebTaskListener : BuildService<KobwebTaskListener.Parameters>, OperationCompletionListener {
     interface Parameters : BuildServiceParameters {
-        var isKobwebStartBuild: Boolean
-        var kobwebStartTaskName: String
-
-        // take a `File` instead of a `Path` as parameters must be serializable
-        var kobwebFolderFile: File
+        // Use a Map instead of KobwebSiteProject as parameters must be serializable
+        /**
+         * A map of fully qualified paths of `kobwebStart` tasks with their corresponding Kobweb folder.
+         *
+         * This should contain exactly the start tasks that will run in the current build.
+         */
+        var kobwebFolderFiles: Map<String, File>
     }
 
-    val kobwebFolder = KobwebFolder(parameters.kobwebFolderFile.toPath())
-    var isBuilding = false
+    // The build service is shared across all projects in the build. Thus, if the user's project has multiple
+    // Kobweb sites, potentially running at the same time, it must track each such site so that live reloading
+    // can work for all of them
+    private val kobwebProjects = parameters.kobwebFolderFiles
+        .map { KobwebSiteProject(it.key, KobwebFolder(it.value.toPath())) }
+    private var isBuilding = false
 
     // NOTE: When a project uses an `includeBuild` for a plugin that needs to be built only after the kobweb application
     // plugin is applied, the tasks for building that plugin will be caught by this TaskListener, and thus the code
@@ -39,36 +58,38 @@ abstract class KobwebTaskListener : BuildService<KobwebTaskListener.Parameters>,
     //     id("<includeBuild plugin>") apply false
     // }
     // Warning: The above approach may cause unnecessary builds depending on project setup, use at your own discretion.
-    var isServerRunning = ServerStateFile(kobwebFolder).content?.isRunning() ?: false
+    private val runningServerPaths = mutableSetOf<String>().apply {
+        kobwebProjects.forEach { project ->
+            if (ServerStateFile(project.kobwebFolder).content?.isRunning() == true)
+                add(project.startTask)
+        }
+    }
 
     override fun onFinish(event: FinishEvent) {
-        if (!parameters.isKobwebStartBuild) return
-
-        val taskName = event.descriptor.name.substringAfterLast(":")
         val taskFailed = event.result is FailureResult
-
-        if (isServerRunning) {
-            val serverRequestsFile = ServerRequestsFile(kobwebFolder)
-            if (taskFailed) {
-                serverRequestsFile.enqueueRequest(
-                    ServerRequest.SetStatus(
-                        "Failed.",
-                        isError = true,
-                        timeoutMs = 500
-                    )
-                )
-            } else {
-                if (taskName == parameters.kobwebStartTaskName) {
-                    serverRequestsFile.enqueueRequest(ServerRequest.ClearStatus())
-                    serverRequestsFile.enqueueRequest(ServerRequest.IncrementVersion())
-                } else if (!isBuilding) {
-                    serverRequestsFile.enqueueRequest(ServerRequest.SetStatus("Building..."))
-                    isBuilding = true
+        if (!taskFailed && !isBuilding) {
+            isBuilding = true
+            kobwebProjects.forEach { project ->
+                if (project.startTask in runningServerPaths) {
+                    project.serverRequestsFile.enqueueRequest(ServerRequest.SetStatus("Building..."))
                 }
             }
-        } else {
-            if (!taskFailed && taskName == parameters.kobwebStartTaskName) {
-                isServerRunning = true
+        }
+
+        kobwebProjects.forEach { project ->
+            // update each project's server status individually so that each site is reloaded only when built
+            val isProjectStartTask = event.descriptor.name == project.startTask
+            if (project.startTask in runningServerPaths) {
+                if (taskFailed) {
+                    project.serverRequestsFile.enqueueRequest(
+                        ServerRequest.SetStatus("Failed.", isError = true, timeoutMs = 500)
+                    )
+                } else if (isProjectStartTask) {
+                    project.serverRequestsFile.enqueueRequest(ServerRequest.ClearStatus())
+                    project.serverRequestsFile.enqueueRequest(ServerRequest.IncrementVersion())
+                }
+            } else if (!taskFailed && isProjectStartTask) {
+                runningServerPaths += project.startTask
             }
         }
     }

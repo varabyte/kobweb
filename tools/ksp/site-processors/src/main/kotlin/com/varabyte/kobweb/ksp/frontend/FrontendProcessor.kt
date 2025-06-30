@@ -43,6 +43,8 @@ import com.varabyte.kobweb.ksp.common.getDefaultLayout
 import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.suppresses
+import com.varabyte.kobweb.ksp.util.getAnnotationArgumentValue
+import com.varabyte.kobweb.ksp.util.getArgumentValue
 import com.varabyte.kobweb.ksp.util.receiverClass
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobweb.project.frontend.CssStyleEntry
@@ -208,7 +210,7 @@ class FrontendProcessor(
                     layoutMethods += layoutMethodData
                 }
 
-                annotatedFun.getAnnotationsByName(LAYOUT_FQN).first().arguments.first().value?.toString().orEmpty()
+                annotatedFun.getAnnotationArgumentValue(LAYOUT_FQN).orEmpty()
                     .let { layoutFqn ->
                         // Users should NOT put the NO_LAYOUT_FQN in their layout, but we catch it here anyway to avoid
                         // showing them a potentially confusing error from the else branch. However, we should not
@@ -301,7 +303,7 @@ class FrontendProcessor(
                 pages
                     .filter { page -> page.hasLayoutAnnotation() }
                     .map { page -> page to page.getAnnotationsByName(LAYOUT_FQN).first() }
-                    .filter { (_, layout) -> layout.arguments.first().value?.toString().orEmpty().isEmpty() }
+                    .filter { (_, layout) -> layout.getArgumentValue().orEmpty().isEmpty() }
                     .forEach { (page, layout) ->
                         logger.error(
                             "@Page method \"${page.qualifiedName!!.asString()}\" cannot apply a `@Layout` annotation without specifying a target path. Please add a valid layout path to the layout annotation or remove it.",
@@ -390,10 +392,6 @@ class FrontendProcessor(
         // enforced to be declared in the same file.
         private val consumedComponentKinds = mutableMapOf<KSType, KSPropertyDeclaration>()
 
-        fun KSAnnotated.getAnnotationValue(fqn: String): String? {
-            return this.getAnnotationsByName(fqn).firstOrNull()?.let { it.arguments.first().value.toString() }
-        }
-
         /**
          * Get the CSS name for some target property, e.g. "BoldItalicStyle" -> "bold-italic"
          *
@@ -404,7 +402,7 @@ class FrontendProcessor(
             processCssName: (String) -> String = { it },
             processPropertyName: (String) -> String,
         ): String {
-            return this.getAnnotationValue(CSS_NAME_FQN)
+            return this.getAnnotationArgumentValue(CSS_NAME_FQN)
                 ?: this.simpleName.asString().let(processPropertyName).titleCamelCaseToKebabCase().let(processCssName)
         }
 
@@ -414,7 +412,7 @@ class FrontendProcessor(
         // precedence. So, property first, then container, for example.
         private fun List<KSAnnotated>.getCssPrefix(): String? {
             return (
-                this.firstNotNullOfOrNull { it.getAnnotationValue(CSS_PREFIX_FQN) } ?: defaultCssPrefix
+                this.firstNotNullOfOrNull { it.getAnnotationArgumentValue(CSS_PREFIX_FQN) } ?: defaultCssPrefix
                 )?.takeIf { it.isNotEmpty() } // If the CssPrefix annotation is set to "", that should disable the prefix
         }
 
@@ -494,7 +492,7 @@ class FrontendProcessor(
             if (parentSingleton == null) return this.getCssPrefix() to null
 
             val containerName =
-                parentSingleton.getAnnotationValue(CSS_NAME_FQN)
+                parentSingleton.getAnnotationArgumentValue(CSS_NAME_FQN)
                     ?: parentSingleton.simpleName.asString().titleCamelCaseToKebabCase()
 
             return listOf(this, parentSingleton).getCssPrefix() to containerName
@@ -531,7 +529,7 @@ class FrontendProcessor(
                     import = import,
                     fqcn = fqcn,
                     name = propertyCssName.prefixed(prefix, containerName),
-                    layer = property.getAnnotationValue(CSS_LAYER_FQN)
+                    layer = property.getAnnotationArgumentValue(CSS_LAYER_FQN)
                 )
             }
         }
@@ -583,7 +581,7 @@ class FrontendProcessor(
                     import = import,
                     fqcn = fqcn,
                     name = if (isRelativeCssName) propertyCssName else propertyCssName.prefixed(prefix, containerName),
-                    layer = property.getAnnotationValue(CSS_LAYER_FQN)
+                    layer = property.getAnnotationArgumentValue(CSS_LAYER_FQN)
                 )
             }
         }

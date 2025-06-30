@@ -2094,6 +2094,44 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyShapeMargin() {
+        assertThat(styleToText { shapeMargin(ShapeMargin.of(12.px)) }).isEqualTo("shape-margin: 12px")
+        assertThat(styleToText { shapeMargin(ShapeMargin.of(1.percent)) }).isEqualTo("shape-margin: 1%")
+
+        assertThat(styleToText { shapeMargin(ShapeMargin.Inherit) }).isEqualTo("shape-margin: inherit")
+        assertThat(styleToText { shapeMargin(ShapeMargin.Initial) }).isEqualTo("shape-margin: initial")
+        assertThat(styleToText { shapeMargin(ShapeMargin.Revert) }).isEqualTo("shape-margin: revert")
+        assertThat(styleToText { shapeMargin(ShapeMargin.RevertLayer) }).isEqualTo("shape-margin: revert-layer")
+        assertThat(styleToText { shapeMargin(ShapeMargin.Unset) }).isEqualTo("shape-margin: unset")
+    }
+
+    @Test
+    fun verifyShapeRendering() {
+        assertThat(styleToText { shapeRendering(ShapeRendering.Auto) }).isEqualTo("shape-rendering: auto")
+        assertThat(styleToText { shapeRendering(ShapeRendering.CrispEdges) }).isEqualTo("shape-rendering: crispEdges")
+        assertThat(styleToText { shapeRendering(ShapeRendering.OptimizeSpeed) }).isEqualTo("shape-rendering: optimizeSpeed")
+        assertThat(styleToText { shapeRendering(ShapeRendering.GeometricPrecision) }).isEqualTo("shape-rendering: geometricPrecision")
+
+        assertThat(styleToText { shapeRendering(ShapeRendering.Inherit) }).isEqualTo("shape-rendering: inherit")
+        assertThat(styleToText { shapeRendering(ShapeRendering.Initial) }).isEqualTo("shape-rendering: initial")
+        assertThat(styleToText { shapeRendering(ShapeRendering.Revert) }).isEqualTo("shape-rendering: revert")
+        assertThat(styleToText { shapeRendering(ShapeRendering.RevertLayer) }).isEqualTo("shape-rendering: revert-layer")
+        assertThat(styleToText { shapeRendering(ShapeRendering.Unset) }).isEqualTo("shape-rendering: unset")
+    }
+
+    @Test
+    fun verifyTableLayout() {
+        assertThat(styleToText { tableLayout(TableLayout.Auto) }).isEqualTo("table-layout: auto")
+        assertThat(styleToText { tableLayout(TableLayout.Fixed) }).isEqualTo("table-layout: fixed")
+
+        assertThat(styleToText { tableLayout(TableLayout.Inherit) }).isEqualTo("table-layout: inherit")
+        assertThat(styleToText { tableLayout(TableLayout.Initial) }).isEqualTo("table-layout: initial")
+        assertThat(styleToText { tableLayout(TableLayout.Revert) }).isEqualTo("table-layout: revert")
+        assertThat(styleToText { tableLayout(TableLayout.RevertLayer) }).isEqualTo("table-layout: revert-layer")
+        assertThat(styleToText { tableLayout(TableLayout.Unset) }).isEqualTo("table-layout: unset")
+    }
+
+    @Test
     fun verifyTextAlign() {
         assertThat(styleToText { textAlign(TextAlign.Left) }).isEqualTo("text-align: left")
         assertThat(styleToText { textAlign(TextAlign.Right) }).isEqualTo("text-align: right")

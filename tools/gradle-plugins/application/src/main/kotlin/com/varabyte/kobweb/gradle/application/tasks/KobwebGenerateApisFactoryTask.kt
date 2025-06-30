@@ -20,36 +20,16 @@ import javax.inject.Inject
 
 abstract class KobwebGenerateApisFactoryTask @Inject constructor(private val appBlock: AppBlock) :
     KobwebGenerateTask("Generate Kobweb code for the server") {
-    @get:Optional
-    @get:InputFile
-    abstract val kspGenFile: RegularFileProperty
 
-    @get:InputFiles
-    abstract val compileClasspath: ConfigurableFileCollection
+    @get:InputFile
+    abstract val appDataFile: RegularFileProperty
 
     @OutputDirectory // needs to be dir to be registered as a kotlin srcDir
     fun getGenApisFactoryFile() = appBlock.getGenJvmSrcRoot()
 
     @TaskAction
     fun execute() {
-        val unmergedAppBackendData =
-            kspGenFile.orNull?.let { Json.decodeFromString<AppBackendData>(it.asFile.readText()) }
-                ?: AppBackendData()
-
-        val mergedBackendData = buildList {
-            add(unmergedAppBackendData.backendData)
-            compileClasspath.forEach { file ->
-                file.searchZipFor(KOBWEB_METADATA_BACKEND) { bytes ->
-                    add(Json.decodeFromString<BackendData>(bytes.decodeToString()))
-                }
-            }
-        }.merge(throwError = { throw GradleException(it) })
-
-        val appBackendData = AppBackendData(
-            unmergedAppBackendData.apiInterceptorMethod,
-            mergedBackendData
-        )
-
+        val appBackendData = Json.decodeFromString<AppBackendData>(appDataFile.get().asFile.readText())
         val apisFactoryFile = getGenApisFactoryFile().get().asFile.resolve("ApisFactoryImpl.kt")
         apisFactoryFile.writeText(createApisFactoryImpl(appBackendData))
     }

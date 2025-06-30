@@ -536,6 +536,24 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifyShapeMargin() {
+        assertThat(modifierToText {
+            Modifier.shapeMargin(ShapeMargin.Initial)
+        }).isEqualTo("shape-margin: initial")
+        assertThat(modifierToText {
+            Modifier.shapeMargin(25.px)
+        }).isEqualTo("shape-margin: 25px")
+
+        assertThat(modifierToText {
+            Modifier.shapeMargin(15.percent)
+        }).isEqualTo("shape-margin: 15%")
+
+        assertThat(modifierToText {
+            Modifier.shapeMargin(15.em)
+        }).isEqualTo("shape-margin: 15em")
+    }
+
+    @Test
     fun verifyText() {
         assertThat(modifierToText {
             Modifier.rubyPosition(RubyPosition.Under)
