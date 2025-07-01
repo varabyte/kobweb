@@ -4,8 +4,10 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.kobweb.compose.css.functions.url
+import com.varabyte.kobweb.compose.css.textCombineUpright
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
+import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.truthish.assertThat
 import org.jetbrains.compose.web.css.*
@@ -545,6 +547,14 @@ class StyleModifierTests {
     @Test
     fun verifyText() {
         assertThat(modifierToText {
+            Modifier.hyphenateCharacter(HyphenateCharacter.Auto)
+        }).isEqualTo("hyphenate-character: auto")
+
+        assertThat(modifierToText {
+            Modifier.hyphenateCharacter("-")
+        }).isEqualTo("hyphenate-character: \"-\"")
+
+        assertThat(modifierToText {
             Modifier.rubyPosition(RubyPosition.Under)
         }).isEqualTo("ruby-position: under")
 
@@ -553,8 +563,28 @@ class StyleModifierTests {
         }).isEqualTo("text-align: center")
 
         assertThat(modifierToText {
+            Modifier.textAlignLast(TextAlignLast.Justify)
+        }).isEqualTo("text-align-last: justify")
+
+        assertThat(modifierToText {
+            Modifier.textCombineUpright(TextCombineUpright.All)
+        }).isEqualTo("text-combine-upright: all")
+
+        assertThat(modifierToText {
             Modifier.textDecorationLine(TextDecorationLine.Underline)
         }).isEqualTo("text-decoration-line: underline")
+
+        assertThat(modifierToText {
+            Modifier.textDecorationSkipInk(TextDecorationSkipInk.Auto)
+        }).isEqualTo("text-decoration-skip-ink: auto")
+
+        assertThat(modifierToText {
+            Modifier.textEmphasisPosition(TextEmphasisPosition.Auto)
+        }).isEqualTo("text-emphasis-position: auto")
+
+        assertThat(modifierToText {
+            Modifier.textEmphasisPosition(TextEmphasisPosition.Over, TextEmphasisPosition.Side.Right)
+        }).isEqualTo("text-emphasis-position: over right")
 
         assertThat(modifierToText {
             Modifier.textOverflow(TextOverflow.Ellipsis)
@@ -571,6 +601,37 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.textShadow(TextShadow.Initial)
         }).isEqualTo("text-shadow: initial")
+
+        assertThat(modifierToText {
+            Modifier.textIndent(TextIndent.of(25.px))
+        }).isEqualTo("text-indent: 25px")
+        assertThat(modifierToText {
+            Modifier.textIndent(15.percent)
+        }).isEqualTo("text-indent: 15%")
+
+        assertThat(modifierToText {
+            Modifier.textOrientation(TextOrientation.Mixed)
+        }).isEqualTo("text-orientation: mixed")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(TextUnderlineOffset.Auto)
+        }).isEqualTo("text-underline-offset: auto")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(TextUnderlineOffset.of(0.1.em))
+        }).isEqualTo("text-underline-offset: 0.1em")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(20.percent)
+        }).isEqualTo("text-underline-offset: 20%")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlinePosition(TextUnderlinePosition.Auto)
+        }).isEqualTo("text-underline-position: auto")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlinePosition(TextUnderlinePosition.FromFont, TextUnderlinePosition.Right)
+        }).isEqualTo("text-underline-position: from-font right")
 
         assertThat(modifierToText {
             Modifier.textTransform(TextTransform.Capitalize)
