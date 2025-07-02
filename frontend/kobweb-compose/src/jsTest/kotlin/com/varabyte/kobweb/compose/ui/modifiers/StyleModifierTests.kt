@@ -10,6 +10,7 @@ import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.truthish.assertThat
+import org.jetbrains.compose.web.attributes.DirType
 import org.jetbrains.compose.web.css.*
 import kotlin.test.Test
 
@@ -541,6 +542,14 @@ class StyleModifierTests {
         }).isEqualTo("hyphenate-character: \"-\"")
 
         assertThat(modifierToText {
+            Modifier.letterSpacing(25.px)
+        }).isEqualTo("letter-spacing: 25px")
+
+        assertThat(modifierToText {
+            Modifier.lineBreak(LineBreak.Anywhere)
+        }).isEqualTo("line-break: anywhere")
+
+        assertThat(modifierToText {
             Modifier.rubyPosition(RubyPosition.Under)
         }).isEqualTo("ruby-position: under")
 
@@ -583,6 +592,10 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.textShadow(TextShadow.of(2.px, 2.px), TextShadow.of(4.px, 4.px, 2.px, Colors.Red))
         }).isEqualTo("text-shadow: 2px 2px, 4px 4px 2px red")
+
+        assertThat(modifierToText {
+            Modifier.textShadow(listOf(TextShadow.of(1.px, 2.px), TextShadow.of(3.px, 4.px, 1.px, Colors.Green)))
+        }).isEqualTo("text-shadow: 1px 2px, 3px 4px 1px green")
 
         assertThat(modifierToText {
             Modifier.textShadow(TextShadow.Initial)
