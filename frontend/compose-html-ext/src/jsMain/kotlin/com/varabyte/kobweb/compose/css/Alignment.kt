@@ -17,17 +17,18 @@ import org.jetbrains.compose.web.css.*
  * Enumeration identifying which baseline set to apply additional alignment to.
  */
 internal enum class BaselineSet {
-    FIRST,
-    LAST
+    First,
+    Last
 }
 
 /**
  * Enumeration for strategies of how to handle overflowing items.
  */
-internal enum class OverflowStrategy {
-    SAFE,
-    UNSAFE;
+enum class AlignOverflowStrategy {
+    Safe,
+    Unsafe;
 }
+typealias JustifyOverflowStrategy = AlignOverflowStrategy
 
 private fun BaselineSet?.toValue(): String {
     val self = this
@@ -40,7 +41,7 @@ private fun BaselineSet?.toValue(): String {
     }
 }
 
-private fun OverflowStrategy.toValue(position: StylePropertyValue) = "${name.lowercase()} $position"
+private fun AlignOverflowStrategy.toValue(position: StylePropertyValue) = "${name.lowercase()} $position"
 
 // endregion
 
@@ -75,12 +76,13 @@ sealed interface AlignContent : StylePropertyValue {
 
         // Baseline
         val Baseline get() = (null as? BaselineSet?).toValue().unsafeCast<AlignContent>()
-        val FirstBaseline get() = BaselineSet.FIRST.toValue().unsafeCast<AlignContent>()
-        val LastBaseline get() = BaselineSet.LAST.toValue().unsafeCast<AlignContent>()
+        val FirstBaseline get() = BaselineSet.First.toValue().unsafeCast<AlignContent>()
+        val LastBaseline get() = BaselineSet.Last.toValue().unsafeCast<AlignContent>()
 
         // Overflow
-        fun Safe(position: AlignContentPosition) = OverflowStrategy.SAFE.toValue(position).unsafeCast<AlignContent>()
-        fun Unsafe(position: AlignContentPosition) = OverflowStrategy.UNSAFE.toValue(position).unsafeCast<AlignContent>()
+        fun Safe(position: AlignContentPosition) = of(AlignOverflowStrategy.Safe, position)
+        fun Unsafe(position: AlignContentPosition) = of(AlignOverflowStrategy.Unsafe, position)
+        fun of(strategy: AlignOverflowStrategy, position: AlignContentPosition) = strategy.toValue(position).unsafeCast<AlignContent>()
     }
 }
 
@@ -118,12 +120,13 @@ sealed interface AlignItems : StylePropertyValue {
 
         // Baseline
         val Baseline get() = (null as? BaselineSet?).toValue().unsafeCast<AlignItems>()
-        val FirstBaseline get() = BaselineSet.FIRST.toValue().unsafeCast<AlignItems>()
-        val LastBaseline get() = BaselineSet.LAST.toValue().unsafeCast<AlignItems>()
+        val FirstBaseline get() = BaselineSet.First.toValue().unsafeCast<AlignItems>()
+        val LastBaseline get() = BaselineSet.Last.toValue().unsafeCast<AlignItems>()
 
         // Overflow
-        fun Safe(position: AlignItemsPosition): AlignItems = OverflowStrategy.SAFE.toValue(position).unsafeCast<AlignItems>()
-        fun Unsafe(position: AlignItemsPosition): AlignItems = OverflowStrategy.UNSAFE.toValue(position).unsafeCast<AlignItems>()
+        fun Safe(position: AlignItemsPosition) = of(AlignOverflowStrategy.Safe, position)
+        fun Unsafe(position: AlignItemsPosition) = of(AlignOverflowStrategy.Unsafe, position)
+        fun of(strategy: AlignOverflowStrategy, position: AlignItemsPosition) = strategy.toValue(position).unsafeCast<AlignItems>()
     }
 }
 
@@ -162,12 +165,13 @@ sealed interface AlignSelf : StylePropertyValue {
 
         // Baseline
         val Baseline get() = (null as? BaselineSet?).toValue().unsafeCast<AlignSelf>()
-        val FirstBaseline get() = BaselineSet.FIRST.toValue().unsafeCast<AlignSelf>()
-        val LastBaseline get() = BaselineSet.LAST.toValue().unsafeCast<AlignSelf>()
+        val FirstBaseline get() = BaselineSet.First.toValue().unsafeCast<AlignSelf>()
+        val LastBaseline get() = BaselineSet.Last.toValue().unsafeCast<AlignSelf>()
 
         // Overflow
-        fun Safe(position: AlignSelfPosition) = OverflowStrategy.SAFE.toValue(position).unsafeCast<AlignSelf>()
-        fun Unsafe(position: AlignSelfPosition) = OverflowStrategy.UNSAFE.toValue(position).unsafeCast<AlignSelf>()
+        fun Safe(position: AlignSelfPosition) = of(AlignOverflowStrategy.Safe, position)
+        fun Unsafe(position: AlignSelfPosition) = of(AlignOverflowStrategy.Unsafe, position)
+        fun of(strategy: AlignOverflowStrategy, position: AlignSelfPosition) = strategy.toValue(position).unsafeCast<AlignSelfPosition>()
     }
 }
 
@@ -210,9 +214,10 @@ sealed interface JustifyContent : StylePropertyValue {
         val Stretch get() = "stretch".unsafeCast<JustifyContent>()
 
         // Overflow
-        fun Safe(position: JustifyContentPosition) = OverflowStrategy.SAFE.toValue(position).unsafeCast<JustifyContent>()
-        fun Unsafe(position: JustifyContentPosition) =
-            OverflowStrategy.UNSAFE.toValue(position).unsafeCast<JustifyContent>()
+        fun Safe(position: JustifyContentPosition) = of(JustifyOverflowStrategy.Safe, position)
+        fun Unsafe(position: JustifyContentPosition) = of(JustifyOverflowStrategy.Unsafe, position)
+        fun of(strategy: JustifyOverflowStrategy, position: JustifyContentPosition) = strategy.toValue(position).unsafeCast<JustifyContent>()
+
     }
 }
 
@@ -252,12 +257,13 @@ sealed interface JustifyItems : StylePropertyValue {
 
         // Baseline
         val Baseline get() = (null as? BaselineSet?).toValue().unsafeCast<JustifyItems>()
-        val FirstBaseline get() = BaselineSet.FIRST.toValue().unsafeCast<JustifyItems>()
-        val LastBaseline get() = BaselineSet.LAST.toValue().unsafeCast<JustifyItems>()
+        val FirstBaseline get() = BaselineSet.First.toValue().unsafeCast<JustifyItems>()
+        val LastBaseline get() = BaselineSet.Last.toValue().unsafeCast<JustifyItems>()
 
         // Overflow
-        fun Safe(position: JustifyItemsPosition) = OverflowStrategy.SAFE.toValue(position)
-        fun Unsafe(position: JustifyItemsPosition) = OverflowStrategy.UNSAFE.toValue(position)
+        fun Safe(position: JustifyItemsPosition) = of(JustifyOverflowStrategy.Safe, position)
+        fun Unsafe(position: JustifyItemsPosition) = of(JustifyOverflowStrategy.Unsafe, position)
+        fun of(strategy: JustifyOverflowStrategy, position: JustifyItemsPosition) = strategy.toValue(position).unsafeCast<JustifyItems>()
     }
 }
 
@@ -298,12 +304,13 @@ sealed interface JustifySelf : StylePropertyValue {
 
         // Baseline
         val Baseline get() = (null as? BaselineSet?).toValue().unsafeCast<JustifySelf>()
-        val FirstBaseline get() = BaselineSet.FIRST.toValue().unsafeCast<JustifySelf>()
-        val LastBaseline get() = BaselineSet.LAST.toValue().unsafeCast<JustifySelf>()
+        val FirstBaseline get() = BaselineSet.First.toValue().unsafeCast<JustifySelf>()
+        val LastBaseline get() = BaselineSet.Last.toValue().unsafeCast<JustifySelf>()
 
         // Overflow
-        fun Safe(position: JustifySelfPosition) = OverflowStrategy.SAFE.toValue(position).unsafeCast<JustifySelf>()
-        fun Unsafe(position: JustifySelfPosition) = OverflowStrategy.UNSAFE.toValue(position).unsafeCast<JustifySelf>()
+        fun Safe(position: JustifySelfPosition) = of(JustifyOverflowStrategy.Safe, position)
+        fun Unsafe(position: JustifySelfPosition) = of(JustifyOverflowStrategy.Unsafe, position)
+        fun of(strategy: JustifyOverflowStrategy, position: JustifySelfPosition) = strategy.toValue(position).unsafeCast<JustifySelf>()
     }
 }
 

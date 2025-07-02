@@ -123,6 +123,7 @@ class CssStylePropertyTests {
         // Overflow
         assertThat(styleToText { alignContent(AlignContent.Safe(AlignContent.Center)) }).isEqualTo("align-content: safe center")
         assertThat(styleToText { alignContent(AlignContent.Unsafe(AlignContent.FlexEnd)) }).isEqualTo("align-content: unsafe flex-end")
+        assertThat(styleToText { alignContent(AlignContent.of(AlignOverflowStrategy.Safe, AlignContent.Start)) }).isEqualTo("align-content: safe start")
 
         // Global 
         assertThat(styleToText { alignContent(AlignContent.Inherit) }).isEqualTo("align-content: inherit")
@@ -151,6 +152,7 @@ class CssStylePropertyTests {
 
         assertThat(styleToText { alignItems(AlignItems.Safe(AlignItems.Center)) }).isEqualTo("align-items: safe center")
         assertThat(styleToText { alignItems(AlignItems.Unsafe(AlignItems.FlexEnd)) }).isEqualTo("align-items: unsafe flex-end")
+        assertThat(styleToText { alignItems(AlignItems.of(AlignOverflowStrategy.Safe, AlignItems.Start)) }).isEqualTo("align-items: safe start")
 
         assertThat(styleToText { alignItems(AlignItems.Inherit) }).isEqualTo("align-items: inherit")
         assertThat(styleToText { alignItems(AlignItems.Initial) }).isEqualTo("align-items: initial")
@@ -178,6 +180,7 @@ class CssStylePropertyTests {
 
         assertThat(styleToText { alignSelf(AlignSelf.Safe(AlignSelf.Center)) }).isEqualTo("align-self: safe center")
         assertThat(styleToText { alignSelf(AlignSelf.Unsafe(AlignSelf.FlexEnd)) }).isEqualTo("align-self: unsafe flex-end")
+        assertThat(styleToText { alignSelf(AlignSelf.of(AlignOverflowStrategy.Safe, AlignSelf.Start)) }).isEqualTo("align-self: safe start")
 
         assertThat(styleToText { alignSelf(AlignSelf.Inherit) }).isEqualTo("align-self: inherit")
         assertThat(styleToText { alignSelf(AlignSelf.Initial) }).isEqualTo("align-self: initial")
@@ -1497,6 +1500,7 @@ class CssStylePropertyTests {
 
         assertThat(styleToText { justifyContent(JustifyContent.Safe(JustifyContent.Center)) }).isEqualTo("justify-content: safe center")
         assertThat(styleToText { justifyContent(JustifyContent.Unsafe(JustifyContent.FlexEnd)) }).isEqualTo("justify-content: unsafe flex-end")
+        assertThat(styleToText { justifyContent(JustifyContent.of(JustifyOverflowStrategy.Safe, JustifyContent.Start)) }).isEqualTo("justify-content: safe start")
 
         assertThat(styleToText { justifyContent(JustifyContent.Inherit) }).isEqualTo("justify-content: inherit")
         assertThat(styleToText { justifyContent(JustifyContent.Initial) }).isEqualTo("justify-content: initial")
@@ -1526,6 +1530,7 @@ class CssStylePropertyTests {
 
         assertThat(styleToText { justifyItems(JustifyItems.Safe(JustifyItems.Center)) }).isEqualTo("justify-items: safe center")
         assertThat(styleToText { justifyItems(JustifyItems.Unsafe(JustifyItems.FlexEnd)) }).isEqualTo("justify-items: unsafe flex-end")
+        assertThat(styleToText { justifyItems(JustifyItems.of(JustifyOverflowStrategy.Safe, JustifyItems.Start)) }).isEqualTo("justify-items: safe start")
 
         assertThat(styleToText { justifyItems(JustifyItems.Inherit) }).isEqualTo("justify-items: inherit")
         assertThat(styleToText { justifyItems(JustifyItems.Initial) }).isEqualTo("justify-items: initial")
@@ -1556,6 +1561,7 @@ class CssStylePropertyTests {
 
         assertThat(styleToText { justifySelf(JustifySelf.Safe(JustifySelf.Center)) }).isEqualTo("justify-self: safe center")
         assertThat(styleToText { justifySelf(JustifySelf.Unsafe(JustifySelf.FlexEnd)) }).isEqualTo("justify-self: unsafe flex-end")
+        assertThat(styleToText { justifySelf(JustifySelf.of(JustifyOverflowStrategy.Safe, JustifySelf.Start)) }).isEqualTo("justify-self: safe start")
 
         assertThat(styleToText { justifySelf(JustifySelf.Inherit) }).isEqualTo("justify-self: inherit")
         assertThat(styleToText { justifySelf(JustifySelf.Initial) }).isEqualTo("justify-self: initial")
