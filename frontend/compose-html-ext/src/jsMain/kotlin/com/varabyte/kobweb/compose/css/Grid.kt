@@ -3,6 +3,7 @@
 
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase
 import org.jetbrains.compose.web.css.*
 
 @DslMarker
@@ -69,11 +70,11 @@ sealed class GridEntry private constructor(private val value: String) {
          * Note that this supports limited types of sizing values.
          */
         class Auto internal constructor(type: Type, vararg entries: GridEntry) : Repeat(type, entries) {
-            enum class Type(private val value: String) {
-                AutoFill("auto-fill"),
-                AutoFit("auto-fit");
+            enum class Type : StylePropertyValue {
+                AutoFill,
+                AutoFit;
 
-                override fun toString() = value
+                override fun toString() = name.titleCamelCaseToKebabCase()
             }
         }
     }

@@ -125,9 +125,11 @@ fun StyleScope.textDecorationSkipInk(textDecorationSkipInk: TextDecorationSkipIn
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-position
 sealed interface TextEmphasisPosition : StylePropertyValue {
     sealed interface Baseline: TextEmphasisPosition
-    enum class Side {
+    enum class Side : StylePropertyValue {
         Left,
-        Right
+        Right;
+
+        override fun toString(): String = name.lowercase()
     }
 
     companion object : CssGlobalValues<TextEmphasisPosition> {
@@ -135,7 +137,7 @@ sealed interface TextEmphasisPosition : StylePropertyValue {
         val Over get() = "over".unsafeCast<Baseline>()
         val Under get() = "under".unsafeCast<Baseline>()
 
-        fun of(baseline: Baseline, side: Side) = "$baseline ${side.name.lowercase()}".unsafeCast<TextEmphasisPosition>()
+        fun of(baseline: Baseline, side: Side) = "$baseline $side".unsafeCast<TextEmphasisPosition>()
     }
 }
 

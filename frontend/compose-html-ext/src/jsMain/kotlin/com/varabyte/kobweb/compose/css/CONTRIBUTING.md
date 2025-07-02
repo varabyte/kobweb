@@ -195,6 +195,47 @@ sealed interface SolidShape : StylePropertyValue {
 ```
 
 ---
+### Any enum you expose should implement `StylePropertyValue`
+
+... and be TitleCamelCase, to match the look and feel of keyword property names. It should also provide a `toString`
+override, set to the value that CSS expects (most often the enum's name lowercased but occasionally kebab-case).
+
+By exposing enums as `StylePropertyValue`s, it allows us to use them inside style variables
+
+#### Example
+
+Pay attention to the side enum below:
+
+```kotlin
+sealed interface TextEmphasisPosition : StylePropertyValue {
+    sealed interface Baseline: TextEmphasisPosition
+    enum class Side : StylePropertyValue {
+        Left,
+        Right;
+
+        override fun toString(): String = name.lowercase()
+    }
+
+    companion object : CssGlobalValues<TextEmphasisPosition> {
+        val Over: Baseline
+        val Under: Baseline
+
+        fun of(baseline: Baseline, side: Side) = "$baseline $side".unsafeCast<TextEmphasisPosition>()
+    }
+}
+```
+
+This allows the following code to be valid:
+
+```kotlin
+val SideVar by StyleVariable(TextEmphasisPosition.Side.Right)
+
+val SomeTextStyle = CssStyle.base {
+    Modifier.textEmphasisPosition(TextEmphasisBaseline.Under, SideVar.value())
+}
+```
+
+---
 ### Create `of` companion object methods for dynamic values
 
 #### Example
