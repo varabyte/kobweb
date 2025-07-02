@@ -257,6 +257,88 @@ sealed interface Anchor : StylePropertyValue {
 ```
 
 ---
+### Handling keywords that modify other keywords
+
+Some CSS properties have keywords that should only appear in conjunction with other keywords and cannot appear alone.
+
+We have so far identified two cases, one where the modifying keyword only ever apply to a single target keyword,
+and one where it applies to a collection of other keywords.
+
+Both kinds occur in the `align-content` property so we'll use that to highlight them.
+
+* "first baseline" / "last baseline"
+   * `first` and `last` are modifying keywords
+   * they only ever affect `baseline`; they are not used with any other keyword
+
+* "safe start" / "unsafe end"
+   * `safe` and `unsafe` are modifying keywords
+   * they act on any of the positional keywords (e.g. `start`, `end`, `center`).
+
+We take approaches which ensure that our APIs will show up in autocomplete lists, as in the following cases (where `|`
+represents the cursor): `AlignContent.Firs|`, `AlignContent.Saf|`
+
+Note that each case requires a slightly different approaches in the Kotlin code, whether there is a single target or
+not.
+
+#### The modifying keyword only applies to a single target keyword
+
+This is the "first baseline" / "last baseline" case.
+
+As there is only one target keyword being modified (here, "baseline"), we can keep it simple and create direct
+properties to represent these additional cases.
+
+```kotlin
+sealed interface AlignSelf : StylePropertyValue {
+    companion object : CssGlobalValues<AlignSelf> {
+        val Baseline get() = "baseline".unsafeCast<AlignSelf>() // Keyword
+        val FirstBaseline get() = "first baseline".unsafeCast<AlignSelf>() // Modified keyword
+        val LastBaseline get() = "last baseline".unsafeCast<AlignSelf>() // Modified keyword
+    }
+}
+```
+
+#### The modifying keyword applies to multiple target keywords
+
+This is the "safe $position" / "unsafe $position" case.
+
+We handle this by creating `Safe` and `Unsafe` methods (capitalized, so they feel like keywords) and have them accept a
+positional keyword instance as their argument.
+
+```kotlin
+sealed interface AlignSelf : StylePropertyValue {
+    sealed interface AlignContentPosition : AlignContent
+
+    companion object : CssGlobalValues<AlignContent> {
+        // Positional
+        val Center: AlignContentPosition
+        val Start: AlignContentPosition
+        val End: AlignContentPosition
+        val FlexStart: AlignContentPosition
+        val FlexEnd: AlignContentPosition
+
+        // Overflow
+        fun Safe(position: AlignContentPosition) = "safe $position".unsafeCast<AlignContent>()
+        fun Unsafe(position: AlignContentPosition) = "unsafe $position".unsafeCast<AlignContent>()
+    }
+}
+```
+
+#### No public `of` methods
+
+Note that in the above classes, we don't provide public `of` methods. We could have added a
+`AlignSelf.of(Safety, Position)` method for example. 
+
+This is for the following reasons:
+
+* Keeps the API simple -- there's only one way to do something
+* This means you don't have to spend time creating an extra `Modifier` method to accompany it
+  * Why call `Modifier.example(Example.First, Example.Second)` when you can call
+    `Modifier.example(Example.First(Example.Second))` which is the same number of characters?
+* The method syntax can help users build a stronger mental model that the keywords are tightly related
+  * `Example.of(First, Second)` represents two values working separately, e.g. on different axes, while
+    `Example.of(First(Second))` emphasizes that these two values are connected somehow.
+
+---
 ### Create `list` methods for listable values
 
 Several CSS properties exist that accept lists of values. But not every valid value for that property is accepted -- it
