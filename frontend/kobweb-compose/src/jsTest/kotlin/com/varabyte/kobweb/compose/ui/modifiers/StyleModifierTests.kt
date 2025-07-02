@@ -245,6 +245,25 @@ class StyleModifierTests {
             }
         }).isEqualTo("margin-block-start: 10px; margin-block-end: 20px")
 
+        assertThat(modifierToText { Modifier.marginInline(both = 10.px) }).isEqualTo("margin-inline: 10px")
+        assertThat(modifierToText {
+            Modifier.marginInline(start = 10.px, end = 20.px)
+        }).isEqualTo("margin-inline: 10px 20px")
+        assertThat(modifierToText { Modifier.marginInline(end = 20.px) }).isEqualTo("margin-inline: 0px 20px")
+
+        assertThat(modifierToText {
+            Modifier.marginInline {
+                start(10.px)
+                end(20.px)
+            }
+        }).isEqualTo("margin-inline-start: 10px; margin-inline-end: 20px")
+
+        assertThat(modifierToText {
+            Modifier.marginInline {
+                end(20.px)
+            }
+        }).isEqualTo("margin-inline-end: 20px")
+
         assertThat(modifierToText {
             Modifier.overflow(Overflow.Hidden)
         }).isEqualTo("overflow: hidden")
@@ -319,39 +338,6 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.zIndex(100)
         }).isEqualTo("z-index: 100")
-    }
-
-    @Test
-    fun verifyMarginInline() {
-        assertThat(modifierToText { Modifier.marginInline(both = 10.px) }).isEqualTo("margin-inline: 10px")
-        assertThat(modifierToText {
-            Modifier.marginInline(start = 10.px, end = 20.px)
-        }).isEqualTo("margin-inline: 10px 20px")
-        assertThat(modifierToText { Modifier.marginInline(end = 20.px) }).isEqualTo("margin-inline: 0px 20px")
-
-        assertThat(modifierToText {
-            Modifier.marginInline {
-                start(10.px)
-                end(20.px)
-            }
-        }).isEqualTo("margin-inline-start: 10px; margin-inline-end: 20px")
-
-        assertThat(modifierToText {
-            Modifier.marginInline {
-                end(20.px)
-            }
-        }).isEqualTo("margin-inline-end: 20px")
-    }
-
-    @Test
-    fun verifyOrphans() {
-        assertThat(modifierToText {
-            Modifier.orphans(2)
-        }).isEqualTo("orphans: 2")
-
-        assertThat(modifierToText {
-            Modifier.orphans(Orphans.Inherit)
-        }).isEqualTo("orphans: inherit")
     }
 
     @Test
@@ -527,7 +513,7 @@ class StyleModifierTests {
     }
 
     @Test
-    fun verifyShapeMargin() {
+    fun verifyShape() {
         assertThat(modifierToText {
             Modifier.shapeMargin(ShapeMargin.Initial)
         }).isEqualTo("shape-margin: initial")
@@ -823,6 +809,14 @@ class StyleModifierTests {
 
     @Test
     fun verifyTypography() {
+        assertThat(modifierToText {
+            Modifier.orphans(2)
+        }).isEqualTo("orphans: 2")
+
+        assertThat(modifierToText {
+            Modifier.orphans(Orphans.Inherit)
+        }).isEqualTo("orphans: inherit")
+
         assertThat(modifierToText { Modifier.widows(Widows.of(2)) }).isEqualTo("widows: 2")
         assertThat(modifierToText { Modifier.widows(3) }).isEqualTo("widows: 3")
         assertThat(modifierToText { Modifier.widows(Widows.Revert) }).isEqualTo("widows: revert")
