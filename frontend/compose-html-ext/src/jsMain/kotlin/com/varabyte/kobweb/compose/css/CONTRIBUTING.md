@@ -155,7 +155,7 @@ class CopiedStyle {
 ⚠️ Be extra vigilant to this mistake. If you miss catching it here, you have one more chance to catch it in the tests.
 
 ---
-### Additional enum values should be declared in the companion object and use `unsafeCast`
+### Additional keyword values should be declared in the companion object and use `unsafeCast`
 
 Also, they should be TitleCamelCase, and use `get()` so they are resolved lazily
 
@@ -171,7 +171,7 @@ sealed interface StyleExample : StylePropertyValue {
 ```
 
 ---
-### Shared enum values can be refactored into an internal, sealed CssValues<T> interface.
+### Shared keyword values can be refactored into an internal, sealed CssValues<T> interface.
 
 #### Example
 
@@ -195,7 +195,7 @@ sealed interface SolidShape : StylePropertyValue {
 ```
 
 ---
-### Create `of` companion object methods for dynamic (non-enum) values
+### Create `of` companion object methods for dynamic values
 
 #### Example
 
@@ -541,7 +541,7 @@ values.
 This will help verify both to yourself AND to the person reviewing the code that the API you designed captured the
 full functionality of the target CSS property.
 
-* You MUST add an assertion for every single enum value exposed by your class.
+* You MUST add an assertion for every single keyword value exposed by your class.
 * You SHOULD try to cover as many unique cases as possible for dynamic `of` methods.
   * A good rule of thumb is to look at the associated MDN documentation and many / all the examples they share there.
 
