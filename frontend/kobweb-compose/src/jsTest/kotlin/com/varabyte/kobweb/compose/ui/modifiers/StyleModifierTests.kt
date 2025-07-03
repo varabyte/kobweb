@@ -1,16 +1,12 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.kobweb.compose.css.functions.url
-import com.varabyte.kobweb.compose.css.textCombineUpright
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.truthish.assertThat
-import org.jetbrains.compose.web.attributes.DirType
 import org.jetbrains.compose.web.css.*
 import kotlin.test.Test
 
@@ -38,7 +34,7 @@ class StyleModifierTests {
         }).isEqualTo("background: url(\"test.png\") blue")
 
         assertThat(modifierToText {
-            Modifier.backgroundAttachment(BackgroundAttachment.Fixed)
+            Modifier.background { attachment(BackgroundAttachment.Fixed) }
         }).isEqualTo("background-attachment: fixed")
 
         assertThat(modifierToText {
@@ -54,7 +50,7 @@ class StyleModifierTests {
         }).isEqualTo("background-blend-mode: multiply, color-dodge")
 
         assertThat(modifierToText {
-            Modifier.backgroundClip(BackgroundClip.ContentBox)
+            Modifier.background { clip(BackgroundClip.ContentBox) }
         }).isEqualTo("background-clip: content-box")
 
         assertThat(modifierToText {
@@ -78,23 +74,27 @@ class StyleModifierTests {
         }).isEqualTo("background-image: linear-gradient(red, green)")
 
         assertThat(modifierToText {
-            Modifier.backgroundOrigin(BackgroundOrigin.BorderBox)
+            Modifier.background { origin(BackgroundOrigin.BorderBox) }
         }).isEqualTo("background-origin: border-box")
 
         assertThat(modifierToText {
-            Modifier.backgroundPosition(BackgroundPosition.of(CSSPosition.Center))
+            Modifier.background { position(BackgroundPosition.of(CSSPosition.Center)) }
         }).isEqualTo("background-position: left 50% top 50%")
 
         assertThat(modifierToText {
-            Modifier.backgroundRepeat(BackgroundRepeat.NoRepeat)
+            Modifier.background { position { x(Edge.Left); y(Edge.CenterY) } }
+        }).isEqualTo("background-position-x: left; background-position-y: center")
+
+        assertThat(modifierToText {
+            Modifier.background { repeat(BackgroundRepeat.NoRepeat) }
         }).isEqualTo("background-repeat: no-repeat")
 
         assertThat(modifierToText {
-            Modifier.backgroundRepeat(BackgroundRepeat.Space, BackgroundRepeat.Round)
+            Modifier.background { repeat(BackgroundRepeat.Space, BackgroundRepeat.Round) }
         }).isEqualTo("background-repeat: space round")
 
         assertThat(modifierToText {
-            Modifier.backgroundSize(BackgroundSize.Contain)
+            Modifier.background { size(BackgroundSize.Contain) }
         }).isEqualTo("background-size: contain")
     }
 
