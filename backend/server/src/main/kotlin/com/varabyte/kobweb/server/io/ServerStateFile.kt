@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.server.io
 
 import com.charleskorn.kaml.Yaml
+import com.varabyte.kobweb.common.yaml.nonStrictDefault
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.io.KobwebWritableTextFile
 import com.varabyte.kobweb.server.api.ServerState
@@ -9,6 +10,6 @@ import com.varabyte.kobweb.server.api.ServerState
 class ServerStateFile(kobwebFolder: KobwebFolder) : KobwebWritableTextFile<ServerState>(
     kobwebFolder,
     "server/state.yaml",
-    serialize = { requests -> Yaml.default.encodeToString(ServerState.serializer(), requests) },
-    deserialize = { text -> Yaml.default.decodeFromString(ServerState.serializer(), text) }
+    serialize = { requests -> Yaml.nonStrictDefault.encodeToString(ServerState.serializer(), requests) },
+    deserialize = { text -> Yaml.nonStrictDefault.decodeFromString(ServerState.serializer(), text) }
 )

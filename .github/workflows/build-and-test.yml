@@ -1,4 +1,4 @@
-name: Build
+name: Build & Test
 
 on:
   # starting with a minimal scope; potentially we can set this to '*' but we can decide if that's helper later

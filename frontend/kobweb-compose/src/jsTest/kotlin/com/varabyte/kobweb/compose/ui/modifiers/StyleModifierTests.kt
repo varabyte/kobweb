@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.kobweb.compose.css.functions.url
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -35,7 +34,7 @@ class StyleModifierTests {
         }).isEqualTo("background: url(\"test.png\") blue")
 
         assertThat(modifierToText {
-            Modifier.backgroundAttachment(BackgroundAttachment.Fixed)
+            Modifier.background { attachment(BackgroundAttachment.Fixed) }
         }).isEqualTo("background-attachment: fixed")
 
         assertThat(modifierToText {
@@ -51,7 +50,7 @@ class StyleModifierTests {
         }).isEqualTo("background-blend-mode: multiply, color-dodge")
 
         assertThat(modifierToText {
-            Modifier.backgroundClip(BackgroundClip.ContentBox)
+            Modifier.background { clip(BackgroundClip.ContentBox) }
         }).isEqualTo("background-clip: content-box")
 
         assertThat(modifierToText {
@@ -75,23 +74,27 @@ class StyleModifierTests {
         }).isEqualTo("background-image: linear-gradient(red, green)")
 
         assertThat(modifierToText {
-            Modifier.backgroundOrigin(BackgroundOrigin.BorderBox)
+            Modifier.background { origin(BackgroundOrigin.BorderBox) }
         }).isEqualTo("background-origin: border-box")
 
         assertThat(modifierToText {
-            Modifier.backgroundPosition(BackgroundPosition.of(CSSPosition.Center))
+            Modifier.background { position(BackgroundPosition.of(CSSPosition.Center)) }
         }).isEqualTo("background-position: left 50% top 50%")
 
         assertThat(modifierToText {
-            Modifier.backgroundRepeat(BackgroundRepeat.NoRepeat)
+            Modifier.background { position { x(Edge.Left); y(Edge.CenterY) } }
+        }).isEqualTo("background-position-x: left; background-position-y: center")
+
+        assertThat(modifierToText {
+            Modifier.background { repeat(BackgroundRepeat.NoRepeat) }
         }).isEqualTo("background-repeat: no-repeat")
 
         assertThat(modifierToText {
-            Modifier.backgroundRepeat(BackgroundRepeat.Space, BackgroundRepeat.Round)
+            Modifier.background { repeat(BackgroundRepeat.Space, BackgroundRepeat.Round) }
         }).isEqualTo("background-repeat: space round")
 
         assertThat(modifierToText {
-            Modifier.backgroundSize(BackgroundSize.Contain)
+            Modifier.background { size(BackgroundSize.Contain) }
         }).isEqualTo("background-size: contain")
     }
 
@@ -243,6 +246,25 @@ class StyleModifierTests {
             }
         }).isEqualTo("margin-block-start: 10px; margin-block-end: 20px")
 
+        assertThat(modifierToText { Modifier.marginInline(both = 10.px) }).isEqualTo("margin-inline: 10px")
+        assertThat(modifierToText {
+            Modifier.marginInline(start = 10.px, end = 20.px)
+        }).isEqualTo("margin-inline: 10px 20px")
+        assertThat(modifierToText { Modifier.marginInline(end = 20.px) }).isEqualTo("margin-inline: 0px 20px")
+
+        assertThat(modifierToText {
+            Modifier.marginInline {
+                start(10.px)
+                end(20.px)
+            }
+        }).isEqualTo("margin-inline-start: 10px; margin-inline-end: 20px")
+
+        assertThat(modifierToText {
+            Modifier.marginInline {
+                end(20.px)
+            }
+        }).isEqualTo("margin-inline-end: 20px")
+
         assertThat(modifierToText {
             Modifier.overflow(Overflow.Hidden)
         }).isEqualTo("overflow: hidden")
@@ -317,39 +339,6 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.zIndex(100)
         }).isEqualTo("z-index: 100")
-    }
-
-    @Test
-    fun verifyMarginInline() {
-        assertThat(modifierToText { Modifier.marginInline(both = 10.px) }).isEqualTo("margin-inline: 10px")
-        assertThat(modifierToText {
-            Modifier.marginInline(start = 10.px, end = 20.px)
-        }).isEqualTo("margin-inline: 10px 20px")
-        assertThat(modifierToText { Modifier.marginInline(end = 20.px) }).isEqualTo("margin-inline: 0px 20px")
-
-        assertThat(modifierToText {
-            Modifier.marginInline {
-                start(10.px)
-                end(20.px)
-            }
-        }).isEqualTo("margin-inline-start: 10px; margin-inline-end: 20px")
-
-        assertThat(modifierToText {
-            Modifier.marginInline {
-                end(20.px)
-            }
-        }).isEqualTo("margin-inline-end: 20px")
-    }
-
-    @Test
-    fun verifyOrphans() {
-        assertThat(modifierToText {
-            Modifier.orphans(2)
-        }).isEqualTo("orphans: 2")
-
-        assertThat(modifierToText {
-            Modifier.orphans(Orphans.Inherit)
-        }).isEqualTo("orphans: inherit")
     }
 
     @Test
@@ -525,7 +514,7 @@ class StyleModifierTests {
     }
 
     @Test
-    fun verifyShapeMargin() {
+    fun verifyShape() {
         assertThat(modifierToText {
             Modifier.shapeMargin(ShapeMargin.Initial)
         }).isEqualTo("shape-margin: initial")
@@ -545,6 +534,22 @@ class StyleModifierTests {
     @Test
     fun verifyText() {
         assertThat(modifierToText {
+            Modifier.hyphenateCharacter(HyphenateCharacter.Auto)
+        }).isEqualTo("hyphenate-character: auto")
+
+        assertThat(modifierToText {
+            Modifier.hyphenateCharacter("-")
+        }).isEqualTo("hyphenate-character: \"-\"")
+
+        assertThat(modifierToText {
+            Modifier.letterSpacing(25.px)
+        }).isEqualTo("letter-spacing: 25px")
+
+        assertThat(modifierToText {
+            Modifier.lineBreak(LineBreak.Anywhere)
+        }).isEqualTo("line-break: anywhere")
+
+        assertThat(modifierToText {
             Modifier.rubyPosition(RubyPosition.Under)
         }).isEqualTo("ruby-position: under")
 
@@ -553,8 +558,28 @@ class StyleModifierTests {
         }).isEqualTo("text-align: center")
 
         assertThat(modifierToText {
+            Modifier.textAlignLast(TextAlignLast.Justify)
+        }).isEqualTo("text-align-last: justify")
+
+        assertThat(modifierToText {
+            Modifier.textCombineUpright(TextCombineUpright.All)
+        }).isEqualTo("text-combine-upright: all")
+
+        assertThat(modifierToText {
             Modifier.textDecorationLine(TextDecorationLine.Underline)
         }).isEqualTo("text-decoration-line: underline")
+
+        assertThat(modifierToText {
+            Modifier.textDecorationSkipInk(TextDecorationSkipInk.Auto)
+        }).isEqualTo("text-decoration-skip-ink: auto")
+
+        assertThat(modifierToText {
+            Modifier.textEmphasisPosition(TextEmphasisPosition.Auto)
+        }).isEqualTo("text-emphasis-position: auto")
+
+        assertThat(modifierToText {
+            Modifier.textEmphasisPosition(TextEmphasisPosition.Over, TextEmphasisPosition.Side.Right)
+        }).isEqualTo("text-emphasis-position: over right")
 
         assertThat(modifierToText {
             Modifier.textOverflow(TextOverflow.Ellipsis)
@@ -569,8 +594,43 @@ class StyleModifierTests {
         }).isEqualTo("text-shadow: 2px 2px, 4px 4px 2px red")
 
         assertThat(modifierToText {
+            Modifier.textShadow(listOf(TextShadow.of(1.px, 2.px), TextShadow.of(3.px, 4.px, 1.px, Colors.Green)))
+        }).isEqualTo("text-shadow: 1px 2px, 3px 4px 1px green")
+
+        assertThat(modifierToText {
             Modifier.textShadow(TextShadow.Initial)
         }).isEqualTo("text-shadow: initial")
+
+        assertThat(modifierToText {
+            Modifier.textIndent(TextIndent.of(25.px))
+        }).isEqualTo("text-indent: 25px")
+        assertThat(modifierToText {
+            Modifier.textIndent(15.percent)
+        }).isEqualTo("text-indent: 15%")
+
+        assertThat(modifierToText {
+            Modifier.textOrientation(TextOrientation.Mixed)
+        }).isEqualTo("text-orientation: mixed")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(TextUnderlineOffset.Auto)
+        }).isEqualTo("text-underline-offset: auto")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(TextUnderlineOffset.of(0.1.em))
+        }).isEqualTo("text-underline-offset: 0.1em")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlineOffset(20.percent)
+        }).isEqualTo("text-underline-offset: 20%")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlinePosition(TextUnderlinePosition.Auto)
+        }).isEqualTo("text-underline-position: auto")
+
+        assertThat(modifierToText {
+            Modifier.textUnderlinePosition(TextUnderlinePosition.FromFont, TextUnderlinePosition.Right)
+        }).isEqualTo("text-underline-position: from-font right")
 
         assertThat(modifierToText {
             Modifier.textTransform(TextTransform.Capitalize)
@@ -762,6 +822,14 @@ class StyleModifierTests {
 
     @Test
     fun verifyTypography() {
+        assertThat(modifierToText {
+            Modifier.orphans(2)
+        }).isEqualTo("orphans: 2")
+
+        assertThat(modifierToText {
+            Modifier.orphans(Orphans.Inherit)
+        }).isEqualTo("orphans: inherit")
+
         assertThat(modifierToText { Modifier.widows(Widows.of(2)) }).isEqualTo("widows: 2")
         assertThat(modifierToText { Modifier.widows(3) }).isEqualTo("widows: 3")
         assertThat(modifierToText { Modifier.widows(Widows.Revert) }).isEqualTo("widows: revert")
