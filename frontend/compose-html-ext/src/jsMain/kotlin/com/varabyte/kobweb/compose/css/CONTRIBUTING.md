@@ -155,7 +155,7 @@ class CopiedStyle {
 ⚠️ Be extra vigilant to this mistake. If you miss catching it here, you have one more chance to catch it in the tests.
 
 ---
-### Additional enum values should be declared in the companion object and use `unsafeCast`
+### Additional keyword values should be declared in the companion object and use `unsafeCast`
 
 Also, they should be TitleCamelCase, and use `get()` so they are resolved lazily
 
@@ -171,7 +171,7 @@ sealed interface StyleExample : StylePropertyValue {
 ```
 
 ---
-### Shared enum values can be refactored into an internal, sealed CssValues<T> interface.
+### Shared keyword values can be refactored into an internal, sealed CssValues<T> interface.
 
 #### Example
 
@@ -195,7 +195,48 @@ sealed interface SolidShape : StylePropertyValue {
 ```
 
 ---
-### Create `of` companion object methods for dynamic (non-enum) values
+### Any enum you expose should implement `StylePropertyValue`
+
+... and be TitleCamelCase, to match the look and feel of keyword property names. It should also provide a `toString`
+override, set to the value that CSS expects (most often the enum's name lowercased but occasionally kebab-case).
+
+By exposing enums as `StylePropertyValue`s, it allows us to use them inside style variables
+
+#### Example
+
+Pay attention to the side enum below:
+
+```kotlin
+sealed interface TextEmphasisPosition : StylePropertyValue {
+    sealed interface Baseline: TextEmphasisPosition
+    enum class Side : StylePropertyValue {
+        Left,
+        Right;
+
+        override fun toString(): String = name.lowercase()
+    }
+
+    companion object : CssGlobalValues<TextEmphasisPosition> {
+        val Over: Baseline
+        val Under: Baseline
+
+        fun of(baseline: Baseline, side: Side) = "$baseline $side".unsafeCast<TextEmphasisPosition>()
+    }
+}
+```
+
+This allows the following code to be valid:
+
+```kotlin
+val SideVar by StyleVariable(TextEmphasisPosition.Side.Right)
+
+val SomeTextStyle = CssStyle.base {
+    Modifier.textEmphasisPosition(TextEmphasisBaseline.Under, SideVar.value())
+}
+```
+
+---
+### Create `of` companion object methods for dynamic values
 
 #### Example
 
@@ -255,6 +296,88 @@ sealed interface Anchor : StylePropertyValue {
   }
 }
 ```
+
+---
+### Handling keywords that modify other keywords
+
+Some CSS properties have keywords that should only appear in conjunction with other keywords and cannot appear alone.
+
+We have so far identified two cases, one where the modifying keyword only ever apply to a single target keyword,
+and one where it applies to a collection of other keywords.
+
+Both kinds occur in the `align-content` property so we'll use that to highlight them.
+
+* "first baseline" / "last baseline"
+   * `first` and `last` are modifying keywords
+   * they only ever affect `baseline`; they are not used with any other keyword
+
+* "safe start" / "unsafe end"
+   * `safe` and `unsafe` are modifying keywords
+   * they act on any of the positional keywords (e.g. `start`, `end`, `center`).
+
+We take approaches which ensure that our APIs will show up in autocomplete lists, as in the following cases (where `|`
+represents the cursor): `AlignContent.Firs|`, `AlignContent.Saf|`
+
+Note that each case requires a slightly different approaches in the Kotlin code, whether there is a single target or
+not.
+
+#### The modifying keyword only applies to a single target keyword
+
+This is the "first baseline" / "last baseline" case.
+
+As there is only one target keyword being modified (here, "baseline"), we can keep it simple and create direct
+properties to represent these additional cases.
+
+```kotlin
+sealed interface AlignSelf : StylePropertyValue {
+    companion object : CssGlobalValues<AlignSelf> {
+        val Baseline get() = "baseline".unsafeCast<AlignSelf>() // Keyword
+        val FirstBaseline get() = "first baseline".unsafeCast<AlignSelf>() // Modified keyword
+        val LastBaseline get() = "last baseline".unsafeCast<AlignSelf>() // Modified keyword
+    }
+}
+```
+
+#### The modifying keyword applies to multiple target keywords
+
+This is the "safe $position" / "unsafe $position" case.
+
+We handle this by creating `Safe` and `Unsafe` methods (capitalized, so they feel like keywords) and have them accept a
+positional keyword instance as their argument.
+
+```kotlin
+sealed interface AlignSelf : StylePropertyValue {
+    sealed interface AlignContentPosition : AlignContent
+
+    companion object : CssGlobalValues<AlignContent> {
+        // Positional
+        val Center: AlignContentPosition
+        val Start: AlignContentPosition
+        val End: AlignContentPosition
+        val FlexStart: AlignContentPosition
+        val FlexEnd: AlignContentPosition
+
+        // Overflow
+        fun Safe(position: AlignContentPosition) = "safe $position".unsafeCast<AlignContent>()
+        fun Unsafe(position: AlignContentPosition) = "unsafe $position".unsafeCast<AlignContent>()
+    }
+}
+```
+
+#### No public `of` methods
+
+Note that in the above classes, we don't provide public `of` methods. We could have added a
+`AlignSelf.of(Safety, Position)` method for example. 
+
+This is for the following reasons:
+
+* Keeps the API simple -- there's only one way to do something
+* This means you don't have to spend time creating an extra `Modifier` method to accompany it
+  * Why call `Modifier.example(Example.First, Example.Second)` when you can call
+    `Modifier.example(Example.First(Example.Second))` which is the same number of characters?
+* The method syntax can help users build a stronger mental model that the keywords are tightly related
+  * `Example.of(First, Second)` represents two values working separately, e.g. on different axes, while
+    `Example.of(First(Second))` emphasizes that these two values are connected somehow.
 
 ---
 ### Create `list` methods for listable values
@@ -459,7 +582,7 @@ values.
 This will help verify both to yourself AND to the person reviewing the code that the API you designed captured the
 full functionality of the target CSS property.
 
-* You MUST add an assertion for every single enum value exposed by your class.
+* You MUST add an assertion for every single keyword value exposed by your class.
 * You SHOULD try to cover as many unique cases as possible for dynamic `of` methods.
   * A good rule of thumb is to look at the associated MDN documentation and many / all the examples they share there.
 

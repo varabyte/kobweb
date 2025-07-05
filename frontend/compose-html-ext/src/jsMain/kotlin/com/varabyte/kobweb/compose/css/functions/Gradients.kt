@@ -56,7 +56,7 @@ class RepeatingGradient<G : Gradient> internal constructor(private val wrapped: 
 // region linear gradient: https://developer.mozilla.org/en-US/docs/Web/CSS/gradient/linear-gradient
 
 sealed class LinearGradient private constructor(private val gradientStr: String) : Gradient {
-    enum class Direction {
+    enum class Direction : StylePropertyValue {
         ToTop,
         ToTopRight,
         ToRight,
@@ -238,7 +238,7 @@ class RadialGradient private constructor(private val gradientStr: String) : Grad
         }
     }
 
-    enum class Extent {
+    enum class Extent : StylePropertyValue {
         ClosestSide,
         ClosestCorner,
         FarthestSide,

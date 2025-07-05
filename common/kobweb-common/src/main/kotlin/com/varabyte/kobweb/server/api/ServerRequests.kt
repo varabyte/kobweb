@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.server.api
 
 import com.charleskorn.kaml.Yaml
+import com.varabyte.kobweb.common.yaml.nonStrictDefault
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.io.KobwebWritableTextFile
 import kotlinx.serialization.SerialName
@@ -87,8 +88,8 @@ class ServerRequests(
 class ServerRequestsFile(kobwebFolder: KobwebFolder) : KobwebWritableTextFile<ServerRequests>(
     kobwebFolder,
     "server/requests.yaml",
-    serialize = { requests -> Yaml.default.encodeToString(ServerRequests.serializer(), requests) },
-    deserialize = { text -> Yaml.default.decodeFromString(ServerRequests.serializer(), text) }
+    serialize = { requests -> Yaml.nonStrictDefault.encodeToString(ServerRequests.serializer(), requests) },
+    deserialize = { text -> Yaml.nonStrictDefault.decodeFromString(ServerRequests.serializer(), text) }
 ) {
     fun enqueueRequest(request: ServerRequest) {
         val currRequests = content

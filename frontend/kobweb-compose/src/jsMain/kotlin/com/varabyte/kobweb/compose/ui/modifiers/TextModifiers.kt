@@ -13,6 +13,14 @@ fun Modifier.dir(dirType: DirType) = attrsModifier {
     dir(dirType)
 }
 
+fun Modifier.hyphenateCharacter(hyphenateCharacter: HyphenateCharacter) = styleModifier {
+    hyphenateCharacter(hyphenateCharacter)
+}
+
+fun Modifier.hyphenateCharacter(value: String) = styleModifier {
+    hyphenateCharacter(HyphenateCharacter.of(value))
+}
+
 fun Modifier.lang(value: String) = attrsModifier {
     lang(value)
 }
@@ -37,8 +45,43 @@ fun Modifier.textAlign(textAlign: TextAlign): Modifier = styleModifier {
     textAlign(textAlign)
 }
 
+fun Modifier.textAlignLast(textAlignLast: TextAlignLast) = styleModifier {
+    textAlignLast(textAlignLast)
+}
+
+fun Modifier.textCombineUpright(textCombineUpright: TextCombineUpright) = styleModifier {
+    textCombineUpright(textCombineUpright)
+}
+
 fun Modifier.textDecorationLine(textDecorationLine: TextDecorationLine): Modifier = styleModifier {
     textDecorationLine(textDecorationLine)
+}
+
+fun Modifier.textDecorationSkipInk(textDecorationSkipInk: TextDecorationSkipInk) = styleModifier {
+    textDecorationSkipInk(textDecorationSkipInk)
+}
+
+fun Modifier.textEmphasisPosition(textEmphasisPosition: TextEmphasisPosition) = styleModifier {
+    textEmphasisPosition(textEmphasisPosition)
+}
+
+fun Modifier.textEmphasisPosition(
+    baseline: TextEmphasisPosition.Baseline,
+    side: TextEmphasisPosition.Side
+) = styleModifier {
+        textEmphasisPosition(TextEmphasisPosition.of(baseline, side))
+    }
+
+fun Modifier.textIndent(textIndent: TextIndent) = styleModifier {
+    textIndent(textIndent)
+}
+
+fun Modifier.textIndent(value: CSSLengthOrPercentageNumericValue) = styleModifier {
+    textIndent(TextIndent.of(value))
+}
+
+fun Modifier.textOrientation(textOrientation: TextOrientation) = styleModifier {
+    textOrientation(textOrientation)
 }
 
 fun Modifier.textOverflow(textOverflow: TextOverflow): Modifier = styleModifier {
@@ -73,6 +116,24 @@ fun Modifier.textShadow(textShadow: TextShadow): Modifier = styleModifier {
 
 fun Modifier.textTransform(textTransform: TextTransform): Modifier = styleModifier {
     textTransform(textTransform)
+}
+
+fun Modifier.textUnderlineOffset(textUnderlineOffset: TextUnderlineOffset) = styleModifier {
+    textUnderlineOffset(textUnderlineOffset)
+}
+fun Modifier.textUnderlineOffset(value: CSSLengthOrPercentageNumericValue) = styleModifier {
+    textUnderlineOffset(TextUnderlineOffset.of(value))
+}
+
+fun Modifier.textUnderlinePosition(textUnderlinePosition: TextUnderlinePosition) = styleModifier {
+    textUnderlinePosition(textUnderlinePosition)
+}
+
+fun Modifier.textUnderlinePosition(
+    baseline: TextUnderlinePosition.Baseline,
+    side: TextUnderlinePosition.Side
+) = styleModifier {
+    textUnderlinePosition(TextUnderlinePosition.of(baseline, side))
 }
 
 fun Modifier.whiteSpace(whiteSpace: WhiteSpace): Modifier = styleModifier {

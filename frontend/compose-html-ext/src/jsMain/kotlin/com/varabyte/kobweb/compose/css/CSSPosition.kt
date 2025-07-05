@@ -2,7 +2,7 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-sealed class Edge(private val value: String) {
+sealed class Edge(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -22,7 +22,7 @@ class EdgeX internal constructor(value: String) : EdgeXOrCenter(value) {
 }
 
 class CenterX internal constructor() : EdgeXOrCenter("center")
-class EdgeXOffset internal constructor(val edgeX: EdgeX, val offset: CSSLengthOrPercentageNumericValue) {
+class EdgeXOffset internal constructor(val edgeX: EdgeX, val offset: CSSLengthOrPercentageNumericValue) : StylePropertyValue {
     override fun toString() = "$edgeX $offset"
 }
 
@@ -32,7 +32,7 @@ class EdgeY internal constructor(value: String) : EdgeYOrCenter(value) {
 }
 
 class CenterY internal constructor() : EdgeYOrCenter("center")
-class EdgeYOffset internal constructor(val edgeY: EdgeY, val offset: CSSLengthOrPercentageNumericValue) {
+class EdgeYOffset internal constructor(val edgeY: EdgeY, val offset: CSSLengthOrPercentageNumericValue) : StylePropertyValue {
     override fun toString() = "$edgeY $offset"
 }
 
