@@ -1,5 +1,7 @@
 package com.varabyte.kobweb.compose.ui
 
+import androidx.compose.runtime.Immutable
+
 // Inspired by the official Android API
 // See also: https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/ui/ui/src/commonMain/kotlin/androidx/compose/ui/Modifier.kt
 
@@ -9,6 +11,7 @@ package com.varabyte.kobweb.compose.ui
  * An individual modifier, when triggered, will run an operation responsible for modifying the look and feel of some
  * target UI component.
  */
+@Immutable
 interface Modifier {
     /**
      * Run through all elements from left to right and apply [operation] on each one in order.
