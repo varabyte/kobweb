@@ -206,10 +206,7 @@ class GridTrackBuilder : GridTrackBuilderInRepeat() {
 }
 
 sealed interface GridAuto : StylePropertyValue {
-    companion object : CssGlobalValues<GridAuto> {
-        // Keywords
-        val None get() = "none".unsafeCast<GridAuto>()
-    }
+    companion object : CssGlobalValues<GridAuto>
 }
 
 fun StyleScope.gridAutoColumns(gridAutoColumns: GridAuto) {

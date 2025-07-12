@@ -9,8 +9,8 @@ internal sealed interface CssSizeValues<T: StylePropertyValue> {
     fun of(width: CSSAutoKeyword) = "$width".unsafeCast<T>()
 
     // Keyword
-    @Suppress("FunctionName")
-    fun FitContent(value: CSSLengthOrPercentageNumericValue) = "fit-content($value)".unsafeCast<T>()
+    // Not widely supported: https://caniuse.com/mdn-css_properties_width_fit-content_function
+    // fun FitContent(value: CSSLengthOrPercentageNumericValue) = "fit-content($value)".unsafeCast<T>()
     val FitContent get() = "fit-content".unsafeCast<T>()
     val MaxContent get() = "max-content".unsafeCast<T>()
     val MinContent get() = "min-content".unsafeCast<T>()
@@ -18,12 +18,12 @@ internal sealed interface CssSizeValues<T: StylePropertyValue> {
 
 internal sealed interface CssMaxSizeValues<T: StylePropertyValue> {
     fun of(value: CSSLengthOrPercentageNumericValue) = "$value".unsafeCast<T>()
-    fun of(width: CSSAutoKeyword) = "$width".unsafeCast<T>()
 
     // Keyword
     val None get() = "none".unsafeCast<T>()
-    @Suppress("FunctionName")
-    fun FitContent(value: CSSLengthOrPercentageNumericValue) = "fit-content($value)".unsafeCast<T>()
+
+    // Not widely supported: https://caniuse.com/mdn-css_properties_max-width_fit-content_function
+    // fun FitContent(value: CSSLengthOrPercentageNumericValue) = "fit-content($value)".unsafeCast<T>()
     val FitContent get() = "fit-content".unsafeCast<T>()
     val MaxContent get() = "max-content".unsafeCast<T>()
     val MinContent get() = "min-content".unsafeCast<T>()
