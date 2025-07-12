@@ -8,12 +8,6 @@ sealed interface CaptionSide : StylePropertyValue {
         // Directional values
         val Top get() = "top".unsafeCast<CaptionSide>()
         val Bottom get() = "bottom".unsafeCast<CaptionSide>()
-
-        // Logical values
-        val BlockStart get() = "block-start".unsafeCast<CaptionSide>()
-        val BlockEnd get() = "block-end".unsafeCast<CaptionSide>()
-        val InlineStart get() = "inline-start".unsafeCast<CaptionSide>()
-        val InlineEnd get() = "inline-end".unsafeCast<CaptionSide>()
     }
 }
 
