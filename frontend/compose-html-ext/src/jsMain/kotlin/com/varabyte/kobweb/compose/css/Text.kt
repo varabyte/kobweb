@@ -51,7 +51,9 @@ sealed interface TextAlign : StylePropertyValue {
         val Right get() = "right".unsafeCast<TextAlign>()
         val Center get() = "center".unsafeCast<TextAlign>()
         val Justify get() = "justify".unsafeCast<TextAlign>()
-        val JustifyAll get() = "justify-all".unsafeCast<TextAlign>()
+
+        // Not widely supported: https://wpt.fyi/results/css/css-text/text-align?q=text-align-justifyall
+        // val JustifyAll get() = "justify-all".unsafeCast<TextAlign>()
         val Start get() = "start".unsafeCast<TextAlign>()
         val End get() = "end".unsafeCast<TextAlign>()
         val MatchParent get() = "match-parent".unsafeCast<TextAlign>()
@@ -113,7 +115,7 @@ sealed interface TextDecorationSkipInk : StylePropertyValue {
         val Auto get() = "auto".unsafeCast<TextDecorationSkipInk>()
         val None get() = "none".unsafeCast<TextDecorationSkipInk>()
 
-        // Still widely unsupported: https://caniuse.com/mdn-css_properties_text-decoration-skip-ink_all
+        // Not widely supported: https://caniuse.com/mdn-css_properties_text-decoration-skip-ink_all
         // val All get() = "all".unsafeCast<TextDecorationSkipInk>()
     }
 }
@@ -124,7 +126,7 @@ fun StyleScope.textDecorationSkipInk(textDecorationSkipInk: TextDecorationSkipIn
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-emphasis-position
 sealed interface TextEmphasisPosition : StylePropertyValue {
-    sealed interface Baseline: TextEmphasisPosition
+    sealed interface Baseline : TextEmphasisPosition
     enum class Side : StylePropertyValue {
         Left,
         Right;
@@ -133,7 +135,8 @@ sealed interface TextEmphasisPosition : StylePropertyValue {
     }
 
     companion object : CssGlobalValues<TextEmphasisPosition> {
-        val Auto get() = "auto".unsafeCast<TextEmphasisPosition>()
+        // Not widely supported: https://caniuse.com/mdn-css_properties_text-emphasis-position_auto
+        // val Auto get() = "auto".unsafeCast<TextEmphasisPosition>()
         val Over get() = "over".unsafeCast<Baseline>()
         val Under get() = "under".unsafeCast<Baseline>()
 
@@ -148,7 +151,7 @@ fun StyleScope.textEmphasisPosition(textEmphasisPosition: TextEmphasisPosition) 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-indent
 sealed interface TextIndent : StylePropertyValue {
     companion object : CssGlobalValues<TextIndent> {
-        // Still widely unsupported...
+        // Not widely supported
         // https://caniuse.com/mdn-css_properties_text-indent_hanging
         // val Hanging get() = "hanging".unsafeCast<TextIndent>()
         // https://caniuse.com/mdn-css_properties_text-indent_each-line
@@ -320,7 +323,9 @@ sealed interface UserSelect : StylePropertyValue {
         val None get() = "none".unsafeCast<UserSelect>()
         val Auto get() = "auto".unsafeCast<UserSelect>()
         val Text get() = "text".unsafeCast<UserSelect>()
-        val Contain get() = "contain".unsafeCast<UserSelect>()
+
+        // Not widely supported: Not in MDN
+        // val Contain get() = "contain".unsafeCast<UserSelect>()
         val All get() = "all".unsafeCast<UserSelect>()
     }
 }

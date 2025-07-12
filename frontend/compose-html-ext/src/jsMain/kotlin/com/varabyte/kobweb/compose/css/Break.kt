@@ -6,8 +6,9 @@ internal sealed interface CssBreakValues<T: StylePropertyValue> {
     // Generic break values
     val Auto get() = "auto".unsafeCast<T>()
     val Avoid get() = "avoid".unsafeCast<T>()
-    val Always get() = "always".unsafeCast<T>()
-    val All get() = "all".unsafeCast<T>()
+    // Not widely supported: https://caniuse.com/mdn-css_properties_break-after_always
+    // val Always get() = "always".unsafeCast<T>()
+    // val All get() = "all".unsafeCast<T>()
 
     // Page break values
     val AvoidPage get() = "avoid-page".unsafeCast<T>()
@@ -21,9 +22,9 @@ internal sealed interface CssBreakValues<T: StylePropertyValue> {
     val Column get() = "column".unsafeCast<T>()
     val AvoidColumn get() = "avoid-column".unsafeCast<T>()
 
-    // Region break values
-    val Region get() = "region".unsafeCast<T>()
-    val AvoidRegion get() = "avoid-region".unsafeCast<T>()
+    // CSS Regions are not widely supported: https://caniuse.com/css-regions
+    // val Region get() = "region".unsafeCast<T>()
+    // val AvoidRegion get() = "avoid-region".unsafeCast<T>()
 }
 
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/break-after
@@ -52,7 +53,8 @@ sealed interface BreakInside : StylePropertyValue {
         val Avoid get() = "avoid".unsafeCast<BreakInside>()
         val AvoidPage get() = "avoid-page".unsafeCast<BreakInside>()
         val AvoidColumn get() = "avoid-column".unsafeCast<BreakInside>()
-        val AvoidRegion get() = "avoid-region".unsafeCast<BreakInside>()
+        // CSS Regions are not widely supported: https://caniuse.com/css-regions
+        // val AvoidRegion get() = "avoid-region".unsafeCast<BreakInside>()
     }
 }
 

@@ -574,8 +574,8 @@ class StyleModifierTests {
         }).isEqualTo("text-decoration-skip-ink: auto")
 
         assertThat(modifierToText {
-            Modifier.textEmphasisPosition(TextEmphasisPosition.Auto)
-        }).isEqualTo("text-emphasis-position: auto")
+            Modifier.textEmphasisPosition(TextEmphasisPosition.Over)
+        }).isEqualTo("text-emphasis-position: over")
 
         assertThat(modifierToText {
             Modifier.textEmphasisPosition(TextEmphasisPosition.Over, TextEmphasisPosition.Side.Right)
