@@ -70,6 +70,7 @@ class MutableSilkTheme {
         48.cssRem,
         62.cssRem,
         80.cssRem,
+        96.cssRem,
     )
 
     private fun _registerStyle(name: String, style: CssStyle<*>, kind: KClass<out CssKind>, layer: String?) {

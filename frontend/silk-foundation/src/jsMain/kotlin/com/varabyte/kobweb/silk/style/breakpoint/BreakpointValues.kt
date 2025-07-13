@@ -44,6 +44,7 @@ data class BreakpointValues<out T : CSSLengthNumericValue>(
     val md: BreakpointUnitValue<T>,
     val lg: BreakpointUnitValue<T>,
     val xl: BreakpointUnitValue<T>,
+    val xxl: BreakpointUnitValue<T>,
 )
 
 /**
@@ -54,11 +55,13 @@ fun BreakpointSizes(
     md: CSSpxValue,
     lg: CSSpxValue,
     xl: CSSpxValue,
+    xxl: CSSpxValue = xl, // Default fallback provided for backwards compat
 ) = BreakpointValues(
     BreakpointUnitValue.Px(sm),
     BreakpointUnitValue.Px(md),
     BreakpointUnitValue.Px(lg),
-    BreakpointUnitValue.Px(xl)
+    BreakpointUnitValue.Px(xl),
+    BreakpointUnitValue.Px(xxl),
 )
 
 /**
@@ -69,11 +72,13 @@ fun BreakpointSizes(
     md: CSSSizeValue<CSSUnit.em>,
     lg: CSSSizeValue<CSSUnit.em>,
     xl: CSSSizeValue<CSSUnit.em>,
+    xxl: CSSSizeValue<CSSUnit.em> = xl, // Default fallback provided for backwards compat
 ) = BreakpointValues(
     BreakpointUnitValue.Em(sm),
     BreakpointUnitValue.Em(md),
     BreakpointUnitValue.Em(lg),
-    BreakpointUnitValue.Em(xl)
+    BreakpointUnitValue.Em(xl),
+    BreakpointUnitValue.Em(xxl),
 )
 
 /**
@@ -84,9 +89,11 @@ fun BreakpointSizes(
     md: CSSSizeValue<CSSUnit.rem>,
     lg: CSSSizeValue<CSSUnit.rem>,
     xl: CSSSizeValue<CSSUnit.rem>,
+    xxl: CSSSizeValue<CSSUnit.rem> = xl, // Default fallback provided for backwards compat
 ) = BreakpointValues(
     BreakpointUnitValue.Rem(sm),
     BreakpointUnitValue.Rem(md),
     BreakpointUnitValue.Rem(lg),
     BreakpointUnitValue.Rem(xl),
+    BreakpointUnitValue.Rem(xxl),
 )
