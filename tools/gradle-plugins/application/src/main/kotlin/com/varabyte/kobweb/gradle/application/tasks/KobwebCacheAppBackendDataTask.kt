@@ -2,11 +2,9 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_BACKEND
-import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
 import com.varabyte.kobweb.project.backend.AppBackendData
 import com.varabyte.kobweb.project.backend.BackendData
 import com.varabyte.kobweb.project.backend.merge
-import com.varabyte.kobweb.project.frontend.merge
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
@@ -15,6 +13,7 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
@@ -49,6 +48,7 @@ abstract class KobwebCacheAppBackendDataTask : DefaultTask() {
             "Search the project and merge all backend app data, saving it into a file, at which point it can be looked up by downstream tasks that need it."
     }
 
+    @get:Optional
     @get:InputFile
     abstract val appBackendMetadataFile: RegularFileProperty
 
@@ -60,7 +60,13 @@ abstract class KobwebCacheAppBackendDataTask : DefaultTask() {
 
     @TaskAction
     fun execute() {
-        val appBackendData = Json.decodeFromString<AppBackendData>(appBackendMetadataFile.get().asFile.readText())
+        // metadataFile will normally be found but might not exist for a project which JUST enabled the jvm backend
+        val appBackendDataFile = appBackendMetadataFile.orNull?.asFile ?: run {
+            appDataFile.get().asFile.writeText(Json.encodeToString(AppBackendData()))
+            return
+        }
+
+        val appBackendData = Json.decodeFromString<AppBackendData>(appBackendDataFile.readText())
         val mergedBackendData = buildList {
             add(appBackendData.backendData)
             compileClasspath.forEach { file ->
