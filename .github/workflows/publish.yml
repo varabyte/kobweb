@@ -56,9 +56,7 @@ jobs:
 
       - name: Publish Kobweb artifacts (Maven Central)
         if: inputs.repo-maven-central
-        # TEMPORARY UNTIL https://github.com/vanniktech/gradle-maven-publish-plugin/issues/259 is closed
-        # ETA early July 2025
-        run: ./gradlew publishAllPublicationsToMavenCentralRepository --no-configuration-cache
+        run: ./gradlew publishAllPublicationsToMavenCentralRepository
 
       - name: Publish Kobweb artifacts (Gradle Plugin Portal)
         if: inputs.repo-gradle-portal

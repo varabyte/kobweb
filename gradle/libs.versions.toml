@@ -19,7 +19,7 @@ logback = "1.5.15"
 playwright = "1.50.0"
 shadow = "8.3.0"
 truthish = "1.0.2"
-vanniktech-publish = "0.32.0"
+vanniktech-publish = "0.34.0"
 
 [libraries]
 commonmark-core = { module = "org.commonmark:commonmark", version.ref = "commonmark" }

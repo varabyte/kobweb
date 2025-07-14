@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.gradle.publish
 
-import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
@@ -32,7 +31,7 @@ internal fun PublishingExtension.addVarabyteArtifact(
                 coordinates(artifactId = artifactId)
             }
 
-            publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
+            publishToMavenCentral(automaticRelease = true)
             signAllPublications()
 
             pom {
