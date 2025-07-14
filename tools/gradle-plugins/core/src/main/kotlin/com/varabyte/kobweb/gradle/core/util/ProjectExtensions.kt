@@ -2,6 +2,7 @@ package com.varabyte.kobweb.gradle.core.util
 
 import com.varabyte.kobweb.gradle.core.kmp.TargetPlatform
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
+import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateModuleMetadataTask
 import org.gradle.api.Project
@@ -47,6 +48,26 @@ fun Project.getJsDependencyResults(): Provider<List<ResolvedDependencyResult>> {
  */
 fun Project.getTransitiveJsDependencyResults(): Provider<List<ResolvedDependencyResult>> {
     return provider { getDependencyResultsFromConfiguration(jsTarget.runtimeClasspath) }
+}
+
+/**
+ * Lazily returns a list of this module's direct JVM dependencies (no transitive dependencies included).
+ *
+ * @see getTransitiveJvmDependencyResults
+ * @see hasDependencyNamed for a way to check if a specific dependency is included in this list.
+ */
+fun Project.getJvmDependencyResults(): Provider<List<ResolvedDependencyResult>> {
+    return provider { jvmTarget?.compileClasspath?.let { getDependencyResultsFromConfiguration(it) } ?: emptyList() }
+}
+
+/**
+ * Lazily returns a list of this module's direct & transitive JS dependencies.
+ *
+ * @see getJvmDependencyResults
+ * @see hasDependencyNamed for a way to check if a specific dependency is included in this list.
+ */
+fun Project.getTransitiveJvmDependencyResults(): Provider<List<ResolvedDependencyResult>> {
+    return provider { jvmTarget?.runtimeClasspath?.let { getDependencyResultsFromConfiguration(it) } ?: emptyList() }
 }
 
 /**

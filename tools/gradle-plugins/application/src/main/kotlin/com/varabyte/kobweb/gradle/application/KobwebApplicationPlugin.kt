@@ -42,8 +42,10 @@ import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode
 import com.varabyte.kobweb.gradle.core.util.getBuildScripts
+import com.varabyte.kobweb.gradle.core.util.getJvmDependencyResults
 import com.varabyte.kobweb.gradle.core.util.getResourceSources
 import com.varabyte.kobweb.gradle.core.util.getTransitiveJsDependencyResults
+import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.isDescendantOf
 import com.varabyte.kobweb.gradle.core.util.kobwebCacheFile
 import com.varabyte.kobweb.gradle.core.util.namedOrNull
@@ -384,8 +386,18 @@ class KobwebApplicationPlugin @Inject constructor(
             val kobwebGenApisFactoryTask = project.tasks
                 .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock.app)
 
+            // If a user adds "includeServer = true" but doesn't add a dependency on the API artifact, we want to give
+            // them a clear message now; otherwise they'll get a cryptic compilation error later.
+            val hasKobwebApiDepProvider =
+                project.getJvmDependencyResults().hasDependencyNamed("com.varabyte.kobweb:kobweb-api")
             kobwebGenApisFactoryTask.configure {
                 appDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
+
+                doFirst {
+                    if (!hasKobwebApiDepProvider.get()) {
+                        throw GradleException("e: A required jvm dependency for a Kobweb project with includeServer=true was not found. To fix, add compilerOnly(\"com.varabyte.kobweb:kobweb-api\"), or compileOnly(libs.kobweb.api) if using the standard Kobweb template, to the jvmMain.sourceSet block.")
+                    }
+                }
             }
 
             kobwebExportTask.configure {
