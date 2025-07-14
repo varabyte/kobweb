@@ -297,9 +297,6 @@ class CssStylePropertyTests {
 
     @Test
     fun verifyBackgroundColor() {
-        assertThat(styleToText { backgroundColor(BackgroundColor.CurrentColor) }).isEqualTo("background-color: currentcolor")
-        assertThat(styleToText { backgroundColor(BackgroundColor.Transparent) }).isEqualTo("background-color: transparent")
-
         assertThat(styleToText { backgroundColor(BackgroundColor.Inherit) }).isEqualTo("background-color: inherit")
         assertThat(styleToText { backgroundColor(BackgroundColor.Initial) }).isEqualTo("background-color: initial")
         assertThat(styleToText { backgroundColor(BackgroundColor.Revert) }).isEqualTo("background-color: revert")
@@ -701,8 +698,7 @@ class CssStylePropertyTests {
     @Test
     fun verifyCaretColor() {
         assertThat(styleToText { caretColor(CaretColor.Auto) }).isEqualTo("caret-color: auto")
-        assertThat(styleToText { caretColor(CaretColor.Transparent) }).isEqualTo("caret-color: transparent")
-        assertThat(styleToText { caretColor(CaretColor.CurrentColor) }).isEqualTo("caret-color: currentcolor")
+        assertThat(styleToText { caretColor(CaretColor.of(Color.transparent)) }).isEqualTo("caret-color: transparent")
 
         assertThat(styleToText { caretColor(CaretColor.Inherit) }).isEqualTo("caret-color: inherit")
         assertThat(styleToText { caretColor(CaretColor.Initial) }).isEqualTo("caret-color: initial")
@@ -746,8 +742,6 @@ class CssStylePropertyTests {
 
     @Test
     fun verifyColor() {
-        assertThat(styleToText { color(CSSColor.CurrentColor) }).isEqualTo("color: currentColor")
-
         assertThat(styleToText { color(CSSColor.Inherit) }).isEqualTo("color: inherit")
         assertThat(styleToText { color(CSSColor.Initial) }).isEqualTo("color: initial")
         assertThat(styleToText { color(CSSColor.Revert) }).isEqualTo("color: revert")
@@ -1558,6 +1552,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { lineBreak(LineBreak.RevertLayer) }).isEqualTo("line-break: revert-layer")
         assertThat(styleToText { lineBreak(LineBreak.Unset) }).isEqualTo("line-break: unset")
     }
+
     @Test
     fun verifyLineHeight() {
         assertThat(styleToText { lineHeight(LineHeight.Normal) }).isEqualTo("line-height: normal")
@@ -1776,7 +1771,7 @@ class CssStylePropertyTests {
     }
 
     @Test
-    fun verifyOrphans(){
+    fun verifyOrphans() {
         assertThat(styleToText { orphans(Orphans.of(2)) }).isEqualTo("orphans: 2")
         //Global
         assertThat(styleToText { orphans(Orphans.Inherit) }).isEqualTo("orphans: inherit")
