@@ -2612,7 +2612,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { willChange(WillChange.ScrollPosition) }).isEqualTo("will-change: scroll-position")
         assertThat(styleToText { willChange(WillChange.Contents) }).isEqualTo("will-change: contents")
 
-        assertThat(styleToText { willChange(WillChange.of("left","top")) }).isEqualTo("will-change: left, top")
+        assertThat(styleToText { willChange(WillChange.of("left", "top")) }).isEqualTo("will-change: left, top")
 
         assertThat(styleToText { willChange(WillChange.Inherit) }).isEqualTo("will-change: inherit")
         assertThat(styleToText { willChange(WillChange.Initial) }).isEqualTo("will-change: initial")
@@ -2652,6 +2652,8 @@ class CssStylePropertyTests {
         assertThat(styleToText { writingMode(WritingMode.HorizontalTb) }).isEqualTo("writing-mode: horizontal-tb")
         assertThat(styleToText { writingMode(WritingMode.VerticalRl) }).isEqualTo("writing-mode: vertical-rl")
         assertThat(styleToText { writingMode(WritingMode.VerticalLr) }).isEqualTo("writing-mode: vertical-lr")
+        assertThat(styleToText { writingMode(WritingMode.SidewaysRl) }).isEqualTo("writing-mode: sideways-rl")
+        assertThat(styleToText { writingMode(WritingMode.SidewaysLr) }).isEqualTo("writing-mode: sideways-lr")
 
         assertThat(styleToText { writingMode(WritingMode.Inherit) }).isEqualTo("writing-mode: inherit")
         assertThat(styleToText { writingMode(WritingMode.Initial) }).isEqualTo("writing-mode: initial")

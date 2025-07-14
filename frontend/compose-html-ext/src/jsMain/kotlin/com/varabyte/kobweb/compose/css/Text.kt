@@ -390,6 +390,8 @@ sealed interface WritingMode : StylePropertyValue {
         val HorizontalTb get() = "horizontal-tb".unsafeCast<WritingMode>()
         val VerticalRl get() = "vertical-rl".unsafeCast<WritingMode>()
         val VerticalLr get() = "vertical-lr".unsafeCast<WritingMode>()
+        val SidewaysRl get() = "sideways-rl".unsafeCast<WritingMode>()
+        val SidewaysLr get() = "sideways-lr".unsafeCast<WritingMode>()
     }
 }
 
