@@ -48,14 +48,19 @@ fun StyleScope.colorScheme(colorScheme: ColorScheme) {
 sealed interface CSSColor : StylePropertyValue {
     companion object : CssGlobalValues<CSSColor> {
         // Keywords
+        @Deprecated(
+            "We are removing duplicate values.",
+            ReplaceWith("Color.currentColor", "org.jetbrains.compose.web.css.Color")
+        )
         val CurrentColor get() = "currentColor".unsafeCast<CSSColor>()
     }
 }
 
 fun StyleScope.color(color: CSSColor) {
-    color(color.toString())
+    property("color", color)
 }
 
+@Deprecated("We are moving away from stingly-typed values. Use `CSSColor`, `org.jetbrains.compose.web.css.Color`, or `com.varabyte.kobweb.compose.ui.graphics.Colors` instead.")
 fun StyleScope.color(value: String) {
     property("color", value)
 }

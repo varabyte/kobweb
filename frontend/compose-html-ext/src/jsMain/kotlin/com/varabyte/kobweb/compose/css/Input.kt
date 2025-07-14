@@ -10,7 +10,17 @@ sealed interface CaretColor : StylePropertyValue {
 
         // Keyword
         val Auto get() = "auto".unsafeCast<CaretColor>()
+
+        @Deprecated(
+            "We are removing duplicate values.",
+            ReplaceWith("Color.transparent", "org.jetbrains.compose.web.css.Color")
+        )
         val Transparent get() = "transparent".unsafeCast<CaretColor>()
+
+        @Deprecated(
+            "We are removing duplicate values.",
+            ReplaceWith("Color.currentColor", "org.jetbrains.compose.web.css.Color")
+        )
         val CurrentColor get() = "currentcolor".unsafeCast<CaretColor>()
     }
 }
