@@ -26,25 +26,6 @@ sealed interface BackgroundBlendMode : StylePropertyValue {
 
     companion object : CssBlendModeValues<Listable>, CssGlobalValues<BackgroundBlendMode> {
         fun list(vararg blendModes: Listable): BackgroundBlendMode = blendModes.joinToString().unsafeCast<BackgroundBlendMode>()
-
-        override val Normal get() = "normal".unsafeCast<Listable>()
-        override val Multiply get() = "multiply".unsafeCast<Listable>()
-        override val Screen get() = "screen".unsafeCast<Listable>()
-        override val Overlay get() = "overlay".unsafeCast<Listable>()
-        override val Darken get() = "darken".unsafeCast<Listable>()
-        override val Lighten get() = "lighten".unsafeCast<Listable>()
-        override val ColorDodge get() = "color-dodge".unsafeCast<Listable>()
-        override val ColorBurn get() = "color-burn".unsafeCast<Listable>()
-        override val HardLight get() = "hard-light".unsafeCast<Listable>()
-        override val SoftLight get() = "soft-light".unsafeCast<Listable>()
-        override val Difference get() = "difference".unsafeCast<Listable>()
-        override val Exclusion get() = "exclusion".unsafeCast<Listable>()
-        override val Hue get() = "hue".unsafeCast<Listable>()
-        override val Saturation get() = "saturation".unsafeCast<Listable>()
-        override val Color get() = "color".unsafeCast<Listable>()
-        override val Luminosity get() = "luminosity".unsafeCast<Listable>()
-        override val PlusDarker get() = "plus-darker".unsafeCast<Listable>()
-        override val PlusLighter get() = "plus-lighter".unsafeCast<Listable>()
     }
 }
 

@@ -56,7 +56,8 @@ sealed interface TextAlign : StylePropertyValue {
         // val JustifyAll get() = "justify-all".unsafeCast<TextAlign>()
         val Start get() = "start".unsafeCast<TextAlign>()
         val End get() = "end".unsafeCast<TextAlign>()
-        val MatchParent get() = "match-parent".unsafeCast<TextAlign>()
+        // Not widely supported (unprefixed): https://caniuse.com/mdn-css_properties_text-align_match-parent
+        // val MatchParent get() = "match-parent".unsafeCast<TextAlign>()
     }
 }
 

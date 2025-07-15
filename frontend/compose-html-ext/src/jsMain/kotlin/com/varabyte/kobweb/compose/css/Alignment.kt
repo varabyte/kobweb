@@ -80,7 +80,8 @@ sealed interface AlignContent : StylePropertyValue {
         // Baseline
         val Baseline get() = (null as? BaselineSet?).toValue().unsafeCast<AlignContent>()
         val FirstBaseline get() = BaselineSet.First.toValue().unsafeCast<AlignContent>()
-        val LastBaseline get() = BaselineSet.Last.toValue().unsafeCast<AlignContent>()
+        // Not widely supported: https://caniuse.com/mdn-css_properties_align-content_flex_context_last_baseline
+        // val LastBaseline get() = BaselineSet.Last.toValue().unsafeCast<AlignContent>()
 
         // Overflow
         fun Safe(position: AlignContentPosition) = OverflowStrategy.Safe.toValue(position).unsafeCast<AlignContent>()
@@ -289,7 +290,7 @@ sealed interface JustifySelf : StylePropertyValue {
         val Normal get() = "normal".unsafeCast<JustifySelf>()
         val Stretch get() = "stretch".unsafeCast<JustifySelf>()
 
-        // Positional  
+        // Positional
         val Center get() = "center".unsafeCast<JustifySelfPosition>()
         val Start get() = "start".unsafeCast<JustifySelfPosition>()
         val End get() = "end".unsafeCast<JustifySelfPosition>()
