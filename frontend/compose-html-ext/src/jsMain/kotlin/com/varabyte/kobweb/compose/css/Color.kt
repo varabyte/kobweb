@@ -120,3 +120,14 @@ sealed class ColorInterpolationMethod private constructor(private val value: Str
             space.withHue(hueInterpolationMethod)
     }
 }
+
+sealed interface Opacity : StylePropertyValue {
+    companion object : CssGlobalValues<Opacity> {
+        fun of(value: Number): Opacity = value.unsafeCast<Opacity>()
+        fun of(value: CSSPercentageNumericValue): Opacity = value.unsafeCast<Opacity>()
+    }
+}
+
+fun StyleScope.opacity(value: Opacity) {
+    property("opacity", value)
+}

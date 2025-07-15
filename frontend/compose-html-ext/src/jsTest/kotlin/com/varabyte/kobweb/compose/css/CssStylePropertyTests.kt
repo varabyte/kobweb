@@ -1782,6 +1782,18 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyOpacity() {
+        assertThat(styleToText { opacity(Opacity.of(0.5)) }).isEqualTo("opacity: 0.5")
+        assertThat(styleToText { opacity(Opacity.of(50.percent)) }).isEqualTo("opacity: 50%")
+
+        assertThat(styleToText { opacity(Opacity.Inherit) }).isEqualTo("opacity: inherit")
+        assertThat(styleToText { opacity(Opacity.Initial) }).isEqualTo("opacity: initial")
+        assertThat(styleToText { opacity(Opacity.Revert) }).isEqualTo("opacity: revert")
+        assertThat(styleToText { opacity(Opacity.RevertLayer) }).isEqualTo("opacity: revert-layer")
+        assertThat(styleToText { opacity(Opacity.Unset) }).isEqualTo("opacity: unset")
+    }
+
+    @Test
     fun verifyOrphans() {
         assertThat(styleToText { orphans(Orphans.of(2)) }).isEqualTo("orphans: 2")
         //Global
