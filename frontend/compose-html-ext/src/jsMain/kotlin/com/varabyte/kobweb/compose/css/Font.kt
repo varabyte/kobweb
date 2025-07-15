@@ -50,7 +50,8 @@ sealed interface FontVariantAlternates : StylePropertyValue {
         fun Ornaments(ident: String): Listable = "ornaments($ident)".unsafeCast<Listable>()
         fun Annotation(ident: String): Listable = "annotation($ident)".unsafeCast<Listable>()
 
-        fun list(vararg values: Listable): FontVariantAlternates = values.joinToString(" ").unsafeCast<FontVariantAlternates>()
+        fun list(vararg values: Listable): FontVariantAlternates =
+            values.joinToString(" ").unsafeCast<FontVariantAlternates>()
     }
 }
 
@@ -60,15 +61,16 @@ fun StyleScope.fontVariantAlternates(fontVariantAlternates: FontVariantAlternate
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-caps
 sealed interface FontVariantCaps : StylePropertyValue {
+    sealed interface ValidInShorthand : FontVariantCaps
     companion object : CssGlobalValues<FontVariantCaps> {
         // Keyword
         val Normal get() = "normal".unsafeCast<FontVariantCaps>()
-        val SmallCaps get() = "small-caps".unsafeCast<FontVariantCaps>()
-        val AllSmallCaps get() = "all-small-caps".unsafeCast<FontVariantCaps>()
-        val PetiteCaps get() = "petite-caps".unsafeCast<FontVariantCaps>()
-        val AllPetiteCaps get() = "all-petite-caps".unsafeCast<FontVariantCaps>()
-        val Unicase get() = "unicase".unsafeCast<FontVariantCaps>()
-        val TitlingCaps get() = "titling-caps".unsafeCast<FontVariantCaps>()
+        val SmallCaps get() = "small-caps".unsafeCast<ValidInShorthand>()
+        val AllSmallCaps get() = "all-small-caps".unsafeCast<ValidInShorthand>()
+        val PetiteCaps get() = "petite-caps".unsafeCast<ValidInShorthand>()
+        val AllPetiteCaps get() = "all-petite-caps".unsafeCast<ValidInShorthand>()
+        val Unicase get() = "unicase".unsafeCast<ValidInShorthand>()
+        val TitlingCaps get() = "titling-caps".unsafeCast<ValidInShorthand>()
     }
 }
 
@@ -99,7 +101,8 @@ sealed interface FontVariantEastAsian : StylePropertyValue {
         val FullWidth get() = "full-width".unsafeCast<Listable>()
         val ProportionalWidth get() = "proportional-width".unsafeCast<Listable>()
 
-        fun list(vararg values: Listable): FontVariantEastAsian = values.joinToString(" ").unsafeCast<FontVariantEastAsian>()
+        fun list(vararg values: Listable): FontVariantEastAsian =
+            values.joinToString(" ").unsafeCast<FontVariantEastAsian>()
     }
 }
 
@@ -109,12 +112,13 @@ fun StyleScope.fontVariantEastAsian(eastAsian: FontVariantEastAsian) {
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-emoji
 sealed interface FontVariantEmoji : StylePropertyValue {
+    sealed interface ValidInShorthand : FontVariantEmoji
     companion object : CssGlobalValues<FontVariantEmoji> {
         // Keyword
         val Normal get() = "normal".unsafeCast<FontVariantEmoji>()
-        val Text get() = "text".unsafeCast<FontVariantEmoji>()
-        val Emoji get() = "emoji".unsafeCast<FontVariantEmoji>()
-        val Unicode get() = "unicode".unsafeCast<FontVariantEmoji>()
+        val Text get() = "text".unsafeCast<ValidInShorthand>()
+        val Emoji get() = "emoji".unsafeCast<ValidInShorthand>()
+        val Unicode get() = "unicode".unsafeCast<ValidInShorthand>()
     }
 }
 
@@ -199,7 +203,8 @@ sealed interface FontVariantNumeric : StylePropertyValue {
         val DiagonalFractions get() = "diagonal-fractions".unsafeCast<Listable>()
         val StackedFractions get() = "stacked-fractions".unsafeCast<Listable>()
 
-        fun list(vararg keywords: Listable): FontVariantNumeric = keywords.joinToString(" ").unsafeCast<FontVariantNumeric>()
+        fun list(vararg keywords: Listable): FontVariantNumeric =
+            keywords.joinToString(" ").unsafeCast<FontVariantNumeric>()
     }
 }
 
@@ -209,11 +214,12 @@ fun StyleScope.fontVariantNumeric(numeric: FontVariantNumeric) {
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-position
 sealed interface FontVariantPosition : StylePropertyValue {
+    sealed interface ValidInShorthand : FontVariantPosition
     companion object : CssGlobalValues<FontVariantPosition> {
         // Keyword
         val Normal get() = "normal".unsafeCast<FontVariantPosition>()
-        val Sub get() = "sub".unsafeCast<FontVariantPosition>()
-        val Super get() = "super".unsafeCast<FontVariantPosition>()
+        val Sub get() = "sub".unsafeCast<ValidInShorthand>()
+        val Super get() = "super".unsafeCast<ValidInShorthand>()
     }
 }
 
@@ -221,26 +227,28 @@ fun StyleScope.fontVariantPosition(position: FontVariantPosition) {
     property("font-variant-position", position)
 }
 
-fun StyleScope.fontVariant(
-    alternates: FontVariantAlternates? = null,
-    caps: FontVariantCaps? = null,
-    eastAsian: FontVariantEastAsian? = null,
-    emoji: FontVariantEmoji? = null,
-    ligatures: FontVariantLigatures? = null,
-    numeric: FontVariantNumeric? = null,
-    position: FontVariantPosition? = null,
-) {
-    property(
-        "font-variant", buildList {
-            alternates?.let { add(it) }
-            caps?.let { add(it) }
-            eastAsian?.let { add(it) }
-            emoji?.let { add(it) }
-            ligatures?.let { add(it) }
-            numeric?.let { add(it) }
-            position?.let { add(it) }
-        }.joinToString(" ")
-    )
+sealed interface FontVariant : StylePropertyValue {
+    companion object : CssGlobalValues<FontVariant> {
+        // Keyword
+        val Normal get() = "normal".unsafeCast<FontVariant>()
+        fun of(
+            alternates: FontVariantAlternates.Listable? = null,
+            caps: FontVariantCaps.ValidInShorthand? = null,
+            eastAsian: FontVariantEastAsian.Listable? = null,
+            emoji: FontVariantEmoji.ValidInShorthand? = null,
+            ligatures: FontVariantLigatures.Listable? = null,
+            numeric: FontVariantNumeric.Listable? = null,
+            position: FontVariantPosition.ValidInShorthand? = null,
+        ): FontVariant {
+            return listOfNotNull(alternates, caps, eastAsian, emoji, ligatures, numeric, position)
+                .joinToString(" ")
+                .unsafeCast<FontVariant>()
+        }
+    }
+}
+
+fun StyleScope.fontVariant(fontVariant: FontVariant) {
+    property("font-variant", fontVariant)
 }
 
 // endregion FontVariant
