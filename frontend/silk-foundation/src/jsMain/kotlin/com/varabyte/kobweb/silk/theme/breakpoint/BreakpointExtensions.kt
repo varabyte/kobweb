@@ -14,6 +14,7 @@ private fun Breakpoint.toValue(): BreakpointUnitValue<CSSLengthNumericValue>? {
         Breakpoint.MD -> SilkTheme.breakpoints.md
         Breakpoint.LG -> SilkTheme.breakpoints.lg
         Breakpoint.XL -> SilkTheme.breakpoints.xl
+        Breakpoint.XXL -> SilkTheme.breakpoints.xxl
     }
 }
 

@@ -5,6 +5,7 @@ import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint.LG
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint.MD
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint.SM
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint.XL
+import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint.XXL
 import com.varabyte.kobweb.silk.theme.breakpoint.toWidth
 import org.jetbrains.compose.web.css.*
 
@@ -22,7 +23,7 @@ sealed interface BreakpointQueryProvider {
  * styles, if you even need to use breakpoints at all).
  *
  * [XL] is provided for ultra-wide scenarios as well as additional flexibility in case the user wants to override what
- * these size means in their own web app.
+ * these size means in their own web app. [XXL] for super ultra-wide / 4K monitors.
  *
  * By default, you can think about base styles (without breakpoints) applying to mobile. In other words, if you never
  * add any breakpoints, then the page you get will be styled the same on your phone as well as the widest-screen
@@ -43,7 +44,8 @@ enum class Breakpoint : BreakpointQueryProvider {
     SM,
     MD,
     LG,
-    XL;
+    XL,
+    XXL;
 
     /** Returns a `min-width` media query that applies at this breakpoint and above. */
     override fun toCSSMediaQuery(): CSSMediaQuery = CSSMediaQuery.MediaFeature("min-width", this.toWidth())

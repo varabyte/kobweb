@@ -9,4 +9,5 @@ class ResponsiveValues<T>(
     val md: T,
     val lg: T,
     val xl: T,
+    val xxl: T,
 )

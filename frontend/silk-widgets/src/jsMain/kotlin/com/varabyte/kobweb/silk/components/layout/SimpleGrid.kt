@@ -39,8 +39,8 @@ val SimpleGridStyle = CssStyle<SimpleGridKind> {
  *
  * See the header docs for that method for more details.
  */
-fun numColumns(base: Int, sm: Int = base, md: Int = sm, lg: Int = md, xl: Int = lg) =
-    ResponsiveValues(base, sm, md, lg, xl)
+fun numColumns(base: Int, sm: Int = base, md: Int = sm, lg: Int = md, xl: Int = lg, xxl: Int = xl) =
+    ResponsiveValues(base, sm, md, lg, xl, xxl)
 
 /**
  * A widget making it easy to create a common case of responsive grids, specifically one where you simply specify the
@@ -81,6 +81,7 @@ fun SimpleGrid(
             .setVariable(columnVariables.getValue(Breakpoint.MD), numColumns.md)
             .setVariable(columnVariables.getValue(Breakpoint.LG), numColumns.lg)
             .setVariable(columnVariables.getValue(Breakpoint.XL), numColumns.xl)
+            .setVariable(columnVariables.getValue(Breakpoint.XXL), numColumns.xxl)
             .then(modifier)
             .toAttrs()
     ) {
