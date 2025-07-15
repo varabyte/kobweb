@@ -3,48 +3,33 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 interface CssBlendModeValues<T: StylePropertyValue> {
-    val Normal: T
-    val Multiply: T
-    val Screen: T
-    val Overlay: T
-    val Darken: T
-    val Lighten: T
-    val ColorDodge: T
-    val ColorBurn: T
-    val HardLight: T
-    val SoftLight: T
-    val Difference: T
-    val Exclusion: T
-    val Hue: T
-    val Saturation: T
-    val Color: T
-    val Luminosity: T
-    val PlusDarker: T
-    val PlusLighter: T
+    val Normal get() = "normal".unsafeCast<T>()
+    val Multiply get() = "multiply".unsafeCast<T>()
+    val Screen get() = "screen".unsafeCast<T>()
+    val Overlay get() = "overlay".unsafeCast<T>()
+    val Darken get() = "darken".unsafeCast<T>()
+    val Lighten get() = "lighten".unsafeCast<T>()
+    val ColorDodge get() = "color-dodge".unsafeCast<T>()
+    val ColorBurn get() = "color-burn".unsafeCast<T>()
+    val HardLight get() = "hard-light".unsafeCast<T>()
+    val SoftLight get() = "soft-light".unsafeCast<T>()
+    val Difference get() = "difference".unsafeCast<T>()
+    val Exclusion get() = "exclusion".unsafeCast<T>()
+    val Hue get() = "hue".unsafeCast<T>()
+    val Saturation get() = "saturation".unsafeCast<T>()
+    val Color get() = "color".unsafeCast<T>()
+    val Luminosity get() = "luminosity".unsafeCast<T>()
+    // Not widely supported: https://caniuse.com/mdn-css_properties_mix-blend-mode_plus-darker
+    // val PlusDarker get() = "plus-darker".unsafeCast<T>()
+    // Not widely supported in `background-blend-mode` (added below in `MixBlendMode`):
+    // https://wpt.fyi/results/css/compositing/background-blending?q=plus-lighter
+    // val PlusLighter get() = "plus-lighter".unsafeCast<T>()
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/mix-blend-mode
 sealed interface MixBlendMode : StylePropertyValue {
     companion object : CssBlendModeValues<MixBlendMode>, CssGlobalValues<MixBlendMode> {
-        // Keywords
-        override val Normal get() = "normal".unsafeCast<MixBlendMode>()
-        override val Multiply get() = "multiply".unsafeCast<MixBlendMode>()
-        override val Screen get() = "screen".unsafeCast<MixBlendMode>()
-        override val Overlay get() = "overlay".unsafeCast<MixBlendMode>()
-        override val Darken get() = "darken".unsafeCast<MixBlendMode>()
-        override val Lighten get() = "lighten".unsafeCast<MixBlendMode>()
-        override val ColorDodge get() = "color-dodge".unsafeCast<MixBlendMode>()
-        override val ColorBurn get() = "color-burn".unsafeCast<MixBlendMode>()
-        override val HardLight get() = "hard-light".unsafeCast<MixBlendMode>()
-        override val SoftLight get() = "soft-light".unsafeCast<MixBlendMode>()
-        override val Difference get() = "difference".unsafeCast<MixBlendMode>()
-        override val Exclusion get() = "exclusion".unsafeCast<MixBlendMode>()
-        override val Hue get() = "hue".unsafeCast<MixBlendMode>()
-        override val Saturation get() = "saturation".unsafeCast<MixBlendMode>()
-        override val Color get() = "color".unsafeCast<MixBlendMode>()
-        override val Luminosity get() = "luminosity".unsafeCast<MixBlendMode>()
-        override val PlusDarker get() = "plus-darker".unsafeCast<MixBlendMode>()
-        override val PlusLighter get() = "plus-lighter".unsafeCast<MixBlendMode>()
+        val PlusLighter get() = "plus-lighter".unsafeCast<MixBlendMode>()
     }
 }
 

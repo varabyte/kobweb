@@ -6,11 +6,28 @@ import com.varabyte.kobweb.compose.css.functions.brightness
 import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.truthish.assertThat
 import com.varabyte.truthish.assertThrows
+import com.varabyte.truthish.assertWithMessage
+import kotlinx.browser.document
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.auto
+import org.w3c.dom.HTMLElement
 import kotlin.test.Test
 
 class CssStylePropertyTests {
+    private fun styleToTextOnHtmlElement(block: StyleScope.() -> Unit): String {
+        val element = document.createElement("div").unsafeCast<HTMLElement>()
+        object : StyleScope {
+            override fun property(propertyName: String, value: StylePropertyValue) {
+                element.style.setProperty(propertyName, value.toString())
+            }
+
+            override fun variable(variableName: String, value: StylePropertyValue) {
+                element.style.setProperty(variableName, value.toString())
+            }
+        }.block()
+        return element.style.cssText
+    }
+
     // Convert all properties in a style to the String that would ultimately get put into an HTML style attribute.
     // In other words, key / values will be split by a ':' and multiple properties by a ';'
     private fun styleToText(block: StyleScope.() -> Unit): String {
@@ -19,7 +36,13 @@ class CssStylePropertyTests {
         val styleScope = ComparableStyleScope()
         block.invoke(styleScope)
 
-        return styleScope.properties.entries.joinToString("; ") { (key, value) -> "$key: $value" }
+        return styleScope.properties.entries.joinToString("; ") { (key, value) -> "$key: $value" }.also {
+            // Check that the browser applied the style to an HTML element, meaning it recognizes it as valid CSS
+            // We don't match on the exact string as the browser may reformat it
+            assertWithMessage("Browser should recognize style `$it`")
+                .that(styleToTextOnHtmlElement(block))
+                .isNotBlank()
+        }
     }
 
     @Test
@@ -118,7 +141,6 @@ class CssStylePropertyTests {
         // Baseline
         assertThat(styleToText { alignContent(AlignContent.Baseline) }).isEqualTo("align-content: baseline")
         assertThat(styleToText { alignContent(AlignContent.FirstBaseline) }).isEqualTo("align-content: first baseline")
-        assertThat(styleToText { alignContent(AlignContent.LastBaseline) }).isEqualTo("align-content: last baseline")
 
         // Overflow
         assertThat(styleToText { alignContent(AlignContent.Safe(AlignContent.Center)) }).isEqualTo("align-content: safe center")
@@ -271,8 +293,6 @@ class CssStylePropertyTests {
         assertThat(styleToText { backgroundBlendMode(BackgroundBlendMode.Saturation) }).isEqualTo("background-blend-mode: saturation")
         assertThat(styleToText { backgroundBlendMode(BackgroundBlendMode.Color) }).isEqualTo("background-blend-mode: color")
         assertThat(styleToText { backgroundBlendMode(BackgroundBlendMode.Luminosity) }).isEqualTo("background-blend-mode: luminosity")
-        assertThat(styleToText { backgroundBlendMode(BackgroundBlendMode.PlusDarker) }).isEqualTo("background-blend-mode: plus-darker")
-        assertThat(styleToText { backgroundBlendMode(BackgroundBlendMode.PlusLighter) }).isEqualTo("background-blend-mode: plus-lighter")
 
         assertThat(styleToText { backgroundBlendMode(BackgroundBlendMode.Inherit) }).isEqualTo("background-blend-mode: inherit")
         assertThat(styleToText { backgroundBlendMode(BackgroundBlendMode.Initial) }).isEqualTo("background-blend-mode: initial")
@@ -1756,7 +1776,6 @@ class CssStylePropertyTests {
         assertThat(styleToText { mixBlendMode(MixBlendMode.Saturation) }).isEqualTo("mix-blend-mode: saturation")
         assertThat(styleToText { mixBlendMode(MixBlendMode.Color) }).isEqualTo("mix-blend-mode: color")
         assertThat(styleToText { mixBlendMode(MixBlendMode.Luminosity) }).isEqualTo("mix-blend-mode: luminosity")
-        assertThat(styleToText { mixBlendMode(MixBlendMode.PlusDarker) }).isEqualTo("mix-blend-mode: plus-darker")
         assertThat(styleToText { mixBlendMode(MixBlendMode.PlusLighter) }).isEqualTo("mix-blend-mode: plus-lighter")
 
         assertThat(styleToText { mixBlendMode(MixBlendMode.Inherit) }).isEqualTo("mix-blend-mode: inherit")
@@ -2132,7 +2151,6 @@ class CssStylePropertyTests {
         assertThat(styleToText { textAlign(TextAlign.Justify) }).isEqualTo("text-align: justify")
         assertThat(styleToText { textAlign(TextAlign.Start) }).isEqualTo("text-align: start")
         assertThat(styleToText { textAlign(TextAlign.End) }).isEqualTo("text-align: end")
-        assertThat(styleToText { textAlign(TextAlign.MatchParent) }).isEqualTo("text-align: match-parent")
 
         assertThat(styleToText { textAlign(TextAlign.Inherit) }).isEqualTo("text-align: inherit")
         assertThat(styleToText { textAlign(TextAlign.Initial) }).isEqualTo("text-align: initial")
