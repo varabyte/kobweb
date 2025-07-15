@@ -1208,33 +1208,44 @@ class CssStylePropertyTests {
     @Test
     fun verifyFontVariant() {
         // Individual values
-        assertThat(styleToText { fontVariant(alternates = FontVariantAlternates.Normal) })
+        assertThat(styleToText { fontVariant(FontVariant.Normal) })
             .isEqualTo("font-variant: normal")
-        assertThat(styleToText { fontVariant(caps = FontVariantCaps.SmallCaps) })
+        assertThat(styleToText { fontVariant(FontVariant.of(alternates = FontVariantAlternates.HistoricalForms)) })
+            .isEqualTo("font-variant: historical-forms")
+        assertThat(styleToText { fontVariant(FontVariant.of(caps = FontVariantCaps.SmallCaps)) })
             .isEqualTo("font-variant: small-caps")
-        assertThat(styleToText { fontVariant(eastAsian = FontVariantEastAsian.Ruby) })
+        assertThat(styleToText { fontVariant(FontVariant.of(eastAsian = FontVariantEastAsian.Ruby)) })
             .isEqualTo("font-variant: ruby")
-        assertThat(styleToText { fontVariant(emoji = FontVariantEmoji.Text) })
+        assertThat(styleToText { fontVariant(FontVariant.of(emoji = FontVariantEmoji.Text)) })
             .isEqualTo("font-variant: text")
-        assertThat(styleToText { fontVariant(ligatures = FontVariantLigatures.CommonLigatures) })
+        assertThat(styleToText { fontVariant(FontVariant.of(ligatures = FontVariantLigatures.CommonLigatures)) })
             .isEqualTo("font-variant: common-ligatures")
-        assertThat(styleToText { fontVariant(numeric = FontVariantNumeric.Ordinal) })
+        assertThat(styleToText { fontVariant(FontVariant.of(numeric = FontVariantNumeric.Ordinal)) })
             .isEqualTo("font-variant: ordinal")
-        assertThat(styleToText { fontVariant(position = FontVariantPosition.Super) })
+        assertThat(styleToText { fontVariant(FontVariant.of(position = FontVariantPosition.Super)) })
             .isEqualTo("font-variant: super")
 
         // Multiple values
         assertThat(styleToText {
             fontVariant(
-                alternates = FontVariantAlternates.Normal,
-                caps = FontVariantCaps.SmallCaps,
-                eastAsian = FontVariantEastAsian.Ruby,
-                emoji = FontVariantEmoji.Text,
-                ligatures = FontVariantLigatures.CommonLigatures,
-                numeric = FontVariantNumeric.Ordinal,
-                position = FontVariantPosition.Super
+                FontVariant.of(
+                    alternates = FontVariantAlternates.HistoricalForms,
+                    caps = FontVariantCaps.SmallCaps,
+                    eastAsian = FontVariantEastAsian.Ruby,
+                    emoji = FontVariantEmoji.Text,
+                    ligatures = FontVariantLigatures.CommonLigatures,
+                    numeric = FontVariantNumeric.Ordinal,
+                    position = FontVariantPosition.Super
+                )
             )
-        }).isEqualTo("font-variant: normal small-caps ruby text common-ligatures ordinal super")
+        }).isEqualTo("font-variant: historical-forms small-caps ruby text common-ligatures ordinal super")
+
+        // Global
+        assertThat(styleToText { fontVariant(FontVariant.Inherit) }).isEqualTo("font-variant: inherit")
+        assertThat(styleToText { fontVariant(FontVariant.Initial) }).isEqualTo("font-variant: initial")
+        assertThat(styleToText { fontVariant(FontVariant.Revert) }).isEqualTo("font-variant: revert")
+        assertThat(styleToText { fontVariant(FontVariant.RevertLayer) }).isEqualTo("font-variant: revert-layer")
+        assertThat(styleToText { fontVariant(FontVariant.Unset) }).isEqualTo("font-variant: unset")
     }
 
     @Test

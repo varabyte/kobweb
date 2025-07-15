@@ -87,16 +87,20 @@ fun Modifier.fontVariant(scope: FontVariantScope.() -> Unit) = styleModifier {
     FontVariantScope(this).scope()
 }
 
+fun Modifier.fontVariant(fontVariant: FontVariant) = styleModifier {
+    fontVariant(fontVariant)
+}
+
 fun Modifier.fontVariant(
-    alternates: FontVariantAlternates? = null,
-    caps: FontVariantCaps? = null,
-    eastAsian: FontVariantEastAsian? = null,
-    emoji: FontVariantEmoji? = null,
-    ligatures: FontVariantLigatures? = null,
-    numeric: FontVariantNumeric? = null,
-    position: FontVariantPosition? = null,
+    alternates: FontVariantAlternates.Listable? = null,
+    caps: FontVariantCaps.ValidInShorthand? = null,
+    eastAsian: FontVariantEastAsian.Listable? = null,
+    emoji: FontVariantEmoji.ValidInShorthand? = null,
+    ligatures: FontVariantLigatures.Listable? = null,
+    numeric: FontVariantNumeric.Listable? = null,
+    position: FontVariantPosition.ValidInShorthand? = null,
 ) = styleModifier {
-    fontVariant(alternates, caps, eastAsian, emoji, ligatures, numeric, position)
+    fontVariant(FontVariant.of(alternates, caps, eastAsian, emoji, ligatures, numeric, position))
 }
 
 fun Modifier.fontVariationSettings(value: FontVariationSettings): Modifier = styleModifier {
