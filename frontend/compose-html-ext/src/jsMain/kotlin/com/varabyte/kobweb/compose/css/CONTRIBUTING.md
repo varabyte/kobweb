@@ -73,11 +73,19 @@ for developers who need to quickly jump to the link to understand the property's
 ---
 ### Every **non-longhand** CSS style property should have a corresponding sealed interface
 
-Some CSS properties are called *shorthand* and some are called *longhand*. A shorthand property is one that is a
-grouped representation of several inner properties, themselves called longhand properties.
+Some CSS properties are called *shorthand* and some are called *longhand*. Many CSS properties are neither.
 
-For example, `margin-inline` is a shorthand property for `margin-inline-start` and `margin-inline-end`.
+A shorthand property is one that is a grouped representation of several inner properties, themselves called longhand
+properties.
+
+If you look at the [Kobweb CSS checklist](https://docs.google.com/spreadsheets/d/1Uu2diibyOzDFPgzzM8BWlw4B9_CTDBACv_1E_tsXbp8),
+everything in the second and third columns are longhand properties. Anything in the first column that parents properties
+in the second column is a shorthand property.
+
+For example, `margin-inline` is a shorthand property for `margin-inline-start` and `margin-inline-end`. Conversely,
 `margin-inline-start` and `margin-inline-end` are longhand properties.
+
+Meanwhile, `appearance` is just a regular CSS property, neither shorthand nor longhand.
 
 Many longhand properties are simple primitive values (such as `border-width`).
 
@@ -93,22 +101,38 @@ But we require types for shorthand properties and normal properties as a pre-req
 sealed interface StyleExample /*...*/
 ```
 
+##### Avoid
+
 ```kotlin
-❌
-sealed interface MarginInlineEnd /* ... */
+// margin-inline-end is a longhand property and we shouldn't provide an
+// interface for it.
+❌ sealed interface MarginInlineEnd /* ... */
+
+// Instead, just handle this with a StyleScope extension method / methods
+// that accept relevant primitive values. We talk more about these methods
+// much later in the document.
+fun StyleScope.marginInlineEnd(value: CSSLengthOrPercentageNumericValue) {
+    property("margin-inline-end", value)
+}
 ```
 
-Even if the property is 99% of the time a simple integer value (e.g. `column-count`), we still need to support users
-being able to pass in global values (e.g. `ColumnCount.Inherit`), so we will always need a container type for every
-single property type.
+Even if the (non-longhand) property is a simple integer value 99% of the time (e.g. `column-count`), we still need to
+support users being able to pass in global values (e.g. `ColumnCount.Inherit`). For this reason, we always need to
+create some kind of container type to hang those global values on, thus here we chose a sealed interface.
 
 We seal the interface to prevent users from inheriting it. Our intention is for this to be self-contained type that only
 we control.
 
+Longhand properties technically can also support global keywords (e.g. `margin-inline-end: inherit` is valid!) but our
+expectation for now is the need for this is going to be so rare that it's not worth creating tons of extra code for it.
+If a user *really* needed to do this, they can always use `property("margin-inline-end", "inherit")` as a workaround.
+We may revisit this decision later.
+
 #### Exception
 
-If a longhand property is notably complex, like several of the `animation` longhand properties are, then you can of
-course introduce classes for those cases. But we do not plan to support most of them at this time.
+If a longhand property is notably complex and not simply primitive values, like several of the `animation` longhand
+properties are, then you can of course introduce classes for those cases. But we do not plan to support most of them at
+this time.
 
 ---
 ### Every interface should implement `StylePropertyValue`
