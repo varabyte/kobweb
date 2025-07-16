@@ -6,9 +6,6 @@ import com.varabyte.kobweb.compose.attributes.onTransitionRun
 import com.varabyte.kobweb.compose.attributes.onTransitionStart
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.Transition
-import com.varabyte.kobweb.compose.css.TransitionBehavior
-import com.varabyte.kobweb.compose.css.transition
-import com.varabyte.kobweb.compose.css.transitionBehavior
 import com.varabyte.kobweb.compose.events.SyntheticTransitionEvent
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
@@ -32,7 +29,7 @@ fun Modifier.transition(transitions: Array<Transition.Listable>) = styleModifier
     transition(Transition.list(*transitions))
 }
 
-class TransitionScope(private val styleScope: StyleScope) {
+class TransitionScope internal constructor(private val styleScope: StyleScope) {
     fun property(vararg properties: TransitionProperty.Name) = styleScope.transitionProperty(*properties)
     fun property(vararg properties: String) = styleScope.transitionProperty(*properties)
     fun duration(vararg durations: CSSTimeNumericValue) = styleScope.transitionDuration(*durations)
