@@ -8,7 +8,7 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
 @Suppress("FunctionName") // leading underscore to emphasize the internal nature of the method
-class BackgroundPositionScope(private val styleScope: StyleScope) {
+class BackgroundPositionScope internal constructor(private val styleScope: StyleScope) {
     private fun _x(value: StylePropertyValue) = styleScope.property("background-position-x", value)
     private fun _y(value: StylePropertyValue) = styleScope.property("background-position-y", value)
 
@@ -20,7 +20,7 @@ class BackgroundPositionScope(private val styleScope: StyleScope) {
     fun y(value: EdgeYOffset) = _y(value)
 }
 
-class BackgroundScope(private val styleScope: StyleScope) {
+class BackgroundScope internal constructor(private val styleScope: StyleScope) {
     fun attachment(backgroundAttachment: BackgroundAttachment) = styleScope.backgroundAttachment(backgroundAttachment)
     fun clip(backgroundClip: BackgroundClip) = styleScope.backgroundClip(backgroundClip)
     fun color(color: CSSColorValue) = styleScope.backgroundColor(color)
