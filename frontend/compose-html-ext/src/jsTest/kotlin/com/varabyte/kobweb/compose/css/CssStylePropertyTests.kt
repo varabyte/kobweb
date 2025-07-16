@@ -14,6 +14,16 @@ import org.w3c.dom.HTMLElement
 import kotlin.test.Test
 
 class CssStylePropertyTests {
+    /**
+     * Apply a style block to a temporary HTML element and return the inline style of the element, in the form
+     * `key: value; key2: value2;`.
+     *
+     * The exact text of the values may be altered by the browser's internal normalization
+     * (e.g. `property("margin", "10px 10px")` becomes `margin: 10px;`).
+     *
+     * This is useful for testing that the browser recognizes a style as valid CSS, because an invalid style will not
+     * get applied and thus output an empty string.
+     */
     private fun styleToTextOnHtmlElement(block: StyleScope.() -> Unit): String {
         val element = document.createElement("div").unsafeCast<HTMLElement>()
         object : StyleScope {
@@ -28,8 +38,11 @@ class CssStylePropertyTests {
         return element.style.cssText
     }
 
-    // Convert all properties in a style to the String that would ultimately get put into an HTML style attribute.
-    // In other words, key / values will be split by a ':' and multiple properties by a ';'
+    /**
+     * Convert all properties in a style to the String that would ultimately get put into an HTML style attribute.
+     *
+     * In other words, key / values will be split by a ':' and multiple properties by a ';'.
+     */
     private fun styleToText(block: StyleScope.() -> Unit): String {
         // We don't care about comparing -- but it's an easy way to construct a style scope, as Compose HTML doesn't
         // give us an easy way otherwise.
@@ -37,8 +50,8 @@ class CssStylePropertyTests {
         block.invoke(styleScope)
 
         return styleScope.properties.entries.joinToString("; ") { (key, value) -> "$key: $value" }.also {
-            // Check that the browser applied the style to an HTML element, meaning it recognizes it as valid CSS
-            // We don't match on the exact string as the browser may reformat it
+            // We don't match on the exact string as the browser may reformat it, so we just check that the browser did
+            // not reject the style.
             assertWithMessage("Browser should recognize style `$it`")
                 .that(styleToTextOnHtmlElement(block))
                 .isNotBlank()
