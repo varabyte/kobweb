@@ -701,7 +701,7 @@ fun InputGroup(
                 }
             }
             .thenIf(scope.rightInset != null) {
-                Modifier.paddingInline { end(scope.leftInsetWidth ?: InputVars.InsetLeftWidth.value()) }
+                Modifier.paddingInline { end(scope.rightInsetWidth ?: InputVars.InsetRightWidth.value()) }
             }
 
         // Render addons (if set) and the main input
