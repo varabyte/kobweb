@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
@@ -289,6 +290,61 @@ class CssStyleColorModeHtmlTest {
                 Div(SimpleStyle.toAttrs {
                     autoRef {
                         assertThat(it.computedStyle.width).isEqualTo("20px")
+                    }
+                })
+            }
+        }
+    }
+
+    @Test
+    fun styleOrder() = runComposeTest {
+        val stylesheet = StyleSheet()
+        // Declaring the same property twice with different values allows using new CSS features while providing a
+        // fallback for older browsers, as the browser will use the last valid value it sees.
+        val FallbackStyle = CssStyle.base {
+            Modifier.width(10.px).width("nonsense".unsafeCast<Width>())
+        }
+        val FlippedOrderStyle = CssStyle.base {
+            if (colorMode.isLight) {
+                Modifier.margin(10.px).margin { top(50.px) }
+            } else {
+                Modifier.margin { top(50.px) }.margin(10.px)
+            }
+        }
+
+        _SilkTheme = MutableSilkTheme().apply {
+            registerStyle("fallback-style", FallbackStyle)
+            registerStyle("flipped-order-style", FlippedOrderStyle)
+        }.let(::ImmutableSilkTheme)
+        SilkTheme.registerStylesInto(stylesheet)
+
+        composition {
+            Style(stylesheet)
+
+            Div({ classes(ColorMode.LIGHT.cssClass) }) {
+                Div(FallbackStyle.toAttrs {
+                    autoRef {
+                        assertThat(it.computedStyle.width).isEqualTo("10px")
+                    }
+                })
+
+                Div(FlippedOrderStyle.toAttrs {
+                    autoRef {
+                        assertThat(it.computedStyle.marginTop).isEqualTo("50px")
+                    }
+                })
+            }
+
+            Div({ classes(ColorMode.DARK.cssClass) }) {
+                Div(FallbackStyle.toAttrs {
+                    autoRef {
+                        assertThat(it.computedStyle.width).isEqualTo("10px")
+                    }
+                })
+
+                Div(FlippedOrderStyle.toAttrs {
+                    autoRef {
+                        assertThat(it.computedStyle.marginTop).isEqualTo("10px")
                     }
                 })
             }

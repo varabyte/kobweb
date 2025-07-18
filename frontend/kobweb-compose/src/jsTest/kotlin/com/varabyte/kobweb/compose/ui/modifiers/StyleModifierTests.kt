@@ -20,7 +20,7 @@ class StyleModifierTests {
         val modifier = produceModifier()
         modifier.toStyles().invoke(styleScope)
 
-        return styleScope.properties.entries.joinToString("; ") { (key, value) -> "$key: $value" }
+        return styleScope.properties.joinToString("; ") { "${it.name}: ${it.value}" }
     }
 
     @Test
