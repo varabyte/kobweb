@@ -185,8 +185,8 @@ abstract class CssStyle<K : CssKind> internal constructor(
         styles: ComparableStyleScope
     ) {
         cssRule style {
-            styles.properties.forEach { entry -> property(entry.key, entry.value) }
-            styles.variables.forEach { entry -> variable(entry.key, entry.value) }
+            styles.properties.forEach { entry -> property(entry.name, entry.value) }
+            styles.variables.forEach { entry -> variable(entry.name, entry.value) }
         }
     }
 

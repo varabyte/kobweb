@@ -49,7 +49,7 @@ class CssStylePropertyTests {
         val styleScope = ComparableStyleScope()
         block.invoke(styleScope)
 
-        return styleScope.properties.entries.joinToString("; ") { (key, value) -> "$key: $value" }.also {
+        return styleScope.properties.joinToString("; ") { "${it.name}: ${it.value}" }.also {
             // We don't match on the exact string as the browser may reformat it, so we just check that the browser did
             // not reject the style.
             assertWithMessage("Browser should recognize style `$it`")
