@@ -12,6 +12,7 @@ import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.MutationObserver
 import org.w3c.dom.MutationObserverInit
+import org.w3c.dom.css.CSSStyleDeclaration
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -160,3 +161,12 @@ private class TestMonotonicClockImpl(private val onRecomposeComplete: () -> Unit
         }
     }
 }
+
+/**
+ * Returns a live [CSSStyleDeclaration] representing the values of all CSS properties of the element, taking into
+ * account stylesheets and inline styles.
+ *
+ * @see org.w3c.dom.Window.getComputedStyle
+ */
+val HTMLElement.computedStyle: CSSStyleDeclaration
+    get() = window.getComputedStyle(this)
