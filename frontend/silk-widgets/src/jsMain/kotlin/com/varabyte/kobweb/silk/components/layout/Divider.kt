@@ -23,6 +23,7 @@ sealed interface HorizontalDividerKind : ComponentKind
 
 val HorizontalDividerStyle = CssStyle.base<HorizontalDividerKind> {
     Modifier
+        .border(0.px)
         .borderTop(1.px, LineStyle.Solid, DividerVars.Color.value())
         .width(DividerVars.Length.value())
 }
@@ -42,6 +43,7 @@ sealed interface VerticalDividerKind : ComponentKind
 
 val VerticalDividerStyle = CssStyle.base<VerticalDividerKind> {
     Modifier
+        .border(0.px)
         .borderLeft(1.px, LineStyle.Solid, DividerVars.Color.value())
         .height(DividerVars.Length.value())
 }
