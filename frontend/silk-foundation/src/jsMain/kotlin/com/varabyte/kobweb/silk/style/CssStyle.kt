@@ -364,10 +364,6 @@ abstract class CssStyle<K : CssKind> internal constructor(
         val darkModifiers = CssStyleScope(ColorMode.DARK).mergeCssModifiers(init)
             .assertNoAttributeModifiers(selector, layer)
 
-        // Use StyleSheets as rule builders for all styles belonging to a common `@scope` color mode block
-        val lightStyleSheet = StyleSheet()
-        val darkStylesSheet = StyleSheet()
-
         StyleGroup.from(lightModifiers[CssModifier.BaseKey]?.modifier, darkModifiers[CssModifier.BaseKey]?.modifier)
             ?.let { group ->
                 if (ColorModeStrategy.current.useScope) {
@@ -421,30 +417,6 @@ abstract class CssStyle<K : CssKind> internal constructor(
                 }
             }
         }
-
-        if (ColorModeStrategy.current.useScope) {
-            styleSheet.apply {
-                if (lightStyleSheet.cssRules.isNotEmpty()) {
-                    add(
-                        CSSScopeRuleDeclaration(
-                            start = ".${ColorMode.LIGHT.cssClass}",
-                            end = ".${ColorMode.DARK.cssClass}",
-                            rules = lightStyleSheet.cssRules
-                        )
-                    )
-                }
-                if (darkStylesSheet.cssRules.isNotEmpty()) {
-                    add(
-                        CSSScopeRuleDeclaration(
-                            start = ".${ColorMode.DARK.cssClass}",
-                            end = ".${ColorMode.LIGHT.cssClass}",
-                            rules = darkStylesSheet.cssRules
-                        )
-                    )
-                }
-            }
-        }
-
         return ClassSelectors(classNames)
     }
 
