@@ -22,6 +22,24 @@ fun Modifier.font(scope: FontScope.() -> Unit) = styleModifier {
 }
 
 fun Modifier.fontFamily(vararg values: String): Modifier = styleModifier {
+    values.forEach { value ->
+        require(
+            value.isNotEmpty() &&
+                // String might be a function, like `var(--some-var-name, "Times New Roman")`
+                (!value.contains(",") || value.contains(Regex("\\(.+\\)")))
+        ) {
+            buildString {
+                append("In `Modifier.fontFamily`, a font name shouldn't contain a comma, but got \"$value\".")
+                if (values.size == 1) {
+                    append(
+                        " Maybe you meant to call `fontFamily(${
+                        value.split(",").joinToString { "\"" + it.trim() + "\"" }
+                    })`?")
+                }
+            }
+        }
+    }
+
     fontFamily(*values)
 }
 
