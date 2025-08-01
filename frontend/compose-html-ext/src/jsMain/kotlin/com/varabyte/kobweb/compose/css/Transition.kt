@@ -39,7 +39,11 @@ sealed interface TransitionProperty : StylePropertyValue {
     companion object : CssGlobalValues<TransitionProperty> {
         // Custom
         fun of(customValue: String): Name {
-            require(customValue.isNotEmpty() && customValue.none { it.isWhitespace() }) {
+            require(
+                customValue.isNotEmpty() &&
+                    // String might be a function, like `var(--some-var-name, opacity)`
+                    (customValue.none { it.isWhitespace() } || customValue.contains(Regex("\\(.+\\)")))
+            ) {
                 "Invalid transition property name. A property shouldn't contain any spaces, but got \"$customValue\"."
             }
             return customValue.unsafeCast<Name>()

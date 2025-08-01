@@ -2540,6 +2540,17 @@ class CssStylePropertyTests {
             )
         })
             .isEqualTo("transition: opacity 1s, color 1s")
+
+        val someTransitionVar by StyleVariable<String>()
+        assertThat(styleToText {
+            transition(
+                Transition.of(
+                    TransitionProperty.of(someTransitionVar.value("opacity")),
+                    1.s,
+                )
+            )
+        })
+            .isEqualTo("transition: var(--some-transition, opacity) 1s")
     }
 
     @Test
