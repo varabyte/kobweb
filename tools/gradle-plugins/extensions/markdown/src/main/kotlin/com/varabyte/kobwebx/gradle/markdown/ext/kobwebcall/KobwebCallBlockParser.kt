@@ -79,9 +79,9 @@ class KobwebCallBlockParser(
             block.appendChild(KobwebCall(method, appendBrace = lines.isNotEmpty()))
 
             if (lines.isNotEmpty()) {
-                val baseIndent = lines.minOf { it.sourceSpan.columnIndex }
+                val baseIndent = lines.mapNotNull { it.sourceSpan }.minOf { it.columnIndex }
                 val content = lines
-                    .joinToString("\n") { " ".repeat(it.sourceSpan.columnIndex - baseIndent) + it.content }
+                    .joinToString("\n") { " ".repeat((it.sourceSpan?.columnIndex ?: baseIndent) - baseIndent) + it.content }
                 val innerDocument = createParser.invoke().parse(content)
                 block.appendChild(innerDocument)
             }
