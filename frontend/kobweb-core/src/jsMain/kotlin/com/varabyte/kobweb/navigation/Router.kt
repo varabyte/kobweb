@@ -437,7 +437,7 @@ class Router {
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE,
     ): Boolean {
-        if (pathQueryAndFragment.contains("://")) return false
+        if (pathQueryAndFragment.includesHost()) return false
 
         @Suppress("NAME_SHADOWING") // Intentionally transformed
         var pathQueryAndFragment = BasePath.prependTo(pathQueryAndFragment)
@@ -592,12 +592,28 @@ class Router {
             )
         ) {
             window.open(pathQueryAndFragment,
-                if (pathQueryAndFragment.startsWith(window.origin)) {
+                if (pathQueryAndFragment.resolvesToSameOrigin()) {
                     openInternalLinksStrategy
                 } else {
                     openExternalLinksStrategy
                 }
             )
         }
+    }
+
+    /**
+     * Check whether a link includes the domain like //example.com/page or https://example.com/page
+     */
+    private fun String.includesHost(): Boolean =
+        this.contains("://")
+            || this.startsWith("//")
+
+    /**
+     * Check whether a link points to the same origin as the current page.
+     */
+    private fun String.resolvesToSameOrigin(): Boolean {
+        val resolvedUrl = URL(this, window.location.href)
+
+        return resolvedUrl.origin == window.location.origin
     }
 }
