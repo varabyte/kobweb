@@ -77,19 +77,16 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                         parser
                             .parse(mdFile.readText())
                             .accept(visitor)
-                        visitor.frontMatterElement?.let { frontMatter ->
-                            add(
-                                MarkdownEntry(
-                                    filePath = relativePagePath.invariantSeparatorsPathString,
-                                    frontMatter = frontMatter,
-                                    route = RouteUtils.getRoute(
-                                        relativePagePath.toFile(),
-                                        frontMatter,
-                                    ),
-                                    "${srcPath.packageFromFile()}.${mdFile.capitalizedNameWithoutExtension}Page"
-                                )
+
+                        val fmElement = visitor.frontMatterElement ?: FrontMatterElement.EmptyMap
+                        add(
+                            MarkdownEntry(
+                                filePath = relativePagePath.invariantSeparatorsPathString,
+                                frontMatter = fmElement,
+                                route = RouteUtils.getRoute(relativePagePath.toFile(), fmElement),
+                                "${srcPath.packageFromFile()}.${mdFile.capitalizedNameWithoutExtension}Page"
                             )
-                        }
+                        )
                     }
                 }
             }
