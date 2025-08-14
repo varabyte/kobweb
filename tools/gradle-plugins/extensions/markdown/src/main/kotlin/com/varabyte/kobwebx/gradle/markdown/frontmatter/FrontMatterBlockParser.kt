@@ -5,6 +5,7 @@ import com.charleskorn.kaml.YamlList
 import com.charleskorn.kaml.YamlMap
 import com.charleskorn.kaml.YamlNode
 import com.charleskorn.kaml.YamlNull
+import com.charleskorn.kaml.YamlPath
 import com.charleskorn.kaml.YamlScalar
 import com.charleskorn.kaml.YamlTaggedNode
 import com.varabyte.kobwebx.frontmatter.FrontMatterElement
@@ -43,7 +44,14 @@ internal class FrontMatterBlockParser : AbstractBlockParser() {
     override fun tryContinue(state: ParserState): BlockContinue? {
         val line = state.line
         if (DELIMITER_REGEX.matches(line.content)) {
-            val fmRootNode = Yaml.default.parseToYamlNode(lines.joinToString("\n") { it.content })
+            val fmRootNode = lines.joinToString("\n") { it.content }.let { yamlText ->
+                // Manually handle empty frontmatter, or else `parseToYamlNode` throws an exception
+                if (yamlText.all { it.isWhitespace() }) {
+                    YamlMap(emptyMap(), YamlPath.root)
+                } else {
+                    Yaml.default.parseToYamlNode(yamlText)
+                }
+            }
 
             fun YamlNode.toFrontMatterElement(): FrontMatterElement {
                 return when (this) {
