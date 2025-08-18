@@ -1,5 +1,14 @@
 @file:Suppress("LeakingThis") // Following official Gradle guidance
 
+/**
+ * Enhanced Markdown handlers for Kobweb projects.
+ *
+ * Recent enhancements:
+ * - Task list support: Automatically detects and renders task list items (- [x] / - [ ]) in all text contexts,
+ *   including table cells where CommonMark doesn't normally recognize them as TaskListItemMarker nodes.
+ *   Uses FontAwesome icons when Silk is available, falls back to HTML input checkboxes otherwise.
+ */
+
 package com.varabyte.kobwebx.gradle.markdown.handlers
 
 import com.varabyte.kobweb.common.collect.Key
@@ -12,6 +21,7 @@ import com.varabyte.kobwebx.gradle.markdown.util.escapeDollars
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.escapeTripleQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.nestedLiteral
+import org.commonmark.ext.gfm.strikethrough.Strikethrough
 import org.commonmark.ext.gfm.tables.TableBlock
 import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell
@@ -79,6 +89,28 @@ class NodeScope(val reporter: Reporter, val data: TypedMap, private val indentCo
  *     }
  *   }
  * }
+ *
+ * ## Task List Support
+ *
+ * This handler automatically detects and renders task list items (checkboxes) in markdown text,
+ * including those inside table cells where CommonMark doesn't automatically recognize them.
+ *
+ * Task list patterns like `- [x]` (checked) and `- [ ]` (unchecked) are converted to:
+ * - **With Silk**: FontAwesome icons (`FaSquareCheck` for checked, `FaSquare` for unchecked)
+ * - **Without Silk**: HTML input checkboxes (disabled, with proper checked state)
+ *
+ * This works in all contexts including:
+ * - Regular paragraphs
+ * - Table cells
+ * - List items
+ * - Any other text nodes
+ *
+ * Example:
+ * ```markdown
+ * | Feature | Status |
+ * |---------|--------|
+ * | Task A  | - [x]  |
+ * | Task B  | - [ ]  |
  * ```
  */
 abstract class MarkdownHandlers @Inject constructor(project: Project) {
@@ -155,6 +187,9 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
     abstract val em: Property<NodeScope.(Emphasis) -> String>
     @get:Nested
     abstract val strong: Property<NodeScope.(StrongEmphasis) -> String>
+    @get:Nested
+    abstract val strikethrough: Property<NodeScope.(Strikethrough) -> String>
+
     @get:Nested
     abstract val hr: Property<NodeScope.(ThematicBreak) -> String>
     @get:Nested
@@ -258,7 +293,53 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
 
         // region Markdown Node handlers
 
-        text.convention { text -> "$JB_DOM.Text(\"${text.literal.escapeSingleQuotedText()}\")" }
+        text.convention { text ->
+            val literal = text.literal
+            // Handle task list items in text nodes
+            // This covers cases where CommonMark doesn't automatically parse task list items as
+            // TaskListItemMarker nodes, particularly inside table cells or other complex structures.
+            // 
+            // Pattern: "- [x]" or "- [ ]" at the beginning of text (with optional whitespace)
+            // Renders as:
+            // - With Silk: FontAwesome checkbox icons with proper spacing
+            // - Without Silk: HTML input checkboxes (disabled) with proper checked state
+            val taskListPattern = Regex("""^-\s*\[([x\s])\](.*)$""")
+            val match = taskListPattern.find(literal.trim())
+
+            if (match != null) {
+                val isChecked = match.groupValues[1].trim() == "x"
+                val remainingText = match.groupValues[2].trim()
+
+                buildString {
+                    append("$KOBWEB_DOM.GenericTag(\"span\") { ")
+                    
+                    // Render checkbox/icon based on availability of Silk
+                    if (useSilk.get()) {
+                        // Use FontAwesome icons when Silk is available
+                        val iconCode = if (isChecked) {
+                            "com.varabyte.kobweb.silk.components.icons.fa.FaSquareCheck"
+                        } else {
+                            "com.varabyte.kobweb.silk.components.icons.fa.FaSquare"
+                        }
+                        append("$iconCode(); ")
+                    } else {
+                        // Fallback to HTML input checkbox when Silk is not available
+                        val checkedAttr = if (isChecked) "checked" else ""
+                        append("$KOBWEB_DOM.GenericTag(\"input\", \"type=\\\"checkbox\\\" disabled $checkedAttr\" style=\\\"margin-right: 0.5em;\\\"\"); ")
+                    }
+                    
+                    // Add remaining text if present
+                    if (remainingText.isNotEmpty()) {
+                        append("$JB_DOM.Text(\" ${remainingText.escapeSingleQuotedText()}\") ")
+                    }
+                    
+                    append("}")
+                }
+            } else {
+                // Standard text rendering for non-task-list text
+                "$JB_DOM.Text(\"${literal.escapeSingleQuotedText()}\")"
+            }
+        }
         img.convention { image ->
             processImage(image) { data ->
                 buildString {
@@ -299,6 +380,8 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
         }
         em.convention { "$JB_DOM.Em" }
         strong.convention { "$JB_DOM.B" }
+        // Compose HTML does not expose a Del composable; use a generic tag to match HTML semantics.
+        strikethrough.convention { "$KOBWEB_DOM.GenericTag(\"del\")" }
         hr.convention {
             if (useSilk.get()) {
                 "$SILK.layout.HorizontalDivider"

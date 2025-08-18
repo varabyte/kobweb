@@ -6,6 +6,8 @@ import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallExtension
 import com.varabyte.kobwebx.gradle.markdown.frontmatter.FrontMatterExtension
 import org.commonmark.Extension
 import org.commonmark.ext.autolink.AutolinkExtension
+import org.commonmark.ext.footnotes.FootnotesExtension
+import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
 import org.commonmark.ext.gfm.tables.TablesExtension
 import org.commonmark.ext.task.list.items.TaskListItemsExtension
 import org.commonmark.parser.IncludeSourceSpans
@@ -100,6 +102,26 @@ abstract class MarkdownFeatures {
     @get:Input
     abstract val taskList: Property<Boolean>
 
+    /**
+     * If true, support GFM strikethrough syntax using double tildes, e.g. `~~text~~`.
+     *
+     * Defaults to `true`.
+     *
+     * @see <a href="https://github.com/commonmark/commonmark-java#strikethrough">Strikethrough</a>
+     */
+    @get:Input
+    abstract val strikethrough: Property<Boolean>
+
+    /**
+     * If true, support footnotes like "Main text[^1]" with definitions "[^1]: Footnote text".
+     *
+     * Defaults to `true`.
+     *
+     * Note: Inline footnotes via "^[inline]" are not enabled by default.
+     */
+    @get:Input
+    abstract val footnotes: Property<Boolean>
+
     init {
         autolink.convention(true)
         frontMatter.convention(true)
@@ -107,6 +129,8 @@ abstract class MarkdownFeatures {
         kobwebCallDelimiters.convention('{' to '}')
         tables.convention(true)
         taskList.convention(true)
+        strikethrough.convention(true)
+        footnotes.convention(true)
     }
 
     /**
@@ -128,6 +152,12 @@ abstract class MarkdownFeatures {
         }
         if (taskList.get()) {
             extensions.add(TaskListItemsExtension.create())
+        }
+        if (strikethrough.get()) {
+            extensions.add(StrikethroughExtension.create())
+        }
+        if (footnotes.get()) {
+            extensions.add(FootnotesExtension.create())
         }
 
         return Parser.builder()
