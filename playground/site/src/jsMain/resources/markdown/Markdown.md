@@ -6,7 +6,7 @@ This site is generated from Markdown.
 
 Create rich, dynamic web apps with ease, leveraging [Kotlin](https://kotlinlang.org/) and [Compose HTML](https://github.com/JetBrains/compose-multiplatform#compose-html).
 
-Markdown of course supports **bold**, _italic_, and _**bold italic**_ text.
+Markdown of course supports **bold**, _italic_, _**bold italic**_, and ~~strikethrough~~ text.
 
 It also supports
 
@@ -45,6 +45,7 @@ You can link to other Markdown documents with their route overrides resolved cor
 [documents/INDEX.md](documents/INDEX.md)<br>
 [KotlinLanguage.md](jetbrains/KotlinLanguage.md) (`routeOverride: languages/kotlin`)<br>
 [documents/Bananas.md](documents/Bananas.md) (`routeOverride: /fruits/`)<br>
+[documents/unified_test.md](documents/unified_test.md) (`routeOverride: /tests/`)<br>
 [files/external.md](/files/external.md) (Linking to a Markdown file outside of the processed markdown files)<br>
 
 You can use <span id="md-inline-demo">inlined html</span> tags. You can inspect this page to see that "inlined html" is

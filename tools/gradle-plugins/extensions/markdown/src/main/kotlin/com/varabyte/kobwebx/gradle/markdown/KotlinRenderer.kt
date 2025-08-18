@@ -9,16 +9,21 @@ import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlockVisitor
 import com.varabyte.kobwebx.gradle.markdown.frontmatter.FrontMatterBlock
+import com.varabyte.kobwebx.gradle.markdown.handlers.KOBWEB_DOM
 import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
 import com.varabyte.kobwebx.gradle.markdown.handlers.NodeScope
 import com.varabyte.kobwebx.gradle.markdown.util.NodeCache
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.unescapeQuotes
+import org.commonmark.ext.footnotes.FootnoteDefinition
+import org.commonmark.ext.footnotes.FootnoteReference
+import org.commonmark.ext.gfm.strikethrough.Strikethrough
 import org.commonmark.ext.gfm.tables.TableBlock
 import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell
 import org.commonmark.ext.gfm.tables.TableHead
 import org.commonmark.ext.gfm.tables.TableRow
+import org.commonmark.ext.task.list.items.TaskListItemMarker
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.BlockQuote
 import org.commonmark.node.BulletList
@@ -411,7 +416,9 @@ class KotlinRenderer internal constructor(
         }
 
         override fun visit(listItem: ListItem) {
+
             doVisit(listItem, handlers.li)
+
         }
 
         override fun visit(bulletList: BulletList) {
@@ -442,23 +449,6 @@ class KotlinRenderer internal constructor(
             doVisit(text, handlers.text)
         }
 
-        override fun visit(customNode: CustomNode) {
-            when (customNode) {
-                is KobwebCall -> {
-                    output.appendLine("$indent${customNode.toFqn(projectGroup)}")
-                }
-
-                is TableHead -> visit(customNode)
-                is TableBody -> visit(customNode)
-                is TableRow -> visit(customNode)
-                is TableCell -> visit(customNode)
-
-                else -> {
-                    val unhandledNodeName = customNode::class.simpleName!!
-                    reporter.warn("Unhandled Markdown custom node: $unhandledNodeName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20node%20%22$unhandledNodeName%22")
-                }
-            }
-        }
 
         private fun visit(table: TableBlock) {
             doVisit(table, handlers.table)
@@ -483,6 +473,58 @@ class KotlinRenderer internal constructor(
                 doVisit(tableCell, handlers.td)
             }
         }
+        override fun visit(customNode: CustomNode) {
+            when (customNode) {
+                is KobwebCall -> {
+                    output.appendLine("$indent${customNode.toFqn(projectGroup)}")
+                }
+
+                is TableHead -> visit(customNode)
+                is TableBody -> visit(customNode)
+                is TableRow -> visit(customNode)
+                is TableCell -> visit(customNode)
+                is Strikethrough -> visit(customNode)
+                is FootnoteReference -> {
+                    // Render footnote references as superscript with the actual label/number
+                    val scope = NodeScope(reporter, data, indentCount)
+                    val label = customNode.label
+                    // Create a link to the footnote definition
+                    val code = "$KOBWEB_DOM.GenericTag(\"sup\", \"id=\\\"fnref-$label\\\"\")"
+                    scope.childrenOverride = listOf(
+                        // Create a link to the footnote definition
+                        org.commonmark.node.Link("#fn-$label", null).apply {
+                            appendChild(Text(label))
+                        }
+                    )
+                    doVisit(customNode, code, scope)
+                }
+                is TaskListItemMarker -> {
+                    // Render a task list item, which is a checkbox that is either checked or not.
+                    // We prefer to use Silk's FontAwesome icons if available, otherwise we fall back to a
+                    // standard HTML checkbox.
+                    val code = if (handlers.useSilk.get()) {
+                        val icon = if (customNode.isChecked) {
+                            "com.varabyte.kobweb.silk.components.icons.fa.FaSquareCheck"
+                        } else {
+                            "com.varabyte.kobweb.silk.components.icons.fa.FaSquare"
+                        }
+                        // Use a span to apply margin to the icon, giving it some breathing room from the text.
+                        "$KOBWEB_DOM.GenericTag(\"span\", \"style=\\\"margin-right: 0.5em;\\\"\") { $icon() }"
+                    } else {
+                        val checkedAttr = if (customNode.isChecked) "checked" else ""
+                        // The `disabled` attribute is important here, as these are decorative checkboxes.
+                        // A right margin is added to space the checkbox from the list item's text.
+                        val attrs = "type=\\\"checkbox\\\" disabled $checkedAttr style=\\\"margin-right: 0.5em;\\\""
+                        "$KOBWEB_DOM.GenericTag(\"input\", \"$attrs\")"
+                    }
+                    output.appendLine("$indent$code")
+                }
+                else -> {
+                    val unhandledNodeName = customNode::class.simpleName!!
+                    reporter.warn("Unhandled Markdown custom node: $unhandledNodeName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20node%20%22$unhandledNodeName%22")
+                }
+            }
+        }
 
         override fun visit(customBlock: CustomBlock) {
             when (customBlock) {
@@ -505,12 +547,25 @@ class KotlinRenderer internal constructor(
                 }
 
                 is TableBlock -> visit(customBlock)
+                is FootnoteDefinition -> {
+                    // Render individual footnote definitions as block elements inside the footnote container
+                    val scope = NodeScope(reporter, data, indentCount)
+                    val code =
+                        "com.varabyte.kobweb.compose.dom.GenericTag(\"div\", \"class=\\\"footnote-item\\\" id=\\\"fn-${customBlock.label}\\\"\")"
+                    doVisit(customBlock, code, scope)
+                }
 
                 else -> {
-                    val unhandledBlockName = customBlock::class.simpleName!!
-                    reporter.warn("Unhandled Markdown custom block: $unhandledBlockName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20block%20%22$unhandledBlockName%22")
+                    val simple = customBlock::class.simpleName
+                        val unhandledBlockName = simple!!
+                        reporter.warn("Unhandled Markdown custom block: $unhandledBlockName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20block%20%22$unhandledBlockName%22")
+
                 }
             }
+        }
+
+        private fun visit(strikethrough: Strikethrough) {
+            doVisit(strikethrough, handlers.strikethrough)
         }
     }
 }
