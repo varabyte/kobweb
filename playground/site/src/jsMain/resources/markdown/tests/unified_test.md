@@ -4,9 +4,7 @@ date: 'July 8, 2025'
 description: Testing unified markdown processing with remark-gfm and rehype-raw plugins
 tags: [ 'kobweb', 'commonmark', 'gfm', 'test', 'md', 'kotlin' ]
 posted: true
-routeOverride: /tests/
-
-#layout: .components.layouts.EnhancedMarkdownLayout
+routeOverride: /example/
 ---
 
 # Unified Markdown Processing Test
