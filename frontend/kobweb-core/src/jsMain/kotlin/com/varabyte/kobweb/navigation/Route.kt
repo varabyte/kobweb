@@ -9,10 +9,33 @@ class RouteException(value: String) :
 /**
  * A path component to a relative or absolute URL string without a domain, e.g. "/example/path" or "example/path".
  *
- * If this route is constructed with a leading domain, e.g. "http://whatever.com" or protocol,
- * e.g. "mailto:account@site.com", it will throw an exception
+ * If this route is constructed with a leading domain, e.g. "http://whatever.com" or the protocol-relative
+ * version "//whatever.com", or some other protocol, e.g. "mailto:account@site.com", it will throw an exception
  */
 class Route(pathQueryAndFragment: String) {
+    init {
+        // Ideally, we either have an absolute route (like "/a/b/c") or a relative route (like "a/b/c"), but we might
+        // have also been fed a full URL, e.g. "https://site.com/a/b/c" or even "mailto:x@site.com", or a
+        // protocol-relative URL, like "//site.com/a/b/c"
+        // We can leverage the URL class to distinguish these cases - it will throw an exception if we try to
+        // construct an ungrounded URL without a base URL. In other words, we WANT an exception to happen here.
+        // Otherwise, it means our incoming value has a domain which breaks the assumptions and intention of this class
+        // NOTE: We have to check the protocol-relative format directly, and we convert it to an absolute protocol URL
+        // just for this check (remember, we WANT URL construction to throw to indicate a valid route; a
+        // protocol-relative URL will also throw though)
+        val pathQueryAndFragment = if (!pathQueryAndFragment.startsWith("//")) pathQueryAndFragment else "https:$pathQueryAndFragment"
+        val isValidRoute = try {
+            URL(pathQueryAndFragment)
+            false // If here, we have a value like "https://site.com/a/b/c" or "//site.com/a/b/c", bad!
+        } catch (_: Throwable) {
+            true // If here, we have a value like "/a/b/c", good!
+        }
+
+        if (!isValidRoute) {
+            throw RouteException(pathQueryAndFragment)
+        }
+    }
+
     private val pathQueryAndFragment = normalizeSlashes(pathQueryAndFragment)
 
     /**
@@ -67,16 +90,26 @@ class Route(pathQueryAndFragment: String) {
          *
          * For example, normalizing "https://///example.com///a//b///c//" will return "https://example.com/a/b/c/".
          *
+         * We also check for protocol-relative URLs, i.e. those that start with "//" (so "//////example.com///a///b//c"
+         * will return "//example.com/a/b/c")
+         *
          * This is useful because occasionally a user may add an extra slash unintentionally as a typo. Passing such a
          * string into the URL class will result in an exception at construction time.
          */
         fun normalizeSlashes(url: String): String {
-            val (origin, rest) = url.split("://", limit = 2).let { splitResult ->
-                if (splitResult.size == 1) "" to splitResult[0] else "${splitResult[0]}://" to splitResult[1].trimStart('/')
+            val (prefix, rest) = if (!url.startsWith("//")) {
+                // Here, either an absolute URL (https://example.com/a/b/c") or a schemeless one ("/a/b/c")
+                url.split("://", limit = 2).let { splitResult ->
+                    if (splitResult.size == 1) "" to splitResult[0] else "${splitResult[0]}://" to splitResult[1].trimStart('/')
+                }
+            } else {
+                val withoutLeadingSlashes = url.trimStart('/')
+                val domain = withoutLeadingSlashes.substringBefore('/')
+                "//$domain" to withoutLeadingSlashes.substringAfter(domain)
             }
 
             val (path, queryAndFragment) = partition(rest)
-            return "$origin${path.replace(Regex("//+"), "/")}$queryAndFragment"
+            return "$prefix${path.replace(Regex("//+"), "/")}$queryAndFragment"
         }
 
         /** Returns true if a route, i.e. a path without an origin */
@@ -94,24 +127,6 @@ class Route(pathQueryAndFragment: String) {
          * returned.
          */
         fun fromUrl(url: URL): Route = tryCreate(url.href.removePrefix(url.origin)) ?: Route("")
-    }
-
-    init {
-        // Ideally, we either have an absolute route (like "/a/b/c") or a relative route (like "a/b/c"), but we might
-        // have also been fed a full URL, e.g. "https://a/b/c" or even "mailto:a@b.com"
-        // We can leverage the URL class to distinguish these cases - it will throw an exception if we try to
-        // construct an ungrounded URL without a base URL. In other words, we WANT an exception to happen here.
-        // Otherwise, it means our incoming value has a domain which breaks the assumptions and intention of this class
-        val isValidRoute = try {
-            URL(this.pathQueryAndFragment)
-            false // If here, we have a value like "https://a/b/c", bad!
-        } catch (_: Throwable) {
-            true // If here, we have a value like "/a/b/c", good!
-        }
-
-        if (!isValidRoute) {
-            throw RouteException(pathQueryAndFragment)
-        }
     }
 
     private val url = URL(this.pathQueryAndFragment, "http://unused.com")
