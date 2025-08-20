@@ -19,6 +19,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -51,7 +52,7 @@ class KobwebExportConfInputs(
 abstract class KobwebExportTask @Inject constructor(
     private val exportBlock: AppBlock.ExportBlock,
     @get:Nested val confInputs: KobwebExportConfInputs,
-    @get:Input val siteLayout: SiteLayout,
+    @get:Input val siteLayout: Provider<SiteLayout>,
 ) : KobwebTask("Export the Kobweb project into a static site") {
     @get:InputFile
     abstract val appFrontendDataFile: RegularFileProperty
@@ -174,6 +175,7 @@ abstract class KobwebExportTask @Inject constructor(
 
     @TaskAction
     fun execute() {
+        val siteLayout = siteLayout.get()
         // Sever should be running since "kobwebStart" is a prerequisite for this task
         val port = ServerStateFile(kobwebApplication.kobwebFolder).content!!.port
 

@@ -105,11 +105,12 @@ class KobwebApplicationPlugin @Inject constructor(
 
         val env =
             project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV
-        val runLayout =
-            project.findProperty("kobwebRunLayout")?.let { SiteLayout.valueOf(it.toString()) } ?: SiteLayout.FULLSTACK
-        val exportLayout =
-            project.findProperty("kobwebExportLayout")?.let { SiteLayout.valueOf(it.toString()) }
-                ?: SiteLayout.FULLSTACK
+        val runLayout = project.providers.gradleProperty("kobwebRunLayout")
+            .map { SiteLayout.valueOf(it) }
+            .orElse(SiteLayout.FULLSTACK)
+        val exportLayout = project.providers.gradleProperty("kobwebExportLayout")
+            .map { SiteLayout.valueOf(it) }
+            .orElse(SiteLayout.FULLSTACK)
 
         project.extra["kobwebBuildTarget"] =
             project.findProperty("kobwebBuildTarget")?.let { BuildTarget.valueOf(it.toString()) }
@@ -130,7 +131,9 @@ class KobwebApplicationPlugin @Inject constructor(
 
         val kobwebUnpackServerJarTask = project.tasks.register<KobwebUnpackServerJarTask>("kobwebUnpackServerJar")
         val kobwebCreateServerScriptsTask = project.tasks
-            .register<KobwebCreateServerScriptsTask>("kobwebCreateServerScripts", exportLayout)
+            .register<KobwebCreateServerScriptsTask>("kobwebCreateServerScripts") {
+                siteLayout.set(exportLayout)
+            }
 
         val kobwebStartTask = run {
             val reuseServer = project.findProperty("kobwebReuseServer")?.toString()?.toBoolean() ?: true
