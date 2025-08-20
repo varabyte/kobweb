@@ -25,6 +25,9 @@ with [GitHub Flavored Markdown (GFM) extensions](https://github.github.com/gfm/)
 | Tables           |  [x]                               | Organizes data in a grid      |
 | Task Lists       |- [x]                               | Creates checklists |
 | HTML in Markdown | - [x]  <mark>highlighted text</mark> | Allows embedding raw HTML tags |
+| Code Blocks      | - [x]                               | Allows embedding code blocks  |
+| Links            | - [x]                               | Allows embedding links        |
+| Emphasis         | - [x]                               | Allows embedding emphasis     |
 | Column A | Column B                           | Column C | Column D |
 |----------| :---------                         |:--------:|---------:|
 | Left     | Left                               |  Center  |    Right |
