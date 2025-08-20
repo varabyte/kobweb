@@ -4,7 +4,6 @@ date: 'July 8, 2025'
 description: Testing unified markdown processing with remark-gfm and rehype-raw plugins
 tags: [ 'kobweb', 'commonmark', 'gfm', 'test', 'md', 'kotlin' ]
 posted: true
-routeOverride: /example/
 ---
 
 # Unified Markdown Processing Test
@@ -20,21 +19,17 @@ with [GitHub Flavored Markdown (GFM) extensions](https://github.github.com/gfm/)
 ~~This text should be struck through~~ or ~one tilde~
 
 ### Tables
-| Feature          | Status | Notes                         |
-|------------------|--------|-------------------------------|
-| Strikethrough    | ✅      | Crosses out text              |
-| Tables           | ✅      | Organizes data in a grid      |
-| Task Lists       | ✅      | Creates checklists |
-| HTML in Markdown | ✅      | Allows embedding raw HTML tags |
-
-
-
-
-| Column A | Column B | Column C | Column D |
-|----------|:---------|:--------:|---------:|
-| Left     | Left     |  Center  |    Right |
-| Data 1   | Data 2   |  Data 3  |   Data 4 |
-| Row 2    | Row 2    |  Row 2   |    Row 2 |
+| Feature          | Status                             | Notes                         |
+|------------------|------------------------------------|-------------------------------|
+| Strikethrough    | * [x]                              | Crosses out text              |
+| Tables           |  [x]                               | Organizes data in a grid      |
+| Task Lists       |- [x]                               | Creates checklists |
+| HTML in Markdown | - [x]  <mark>highlighted text</mark> | Allows embedding raw HTML tags |
+| Column A | Column B                           | Column C | Column D |
+|----------| :---------                         |:--------:|---------:|
+| Left     | Left                               |  Center  |    Right |
+| Data 1   | Data 2                             |  Data 3  |   Data 4 |
+| Row 2    | Row 2                              |  Row 2   |    Row 2 |
 
 ### Task Lists
 
