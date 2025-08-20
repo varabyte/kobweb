@@ -117,20 +117,20 @@ abstract class MarkdownFeatures {
      *
      * Defaults to `true`.
      *
-     * Note: Inline footnotes via "^[inline]" are not enabled by default.
+     * Note: Inline footnotes via `^[inline]` are not supported at this time.
      */
     @get:Input
     abstract val footnotes: Property<Boolean>
 
     init {
         autolink.convention(true)
+        footnotes.convention(true)
         frontMatter.convention(true)
         kobwebCall.convention(true)
         kobwebCallDelimiters.convention('{' to '}')
+        strikethrough.convention(true)
         tables.convention(true)
         taskList.convention(true)
-        strikethrough.convention(true)
-        footnotes.convention(true)
     }
 
     /**
