@@ -77,6 +77,7 @@ kotlin {
             implementation("com.varabyte.kobweb:kobweb-silk")
             implementation("com.varabyte.kobwebx:silk-icons-fa")
             implementation("com.varabyte.kobwebx:silk-icons-mdi")
+            implementation("com.varabyte.kobwebx:silk-icons-lucide")
             implementation("com.varabyte.kobwebx:kobwebx-markdown")
             implementation("com.varabyte.kobwebx:kobwebx-serialization-kotlinx")
             implementation(project(":sitelib"))
