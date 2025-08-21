@@ -22,7 +22,7 @@ kobweb {
         //testing new feature
         sitemap {
             baseUrl.set("http://localhost:8080")
-            excludeRoutes.addAll("/admin", "/api","/example")
+            excludeRoutes.addAll("/admin", "/api","/example/")
         }
     }
     markdown {
