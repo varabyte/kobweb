@@ -29,52 +29,46 @@ val FitWidthImageVariant = ImageStyle.addVariantBase {
 }
 
 /**
- * Providing a hint to the user agent as to how to best schedule the loading of the image to optimize page performance.
+ * A list of values that hint to the user agent as to how to best schedule the loading of the image to optimize page performance.
  *
  * @param Eager The default behavior, eager tells the browser to load the image as soon as the <img> element is processed.
  * @param Lazy Tells the user agent to hold off on loading the image until the browser estimates that it will be needed imminently.
  */
-enum class ImageLoading(private val value: String) {
-    Eager("eager"),
-    Lazy("lazy");
+enum class ImageLoading {
+    Eager,
+    Lazy;
 
-    override fun toString(): String {
-        return value
-    }
+    override fun toString() = name.lowercase()
 }
 
 /**
- * Provides a hint to the browser as to whether it should perform image decoding along with other tasks in a single step [Sync], or allow other content to be rendered before this completes [Async].
+ * A list of values that hint to the browser as to whether it should perform image decoding along with other tasks in a single step [Sync], or allow other content to be rendered before this completes [Async].
  *
  * @param Sync Decode the image synchronously for atomic presentation with other content.
  * @param Async Decode the image asynchronously and allow other content to be rendered before this completes.
  * @param Auto No preference for the decoding mode; the browser decides what is best for the user.
  */
-enum class ImageDecoding(private val value: String) {
-    Sync("sync"),
-    Async("async"),
-    Auto("auto");
+enum class ImageDecoding {
+    Sync,
+    Async,
+    Auto;
 
-    override fun toString(): String {
-        return value
-    }
+    override fun toString() = name.lowercase()
 }
 
 /**
- * Indicating how the browser should prioritize fetching a particular image relative to other images.
+ * A list of values that indicate how the browser should prioritize fetching a particular image relative to other images.
  *
  * @param High Fetch the image at a high priority relative to other images with the same internal prioritization.
  * @param Low Fetch the image at a low priority relative to other images with the same internal prioritization.
  * @param Auto Don't set a user preference for the fetch priority.
  */
-enum class ImageFetchPriority(private val value: String) {
-    High("high"),
-    Low("low"),
-    Auto("auto");
+enum class ImageFetchPriority {
+    High,
+    Low,
+    Auto;
 
-    override fun toString(): String {
-        return value
-    }
+    override fun toString() = name.lowercase()
 }
 
 /**
@@ -97,10 +91,10 @@ fun Image(
     width: Int? = null,
     height: Int? = null,
     alt: String = "",
-    ref: ElementRefScope<HTMLImageElement>? = null,
     loading: ImageLoading? = null,
     decoding: ImageDecoding? = null,
-    fetchPriority: ImageFetchPriority? = null
+    fetchPriority: ImageFetchPriority? = null,
+    ref: ElementRefScope<HTMLImageElement>? = null,
 ) {
     if (ref != null) {
         Div(Modifier.display(DisplayStyle.None).toAttrs()) {
@@ -140,10 +134,10 @@ fun Image(
     variant: CssStyleVariant<ImageKind>? = null,
     width: Int? = null,
     height: Int? = null,
-    ref: ElementRefScope<HTMLImageElement>? = null,
     loading: ImageLoading? = null,
     decoding: ImageDecoding? = null,
-    fetchPriority: ImageFetchPriority? = null
+    fetchPriority: ImageFetchPriority? = null,
+    ref: ElementRefScope<HTMLImageElement>? = null,
 ) {
     Image(
         src = src,
@@ -152,9 +146,9 @@ fun Image(
         width = width,
         height = height,
         alt = description,
-        ref = ref,
         loading = loading,
         decoding = decoding,
-        fetchPriority = fetchPriority
+        fetchPriority = fetchPriority,
+        ref = ref,
     )
 }
