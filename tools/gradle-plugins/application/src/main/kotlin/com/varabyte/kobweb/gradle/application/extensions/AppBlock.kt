@@ -9,9 +9,11 @@ import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.util.HtmlUtil
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConf
+import kotlinx.html.BODY
 import kotlinx.html.HEAD
 import kotlinx.html.link
 import kotlinx.html.meta
+import kotlinx.html.script
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
@@ -188,6 +190,30 @@ abstract class AppBlock @Inject constructor(
         }
 
         /**
+         * A list of element builders to add to the `<body>` of the generated `index.html` file.
+         *
+         * Elements are added after the main application script, making them suitable for:
+         * - Scripts that depend on the app being loaded
+         * - Analytics and tracking scripts
+         * - Third-party widgets and integrations
+         *
+         * You should normally use [ListProperty.add] to add new elements to the body block:
+         * ```
+         * kobweb.app.index.body.add {
+         *    script(src = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js")
+         * }
+         * ```
+         */
+        @get:Internal
+        abstract val body: ListProperty<BODY.() -> Unit>
+
+        /** The serialized version of the [body] elements, intended for use as a Gradle task input. */
+        @get:Input
+        internal val serializedBody = body.map { list ->
+            list.joinToString("") { HtmlUtil.serializeBodyContents(it) }
+        }
+
+        /**
          * The default description for the site.
          *
          * This is a convenience property which, if set, causes a `<meta name="description" content="$description">`
@@ -306,6 +332,9 @@ abstract class AppBlock @Inject constructor(
 
             faviconPath.convention("/favicon.ico")
             lang.convention("en")
+
+            // Initialize body as empty list (no defaults like head has)
+            body.set(emptyList())
 
             head.set(listOf {
                 description.orNull?.takeIf { it.isNotBlank() }?.let { description ->
