@@ -335,12 +335,15 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             }
         }
 
+        // Collect body elements (simpler than head - no library support initially)
+        val bodyElements: List<String> = indexBlock.body.get().map { HtmlUtil.serializeBodyContents(it) }
+
         val basePath = BasePath(confInputs.basePath)
         getGenIndexFile().get().asFile.writeText(
             createIndexFile(
-                confInputs.title,
-                indexBlock.lang.get(),
-                headElements.applyUrlInterceptors(basePath).also { result ->
+                title = confInputs.title,
+                lang = indexBlock.lang.get(),
+                headElements = headElements.applyUrlInterceptors(basePath).also { result ->
                     logger.lifecycle("Final <head> elements:")
                     logger.lifecycle("```")
                     result.elements.forEach { logger.lifecycle("  ${it.replace("\n", "")}") }
@@ -363,10 +366,19 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 // Our script will always exist at the root folder, so be sure to ground it,
                 // e.g. "example.js" -> "/example.js", so the root will be searched even if we're visiting a page in
                 // a subdirectory.
-                basePath.prependTo(confInputs.script.substringAfterLast("/").prefixIfNot("/")),
-                indexBlock.scriptAttributes.get(),
-                buildTarget
+                src = basePath.prependTo(confInputs.script.substringAfterLast("/").prefixIfNot("/")),
+                scriptAttributes = indexBlock.scriptAttributes.get(),
+                bodyElements = bodyElements,
+                buildTarget = buildTarget
             )
         )
+
+        // Optional: Log body elements like we do for head ~ feel free to remove this if not needed
+        if (bodyElements.isNotEmpty()) {
+            logger.lifecycle("Final <body> elements:")
+            logger.lifecycle("```")
+            bodyElements.forEach { logger.lifecycle("  ${it.replace("\n", "")}") }
+            logger.lifecycle("```")
+        }
     }
 }
