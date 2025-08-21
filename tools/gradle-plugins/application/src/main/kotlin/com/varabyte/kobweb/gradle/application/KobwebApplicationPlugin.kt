@@ -7,6 +7,7 @@ import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
 import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.extensions.remoteDebugging
 import com.varabyte.kobweb.gradle.application.extensions.server
+import com.varabyte.kobweb.gradle.application.extensions.sitemap
 import com.varabyte.kobweb.gradle.application.ksp.kspBackendFile
 import com.varabyte.kobweb.gradle.application.ksp.kspFrontendFile
 import com.varabyte.kobweb.gradle.application.tasks.KobwebBrowserCacheIdTask
@@ -21,6 +22,7 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebExportTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenIndexConfInputs
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenSiteEntryConfInputs
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateApisFactoryTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSitemapTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteEntryTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteIndexTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateTask
@@ -28,6 +30,7 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebListRoutesTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStartTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebUnpackServerJarTask
+import com.varabyte.kobweb.gradle.application.util.site.kobwebSiteRoutes
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
 import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
@@ -71,6 +74,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import javax.inject.Inject
 import kotlin.io.path.exists
+import org.gradle.api.Task
 
 val Project.kobwebFolder: KobwebFolder
     get() = KobwebFolder.fromChildPath(layout.projectDirectory.asFile.toPath())
@@ -211,7 +215,6 @@ class KobwebApplicationPlugin @Inject constructor(
                 KobwebExportConfInputs(kobwebConf),
                 exportLayout,
             )
-
         val kobwebListRoutesTask = project.tasks.register<KobwebListRoutesTask>("kobwebListRoutes")
 
         project.tasks.register<KobwebBrowserCacheIdTask>("kobwebBrowserCacheId") {
@@ -236,6 +239,28 @@ class KobwebApplicationPlugin @Inject constructor(
         project.tasks.withType<KotlinWebpack>().configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
+
+            // Register sitemap generation for this JS target
+            val kobwebGenerateSitemapTask = project.tasks.register<KobwebGenerateSitemapTask>(
+                "kobwebGenerateSitemap"
+            )
+            kobwebGenerateSitemapTask.configure {
+                routes.set(project.kobwebSiteRoutes)
+                // Generate sitemap into actual source resources directory
+                sitemapFile.set(
+                    project.layout.projectDirectory.file("src/${jsTarget.mainSourceSet}/resources/public/sitemap.xml")
+                )
+                baseUrl.set(appBlock.sitemap.baseUrl)
+                includeDynamicRoutes.set(appBlock.sitemap.includeDynamicRoutes)
+                extraRoutes.set(appBlock.sitemap.extraRoutes)
+                excludeRoutes.set(appBlock.sitemap.excludeRoutes)
+                routeFilter.set(appBlock.sitemap.routeFilter)
+
+                // Ensure sitemap runs after markdown processing if present
+                project.tasks.namedOrNull<Task>("kobwebxMarkdownProcess")?.let { markdownProcessTask ->
+                    dependsOn(markdownProcessTask)
+                }
+            }
 
             // Beginning with Kotlin 2.1.0, the Kotlin Gradle plugin began using uncompressed klibs for
             // inter-project dependencies. This breaks our code responsible for detecting and extracting metadata from
@@ -272,6 +297,8 @@ class KobwebApplicationPlugin @Inject constructor(
                         )
                     }
                 }
+                // Ensure sitemap is generated before processing resources (since it's written to source resources)
+                dependsOn(kobwebGenerateSitemapTask)
             }
 
             val kobwebGenSiteEntryTask = project.tasks.register<KobwebGenerateSiteEntryTask>(
