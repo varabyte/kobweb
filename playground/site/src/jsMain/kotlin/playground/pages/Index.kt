@@ -8,6 +8,8 @@ import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.silk.components.forms.TextInput
 import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Text
+import com.varabyte.kobweb.silk.components.icons.lucide.*
+
 import playground.components.layouts.PageLayoutData
 
 @InitRoute
@@ -23,4 +25,8 @@ fun HomePage() {
     TextInput(name, onTextChange = { name = it })
     P()
     Text("Hello ${name.takeIf { it.isNotBlank() } ?: "World"}!")
+
+
+    LucideCamera()
+
 }
