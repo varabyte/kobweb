@@ -6,6 +6,7 @@ import com.varabyte.kobweb.core.data.add
 import com.varabyte.kobweb.core.init.InitRoute
 import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.silk.components.forms.TextInput
+import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Text
 import com.varabyte.kobweb.silk.components.icons.lucide.*
@@ -27,6 +28,7 @@ fun HomePage() {
     Text("Hello ${name.takeIf { it.isNotBlank() } ?: "World"}!")
 
 
+    P()
+    Text("Here are some icons:")
     LucideCamera()
-
-}
+    LucideZoomIn()}
