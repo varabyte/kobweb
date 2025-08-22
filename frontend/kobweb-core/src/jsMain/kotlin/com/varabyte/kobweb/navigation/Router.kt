@@ -591,7 +591,7 @@ class Router {
                 openInternalLinksStrategy,
             )
         ) {
-            window.open(pathQueryAndFragment,
+            window.open(Route.normalizeSlashes(pathQueryAndFragment),
                 if (pathQueryAndFragment.resolvesToSameOrigin()) {
                     openInternalLinksStrategy
                 } else {

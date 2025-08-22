@@ -27,6 +27,7 @@ class RouteTest {
             "https://example.com/a/b/c" to "https://example.com/a/b/c",
             "https://example.com/a/b/c?key=value#frag" to "https://example.com/a/b/c?key=value#frag",
             "https://example.com/a/b/c#frag?key=value" to "https://example.com/a/b/c#frag?key=value",
+            "//example.com/a/b/c?key=value#frag" to "//example.com/a/b/c?key=value#frag",
             "/a/b/c?key=value#frag" to "/a/b/c?key=value#frag",
             "/a/b/c#frag?key=value" to "/a/b/c#frag?key=value",
             "https://example.com/?key=value" to "https://example.com/?key=value",
@@ -36,11 +37,12 @@ class RouteTest {
             "https://////example.com///?key=value" to "https://example.com/?key=value",
             "https://example.com/////a///b//c" to "https://example.com/a/b/c",
             "https://example.com///a/b//////c//////" to "https://example.com/a/b/c/",
-            "//////a////b///c//" to "/a/b/c/",
+            "//////example.com///a////b///c//" to "//example.com/a/b/c/",
 
             // Leave query params / fragments alone!
             "https://example.com/a/b/c?arg=with//slashes#with//slashes" to "https://example.com/a/b/c?arg=with//slashes#with//slashes",
             "https:////example.com//a//b//c//?arg=with//slashes#with//slashes" to "https://example.com/a/b/c/?arg=with//slashes#with//slashes",
+            "//////example.com//a//b//c//?arg=with//slashes#with//slashes" to "//example.com/a/b/c/?arg=with//slashes#with//slashes",
         )
 
         beforeAfter.forEach { (before, after) ->

@@ -12,6 +12,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
@@ -29,7 +30,7 @@ import javax.inject.Inject
 abstract class KobwebStartTask @Inject constructor(
     private val remoteDebuggingBlock: AppBlock.ServerBlock.RemoteDebuggingBlock,
     private val env: ServerEnvironment,
-    private val siteLayout: SiteLayout,
+    private val siteLayout: Provider<SiteLayout>,
     private val reuseServer: Boolean,
 ) : KobwebTask("Start a Kobweb server") {
 
@@ -77,7 +78,7 @@ abstract class KobwebStartTask @Inject constructor(
         val processParams = buildList<String> {
             add("${javaHome.invariantSeparatorsPath}/bin/java")
             add(env.toSystemPropertyParam())
-            add(siteLayout.toSystemPropertyParam())
+            add(siteLayout.get().toSystemPropertyParam())
             // See: https://ktor.io/docs/development-mode.html#system-property)
             add("-Dio.ktor.development=${env == ServerEnvironment.DEV}")
             if (env == ServerEnvironment.DEV && remoteDebuggingEnabled) {

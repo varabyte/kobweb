@@ -415,7 +415,11 @@ fun createMainFunction(
             }
 
             addCode(CodeBlock.Builder().apply {
-                addStatement("router.tryRoutingTo(BasePath.remove(window.location.href.removePrefix(window.origin)), UpdateHistoryMode.REPLACE)")
+                addComment("Dedup any leading slashes after removing the origin, just in case someone typed")
+                addComment("something like `https://site.com//about` by accident. If we pass `//about` into")
+                addComment("`tryRoutingTo`, Kobweb will reject it as a protocol-relative URL; instead, we")
+                addComment("want it to navigate to `/about`")
+                addStatement("router.tryRoutingTo(\"/\" + BasePath.remove(window.location.href.removePrefix(window.origin).trimStart('/')), UpdateHistoryMode.REPLACE)")
                 addStatement("")
             }.build())
 

@@ -60,13 +60,10 @@ abstract class KobwebCacheAppBackendDataTask : DefaultTask() {
 
     @TaskAction
     fun execute() {
-        // metadataFile will normally be found but might not exist for a project which JUST enabled the jvm backend
-        val appBackendDataFile = appBackendMetadataFile.orNull?.asFile ?: run {
-            appDataFile.get().asFile.writeText(Json.encodeToString(AppBackendData()))
-            return
-        }
+        // metadataFile will normally be found but might not exist for a project which JUST enabled the jvm backend OR
+        // which itself defines no API endpoints but depends on library artifacts that do
+        val appBackendData = appBackendMetadataFile.orNull?.asFile?.readText()?.let { Json.decodeFromString<AppBackendData>(it) } ?: AppBackendData()
 
-        val appBackendData = Json.decodeFromString<AppBackendData>(appBackendDataFile.readText())
         val mergedBackendData = buildList {
             add(appBackendData.backendData)
             compileClasspath.forEach { file ->
