@@ -329,6 +329,62 @@ abstract class AppBlock @Inject constructor(
     }
 
     /**
+     * A sub-block for defining properties related to sitemap generation for SEO.
+     */
+    abstract class SitemapBlock @Inject constructor() : ExtensionAware {
+        /**
+         * The base URL for the site (e.g., "https://example.com").
+         * This will be prepended to all routes in the sitemap.
+         *
+         * IMPORTANT: If your site is deployed under a base path (e.g., GitHub Pages project site),
+         * include it in the baseUrl: "https://username.github.io/project-name"
+         */
+        @get:Input
+        abstract val baseUrl: Property<String>
+
+        /**
+         * Whether to include dynamic routes in the sitemap.
+         * Dynamic routes contain parameters like `/users/{id}` and are generally not useful for SEO.
+         * Defaults to false.
+         */
+        @get:Input
+        abstract val includeDynamicRoutes: Property<Boolean>
+
+        /**
+         * A filter to determine which routes should be included in the sitemap.
+         * Return true to include the route, false to exclude it.
+         *
+         * Note: This is marked @Internal to avoid configuration cache issues with lambda serialization.
+         * For most use cases, use excludeRoutes or includePatterns instead.
+         */
+        @get:Internal
+        abstract val routeFilter: Property<(String) -> Boolean>
+
+        /**
+         * Additional routes to include that may not be discovered automatically.
+         * Useful for dynamic content routes where you know the specific URLs.
+         *
+         * For markdown-generated pages: these are already discovered automatically.
+         * For dynamic templates like @Page("/blog/{slug}"): add concrete URLs like "/blog/my-post".
+         */
+        @get:Input
+        abstract val extraRoutes: ListProperty<String>
+
+        /**
+         * Routes to explicitly exclude from the sitemap.
+         * Takes precedence over discovered routes and extraRoutes.
+         */
+        @get:Input
+        abstract val excludeRoutes: SetProperty<String>
+
+        init {
+            includeDynamicRoutes.convention(false)
+            extraRoutes.set(emptyList())
+            excludeRoutes.set(emptySet())
+        }
+    }
+
+    /**
      * Configuration values for the backend of this Kobweb application.
      */
     abstract class ServerBlock : ExtensionAware {
@@ -581,6 +637,7 @@ abstract class AppBlock @Inject constructor(
 
         extensions.create<IndexBlock>("index", BasePath(conf.site.basePath))
         extensions.create<ServerBlock>("server")
+        extensions.create<SitemapBlock>("sitemap")
         extensions.create<ExportBlock>("export", kobwebFolder)
     }
 }
@@ -596,6 +653,9 @@ val AppBlock.export: AppBlock.ExportBlock
 
 val AppBlock.server: AppBlock.ServerBlock
     get() = extensions.getByType<AppBlock.ServerBlock>()
+
+val AppBlock.sitemap: AppBlock.SitemapBlock
+    get() = extensions.getByType<AppBlock.SitemapBlock>()
 
 val AppBlock.ServerBlock.remoteDebugging: AppBlock.ServerBlock.RemoteDebuggingBlock
     get() = extensions.getByType<AppBlock.ServerBlock.RemoteDebuggingBlock>()
