@@ -9,9 +9,11 @@ import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.util.HtmlUtil
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConf
+import kotlinx.html.BODY
 import kotlinx.html.HEAD
 import kotlinx.html.link
 import kotlinx.html.meta
+import kotlinx.html.script
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
@@ -188,6 +190,54 @@ abstract class AppBlock @Inject constructor(
         }
 
         /**
+         * A list of element builders to add to the `<body>` of the generated `index.html` file.
+         *
+         * Elements are added after the main application script, making them suitable for:
+         * - Scripts that depend on the app being loaded
+         * - Analytics and tracking scripts
+         * - Third-party widgets and integrations
+         *
+         * You should normally use [ListProperty.add] to add new elements to the body block:
+         * ```
+         * kobweb.app.index.body.add {
+         *    script(src = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js")
+         * }
+         * ```
+         */
+        @get:Internal
+        abstract val body: ListProperty<BODY.() -> Unit>
+
+        /** The serialized version of the [body] elements, intended for use as a Gradle task input. */
+        @get:Input
+        internal val serializedBody = body.map { list ->
+            list.joinToString("") { HtmlUtil.serializeBodyContents(it) }
+        }
+
+        /**
+         * A list of element builders to add immediately after the opening `<body>` tag, before the root div and main script.
+         */
+        @get:Internal
+        abstract val bodyStart: ListProperty<BODY.() -> Unit>
+
+        /** The serialized version of the [bodyStart] elements, intended for use as a Gradle task input. */
+        @get:Input
+        internal val serializedBodyStart = bodyStart.map { list ->
+            list.joinToString("") { HtmlUtil.serializeBodyContents(it) }
+        }
+
+        /**
+         * A list of element builders to add immediately before the closing `</body>` tag.
+         */
+        @get:Internal
+        abstract val bodyEnd: ListProperty<BODY.() -> Unit>
+
+        /** The serialized version of the [bodyEnd] elements, intended for use as a Gradle task input. */
+        @get:Input
+        internal val serializedBodyEnd = bodyEnd.map { list ->
+            list.joinToString("") { HtmlUtil.serializeBodyContents(it) }
+        }
+
+        /**
          * The default description for the site.
          *
          * This is a convenience property which, if set, causes a `<meta name="description" content="$description">`
@@ -306,6 +356,12 @@ abstract class AppBlock @Inject constructor(
 
             faviconPath.convention("/favicon.ico")
             lang.convention("en")
+
+            // Initialize body as empty list (no defaults like head has)
+            body.set(emptyList())
+
+            bodyStart.set(emptyList())
+            bodyEnd.set(emptyList())
 
             head.set(listOf {
                 description.orNull?.takeIf { it.isNotBlank() }?.let { description ->
@@ -610,4 +666,36 @@ internal fun KobwebBlock.createAppBlock(kobwebFolder: KobwebFolder, conf: Kobweb
 fun AppBlock.IndexBlock.excludeAllHtmlFromDependencies() {
     excludeHtmlForDependencies.set(listOf(""))
     excludeHtmlForDependencies.disallowChanges()
+}
+
+/**
+ * Add elements to the body at the default position (after main script).
+ */
+fun AppBlock.IndexBlock.body(block: BODY.() -> Unit) {
+    body.add(block)
+}
+
+/**
+ * Add elements to the body at the specified position.
+ */
+fun AppBlock.IndexBlock.body(target: BodyTarget, block: BODY.() -> Unit) {
+    when (target) {
+        BodyTarget.START -> bodyStart.add(block)
+        BodyTarget.AFTER_SCRIPT -> body.add(block)
+        BodyTarget.END -> bodyEnd.add(block)
+    }
+}
+
+/**
+ * Return a body list for a specific [BodyTarget].
+ *
+ * - [BodyTarget.START] maps to [AppBlock.IndexBlock.bodyStart]
+ * - [BodyTarget.AFTER_SCRIPT] maps to [AppBlock.IndexBlock.body]
+ * - [BodyTarget.END] maps to [AppBlock.IndexBlock.bodyEnd]
+ */
+@Deprecated("Use body(target) { ... } instead of body(target).add { ... }", ReplaceWith("body(target) { block() }"))
+fun AppBlock.IndexBlock.body(target: BodyTarget = BodyTarget.AFTER_SCRIPT) = when (target) {
+    BodyTarget.START -> bodyStart
+    BodyTarget.AFTER_SCRIPT -> body
+    BodyTarget.END -> bodyEnd
 }
