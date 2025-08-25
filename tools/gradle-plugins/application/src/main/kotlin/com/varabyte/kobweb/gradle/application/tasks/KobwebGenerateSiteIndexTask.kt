@@ -335,12 +335,25 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             }
         }
 
+        // Collect body elements
+        // AFTER_SCRIPT (default): reuse existing `body` property for backward compatibility
+        val bodyAfterScriptElements: List<String> = indexBlock.serializedBody.get().let {
+            if (it.isBlank()) emptyList() else listOf(it)
+        }
+        // START and END positions are new
+        val bodyStartElements: List<String> = indexBlock.serializedBodyStart.get().let {
+            if (it.isBlank()) emptyList() else listOf(it)
+        }
+        val bodyEndElements: List<String> = indexBlock.serializedBodyEnd.get().let {
+            if (it.isBlank()) emptyList() else listOf(it)
+        }
+
         val basePath = BasePath(confInputs.basePath)
         getGenIndexFile().get().asFile.writeText(
             createIndexFile(
-                confInputs.title,
-                indexBlock.lang.get(),
-                headElements.applyUrlInterceptors(basePath).also { result ->
+                title = confInputs.title,
+                lang = indexBlock.lang.get(),
+                headElements = headElements.applyUrlInterceptors(basePath).also { result ->
                     logger.lifecycle("Final <head> elements:")
                     logger.lifecycle("```")
                     result.elements.forEach { logger.lifecycle("  ${it.replace("\n", "")}") }
@@ -363,10 +376,30 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 // Our script will always exist at the root folder, so be sure to ground it,
                 // e.g. "example.js" -> "/example.js", so the root will be searched even if we're visiting a page in
                 // a subdirectory.
-                basePath.prependTo(confInputs.script.substringAfterLast("/").prefixIfNot("/")),
-                indexBlock.scriptAttributes.get(),
-                buildTarget
+                src = basePath.prependTo(confInputs.script.substringAfterLast("/").prefixIfNot("/")),
+                scriptAttributes = indexBlock.scriptAttributes.get(),
+                bodyStartElements = bodyStartElements,
+                bodyAfterScriptElements = bodyAfterScriptElements,
+                bodyEndElements = bodyEndElements,
+                buildTarget = buildTarget
             )
         )
+
+        // Log final body elements grouped by position
+        if (bodyStartElements.isNotEmpty() || bodyAfterScriptElements.isNotEmpty() || bodyEndElements.isNotEmpty()) {
+            logger.lifecycle("Final <body> elements:")
+            if (bodyStartElements.isNotEmpty()) {
+                logger.lifecycle("  START position:")
+                bodyStartElements.forEach { logger.lifecycle("    ${it.replace("\n", "")}") }
+            }
+            if (bodyAfterScriptElements.isNotEmpty()) {
+                logger.lifecycle("  AFTER_SCRIPT position (default):")
+                bodyAfterScriptElements.forEach { logger.lifecycle("    ${it.replace("\n", "")}") }
+            }
+            if (bodyEndElements.isNotEmpty()) {
+                logger.lifecycle("  END position:")
+                bodyEndElements.forEach { logger.lifecycle("    ${it.replace("\n", "")}") }
+            }
+        }
     }
 }
