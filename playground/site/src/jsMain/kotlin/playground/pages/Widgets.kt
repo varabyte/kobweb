@@ -50,12 +50,19 @@ import com.varabyte.kobweb.silk.components.icons.ArrowForwardIcon
 import com.varabyte.kobweb.silk.components.icons.ArrowUpIcon
 import com.varabyte.kobweb.silk.components.icons.AttachmentIcon
 import com.varabyte.kobweb.silk.components.icons.CheckIcon
+import com.varabyte.kobweb.silk.components.icons.UploadIcon
+import com.varabyte.kobweb.silk.components.icons.CodeIcon
+import com.varabyte.kobweb.silk.components.icons.ClipboardIcon
+import com.varabyte.kobweb.silk.components.icons.UserIcon
 import com.varabyte.kobweb.silk.components.icons.ChevronDownIcon
 import com.varabyte.kobweb.silk.components.icons.ChevronLeftIcon
+import com.varabyte.kobweb.silk.components.icons.SettingsIcon
 import com.varabyte.kobweb.silk.components.icons.ChevronRightIcon
 import com.varabyte.kobweb.silk.components.icons.ChevronUpIcon
 import com.varabyte.kobweb.silk.components.icons.CircleIcon
 import com.varabyte.kobweb.silk.components.icons.CloseIcon
+import com.varabyte.kobweb.silk.components.icons.EditIcon
+import com.varabyte.kobweb.silk.components.icons.TrashIcon
 import com.varabyte.kobweb.silk.components.icons.DownloadIcon
 import com.varabyte.kobweb.silk.components.icons.ExclaimIcon
 import com.varabyte.kobweb.silk.components.icons.HamburgerIcon
@@ -63,8 +70,14 @@ import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
 import com.varabyte.kobweb.silk.components.icons.InfoIcon
 import com.varabyte.kobweb.silk.components.icons.LightbulbIcon
 import com.varabyte.kobweb.silk.components.icons.MinusIcon
+import com.varabyte.kobweb.silk.components.icons.LockIcon
 import com.varabyte.kobweb.silk.components.icons.MoonIcon
+import com.varabyte.kobweb.silk.components.icons.EyeIcon
+import com.varabyte.kobweb.silk.components.icons.EyeOffIcon
 import com.varabyte.kobweb.silk.components.icons.PlusIcon
+import com.varabyte.kobweb.silk.components.icons.CalendarIcon
+import com.varabyte.kobweb.silk.components.icons.SearchIcon
+import com.varabyte.kobweb.silk.components.icons.CheckCircleIcon
 import com.varabyte.kobweb.silk.components.icons.QuestionIcon
 import com.varabyte.kobweb.silk.components.icons.QuoteIcon
 import com.varabyte.kobweb.silk.components.icons.SquareIcon
@@ -272,18 +285,26 @@ fun WidgetsPage() {
                         "Arrow Up" to { ArrowUpIcon() },
                         "Attachment" to { AttachmentIcon() },
                         "Check" to { CheckIcon() },
+                        "Code" to { CodeIcon() },
                         "Chevron Down" to { ChevronDownIcon() },
                         "Chevron Left" to { ChevronLeftIcon() },
                         "Chevron Right" to { ChevronRightIcon() },
                         "Chevron Up" to { ChevronUpIcon() },
                         "Circle" to { CircleIcon() },
+                        "Check Circle" to { CheckCircleIcon() },
                         "Close" to { CloseIcon() },
+                        "Calendar" to { CalendarIcon() },
+                        "Clipboard" to { ClipboardIcon() },
                         "Download" to { DownloadIcon() },
+                        "Edit" to { EditIcon() },
                         "Exclaim" to { ExclaimIcon() },
+                        "Eye" to { EyeIcon() },
+                        "Eye Off" to { EyeOffIcon() },
                         "Hamburger" to { HamburgerIcon() },
                         "Indeterminate" to { IndeterminateIcon() },
                         "Info" to { InfoIcon() },
                         "Lightbulb" to { LightbulbIcon() },
+                        "Lock" to { LockIcon() },
                         "Minus" to { MinusIcon() },
                         "Moon" to { MoonIcon() },
                         "Plus" to { PlusIcon() },
@@ -292,6 +313,11 @@ fun WidgetsPage() {
                         "Square" to { SquareIcon() },
                         "Stop" to { StopIcon() },
                         "Sun" to { SunIcon() },
+                        "Search" to { SearchIcon() },
+                        "Settings" to { SettingsIcon() },
+                        "Trash" to { TrashIcon() },
+                        "Upload" to { UploadIcon() },
+                        "User" to { UserIcon() },
                         "Warning" to { WarningIcon() },
                     )
 
