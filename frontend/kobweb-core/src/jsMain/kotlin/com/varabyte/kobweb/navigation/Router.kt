@@ -19,7 +19,6 @@ import org.w3c.dom.INSTANT
 import org.w3c.dom.ScrollBehavior
 import org.w3c.dom.ScrollToOptions
 import org.w3c.dom.url.URL
-import org.w3c.xhr.XMLHttpRequest
 
 @Page
 @Composable
@@ -404,7 +403,7 @@ class Router {
 
     /**
      * Attempt to navigate **internally** within this site, or return false if that's not possible (i.e. because the
-     * path is external).
+     * path is external or because the route isn't found).
      *
      * By internally, I mean this method expects a route path only -- no https:// origin in other words. "/",
      * "/about", "/help/contact", and "user/123" are valid examples.
@@ -431,11 +430,17 @@ class Router {
      *
      * @param updateHistoryMode How this new path should affect the history. See [UpdateHistoryMode] docs for more
      *   details. Note that this value will be ignored if [pathQueryAndFragment] refers to an external link.
+     *
+     * @param routeToErrorPageOnFail If true, and the input path fails to resolve to a known registered route, this
+     *   method will then force the page to navigate to this site's error page (see also: [setErrorPage]). Otherwise,
+     *   abort early, which can be useful if you have additional code you want to run that will do additional
+     *   processing.
      */
     fun tryRoutingTo(
         pathQueryAndFragment: String,
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE,
+        routeToErrorPageOnFail: Boolean = true,
     ): Boolean {
         if (pathQueryAndFragment.includesHost()) return false
 
@@ -468,29 +473,11 @@ class Router {
                 }
             }
 
-            // Occasionally, a path might not be registered with our router BUT the server would respond to it. For
-            // example, perhaps the incoming path refers to a file that lives on the server e.g.
-            // "documents/external.md". So we ask the server if it's there. If so, we treat this navigation as "handled"
-            // and kick off a request to the server to download the file.
-            run {
+            if (!routeToErrorPageOnFail) {
                 val (pathPart, _) = Route.partition(pathQueryAndFragment)
 
-                if (!routeTree.isRegistered(pathPart)) {
-                    val xhr = XMLHttpRequest()
-                    var fileExistsOnServer = false
-                    xhr.open("HEAD", pathQueryAndFragment, async = false)
-                    xhr.onload = {
-                        fileExistsOnServer = xhr.status == 200.toShort()
-                        Unit
-                    }
-                    xhr.onerror = {}
-                    xhr.onabort = {}
-                    xhr.send(null)
-
-                    if (fileExistsOnServer) {
-                        window.open(pathQueryAndFragment, OpenLinkStrategy.IN_PLACE)
-                        return true
-                    }
+                if (!routeTree.isRegistered(pathPart) && !routeToErrorPageOnFail) {
+                    return false
                 }
             }
         }
@@ -589,6 +576,7 @@ class Router {
                 pathQueryAndFragment,
                 updateHistoryMode,
                 openInternalLinksStrategy,
+                routeToErrorPageOnFail = false,
             )
         ) {
             window.open(Route.normalizeSlashes(pathQueryAndFragment),
