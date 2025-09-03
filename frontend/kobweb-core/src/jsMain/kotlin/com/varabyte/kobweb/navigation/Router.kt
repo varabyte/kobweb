@@ -475,8 +475,7 @@ class Router {
 
             if (!routeToErrorPageOnFail) {
                 val (pathPart, _) = Route.partition(pathQueryAndFragment)
-
-                if (!routeTree.isRegistered(pathPart) && !routeToErrorPageOnFail) {
+                if (!routeTree.isRegistered(pathPart)) {
                     return false
                 }
             }
