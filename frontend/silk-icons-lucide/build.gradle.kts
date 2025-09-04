@@ -18,6 +18,22 @@ val generateIconsTask = tasks.register("generateIcons") {
     outputs.dir(GENERATED_SRC_ROOT)
 
     doLast {
+        if (!srcFile.asFile.exists()) {
+            throw GradleException(
+                """
+                |lucide-icons.json not found!
+                |
+                |To generate the icon data file:
+                |1. cd frontend/silk-icons-lucide
+                |2. npm install lucide@latest
+                |3. node extract-icons.js
+                |4. Run this task again
+                |
+                |See README.md for detailed instructions.
+            """.trimMargin()
+            )
+        }
+
         val iconData = groovy.json.JsonSlurper().parse(srcFile.asFile) as Map<String, List<List<Any>>>
 
         // Generate individual composable functions
