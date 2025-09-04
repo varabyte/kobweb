@@ -419,7 +419,7 @@ fun createMainFunction(
                 addComment("something like `https://site.com//about` by accident. If we pass `//about` into")
                 addComment("`tryRoutingTo`, Kobweb will reject it as a protocol-relative URL; instead, we")
                 addComment("want it to navigate to `/about`")
-                addStatement("router.tryRoutingTo(\"/\" + BasePath.remove(window.location.href.removePrefix(window.origin).trimStart('/')), UpdateHistoryMode.REPLACE)")
+                addStatement("router.tryRoutingTo(BasePath.remove(\"/\" + window.location.href.removePrefix(window.origin).trimStart('/')), UpdateHistoryMode.REPLACE)")
                 addStatement("")
             }.build())
 
