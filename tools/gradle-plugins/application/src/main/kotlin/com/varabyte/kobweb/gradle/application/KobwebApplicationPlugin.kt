@@ -177,6 +177,7 @@ class KobwebApplicationPlugin @Inject constructor(
                             "\"${devScript.substringAfterLast('/')}\" to find the right path."
                     )
                 }
+
             }
         }
         project.tasks.register<KobwebStopTask>("kobwebStop")
@@ -240,27 +241,6 @@ class KobwebApplicationPlugin @Inject constructor(
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
 
-            // Register sitemap generation for this JS target
-            val kobwebGenerateSitemapTask = project.tasks.register<KobwebGenerateSitemapTask>(
-                "kobwebGenerateSitemap"
-            )
-            kobwebGenerateSitemapTask.configure {
-                routes.set(project.kobwebSiteRoutes)
-                // Generate sitemap into actual source resources directory
-                sitemapFile.set(
-                    project.layout.projectDirectory.file("src/${jsTarget.mainSourceSet}/resources/public/sitemap.xml")
-                )
-                baseUrl.set(appBlock.sitemap.baseUrl)
-                includeDynamicRoutes.set(appBlock.sitemap.includeDynamicRoutes)
-                extraRoutes.set(appBlock.sitemap.extraRoutes)
-                excludeRoutes.set(appBlock.sitemap.excludeRoutes)
-                routeFilter.set(appBlock.sitemap.routeFilter)
-
-                // Ensure sitemap runs after markdown processing if present
-                project.tasks.namedOrNull<Task>("kobwebxMarkdownProcess")?.let { markdownProcessTask ->
-                    dependsOn(markdownProcessTask)
-                }
-            }
 
             // Beginning with Kotlin 2.1.0, the Kotlin Gradle plugin began using uncompressed klibs for
             // inter-project dependencies. This breaks our code responsible for detecting and extracting metadata from
@@ -297,8 +277,6 @@ class KobwebApplicationPlugin @Inject constructor(
                         )
                     }
                 }
-                // Ensure sitemap is generated before processing resources (since it's written to source resources)
-                dependsOn(kobwebGenerateSitemapTask)
             }
 
             val kobwebGenSiteEntryTask = project.tasks.register<KobwebGenerateSiteEntryTask>(
@@ -391,6 +369,26 @@ class KobwebApplicationPlugin @Inject constructor(
 
             kobwebListRoutesTask.configure {
                 appDataFile.set(kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile })
+            }
+
+            project.tasks.register<KobwebGenerateSitemapTask>(
+                "kobwebGenerateSitemap"
+            ) {
+                routes.set(project.kobwebSiteRoutes)
+                basePath.set(kobwebConf.site.basePath)
+                sitemapFile.set(
+                    appBlock.genDir.flatMap { genDir ->
+                        project.layout.buildDirectory.dir("$genDir/sitemap/src/${jsTarget.mainSourceSet}/resources")
+                    }.map { it.file("public/sitemap.xml") }
+                )
+                sitemapBlock.set(appBlock.sitemap)
+            }
+
+            // Wire into resource processing - generate directly into resources structure
+            project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
+                resources.srcDir(appBlock.genDir.flatMap { genDir ->
+                    project.layout.buildDirectory.dir("$genDir/sitemap/src/${jsTarget.mainSourceSet}/resources")
+                })
             }
         }
         project.buildTargets.withType<KotlinJvmTarget>().configureEach {
