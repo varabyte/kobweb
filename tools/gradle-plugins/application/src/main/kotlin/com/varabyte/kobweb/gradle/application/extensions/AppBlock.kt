@@ -640,3 +640,11 @@ fun AppBlock.IndexBlock.excludeAllHtmlFromDependencies() {
     excludeHtmlForDependencies.set(listOf(""))
     excludeHtmlForDependencies.disallowChanges()
 }
+
+
+/**
+ * Add elements to the body at the default position (after main script).
+ */
+fun AppBlock.IndexBlock.body(block: BODY.() -> Unit) {
+    body.add(block)
+}
