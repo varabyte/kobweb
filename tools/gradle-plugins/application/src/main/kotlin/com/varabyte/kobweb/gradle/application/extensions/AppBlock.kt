@@ -12,6 +12,7 @@ import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.HEAD
 import kotlinx.html.link
 import kotlinx.html.meta
+import org.gradle.api.GradleException
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
@@ -328,10 +329,18 @@ abstract class AppBlock @Inject constructor(
         }
     }
 
+
     /**
      * A sub-block for defining properties related to sitemap generation for SEO.
      */
     abstract class SitemapBlock @Inject constructor() : ExtensionAware {
+
+
+        /**
+         * Context for sitemap route filtering, providing extensible information about each route.
+         */
+        class SitemapFilterContext(val route: String)
+
         /**
          * The base URL for the site (e.g., "https://example.com").
          * This will be prepended to all routes in the sitemap.
@@ -341,24 +350,6 @@ abstract class AppBlock @Inject constructor(
          */
         @get:Input
         abstract val baseUrl: Property<String>
-
-        /**
-         * Whether to include dynamic routes in the sitemap.
-         * Dynamic routes contain parameters like `/users/{id}` and are generally not useful for SEO.
-         * Defaults to false.
-         */
-        @get:Input
-        abstract val includeDynamicRoutes: Property<Boolean>
-
-        /**
-         * A filter to determine which routes should be included in the sitemap.
-         * Return true to include the route, false to exclude it.
-         *
-         * Note: This is marked @Internal to avoid configuration cache issues with lambda serialization.
-         * For most use cases, use excludeRoutes or includePatterns instead.
-         */
-        @get:Internal
-        abstract val routeFilter: Property<(String) -> Boolean>
 
         /**
          * Additional routes to include that may not be discovered automatically.
@@ -371,16 +362,24 @@ abstract class AppBlock @Inject constructor(
         abstract val extraRoutes: ListProperty<String>
 
         /**
-         * Routes to explicitly exclude from the sitemap.
-         * Takes precedence over discovered routes and extraRoutes.
+         * A filter to determine which routes should be included in the sitemap.
+         * Return true to include the route, false to exclude it.
+         *
+         * Note: This property is marked as `@Internal` to avoid serialization issues with lambdas,
+         * which can affect Gradle's configuration cache.
+         *
+         * IMPORTANT: Dynamic routes (containing '{' and '}') are ALWAYS excluded automatically,
+         * even if you provide a custom filter. This is enforced by the framework.
+         * 
+         * @see [SitemapFilterContext]
          */
-        @get:Input
-        abstract val excludeRoutes: SetProperty<String>
+        @get:Internal // Avoid serialization issues with lambdas
+        abstract val filter: Property<SitemapFilterContext.() -> Boolean>
 
         init {
-            includeDynamicRoutes.convention(false)
             extraRoutes.set(emptyList())
-            excludeRoutes.set(emptySet())
+            // Default filter accepts all routes (dynamic route exclusion is handled in the task)
+            filter.convention { true }
         }
     }
 
@@ -629,6 +628,17 @@ abstract class AppBlock @Inject constructor(
      */
     @get:Input
     abstract val cssPrefix: Property<String>
+
+    /**
+     * Enable sitemap generation for this Kobweb application.
+     *
+     * @param baseUrl The base URL for the site (e.g., "https://example.com")
+     * @param config Configuration block for additional sitemap options
+     */
+    fun generateSitemap(baseUrl: String, config: SitemapBlock.() -> Unit = {}) {
+        sitemap.baseUrl.set(baseUrl)
+        config(sitemap)
+    }
 
     init {
         globals.set(mapOf("title" to conf.site.title))
