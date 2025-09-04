@@ -20,9 +20,18 @@ kobweb {
             }
         }
         //testing new feature
-        sitemap {
-            baseUrl.set("http://localhost:8080")
-            excludeRoutes.addAll("/admin", "/api","/example/")
+        generateSitemap("http://localhost:8080") {
+            // Define routes to exclude from sitemap
+            val excludedPrefixes = listOf("/fruits", "/markdown", "/api")
+            filter.set {
+                // Exclude dynamic routes (default behavior)
+//                val hasDynamicRoute = route.contains('{') && route.contains('}')
+                // Exclude routes with specified prefixes
+                val hasExcludedPrefix = excludedPrefixes.any { prefix -> route.startsWith(prefix) }
+                // Include only if both conditions are false
+               hasExcludedPrefix
+               !hasExcludedPrefix
+            }
         }
     }
     markdown {
