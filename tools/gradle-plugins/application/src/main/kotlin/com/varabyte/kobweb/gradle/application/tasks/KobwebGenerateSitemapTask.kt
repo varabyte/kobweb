@@ -6,103 +6,84 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import javax.inject.Inject
 
-abstract class KobwebGenerateSitemapTask @Inject constructor(
-) : KobwebGenerateTask("Generate an XML sitemap for the site") {
+abstract class KobwebGenerateSitemapTask : KobwebGenerateTask("Generate an XML sitemap for the site") {
 
     @get:Input
-    abstract val baseUrl: Property<String>
+    abstract val basePath: Property<String>
 
-    @get:Input
-    abstract val includeDynamicRoutes: Property<Boolean>
-
-    @get:Input
-    abstract val extraRoutes: ListProperty<String>
-
-    @get:Input
-    abstract val excludeRoutes: SetProperty<String>
+    @get:Nested
+    abstract val sitemapBlock: Property<AppBlock.SitemapBlock>
 
     @get:Input
     abstract val routes: ListProperty<String>
-
-    /**
-     * A filter to determine which routes should be included in the sitemap.
-     * Return true to include the route, false to exclude it.
-     *
-     * Note: This is marked @Internal to avoid configuration cache issues with lambda serialization.
-     */
-    @get:Internal
-    abstract val routeFilter: Property<(String) -> Boolean>
 
     @get:OutputFile
     abstract val sitemapFile: RegularFileProperty
 
     @TaskAction
     fun execute() {
-        // Skip execution if baseUrl is not configured
-        if (!baseUrl.isPresent) {
-            logger.info("Skipping sitemap generation as baseUrl is not configured")
-            return
-        }
-
-        val baseUrlValue = baseUrl.get()
-        val includeDynamic = includeDynamicRoutes.get()
-        val extraRoutesValue = extraRoutes.get()
-        val excludeRoutesValue = excludeRoutes.get()
-        val routeFilterValue = routeFilter.orNull
+        val baseUrlValue = sitemapBlock.get().baseUrl.get()
 
         // Validate baseUrl
         validateBaseUrl(baseUrlValue)
 
-        // Start with discovered routes
-        val allRoutes = routes.get().toMutableSet()
+        // Start with discovered routes and add extra routes
+        val allRoutes = routes.get().toMutableSet().apply {
+            addAll(sitemapBlock.get().extraRoutes.get())
+        }
 
-        // Add extra routes
-        allRoutes.addAll(extraRoutesValue)
-
-        // Apply filters
+        // Apply filters: always exclude dynamic routes first, then apply user filter
         val filteredRoutes = allRoutes
             .filter { route ->
-                // Exclude routes that match any exclude pattern (prefix or exact match)
-                if (isRouteExcluded(route, excludeRoutesValue)) return@filter false
+                    // Always exclude dynamic routes regardless of user filter
+                val isDynamicRoute = route.contains('{') && route.contains('}')
+                if (isDynamicRoute) {
+                    logger.debug("Route: '$route' -> EXCLUDE (dynamic route)")
+                    return@filter false
+                }
 
-                // Exclude dynamic routes if configured (stricter check)
-                if (!includeDynamic && isDynamicRoute(route)) return@filter false
-
-                // Apply custom filter if provided
-                routeFilterValue?.invoke(route) ?: true
+                // Apply user filter for non-dynamic routes
+                val ctx = AppBlock.SitemapBlock.SitemapFilterContext(route)
+                val shouldInclude = sitemapBlock.get().filter.get()(ctx)
+                logger.debug("Route: '$route' -> ${if (shouldInclude) "INCLUDE" else "EXCLUDE"} (user filter)")
+                shouldInclude
             }
             .sorted()
 
-        // Check size limits and warn
+        logger.info("Filtered ${allRoutes.size} routes down to ${filteredRoutes.size} routes")
+        logger.info(
+            "Excluded routes: ${
+                allRoutes.filter { route ->
+                    // Same logic as above: exclude dynamic routes or routes that fail user filter
+                    val isDynamicRoute = route.contains('{') && route.contains('}')
+                    if (isDynamicRoute) return@filter true
+                    val ctx = AppBlock.SitemapBlock.SitemapFilterContext(route)
+                    !sitemapBlock.get().filter.get()(ctx)
+                }
+            }"
+        )
+
+        // Size warnings
         if (filteredRoutes.size > 50000) {
-            logger.warn("Sitemap contains ${filteredRoutes.size} URLs, exceeding the 50,000 URL limit. Consider using excludeRoutes to reduce size.")
+            logger.warn("Sitemap contains ${filteredRoutes.size} URLs, exceeding the 50,000 URL limit. Consider using filter to reduce size.")
         }
 
-        // Generate XML sitemap
+        // Generate XML sitemap in build dir (already configured via sitemapFile)
         val sitemapXml = generateSitemapXml(baseUrlValue, filteredRoutes)
 
-        // Check size limit
         if (sitemapXml.length > 50 * 1024 * 1024) { // 50MB
             logger.warn("Generated sitemap is ${sitemapXml.length / (1024 * 1024)}MB, exceeding the 50MB limit.")
         }
 
         sitemapFile.get().asFile.writeText(sitemapXml)
 
-        logger.lifecycle("Generated sitemap with ${filteredRoutes.size} routes")
-        if (filteredRoutes.size <= 20) {
-            // Only log individual routes for small sitemaps to avoid noise
-            filteredRoutes.forEach { route ->
-                logger.lifecycle("  ${createAbsoluteUrl(baseUrlValue, route)}")
-            }
-        }
+        logger.info("Generated sitemap with ${filteredRoutes.size} routes.")
     }
 
     private fun validateBaseUrl(baseUrl: String) {
@@ -116,22 +97,27 @@ abstract class KobwebGenerateSitemapTask @Inject constructor(
                         "  Testing: \"http://localhost:8080\""
                 )
             }
-
             baseUrl.endsWith("/") ->
                 throw GradleException("sitemap.baseUrl should not end with a trailing slash, got: $baseUrl")
         }
-    }
-
-    private fun isDynamicRoute(route: String): Boolean {
-        // More precise check than just contains('{')
-        return route.contains('{') && route.contains('}')
-    }
-
-    private fun isRouteExcluded(route: String, excludeRoutes: Set<String>): Boolean {
-        return excludeRoutes.any { excludeRoute ->
-            route.startsWith(excludeRoute) || route == excludeRoute
+        val basePathValue = basePath.get()
+        if (basePathValue.isNotBlank()) {
+            try {
+                val baseUrlPath = java.net.URI(baseUrl).path
+                if (baseUrlPath.isNotEmpty() && !baseUrlPath.endsWith("/$basePathValue")) {
+                    throw GradleException(
+                        "sitemap.baseUrl path ('$baseUrlPath') does not end with the project's configured " +
+                            "base path ('/$basePathValue'). This will result in incorrect sitemap links. " +
+                            "Please set baseUrl to include the base path, e.g., \"https://example.com/$basePathValue\"."
+                    )
+                }
+            } catch (e: java.net.URISyntaxException) {
+                // Already handled by the http/https check, but catch to be safe
+                logger.warn("Could not parse sitemap.baseUrl to validate against base path: ${e.message}")
+            }
         }
     }
+
 
     private fun createAbsoluteUrl(baseUrl: String, route: String): String {
         val cleanBaseUrl = baseUrl.trimEnd('/')
@@ -141,8 +127,8 @@ abstract class KobwebGenerateSitemapTask @Inject constructor(
 
     private fun generateSitemapXml(baseUrl: String, routes: List<String>): String {
         return buildString {
-            appendLine("""<?xml version="1.0" encoding="UTF-8"?>""")
-            appendLine("""<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
+            appendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+            appendLine("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">")
 
             routes.forEach { route ->
                 val absoluteUrl = createAbsoluteUrl(baseUrl, route)
