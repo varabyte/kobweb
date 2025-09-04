@@ -79,6 +79,12 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaGithub
 import com.varabyte.kobweb.silk.components.icons.fa.FaHouse
 import com.varabyte.kobweb.silk.components.icons.fa.FaStar
 import com.varabyte.kobweb.silk.components.icons.fa.FaUser
+import com.varabyte.kobweb.silk.components.icons.lucide.LuCamera
+import com.varabyte.kobweb.silk.components.icons.lucide.LuHeart
+import com.varabyte.kobweb.silk.components.icons.lucide.LuHouse
+import com.varabyte.kobweb.silk.components.icons.lucide.LuSearch
+import com.varabyte.kobweb.silk.components.icons.lucide.LuSettings
+import com.varabyte.kobweb.silk.components.icons.lucide.LuUser
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiClose
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiHome
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiMenu
@@ -338,6 +344,27 @@ fun WidgetsPage() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         mdiIcons.forEach { (iconName, iconMethod) ->
+                            Box(IconContainerStyle.toModifier()) { iconMethod() }
+                            Tooltip(ElementTarget.PreviousSibling, iconName)
+                        }
+                    }
+                }
+
+                WidgetSection("Web - Lucide") {
+                    val lucideIcons = mapOf<String, @Composable () -> Unit>(
+                        "Camera" to { LuCamera() },
+                        "Heart" to { LuHeart() },
+                        "House" to { LuHouse() },
+                        "Search" to { LuSearch() },
+                        "Settings" to { LuSettings() },
+                        "User" to { LuUser() },
+                    )
+
+                    Row(
+                        Modifier.gap(0.5.cssRem).flexWrap(FlexWrap.Wrap),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        lucideIcons.forEach { (iconName, iconMethod) ->
                             Box(IconContainerStyle.toModifier()) { iconMethod() }
                             Tooltip(ElementTarget.PreviousSibling, iconName)
                         }
