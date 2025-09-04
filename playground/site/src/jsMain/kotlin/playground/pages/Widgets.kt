@@ -350,8 +350,8 @@ fun WidgetsPage() {
                     }
                 }
 
-                WidgetSection("Web - Lucide") {
-                    val lucideIcons = mapOf<String, @Composable () -> Unit>(
+                WidgetSection("Web - Lu") {
+                    val luIcons = mapOf<String, @Composable () -> Unit>(
                         "Camera" to { LuCamera() },
                         "Heart" to { LuHeart() },
                         "House" to { LuHouse() },
@@ -364,7 +364,7 @@ fun WidgetsPage() {
                         Modifier.gap(0.5.cssRem).flexWrap(FlexWrap.Wrap),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        lucideIcons.forEach { (iconName, iconMethod) ->
+                        luIcons.forEach { (iconName, iconMethod) ->
                             Box(IconContainerStyle.toModifier()) { iconMethod() }
                             Tooltip(ElementTarget.PreviousSibling, iconName)
                         }
