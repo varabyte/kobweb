@@ -335,18 +335,8 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             }
         }
 
-        // Collect body elements
-        // AFTER_SCRIPT (default): reuse existing `body` property for backward compatibility
-        val bodyAfterScriptElements: List<String> = indexBlock.serializedBody.get().let {
-            if (it.isBlank()) emptyList() else listOf(it)
-        }
-        // START and END positions are new
-        val bodyStartElements: List<String> = indexBlock.serializedBodyStart.get().let {
-            if (it.isBlank()) emptyList() else listOf(it)
-        }
-        val bodyEndElements: List<String> = indexBlock.serializedBodyEnd.get().let {
-            if (it.isBlank()) emptyList() else listOf(it)
-        }
+        // Collect body elements (simpler than head - no library support initially)
+        val bodyElements: List<String> = indexBlock.body.get().map { HtmlUtil.serializeBodyContents(it) }
 
         val basePath = BasePath(confInputs.basePath)
         getGenIndexFile().get().asFile.writeText(
@@ -378,28 +368,17 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 // a subdirectory.
                 src = basePath.prependTo(confInputs.script.substringAfterLast("/").prefixIfNot("/")),
                 scriptAttributes = indexBlock.scriptAttributes.get(),
-                bodyStartElements = bodyStartElements,
-                bodyAfterScriptElements = bodyAfterScriptElements,
-                bodyEndElements = bodyEndElements,
+                bodyElements = bodyElements,
                 buildTarget = buildTarget
             )
         )
 
-        // Log final body elements grouped by position
-        if (bodyStartElements.isNotEmpty() || bodyAfterScriptElements.isNotEmpty() || bodyEndElements.isNotEmpty()) {
+        // Optional: Log body elements like we do for head ~ feel free to remove this if not needed
+        if (bodyElements.isNotEmpty()) {
             logger.lifecycle("Final <body> elements:")
-            if (bodyStartElements.isNotEmpty()) {
-                logger.lifecycle("  START position:")
-                bodyStartElements.forEach { logger.lifecycle("    ${it.replace("\n", "")}") }
-            }
-            if (bodyAfterScriptElements.isNotEmpty()) {
-                logger.lifecycle("  AFTER_SCRIPT position (default):")
-                bodyAfterScriptElements.forEach { logger.lifecycle("    ${it.replace("\n", "")}") }
-            }
-            if (bodyEndElements.isNotEmpty()) {
-                logger.lifecycle("  END position:")
-                bodyEndElements.forEach { logger.lifecycle("    ${it.replace("\n", "")}") }
-            }
+            logger.lifecycle("```")
+            bodyElements.forEach { logger.lifecycle("  ${it.replace("\n", "")}") }
+            logger.lifecycle("```")
         }
     }
 }

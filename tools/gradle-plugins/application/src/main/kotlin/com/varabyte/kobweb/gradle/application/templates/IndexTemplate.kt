@@ -74,9 +74,7 @@ fun createIndexFile(
     title: String,
     lang: String,
     headElements: Iterable<String>,
-    bodyStartElements: Iterable<String>,
-    bodyAfterScriptElements: Iterable<String>,
-    bodyEndElements: Iterable<String>,
+    bodyElements: Iterable<String>,
     src: String,
     scriptAttributes: Map<String, String>,
     buildTarget: BuildTarget
@@ -96,11 +94,6 @@ fun createIndexFile(
                 }
 
                 body {
-                    // BodyTarget.START elements
-                    bodyStartElements.forEach { elements ->
-                        unsafe { raw(elements) }
-                    }
-
                     div {
                         id = "_kobweb-root"
                         // Fill max size just in case user sets html / body size
@@ -116,13 +109,8 @@ fun createIndexFile(
                         attributes.putAll(scriptAttributes)
                     }
 
-                    // BodyTarget.AFTER_SCRIPT elements (default)
-                    bodyAfterScriptElements.forEach { elements ->
-                        unsafe { raw(elements) }
-                    }
-
-                    // BodyTarget.END elements
-                    bodyEndElements.forEach { elements ->
+                    // Add user body elements
+                    bodyElements.forEach { elements ->
                         unsafe { raw(elements) }
                     }
                 }
