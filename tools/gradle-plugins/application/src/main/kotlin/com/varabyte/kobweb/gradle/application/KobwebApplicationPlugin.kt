@@ -371,70 +371,78 @@ class KobwebApplicationPlugin @Inject constructor(
                 appDataFile.set(kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile })
             }
 
-            project.tasks.register<KobwebGenerateSitemapTask>(
-                "kobwebGenerateSitemap"
-            ) {
-                routes.set(project.kobwebSiteRoutes)
-                basePath.set(kobwebConf.site.basePath)
-                sitemapFile.set(
-                    appBlock.genDir.flatMap { genDir ->
+            // Only register sitemap generation task if sitemap generation has been enabled
+            if (appBlock.sitemap.isEnabled) {
+                val kobwebGenerateSitemapTask = project.tasks.register<KobwebGenerateSitemapTask>(
+                    "kobwebGenerateSitemap"
+                ) {
+                    routes.set(project.kobwebSiteRoutes)
+                    basePath.set(kobwebConf.site.basePath)
+                    sitemapFile.set(
+                        appBlock.genDir.flatMap { genDir ->
+                            project.layout.buildDirectory.dir("$genDir/sitemap/src/${jsTarget.mainSourceSet}/resources")
+                        }.map { it.file("public/sitemap.xml") }
+                    )
+                    sitemapBlock.set(appBlock.sitemap)
+
+                    // Use onlyIf to ensure proper Gradle task skipping behavior
+                    onlyIf { sitemapBlock.get().baseUrl.isPresent }
+                }
+
+                // Wire into resource processing - generate directly into resources structure
+                project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
+                    resources.srcDir(appBlock.genDir.flatMap { genDir ->
                         project.layout.buildDirectory.dir("$genDir/sitemap/src/${jsTarget.mainSourceSet}/resources")
-                    }.map { it.file("public/sitemap.xml") }
-                )
-                sitemapBlock.set(appBlock.sitemap)
-            }
-
-            // Wire into resource processing - generate directly into resources structure
-            project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
-                resources.srcDir(appBlock.genDir.flatMap { genDir ->
-                    project.layout.buildDirectory.dir("$genDir/sitemap/src/${jsTarget.mainSourceSet}/resources")
-                })
-            }
-        }
-        project.buildTargets.withType<KotlinJvmTarget>().configureEach {
-            val jvmTarget = JvmTarget(this)
-
-            project.setupKspJvm(jvmTarget)
-
-            // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger
-            // much.
-            kobwebStartTask.configure {
-                if (env == ServerEnvironment.DEV) {
-                    // If this site has server routes, make sure we built the jar that our servers can load
-                    dependsOn(project.tasks.namedOrNull(jvmTarget.jar))
+                    })
                 }
             }
 
-            val kobwebCacheAppBackendDataTask = project.tasks.register<KobwebCacheAppBackendDataTask>("kobwebCacheAppBackendData") {
-                appBackendMetadataFile.set(project.kspBackendFile(jvmTarget))
-                compileClasspath.from(project.configurations.named(jvmTarget.compileClasspath))
-                appDataFile.set(this.kobwebCacheFile("appData.json"))
-            }
+            project.buildTargets.withType<KotlinJvmTarget>().configureEach {
+                val jvmTarget = JvmTarget(this)
 
-            val kobwebGenApisFactoryTask = project.tasks
-                .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock.app)
+                project.setupKspJvm(jvmTarget)
 
-            // If a user adds "includeServer = true" but doesn't add a dependency on the API artifact, we want to give
-            // them a clear message now; otherwise they'll get a cryptic compilation error later.
-            val hasKobwebApiDepProvider =
-                project.getJvmDependencyResults().hasDependencyNamed("com.varabyte.kobweb:kobweb-api")
-            kobwebGenApisFactoryTask.configure {
-                appDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
-
-                doFirst {
-                    if (!hasKobwebApiDepProvider.get()) {
-                        throw GradleException("e: A required jvm dependency for a Kobweb project with includeServer=true was not found. To fix, add compilerOnly(\"com.varabyte.kobweb:kobweb-api\"), or compileOnly(libs.kobweb.api) if using the standard Kobweb template, to the jvmMain.sourceSet block.")
+                // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger
+                // much.
+                kobwebStartTask.configure {
+                    if (env == ServerEnvironment.DEV) {
+                        // If this site has server routes, make sure we built the jar that our servers can load
+                        dependsOn(project.tasks.namedOrNull(jvmTarget.jar))
                     }
                 }
-            }
 
-            kobwebExportTask.configure {
-                appBackendDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
-            }
+                val kobwebCacheAppBackendDataTask =
+                    project.tasks.register<KobwebCacheAppBackendDataTask>("kobwebCacheAppBackendData") {
+                        appBackendMetadataFile.set(project.kspBackendFile(jvmTarget))
+                        compileClasspath.from(project.configurations.named(jvmTarget.compileClasspath))
+                        appDataFile.set(this.kobwebCacheFile("appData.json"))
+                    }
 
-            project.kspExcludedSources.from(kobwebGenApisFactoryTask)
-            project.kotlin.sourceSets.named(jvmTarget.mainSourceSet) {
-                kotlin.srcDir(kobwebGenApisFactoryTask)
+                val kobwebGenApisFactoryTask = project.tasks
+                    .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock.app)
+
+                // If a user adds "includeServer = true" but doesn't add a dependency on the API artifact, we want to give
+                // them a clear message now; otherwise they'll get a cryptic compilation error later.
+                val hasKobwebApiDepProvider =
+                    project.getJvmDependencyResults().hasDependencyNamed("com.varabyte.kobweb:kobweb-api")
+                kobwebGenApisFactoryTask.configure {
+                    appDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
+
+                    doFirst {
+                        if (!hasKobwebApiDepProvider.get()) {
+                            throw GradleException("e: A required jvm dependency for a Kobweb project with includeServer=true was not found. To fix, add compilerOnly(\"com.varabyte.kobweb:kobweb-api\"), or compileOnly(libs.kobweb.api) if using the standard Kobweb template, to the jvmMain.sourceSet block.")
+                        }
+                    }
+                }
+
+                kobwebExportTask.configure {
+                    appBackendDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
+                }
+
+                project.kspExcludedSources.from(kobwebGenApisFactoryTask)
+                project.kotlin.sourceSets.named(jvmTarget.mainSourceSet) {
+                    kotlin.srcDir(kobwebGenApisFactoryTask)
+                }
             }
         }
 
