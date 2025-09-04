@@ -376,6 +376,22 @@ abstract class AppBlock @Inject constructor(
         @get:Internal // Avoid serialization issues with lambdas
         abstract val filter: Property<SitemapFilterContext.() -> Boolean>
 
+        /**
+         * Internal flag to track whether sitemap generation has been enabled.
+         * This is used to conditionally register the sitemap generation task.
+         */
+        @get:Internal
+        internal var isEnabled: Boolean = false
+            private set
+
+        /**
+         * Internal method to mark sitemap generation as enabled.
+         * Called by the generateSitemap function.
+         */
+        internal fun markAsEnabled() {
+            isEnabled = true
+        }
+
         init {
             extraRoutes.set(emptyList())
             // Default filter accepts all routes (dynamic route exclusion is handled in the task)
@@ -638,6 +654,7 @@ abstract class AppBlock @Inject constructor(
     fun generateSitemap(baseUrl: String, config: SitemapBlock.() -> Unit = {}) {
         sitemap.baseUrl.set(baseUrl)
         config(sitemap)
+        sitemap.markAsEnabled()
     }
 
     init {
