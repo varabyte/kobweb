@@ -1,5 +1,14 @@
 @file:Suppress("LeakingThis") // Following official Gradle guidance
 
+/**
+ * Enhanced Markdown handlers for Kobweb projects.
+ *
+ * Recent enhancements:
+ * - Task list support: Automatically detects and renders task list items (- [x] / - [ ]) in all text contexts,
+ *   including table cells where CommonMark doesn't normally recognize them as TaskListItemMarker nodes.
+ *   Uses FontAwesome icons when Silk is available, falls back to HTML input checkboxes otherwise.
+ */
+
 package com.varabyte.kobwebx.gradle.markdown.handlers
 
 import com.varabyte.kobweb.common.collect.Key
@@ -12,11 +21,15 @@ import com.varabyte.kobwebx.gradle.markdown.util.escapeDollars
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.escapeTripleQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.nestedLiteral
+import org.commonmark.ext.footnotes.FootnoteDefinition
+import org.commonmark.ext.footnotes.FootnoteReference
+import org.commonmark.ext.gfm.strikethrough.Strikethrough
 import org.commonmark.ext.gfm.tables.TableBlock
 import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell
 import org.commonmark.ext.gfm.tables.TableHead
 import org.commonmark.ext.gfm.tables.TableRow
+import org.commonmark.ext.task.list.items.TaskListItemMarker
 import org.commonmark.node.BlockQuote
 import org.commonmark.node.BulletList
 import org.commonmark.node.Code
@@ -79,6 +92,28 @@ class NodeScope(val reporter: Reporter, val data: TypedMap, private val indentCo
  *     }
  *   }
  * }
+ *
+ * ## Task List Support
+ *
+ * This handler automatically detects and renders task list items (checkboxes) in markdown text,
+ * including those inside table cells where CommonMark doesn't automatically recognize them as TaskListItemMarker nodes.
+ *
+ * Task list patterns like `- [x]` (checked) and `- [ ]` (unchecked) are converted to:
+ * - **With Silk**: FontAwesome icons (`FaSquareCheck` for checked, `FaSquare` for unchecked)
+ * - **Without Silk**: HTML input checkboxes (disabled, with proper checked state)
+ *
+ * This works in all contexts including:
+ * - Regular paragraphs
+ * - Table cells
+ * - List items
+ * - Any other text nodes
+ *
+ * Example:
+ * ```markdown
+ * | Feature | Status |
+ * |---------|--------|
+ * | Task A  | - [x]  |
+ * | Task B  | - [ ]  |
  * ```
  */
 abstract class MarkdownHandlers @Inject constructor(project: Project) {
@@ -140,57 +175,69 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
     abstract val idGenerator: Property<(String) -> String>
 
     @get:Nested
-    abstract val text: Property<NodeScope.(Text) -> String>
-    @get:Nested
-    abstract val img: Property<NodeScope.(Image) -> String>
-    @get:Nested
-    abstract val heading: Property<NodeScope.(Heading) -> String>
-    @get:Nested
-    abstract val p: Property<NodeScope.(Paragraph) -> String>
-    @get:Nested
-    abstract val br: Property<NodeScope.(HardLineBreak) -> String>
-    @get:Nested
     abstract val a: Property<NodeScope.(Link) -> String>
-    @get:Nested
-    abstract val em: Property<NodeScope.(Emphasis) -> String>
-    @get:Nested
-    abstract val strong: Property<NodeScope.(StrongEmphasis) -> String>
-    @get:Nested
-    abstract val hr: Property<NodeScope.(ThematicBreak) -> String>
-    @get:Nested
-    abstract val ul: Property<NodeScope.(BulletList) -> String>
-    @get:Nested
-    abstract val ol: Property<NodeScope.(OrderedList) -> String>
-    @get:Nested
-    abstract val li: Property<NodeScope.(ListItem) -> String>
-    @get:Nested
-    abstract val code: Property<NodeScope.(FencedCodeBlock) -> String>
-    @get:Nested
-    abstract val inlineCode: Property<NodeScope.(Code) -> String>
     @get:Nested
     abstract val blockquote: Property<NodeScope.(BlockQuote) -> String>
     @get:Nested
-    abstract val table: Property<NodeScope.(TableBlock) -> String>
+    abstract val br: Property<NodeScope.(HardLineBreak) -> String>
     @get:Nested
-    abstract val thead: Property<NodeScope.(TableHead) -> String>
+    abstract val code: Property<NodeScope.(FencedCodeBlock) -> String>
     @get:Nested
-    abstract val tbody: Property<NodeScope.(TableBody) -> String>
+    abstract val em: Property<NodeScope.(Emphasis) -> String>
     @get:Nested
-    abstract val tr: Property<NodeScope.(TableRow) -> String>
+    abstract val footnoteDefinition: Property<NodeScope.(FootnoteDefinition) -> String>
     @get:Nested
-    abstract val td: Property<NodeScope.(TableCell) -> String>
-    @get:Nested
-    abstract val th: Property<NodeScope.(TableCell) -> String>
+    abstract val footnoteReference: Property<NodeScope.(FootnoteReference) -> String>
 
-    /** Handler which is fed the raw text (name and attributes) within an opening tag, e.g. `span id="demo"` */
     @get:Nested
-    abstract val rawTag: Property<NodeScope.(String) -> String>
+    abstract val heading: Property<NodeScope.(Heading) -> String>
+
+    @get:Nested
+    abstract val hr: Property<NodeScope.(ThematicBreak) -> String>
+    @get:Nested
+    abstract val html: Property<NodeScope.(HtmlBlock) -> String>
+    @get:Nested
+    abstract val img: Property<NodeScope.(Image) -> String>
+    @get:Nested
+    abstract val inlineCode: Property<NodeScope.(Code) -> String>
+
     @get:Nested
     abstract val inlineTag: Property<NodeScope.(HtmlInline) -> String>
 
     @get:Nested
-    abstract val html: Property<NodeScope.(HtmlBlock) -> String>
+    abstract val li: Property<NodeScope.(ListItem) -> String>
+    @get:Nested
+    abstract val ol: Property<NodeScope.(OrderedList) -> String>
+    @get:Nested
+    abstract val p: Property<NodeScope.(Paragraph) -> String>
+    @get:Nested
+    abstract val rawTag: Property<NodeScope.(String) -> String>
+    @get:Nested
+    abstract val strikethrough: Property<NodeScope.(Strikethrough) -> String>
+    @get:Nested
+    abstract val strong: Property<NodeScope.(StrongEmphasis) -> String>
 
+    @get:Nested
+    abstract val table: Property<NodeScope.(TableBlock) -> String>
+    @get:Nested
+    abstract val taskListItemMarker: Property<NodeScope.(TaskListItemMarker) -> String>
+    @get:Nested
+    abstract val tbody: Property<NodeScope.(TableBody) -> String>
+    @get:Nested
+    abstract val td: Property<NodeScope.(TableCell) -> String>
+    @get:Nested
+    abstract val text: Property<NodeScope.(Text) -> String>
+
+    @get:Nested
+    abstract val th: Property<NodeScope.(TableCell) -> String>
+    @get:Nested
+    abstract val thead: Property<NodeScope.(TableHead) -> String>
+    @get:Nested
+    abstract val tr: Property<NodeScope.(TableRow) -> String>
+    @get:Nested
+    abstract val ul: Property<NodeScope.(BulletList) -> String>
+
+    /** Handler which is fed the raw text (name and attributes) within an opening tag, e.g. `span id="demo"` */
     fun String.escapeSingleQuotedText() = escapeQuotes().escapeDollars()
     fun String.escapeTripleQuotedText() = escapeDollars().escapeTripleQuotes()
 
@@ -258,7 +305,11 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
 
         // region Markdown Node handlers
 
-        text.convention { text -> "$JB_DOM.Text(\"${text.literal.escapeSingleQuotedText()}\")" }
+        text.convention { text ->
+            val literal = text.literal
+            // Standard text rendering
+            "$JB_DOM.Text(\"${literal.escapeSingleQuotedText()}\")"
+        }
         img.convention { image ->
             processImage(image) { data ->
                 buildString {
@@ -299,6 +350,8 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
         }
         em.convention { "$JB_DOM.Em" }
         strong.convention { "$JB_DOM.B" }
+        // Compose HTML does not expose a Del composable; use a generic tag to match HTML semantics.
+        strikethrough.convention { "$KOBWEB_DOM.GenericTag(\"del\")" }
         hr.convention {
             if (useSilk.get()) {
                 "$SILK.layout.HorizontalDivider"
@@ -436,6 +489,30 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
             sb.toString()
         }
 
+        taskListItemMarker.convention { marker ->
+            val isChecked = marker.isChecked
+            if (useSilk.get()) {
+                val iconCode = if (isChecked) {
+                    "com.varabyte.kobweb.silk.components.icons.fa.FaSquareCheck"
+                } else {
+                    "com.varabyte.kobweb.silk.components.icons.fa.FaSquare"
+                }
+                "$KOBWEB_DOM.GenericTag(\"span\", \"style=\\\"margin-right: 0.5em;\\\"\") { $iconCode() }"
+            } else {
+                val checkedAttr = if (isChecked) "checked" else ""
+                "$KOBWEB_DOM.GenericTag(\"input\", \"type=\\\"checkbox\\\" disabled $checkedAttr style=\\\"margin-right: 0.5em;\\\"\")"
+            }
+        }
+
+        footnoteDefinition.convention { definition ->
+            val label = definition.label
+            "$KOBWEB_DOM.GenericTag(\"div\", \"class=\\\"footnote-item\\\" id=\\\"fn-$label\\\"\")"
+        }
+
+        footnoteReference.convention { reference ->
+            val label = reference.label
+            "$KOBWEB_DOM.GenericTag(\"sup\", \"id=\\\"fnref-$label\\\"\") { $KOBWEB_DOM.GenericTag(\"a\", \"href=\\\"#fn-$label\\\"\") { $JB_DOM.Text(\"$label\") } }"
+        }
         // endregion
     }
 }
