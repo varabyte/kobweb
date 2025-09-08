@@ -26,7 +26,10 @@ dependencies {
 Use icons in your Compose code:
 
 ```kotlin
-import com.varabyte.kobweb.silk.components.icons.lucide.*
+import com.varabyte.kobweb.silk.components.icons.lucide.LiCamera
+import com.varabyte.kobweb.silk.components.icons.lucide.LiHeart
+import com.varabyte.kobweb.silk.components.icons.lucide.LiSearch
+
 
 @Composable
 fun MyComponent() {
