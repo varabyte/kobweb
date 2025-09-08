@@ -8,7 +8,7 @@ Lucide is a beautiful & consistent icon toolkit made by the community. It provid
 ## Key Features
 
 - **Tree-shakable**: Only imported icons are included in the final bundle
-- **Type-safe**: Individual composables for each icon (e.g. `LuCamera`, `LuHeart`, `LuSearch`)
+- **Type-safe**: Individual composables for each icon (e.g. `LiCamera`, `LiHeart`, `LiSearch`)
 - **Customizable**: Support for size, stroke width, color, and standard modifiers
 - **Performance**: Direct SVG rendering for optimal performance
 - **No runtime dependencies**: All icon data is embedded at build time
@@ -31,17 +31,17 @@ import com.varabyte.kobweb.silk.components.icons.lucide.*
 @Composable
 fun MyComponent() {
     // Basic usage
-    LuCamera()
+    LiCamera()
     
     // With customization
-    LuHeart(
+    LiHeart(
         size = 2.em,
         color = Colors.Red,
         strokeWidth = 3
     )
     
     // With modifier
-    LuSearch(
+    LiSearch(
         modifier = Modifier
             .margin(1.cssRem)
             .onClick { /* handle click */ }
@@ -51,7 +51,7 @@ fun MyComponent() {
 
 ## Available Parameters
 
-All Lu icon composables accept the following parameters:
+All Li icon composables accept the following parameters:
 
 - `modifier: Modifier = Modifier` - Standard Compose modifier
 - `size: CSSLengthValue = 1.em` - Icon size
@@ -60,29 +60,29 @@ All Lu icon composables accept the following parameters:
 
 ## Tree-Shaking Benefits
 
-Unlike centralized icon systems, each Lu icon is its own composable function. This means:
+Unlike centralized icon systems, each Li icon is its own composable function. This means:
 
-- ✅ **Only used icons are included** in your final JavaScript bundle
-- ✅ **No lookup overhead** at runtime
-- ✅ **Better dead code elimination** by bundlers
-- ✅ **Smaller bundle sizes** for applications that use few icons
+- **Only used icons are included** in your final JavaScript bundle
+- **No lookup overhead** at runtime
+- **Better dead code elimination** by bundlers
+- **Smaller bundle sizes** for applications that use few icons
 
-For example, if you only use `LuCamera` and `LuHeart`, only the SVG data for those two icons will be included in
+For example, if you only use `LiCamera` and `LiHeart`, only the SVG data for those two icons will be included in
 your final bundle, not all 1,600+ icons.
 
 ## Icon Naming Convention
 
-Lu icon names are converted to PascalCase function names with the `Lu` prefix:
+Li icon names are converted to PascalCase function names with the `Li` prefix:
 
-- `camera` → `LuCamera()`
-- `arrow-down` → `LuArrowDown()`
-- `chevron-right` → `LuChevronRight()`
-- `external-link` → `LuExternalLink()`
+- `camera` → `LiCamera()`
+- `arrow-down` → `LiArrowDown()`
+- `chevron-right` → `LiChevronRight()`
+- `external-link` → `LiExternalLink()`
 
 ## Finding Icons
 
 You can browse all available icons at [lucide.dev](https://lucide.dev/icons/). The function name will always be the icon
-name in PascalCase with the `Lu` prefix.
+name in PascalCase with the `Li` prefix.
 
 ## Updating Icons
 
@@ -125,16 +125,16 @@ The `extract-icons.js` script will:
 
 ```kotlin
 // Basic icons
-LuHome()
-LuUser()
-LuSettings()
+LiHome()
+LiUser()
+LiSettings()
 
 // Styled icons
-LuHeart(color = Colors.Red, size = 1.5.em)
-LuSearch(strokeWidth = 1.5)
+LiHeart(color = Colors.Red, size = 1.5.em)
+LiSearch(strokeWidth = 1.5)
 
 // With interactions
-LuMenu(
+LiMenu(
     modifier = Modifier
         .onClick { toggleMenu() }
         .cursor(Cursor.Pointer)
@@ -142,9 +142,9 @@ LuMenu(
 
 // Different sizes
 Row {
-    LuIcon(size = 0.8.em) // Small
-    LuIcon(size = 1.2.em) // Medium  
-    LuIcon(size = 2.em)   // Large
+    LiIcon(size = 0.8.em) // Small
+    LiIcon(size = 1.2.em) // Medium  
+    LiIcon(size = 2.em)   // Large
 }
 ```
 

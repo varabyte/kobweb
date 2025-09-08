@@ -12,7 +12,7 @@ private val GENERATED_SRC_ROOT = "build/generated/icons/src/jsMain/kotlin"
 val generateIconsTask = tasks.register("generateIcons") {
     val srcFile = layout.projectDirectory.file("lucide-icons.json")
     val dstFile =
-        layout.projectDirectory.file("$GENERATED_SRC_ROOT/com/varabyte/kobweb/silk/components/icons/lucide/LuIcons.kt")
+        layout.projectDirectory.file("$GENERATED_SRC_ROOT/com/varabyte/kobweb/silk/components/icons/lucide/LucideIcons.kt")
 
     inputs.files(srcFile)
     outputs.dir(GENERATED_SRC_ROOT)
@@ -38,9 +38,9 @@ val generateIconsTask = tasks.register("generateIcons") {
 
         // Generate individual composable functions
         val iconMethods = iconData.keys.sorted().joinToString("\n\n") { iconName ->
-            // Convert icon name to composable function name, e.g. "a-arrow-down" -> "LuAArrowDown"
+            // Convert icon name to composable function name, e.g. "a-arrow-down" -> "LiAArrowDown"
             @Suppress("DEPRECATION") // capitalize is way more readable than a direct replacement
-            val methodName = "Lu" + iconName.split("-").joinToString("") {
+            val methodName = "Li" + iconName.split("-").joinToString("") {
                 it.capitalize()
             }
 

@@ -79,12 +79,12 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaGithub
 import com.varabyte.kobweb.silk.components.icons.fa.FaHouse
 import com.varabyte.kobweb.silk.components.icons.fa.FaStar
 import com.varabyte.kobweb.silk.components.icons.fa.FaUser
-import com.varabyte.kobweb.silk.components.icons.lucide.LuCamera
-import com.varabyte.kobweb.silk.components.icons.lucide.LuHeart
-import com.varabyte.kobweb.silk.components.icons.lucide.LuHouse
-import com.varabyte.kobweb.silk.components.icons.lucide.LuSearch
-import com.varabyte.kobweb.silk.components.icons.lucide.LuSettings
-import com.varabyte.kobweb.silk.components.icons.lucide.LuUser
+import com.varabyte.kobweb.silk.components.icons.lucide.LiCamera
+import com.varabyte.kobweb.silk.components.icons.lucide.LiHeart
+import com.varabyte.kobweb.silk.components.icons.lucide.LiHouse
+import com.varabyte.kobweb.silk.components.icons.lucide.LiSearch
+import com.varabyte.kobweb.silk.components.icons.lucide.LiSettings
+import com.varabyte.kobweb.silk.components.icons.lucide.LiUser
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiClose
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiHome
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiMenu
@@ -350,21 +350,21 @@ fun WidgetsPage() {
                     }
                 }
 
-                WidgetSection("Web - Lu") {
-                    val luIcons = mapOf<String, @Composable () -> Unit>(
-                        "Camera" to { LuCamera() },
-                        "Heart" to { LuHeart() },
-                        "House" to { LuHouse() },
-                        "Search" to { LuSearch() },
-                        "Settings" to { LuSettings() },
-                        "User" to { LuUser() },
+                WidgetSection("Web - Li") {
+                    val liIcons = mapOf<String, @Composable () -> Unit>(
+                        "Camera" to { LiCamera() },
+                        "Heart" to { LiHeart() },
+                        "House" to { LiHouse() },
+                        "Search" to { LiSearch() },
+                        "Settings" to { LiSettings() },
+                        "User" to { LiUser() },
                     )
 
                     Row(
                         Modifier.gap(0.5.cssRem).flexWrap(FlexWrap.Wrap),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        luIcons.forEach { (iconName, iconMethod) ->
+                        liIcons.forEach { (iconName, iconMethod) ->
                             Box(IconContainerStyle.toModifier()) { iconMethod() }
                             Tooltip(ElementTarget.PreviousSibling, iconName)
                         }
