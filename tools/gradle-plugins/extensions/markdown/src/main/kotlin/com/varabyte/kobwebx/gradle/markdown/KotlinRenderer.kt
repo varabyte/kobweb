@@ -12,6 +12,7 @@ import com.varabyte.kobwebx.gradle.markdown.frontmatter.FrontMatterBlock
 import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
 import com.varabyte.kobwebx.gradle.markdown.handlers.NodeScope
 import com.varabyte.kobwebx.gradle.markdown.util.NodeCache
+import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.unescapeQuotes
 import org.commonmark.ext.footnotes.FootnoteDefinition
 import org.commonmark.ext.footnotes.FootnoteReference
