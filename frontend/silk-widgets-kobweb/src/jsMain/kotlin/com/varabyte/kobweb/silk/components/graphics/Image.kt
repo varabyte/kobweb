@@ -29,6 +29,49 @@ val FitWidthImageVariant = ImageStyle.addVariantBase {
 }
 
 /**
+ * A list of values that hint to the user agent as to how to best schedule the loading of the image to optimize page performance.
+ *
+ * @param Eager The default behavior, eager tells the browser to load the image as soon as the <img> element is processed.
+ * @param Lazy Tells the user agent to hold off on loading the image until the browser estimates that it will be needed imminently.
+ */
+enum class ImageLoading {
+    Eager,
+    Lazy;
+
+    override fun toString() = name.lowercase()
+}
+
+/**
+ * A list of values that hint to the browser as to whether it should perform image decoding along with other tasks in a single step [Sync], or allow other content to be rendered before this completes [Async].
+ *
+ * @param Sync Decode the image synchronously for atomic presentation with other content.
+ * @param Async Decode the image asynchronously and allow other content to be rendered before this completes.
+ * @param Auto No preference for the decoding mode; the browser decides what is best for the user.
+ */
+enum class ImageDecoding {
+    Sync,
+    Async,
+    Auto;
+
+    override fun toString() = name.lowercase()
+}
+
+/**
+ * A list of values that indicate how the browser should prioritize fetching a particular image relative to other images.
+ *
+ * @param High Fetch the image at a high priority relative to other images with the same internal prioritization.
+ * @param Low Fetch the image at a low priority relative to other images with the same internal prioritization.
+ * @param Auto Don't set a user preference for the fetch priority.
+ */
+enum class ImageFetchPriority {
+    High,
+    Low,
+    Auto;
+
+    override fun toString() = name.lowercase()
+}
+
+/**
  * An [Img] tag with a more Silk-like API.
  *
  * @param width The width, in pixels, of the image. If not specified, the image will be displayed at its natural size.
@@ -48,6 +91,9 @@ fun Image(
     width: Int? = null,
     height: Int? = null,
     alt: String = "",
+    loading: ImageLoading? = null,
+    decoding: ImageDecoding? = null,
+    fetchPriority: ImageFetchPriority? = null,
     ref: ElementRefScope<HTMLImageElement>? = null,
 ) {
     if (ref != null) {
@@ -58,6 +104,9 @@ fun Image(
     Img(BasePath.prependTo(src), alt, attrs = ImageStyle.toModifier(variant).then(modifier).toAttrs {
         if (width != null) attr("width", width.toString())
         if (height != null) attr("height", height.toString())
+        if (loading != null) attr("loading", loading.toString())
+        if (decoding != null) attr("decoding", decoding.toString())
+        if (fetchPriority != null) attr("fetchpriority", fetchPriority.toString())
     })
 }
 
@@ -85,7 +134,21 @@ fun Image(
     variant: CssStyleVariant<ImageKind>? = null,
     width: Int? = null,
     height: Int? = null,
+    loading: ImageLoading? = null,
+    decoding: ImageDecoding? = null,
+    fetchPriority: ImageFetchPriority? = null,
     ref: ElementRefScope<HTMLImageElement>? = null,
 ) {
-    Image(src, modifier, variant, width, height, description, ref)
+    Image(
+        src = src,
+        modifier = modifier,
+        variant = variant,
+        width = width,
+        height = height,
+        alt = description,
+        loading = loading,
+        decoding = decoding,
+        fetchPriority = fetchPriority,
+        ref = ref,
+    )
 }
