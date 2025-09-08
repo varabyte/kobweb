@@ -458,7 +458,13 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
                 }
             }
         }
-        li.convention { "$JB_DOM.Li" }
+        li.convention { li ->
+            if (li.isTaskListItem()) {
+                "$JB_DOM.Li(attrs = { classes(\"task-list-item\") })"
+            } else {
+                "$JB_DOM.Li"
+            }
+        }
         ol.convention { "$JB_DOM.Ol" }
         p.convention { "$JB_DOM.P" }
         rawTag.convention { tag ->
@@ -487,12 +493,30 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
         th.convention { cell -> "$JB_DOM.Th${cell.toCallParams()}" }
         thead.convention { "$JB_DOM.Thead" }
         tr.convention { "$JB_DOM.Tr" }
-        ul.convention { "$JB_DOM.Ul" }
-
+        ul.convention { ul ->
+            if (ul.hasTaskListItems()) {
+                "$JB_DOM.Ul(attrs = { classes(\"task-list-container\") })"
+            } else {
+                "$JB_DOM.Ul"
+            }
+        }
 
         // endregion
     }
 
+    /**
+     * Helper function to check if a ListItem contains a TaskListItemMarker
+     */
+    private fun ListItem.isTaskListItem(): Boolean {
+        return children().any { it is TaskListItemMarker }
+    }
+
+    /**
+     * Helper function to check if a BulletList contains any task list items
+     */
+    private fun BulletList.hasTaskListItems(): Boolean {
+        return children().filterIsInstance<ListItem>().any { it.isTaskListItem() }
+    }
 
     // Create relevant `(attrs = { ... })` call parameters for a table cell
     fun TableCell.toCallParams(): String {
