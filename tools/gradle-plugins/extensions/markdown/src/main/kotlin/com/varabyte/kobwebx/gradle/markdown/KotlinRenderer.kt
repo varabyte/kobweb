@@ -452,6 +452,12 @@ class KotlinRenderer internal constructor(
         }
         override fun visit(customBlock: CustomBlock) {
             when (customBlock) {
+                is FootnoteDefinition -> {
+                    doVisit(customBlock, handlers.footnoteDefinition)
+                }
+                is FrontMatterBlock -> {
+                    // No-op. We don't need to do anything here because we already handled parsing front matter earlier.
+                }
                 is KobwebCallBlock -> {
                     val visitor = KobwebCallBlockVisitor()
                     customBlock.accept(visitor)
@@ -465,15 +471,7 @@ class KotlinRenderer internal constructor(
                         }
                     }
                 }
-
-                is FrontMatterBlock -> {
-                    // No-op. We don't need to do anything here because we already handled parsing front matter earlier.
-                }
-
                 is TableBlock -> visit(customBlock)
-                is FootnoteDefinition -> {
-                    doVisit(customBlock, handlers.footnoteDefinition)
-                }
 
                 else -> {
                     val simple = customBlock::class.simpleName
@@ -490,12 +488,12 @@ class KotlinRenderer internal constructor(
                     output.appendLine("$indent${customNode.toFqn(projectGroup)}")
                 }
 
+                is FootnoteReference -> visit(customNode)
                 is Strikethrough -> visit(customNode)
                 is TableHead -> visit(customNode)
                 is TableBody -> visit(customNode)
                 is TableRow -> visit(customNode)
                 is TableCell -> visit(customNode)
-                is FootnoteReference -> visit(customNode)
                 is TaskListItemMarker -> visit(customNode)
 
                 else -> {
