@@ -72,7 +72,7 @@ your final bundle, not all 1,600+ icons.
 
 ## Icon Naming Convention
 
-Li icon names are converted to PascalCase function names with the `Li` prefix:
+Lucide icon names are converted to PascalCase function names with the `Li` prefix:
 
 - `camera` → `LiCamera()`
 - `arrow-down` → `LiArrowDown()`
@@ -121,6 +121,13 @@ The `extract-icons.js` script will:
 - ✅ Provide detailed progress and error reporting
 - ✅ Optionally clean up temporary `node_modules` (with `--cleanup` flag)
 
+## Files Added/Modified
+- `frontend/silk-icons-lucide/build.gradle.kts` - Build configuration with codegen
+- `frontend/silk-icons-lucide/README.md` - Usage documentation
+- `playground/site/src/jsMain/kotlin/playground/pages/Widgets.kt` - Usage examples
+- Generated: `LucideIcons.kt` with all icon composables
+
+
 ## Examples
 
 ```kotlin
@@ -142,9 +149,9 @@ LiMenu(
 
 // Different sizes
 Row {
-    LiIcon(size = 0.8.em) // Small
-    LiIcon(size = 1.2.em) // Medium  
-    LiIcon(size = 2.em)   // Large
+    LiHeart(size = 0.8.em) // Small
+    LiHeart(size = 1.2.em) // Medium  
+    LiHeart(size = 2.em)   // Large
 }
 ```
 
