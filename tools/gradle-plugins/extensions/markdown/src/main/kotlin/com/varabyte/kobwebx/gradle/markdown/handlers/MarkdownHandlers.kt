@@ -1,4 +1,3 @@
-@file:Suppress("LeakingThis") // Following official Gradle guidance
 
 /**
  * Enhanced Markdown handlers for Kobweb projects.
@@ -302,19 +301,53 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
         }
 
         // region Markdown Node handlers
-
-        text.convention { text ->
-            val literal = text.literal
-            // Standard text rendering
-            "$JB_DOM.Text(\"${literal.escapeSingleQuotedText()}\")"
-        }
-        img.convention { image ->
-            processImage(image) { data ->
-                buildString {
-                    append(if (useSilk.get()) "$SILK.graphics.Image" else "$JB_DOM.Img")
-                    append("""("${data.destination}", "${data.altText}")""")
-                }
+        a.convention { link ->
+            if (useSilk.get()) {
+                "$SILK.navigation.Link(\"${link.destination}\")"
+            } else {
+                "$JB_DOM.A(\"${link.destination}\")"
             }
+        }
+        blockquote.convention { blockquote ->
+            if (useSilk.get()) {
+                SilkCalloutBlockquoteHandler().invoke(this, blockquote)
+            } else {
+                "$JB_DOM.Blockquote"
+            }
+        }
+        br.convention { "$JB_DOM.Br" }
+        code.convention { codeBlock ->
+            val text = "\"\"\"${codeBlock.literal.escapeTripleQuotedText()}\"\"\""
+            // Code blocks should generate <pre><code>...</code></pre>
+            // https://daringfireball.net/projects/markdown/syntax#precode
+            "$JB_DOM.Pre { $JB_DOM.Code { $JB_DOM.Text($text) } }"
+        }
+        em.convention { "$JB_DOM.Em" }
+        footnoteDefinition.convention { definition ->
+            val label = definition.label
+            val definitionIds = data.computeIfAbsent(DataKeys.FootnoteDefinitionIds) { mutableMapOf() }
+
+            val baseId = "kobweb-footnote-${slugify(label)}"
+
+            // Use the same ID that was already computed by reference handler, or set it now
+            val finalId = definitionIds.getOrPut(label) { baseId }
+
+            "$JB_DOM.Div(attrs = { id(\"$finalId\"); classes(\"footnote-item\") })"
+        }
+        footnoteReference.convention { reference ->
+            val label = reference.label
+            val definitionIds = data.computeIfAbsent(DataKeys.FootnoteDefinitionIds) { mutableMapOf() }
+            val referenceCounts = data.computeIfAbsent(DataKeys.FootnoteReferenceCounts) { mutableMapOf() }
+
+            // Get or compute definition ID (use the same logic as the definition handler)
+            val defId = definitionIds.getOrPut(label) { "kobweb-footnote-${slugify(label)}" }
+
+            // Increment reference count and build unique reference ID
+            val idx = (referenceCounts[label] ?: 0) + 1
+            referenceCounts[label] = idx
+            val refId = "kobweb-footnote-ref-${slugify(label)}-$idx"
+
+            "$JB_DOM.Sup(attrs = { id(\"$refId\") }) { $JB_DOM.A(href = \"#$defId\") { $JB_DOM.Text(\"$label\") } }"
         }
         heading.convention { heading ->
             buildString {
@@ -337,19 +370,6 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
                 }
             }
         }
-        p.convention { "$JB_DOM.P" }
-        br.convention { "$JB_DOM.Br" }
-        a.convention { link ->
-            if (useSilk.get()) {
-                "$SILK.navigation.Link(\"${link.destination}\")"
-            } else {
-                "$JB_DOM.A(\"${link.destination}\")"
-            }
-        }
-        em.convention { "$JB_DOM.Em" }
-        strong.convention { "$JB_DOM.B" }
-        // Compose HTML does not expose a Del composable; use a generic tag to match HTML semantics.
-        strikethrough.convention { "$KOBWEB_DOM.GenericTag(\"del\")" }
         hr.convention {
             if (useSilk.get()) {
                 "$SILK.layout.HorizontalDivider"
@@ -357,83 +377,6 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
                 "$JB_DOM.Hr"
             }
         }
-        ul.convention { "$JB_DOM.Ul" }
-        ol.convention { "$JB_DOM.Ol" }
-        li.convention { "$JB_DOM.Li" }
-        code.convention { codeBlock ->
-            val text = "\"\"\"${codeBlock.literal.escapeTripleQuotedText()}\"\"\""
-            // Code blocks should generate <pre><code>...</code></pre>
-            // https://daringfireball.net/projects/markdown/syntax#precode
-            "$JB_DOM.Pre { $JB_DOM.Code { $JB_DOM.Text($text) } }"
-        }
-        inlineCode.convention { code ->
-            childrenOverride = listOf(Text(code.literal))
-            "$JB_DOM.Code"
-        }
-        blockquote.convention { blockquote ->
-            if (useSilk.get()) {
-                SilkCalloutBlockquoteHandler().invoke(this, blockquote)
-            } else {
-                "$KOBWEB_DOM.GenericTag(\"blockquote\")"
-            }
-        }
-
-        table.convention { "$JB_DOM.Table" }
-        thead.convention { "$JB_DOM.Thead" }
-        tbody.convention { "$JB_DOM.Tbody" }
-        tr.convention { "$JB_DOM.Tr" }
-
-        // Convert a map of CSS style properties to an `style { ... }` block
-        fun Map<String, String>.toStylesBlock(): String {
-            val styleMap = this.takeIf { it.isNotEmpty() } ?: return ""
-            return buildString {
-                append("style {")
-                append(styleMap.map { (key, value) -> "property(\"$key\", \"$value\")" }.joinToString(";"))
-                append("}")
-            }
-        }
-
-        // Create relevant `(attrs = { ... })` call parameters for a table cell
-        fun TableCell.toCallParams(): String {
-            val alignment = alignment ?: return ""
-
-            val properties = mutableMapOf<String, String>()
-            properties["text-align"] = alignment.name.lowercase()
-            return "(attrs = { ${properties.toStylesBlock()} })"
-        }
-
-        td.convention { cell -> "$JB_DOM.Td${cell.toCallParams()}" }
-        th.convention { cell -> "$JB_DOM.Th${cell.toCallParams()}" }
-
-        fun String.stripTagBrackets() =
-            this.removePrefix("</").removePrefix("<").removeSuffix("/>").removeSuffix(">")
-
-        rawTag.convention { tag ->
-            val parts = tag.stripTagBrackets().split(' ', limit = 2)
-            val name = "\"${parts[0]}\""
-            val attrs = parts.getOrNull(1)?.escapeQuotes()?.let { "\"$it\"" } ?: "null"
-
-            "$KOBWEB_DOM.GenericTag($name, $attrs)"
-        }
-
-        inlineTag.set { htmlInline ->
-            val voidElements = setOf("br", "hr", "img")
-            val tag = htmlInline.literal
-
-            val scope = this
-            buildString {
-                if (!tag.startsWith("</")) {
-                    append(rawTag.get().invoke(scope, tag))
-                    if (!tag.endsWith("/>") && tag.stripTagBrackets() !in voidElements) {
-                        append(" {")
-                    }
-                } else {
-                    // Closing tag
-                    append("}")
-                }
-            }
-        }
-
         html.set { htmlBlock ->
             fun renderNode(el: Element, indentCount: Int, sb: StringBuilder) {
                 sb.append("${indent(indentCount)}$KOBWEB_DOM.GenericTag(\"${el.tagName()}\"")
@@ -486,46 +429,92 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
 
             sb.toString()
         }
+        img.convention { image ->
+            processImage(image) { data ->
+                buildString {
+                    append(if (useSilk.get()) "$SILK.graphics.Image" else "$JB_DOM.Img")
+                    append("""("${data.destination}", "${data.altText}")""")
+                }
+            }
+        }
+        inlineCode.convention { code ->
+            childrenOverride = listOf(Text(code.literal))
+            "$JB_DOM.Code"
+        }
+        inlineTag.set { htmlInline ->
+            val voidElements = setOf("br", "hr", "img")
+            val tag = htmlInline.literal
 
+            val scope = this
+            buildString {
+                if (!tag.startsWith("</")) {
+                    append(rawTag.get().invoke(scope, tag))
+                    if (!tag.endsWith("/>") && tag.stripTagBrackets() !in voidElements) {
+                        append(" {")
+                    }
+                } else {
+                    // Closing tag
+                    append("}")
+                }
+            }
+        }
+        li.convention { "$JB_DOM.Li" }
+        ol.convention { "$JB_DOM.Ol" }
+        p.convention { "$JB_DOM.P" }
+        rawTag.convention { tag ->
+            val parts = tag.stripTagBrackets().split(' ', limit = 2)
+            val name = "\"${parts[0]}\""
+            val attrs = parts.getOrNull(1)?.escapeQuotes()?.let { "\"$it\"" } ?: "null"
+
+            "$KOBWEB_DOM.GenericTag($name, $attrs)"
+        }
+        // Compose HTML does not expose a <del> composable; use a generic tag to match HTML semantics.
+        strikethrough.convention { "$KOBWEB_DOM.GenericTag(\"del\")" }
+        strong.convention { "$JB_DOM.B" }
+        table.convention { "$JB_DOM.Table" }
         taskListItemMarker.convention { marker ->
             val isChecked = marker.isChecked
-//            if (useSilk.get()) {
-//                "com.varabyte.kobweb.silk.components.forms.Checkbox(checked = $isChecked, enabled = false, onCheckedChange = {})"
-//            } else
-                "$KOBWEB_DOM.GenericTag(\"input\", \"type=\\\"checkbox\\\" ${if (isChecked) "checked " else ""}disabled\")"
-
+            //                 "$KOBWEB_DOM.GenericTag(\"input\", \"type=\\\"checkbox\\\" ${if (isChecked) "checked " else ""}disabled\")"
+            "$JB_DOM.Input(org.jetbrains.compose.web.attributes.InputType.Checkbox) {  ${if (isChecked) "checked($isChecked); " else ""};attr(\"disabled\", \"\") }"
         }
-
-        footnoteDefinition.convention { definition ->
-            val label = definition.label
-            val definitionIds = data.computeIfAbsent(DataKeys.FootnoteDefinitionIds) { mutableMapOf() }
-
-            // Compute base ID: kobweb-footnote-<slug(label)>
-            fun slugify(text: String): String = text.lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-')
-            val baseId = "kobweb-footnote-${slugify(label)}"
-
-            // Use the same ID that was already computed by reference handler, or set it now
-            val finalId = definitionIds.getOrPut(label) { baseId }
-
-            "$JB_DOM.Div(attrs = { id(\"$finalId\"); classes(\"footnote-item\") })"
+        tbody.convention { "$JB_DOM.Tbody" }
+        td.convention { cell -> "$JB_DOM.Td${cell.toCallParams()}" }
+        text.convention { text ->
+            val literal = text.literal
+            // Standard text rendering
+            "$JB_DOM.Text(\"${literal.escapeSingleQuotedText()}\")"
         }
+        th.convention { cell -> "$JB_DOM.Th${cell.toCallParams()}" }
+        thead.convention { "$JB_DOM.Thead" }
+        tr.convention { "$JB_DOM.Tr" }
+        ul.convention { "$JB_DOM.Ul" }
 
-        footnoteReference.convention { reference ->
-            val label = reference.label
-            val definitionIds = data.computeIfAbsent(DataKeys.FootnoteDefinitionIds) { mutableMapOf() }
-            val referenceCounts = data.computeIfAbsent(DataKeys.FootnoteReferenceCounts) { mutableMapOf() }
 
-            // Get or compute definition ID (use the same logic as the definition handler)
-            fun slugify(text: String): String = text.lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-')
-            val defId = definitionIds.getOrPut(label) { "kobweb-footnote-${slugify(label)}" }
-
-            // Increment reference count and build unique reference ID
-            val idx = (referenceCounts[label] ?: 0) + 1
-            referenceCounts[label] = idx
-            val refId = "kobweb-footnote-ref-${slugify(label)}-$idx"
-
-            "$KOBWEB_DOM.GenericTag(\"sup\", \"id=\\\"$refId\\\"\") { $JB_DOM.A(href = \"#$defId\") { $JB_DOM.Text(\"$label\") } }"
-        }
         // endregion
     }
+
+
+    // Create relevant `(attrs = { ... })` call parameters for a table cell
+    fun TableCell.toCallParams(): String {
+        val alignment = alignment ?: return ""
+
+        val properties = mutableMapOf<String, String>()
+        properties["text-align"] = alignment.name.lowercase()
+        return "(attrs = { ${properties.toStylesBlock()} })"
+    }
+    fun String.stripTagBrackets() =
+        this.removePrefix("</").removePrefix("<").removeSuffix("/>").removeSuffix(">")
+    // Convert a map of CSS style properties to an `style { ... }` block
+    fun Map<String, String>.toStylesBlock(): String {
+        val styleMap = this.takeIf { it.isNotEmpty() } ?: return ""
+        return buildString {
+            append("style {")
+            append(styleMap.map { (key, value) -> "property(\"$key\", \"$value\")" }.joinToString(";"))
+            append("}")
+        }
+    }
+    // Compute base ID: kobweb-footnote-<slug(label)>
+    fun slugify(text: String): String = text.lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-')
+
+
 }
