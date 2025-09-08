@@ -123,13 +123,13 @@ class KotlinRenderer internal constructor(
                     fun StringBuilder.appendElement(key: String, element: FrontMatterElement) {
                         when (element) {
                             is FrontMatterElement.Scalar -> {
-                                append("addScalar(\"$key\", \"${element.scalar.unescapeQuotes()}\"); ")
+                                append("addScalar(\"$key\", \"${element.scalar.escapeQuotes()}\"); ")
                             }
 
                             is FrontMatterElement.ValueList -> {
                                 append("addList(\"$key\") { ")
                                 element.list.mapNotNull { it.scalarOrNull() }.forEach { scalar ->
-                                    append("addScalar(\"${scalar.unescapeQuotes()}\"); ")
+                                    append("addScalar(\"${scalar.escapeQuotes()}\"); ")
                                 }
                                 append("}; ")
                             }
