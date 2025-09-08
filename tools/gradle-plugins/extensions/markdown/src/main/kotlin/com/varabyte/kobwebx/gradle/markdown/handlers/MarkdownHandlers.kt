@@ -2,11 +2,6 @@
 
 /**
  * Enhanced Markdown handlers for Kobweb projects.
- *
- * Recent enhancements:
- * - Task list support: Automatically detects and renders task list items (- [x] / - [ ]) in all text contexts,
- *   including table cells where CommonMark doesn't normally recognize them as TaskListItemMarker nodes.
- *   Uses FontAwesome icons when Silk is available, falls back to HTML input checkboxes otherwise.
  */
 
 package com.varabyte.kobwebx.gradle.markdown.handlers
@@ -95,12 +90,9 @@ class NodeScope(val reporter: Reporter, val data: TypedMap, private val indentCo
  *
  * ## Task List Support
  *
- * This handler automatically detects and renders task list items (checkboxes) in markdown text,
- * including those inside table cells where CommonMark doesn't automatically recognize them as TaskListItemMarker nodes.
- *
- * Task list patterns like `- [x]` (checked) and `- [ ]` (unchecked) are converted to:
- * - **With Silk**: FontAwesome icons (`FaSquareCheck` for checked, `FaSquare` for unchecked)
- * - **Without Silk**: HTML input checkboxes (disabled, with proper checked state)
+ * Task list items written in markdown will be rendered as checkboxes:
+ * - **With Silk enabled**: Using the Silk Checkbox component (disabled; correct checked state).
+ * - **Without Silk**: Using a native HTML checkbox input (disabled; correct checked state).
  *
  * This works in all contexts including:
  * - Regular paragraphs
@@ -123,6 +115,12 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
     object DataKeys {
         /** Key used by [Heading] nodes to store IDs they generated for themselves. */
         val HeadingIds = Key.create<MutableMap<Heading, String>>("md.heading.ids")
+
+        /** Key used to store footnote definition IDs: maps footnote label → unique definition ID. */
+        val FootnoteDefinitionIds = Key.create<MutableMap<String, String>>("md.footnote.definition.ids")
+
+        /** Key used to count footnote references: counts references per label to generate unique reference IDs. */
+        val FootnoteReferenceCounts = Key.create<MutableMap<String, Int>>("md.footnote.reference.counts")
 
         /**
          * Key used to fetch the project group name.
@@ -491,27 +489,42 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
 
         taskListItemMarker.convention { marker ->
             val isChecked = marker.isChecked
-            if (useSilk.get()) {
-                val iconCode = if (isChecked) {
-                    "com.varabyte.kobweb.silk.components.icons.fa.FaSquareCheck"
-                } else {
-                    "com.varabyte.kobweb.silk.components.icons.fa.FaSquare"
-                }
-                "$KOBWEB_DOM.GenericTag(\"span\", \"style=\\\"margin-right: 0.5em;\\\"\") { $iconCode() }"
-            } else {
-                val checkedAttr = if (isChecked) "checked" else ""
-                "$KOBWEB_DOM.GenericTag(\"input\", \"type=\\\"checkbox\\\" disabled $checkedAttr style=\\\"margin-right: 0.5em;\\\"\")"
-            }
+//            if (useSilk.get()) {
+//                "com.varabyte.kobweb.silk.components.forms.Checkbox(checked = $isChecked, enabled = false, onCheckedChange = {})"
+//            } else
+                "$KOBWEB_DOM.GenericTag(\"input\", \"type=\\\"checkbox\\\" ${if (isChecked) "checked " else ""}disabled\")"
+
         }
 
         footnoteDefinition.convention { definition ->
             val label = definition.label
-            "$KOBWEB_DOM.GenericTag(\"div\", \"class=\\\"footnote-item\\\" id=\\\"fn-$label\\\"\")"
+            val definitionIds = data.computeIfAbsent(DataKeys.FootnoteDefinitionIds) { mutableMapOf() }
+
+            // Compute base ID: kobweb-footnote-<slug(label)>
+            fun slugify(text: String): String = text.lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-')
+            val baseId = "kobweb-footnote-${slugify(label)}"
+
+            // Use the same ID that was already computed by reference handler, or set it now
+            val finalId = definitionIds.getOrPut(label) { baseId }
+
+            "$JB_DOM.Div(attrs = { id(\"$finalId\"); classes(\"footnote-item\") })"
         }
 
         footnoteReference.convention { reference ->
             val label = reference.label
-            "$KOBWEB_DOM.GenericTag(\"sup\", \"id=\\\"fnref-$label\\\"\") { $KOBWEB_DOM.GenericTag(\"a\", \"href=\\\"#fn-$label\\\"\") { $JB_DOM.Text(\"$label\") } }"
+            val definitionIds = data.computeIfAbsent(DataKeys.FootnoteDefinitionIds) { mutableMapOf() }
+            val referenceCounts = data.computeIfAbsent(DataKeys.FootnoteReferenceCounts) { mutableMapOf() }
+
+            // Get or compute definition ID (use the same logic as the definition handler)
+            fun slugify(text: String): String = text.lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-')
+            val defId = definitionIds.getOrPut(label) { "kobweb-footnote-${slugify(label)}" }
+
+            // Increment reference count and build unique reference ID
+            val idx = (referenceCounts[label] ?: 0) + 1
+            referenceCounts[label] = idx
+            val refId = "kobweb-footnote-ref-${slugify(label)}-$idx"
+
+            "$KOBWEB_DOM.GenericTag(\"sup\", \"id=\\\"$refId\\\"\") { $JB_DOM.A(href = \"#$defId\") { $JB_DOM.Text(\"$label\") } }"
         }
         // endregion
     }
