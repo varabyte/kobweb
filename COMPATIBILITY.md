@@ -4,6 +4,7 @@ This page lists the versions of Compose and Kotlin that each version of Kobweb i
 
 | Kobweb      | Compose | Kotlin |
 |-------------|---------|--------|
+| 0.23.3+     | 1.8.0   | 2.2.20 |
 | 0.23.1+     | 1.8.0   | 2.2.10 |
 | 0.23.0      | 1.8.0   | 2.2.0  |
 | 0.22.0      | 1.8.0   | 2.1.21 |
