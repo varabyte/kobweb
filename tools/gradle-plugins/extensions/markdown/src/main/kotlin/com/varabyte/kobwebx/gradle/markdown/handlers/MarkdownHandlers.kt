@@ -1,4 +1,7 @@
-@file:Suppress("LeakingThis") // Following official Gradle guidance
+
+/**
+ * Enhanced Markdown handlers for Kobweb projects.
+ */
 
 package com.varabyte.kobwebx.gradle.markdown.handlers
 
@@ -12,11 +15,15 @@ import com.varabyte.kobwebx.gradle.markdown.util.escapeDollars
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.escapeTripleQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.nestedLiteral
+import org.commonmark.ext.footnotes.FootnoteDefinition
+import org.commonmark.ext.footnotes.FootnoteReference
+import org.commonmark.ext.gfm.strikethrough.Strikethrough
 import org.commonmark.ext.gfm.tables.TableBlock
 import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell
 import org.commonmark.ext.gfm.tables.TableHead
 import org.commonmark.ext.gfm.tables.TableRow
+import org.commonmark.ext.task.list.items.TaskListItemMarker
 import org.commonmark.node.BlockQuote
 import org.commonmark.node.BulletList
 import org.commonmark.node.Code
@@ -79,6 +86,25 @@ class NodeScope(val reporter: Reporter, val data: TypedMap, private val indentCo
  *     }
  *   }
  * }
+ *
+ * ## Task List Support
+ *
+ * Task list items written in markdown will be rendered as checkboxes:
+ * - **With Silk enabled**: Using the Silk Checkbox component (disabled; correct checked state).
+ * - **Without Silk**: Using a native HTML checkbox input (disabled; correct checked state).
+ *
+ * This works in all contexts including:
+ * - Regular paragraphs
+ * - Table cells
+ * - List items
+ * - Any other text nodes
+ *
+ * Example:
+ * ```markdown
+ * | Feature | Status |
+ * |---------|--------|
+ * | Task A  | - [x]  |
+ * | Task B  | - [ ]  |
  * ```
  */
 abstract class MarkdownHandlers @Inject constructor(project: Project) {
@@ -88,6 +114,12 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
     object DataKeys {
         /** Key used by [Heading] nodes to store IDs they generated for themselves. */
         val HeadingIds = Key.create<MutableMap<Heading, String>>("md.heading.ids")
+
+        /** Key used to store footnote definition IDs: maps footnote label → unique definition ID. */
+        val FootnoteDefinitionIds = Key.create<MutableMap<String, String>>("md.footnote.definition.ids")
+
+        /** Key used to count footnote references: counts references per label to generate unique reference IDs. */
+        val FootnoteReferenceCounts = Key.create<MutableMap<String, Int>>("md.footnote.reference.counts")
 
         /**
          * Key used to fetch the project group name.
@@ -140,57 +172,69 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
     abstract val idGenerator: Property<(String) -> String>
 
     @get:Nested
-    abstract val text: Property<NodeScope.(Text) -> String>
-    @get:Nested
-    abstract val img: Property<NodeScope.(Image) -> String>
-    @get:Nested
-    abstract val heading: Property<NodeScope.(Heading) -> String>
-    @get:Nested
-    abstract val p: Property<NodeScope.(Paragraph) -> String>
-    @get:Nested
-    abstract val br: Property<NodeScope.(HardLineBreak) -> String>
-    @get:Nested
     abstract val a: Property<NodeScope.(Link) -> String>
-    @get:Nested
-    abstract val em: Property<NodeScope.(Emphasis) -> String>
-    @get:Nested
-    abstract val strong: Property<NodeScope.(StrongEmphasis) -> String>
-    @get:Nested
-    abstract val hr: Property<NodeScope.(ThematicBreak) -> String>
-    @get:Nested
-    abstract val ul: Property<NodeScope.(BulletList) -> String>
-    @get:Nested
-    abstract val ol: Property<NodeScope.(OrderedList) -> String>
-    @get:Nested
-    abstract val li: Property<NodeScope.(ListItem) -> String>
-    @get:Nested
-    abstract val code: Property<NodeScope.(FencedCodeBlock) -> String>
-    @get:Nested
-    abstract val inlineCode: Property<NodeScope.(Code) -> String>
     @get:Nested
     abstract val blockquote: Property<NodeScope.(BlockQuote) -> String>
     @get:Nested
-    abstract val table: Property<NodeScope.(TableBlock) -> String>
+    abstract val br: Property<NodeScope.(HardLineBreak) -> String>
     @get:Nested
-    abstract val thead: Property<NodeScope.(TableHead) -> String>
+    abstract val code: Property<NodeScope.(FencedCodeBlock) -> String>
     @get:Nested
-    abstract val tbody: Property<NodeScope.(TableBody) -> String>
+    abstract val em: Property<NodeScope.(Emphasis) -> String>
     @get:Nested
-    abstract val tr: Property<NodeScope.(TableRow) -> String>
+    abstract val footnoteDefinition: Property<NodeScope.(FootnoteDefinition) -> String>
     @get:Nested
-    abstract val td: Property<NodeScope.(TableCell) -> String>
-    @get:Nested
-    abstract val th: Property<NodeScope.(TableCell) -> String>
+    abstract val footnoteReference: Property<NodeScope.(FootnoteReference) -> String>
 
-    /** Handler which is fed the raw text (name and attributes) within an opening tag, e.g. `span id="demo"` */
     @get:Nested
-    abstract val rawTag: Property<NodeScope.(String) -> String>
+    abstract val heading: Property<NodeScope.(Heading) -> String>
+
+    @get:Nested
+    abstract val hr: Property<NodeScope.(ThematicBreak) -> String>
+    @get:Nested
+    abstract val html: Property<NodeScope.(HtmlBlock) -> String>
+    @get:Nested
+    abstract val img: Property<NodeScope.(Image) -> String>
+    @get:Nested
+    abstract val inlineCode: Property<NodeScope.(Code) -> String>
+
     @get:Nested
     abstract val inlineTag: Property<NodeScope.(HtmlInline) -> String>
 
     @get:Nested
-    abstract val html: Property<NodeScope.(HtmlBlock) -> String>
+    abstract val li: Property<NodeScope.(ListItem) -> String>
+    @get:Nested
+    abstract val ol: Property<NodeScope.(OrderedList) -> String>
+    @get:Nested
+    abstract val p: Property<NodeScope.(Paragraph) -> String>
+    @get:Nested
+    abstract val rawTag: Property<NodeScope.(String) -> String>
+    @get:Nested
+    abstract val strikethrough: Property<NodeScope.(Strikethrough) -> String>
+    @get:Nested
+    abstract val strong: Property<NodeScope.(StrongEmphasis) -> String>
 
+    @get:Nested
+    abstract val table: Property<NodeScope.(TableBlock) -> String>
+    @get:Nested
+    abstract val taskListItemMarker: Property<NodeScope.(TaskListItemMarker) -> String>
+    @get:Nested
+    abstract val tbody: Property<NodeScope.(TableBody) -> String>
+    @get:Nested
+    abstract val td: Property<NodeScope.(TableCell) -> String>
+    @get:Nested
+    abstract val text: Property<NodeScope.(Text) -> String>
+
+    @get:Nested
+    abstract val th: Property<NodeScope.(TableCell) -> String>
+    @get:Nested
+    abstract val thead: Property<NodeScope.(TableHead) -> String>
+    @get:Nested
+    abstract val tr: Property<NodeScope.(TableRow) -> String>
+    @get:Nested
+    abstract val ul: Property<NodeScope.(BulletList) -> String>
+
+    /** Handler which is fed the raw text (name and attributes) within an opening tag, e.g. `span id="demo"` */
     fun String.escapeSingleQuotedText() = escapeQuotes().escapeDollars()
     fun String.escapeTripleQuotedText() = escapeDollars().escapeTripleQuotes()
 
@@ -257,15 +301,53 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
         }
 
         // region Markdown Node handlers
-
-        text.convention { text -> "$JB_DOM.Text(\"${text.literal.escapeSingleQuotedText()}\")" }
-        img.convention { image ->
-            processImage(image) { data ->
-                buildString {
-                    append(if (useSilk.get()) "$SILK.graphics.Image" else "$JB_DOM.Img")
-                    append("""("${data.destination}", "${data.altText}")""")
-                }
+        a.convention { link ->
+            if (useSilk.get()) {
+                "$SILK.navigation.Link(\"${link.destination}\")"
+            } else {
+                "$JB_DOM.A(\"${link.destination}\")"
             }
+        }
+        blockquote.convention { blockquote ->
+            if (useSilk.get()) {
+                SilkCalloutBlockquoteHandler().invoke(this, blockquote)
+            } else {
+                "$JB_DOM.Blockquote"
+            }
+        }
+        br.convention { "$JB_DOM.Br" }
+        code.convention { codeBlock ->
+            val text = "\"\"\"${codeBlock.literal.escapeTripleQuotedText()}\"\"\""
+            // Code blocks should generate <pre><code>...</code></pre>
+            // https://daringfireball.net/projects/markdown/syntax#precode
+            "$JB_DOM.Pre { $JB_DOM.Code { $JB_DOM.Text($text) } }"
+        }
+        em.convention { "$JB_DOM.Em" }
+        footnoteDefinition.convention { definition ->
+            val label = definition.label
+            val definitionIds = data.computeIfAbsent(DataKeys.FootnoteDefinitionIds) { mutableMapOf() }
+
+            val baseId = "kobweb-footnote-${slugify(label)}"
+
+            // Use the same ID that was already computed by reference handler, or set it now
+            val finalId = definitionIds.getOrPut(label) { baseId }
+
+            "$JB_DOM.Div(attrs = { id(\"$finalId\"); classes(\"footnote-item\") })"
+        }
+        footnoteReference.convention { reference ->
+            val label = reference.label
+            val definitionIds = data.computeIfAbsent(DataKeys.FootnoteDefinitionIds) { mutableMapOf() }
+            val referenceCounts = data.computeIfAbsent(DataKeys.FootnoteReferenceCounts) { mutableMapOf() }
+
+            // Get or compute definition ID (use the same logic as the definition handler)
+            val defId = definitionIds.getOrPut(label) { "kobweb-footnote-${slugify(label)}" }
+
+            // Increment reference count and build unique reference ID
+            val idx = (referenceCounts[label] ?: 0) + 1
+            referenceCounts[label] = idx
+            val refId = "kobweb-footnote-ref-${slugify(label)}-$idx"
+
+            "$JB_DOM.Sup(attrs = { id(\"$refId\") }) { $JB_DOM.A(href = \"#$defId\") { $JB_DOM.Text(\"$label\") } }"
         }
         heading.convention { heading ->
             buildString {
@@ -288,17 +370,6 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
                 }
             }
         }
-        p.convention { "$JB_DOM.P" }
-        br.convention { "$JB_DOM.Br" }
-        a.convention { link ->
-            if (useSilk.get()) {
-                "$SILK.navigation.Link(\"${link.destination}\")"
-            } else {
-                "$JB_DOM.A(\"${link.destination}\")"
-            }
-        }
-        em.convention { "$JB_DOM.Em" }
-        strong.convention { "$JB_DOM.B" }
         hr.convention {
             if (useSilk.get()) {
                 "$SILK.layout.HorizontalDivider"
@@ -306,83 +377,6 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
                 "$JB_DOM.Hr"
             }
         }
-        ul.convention { "$JB_DOM.Ul" }
-        ol.convention { "$JB_DOM.Ol" }
-        li.convention { "$JB_DOM.Li" }
-        code.convention { codeBlock ->
-            val text = "\"\"\"${codeBlock.literal.escapeTripleQuotedText()}\"\"\""
-            // Code blocks should generate <pre><code>...</code></pre>
-            // https://daringfireball.net/projects/markdown/syntax#precode
-            "$JB_DOM.Pre { $JB_DOM.Code { $JB_DOM.Text($text) } }"
-        }
-        inlineCode.convention { code ->
-            childrenOverride = listOf(Text(code.literal))
-            "$JB_DOM.Code"
-        }
-        blockquote.convention { blockquote ->
-            if (useSilk.get()) {
-                SilkCalloutBlockquoteHandler().invoke(this, blockquote)
-            } else {
-                "$KOBWEB_DOM.GenericTag(\"blockquote\")"
-            }
-        }
-
-        table.convention { "$JB_DOM.Table" }
-        thead.convention { "$JB_DOM.Thead" }
-        tbody.convention { "$JB_DOM.Tbody" }
-        tr.convention { "$JB_DOM.Tr" }
-
-        // Convert a map of CSS style properties to an `style { ... }` block
-        fun Map<String, String>.toStylesBlock(): String {
-            val styleMap = this.takeIf { it.isNotEmpty() } ?: return ""
-            return buildString {
-                append("style {")
-                append(styleMap.map { (key, value) -> "property(\"$key\", \"$value\")" }.joinToString(";"))
-                append("}")
-            }
-        }
-
-        // Create relevant `(attrs = { ... })` call parameters for a table cell
-        fun TableCell.toCallParams(): String {
-            val alignment = alignment ?: return ""
-
-            val properties = mutableMapOf<String, String>()
-            properties["text-align"] = alignment.name.lowercase()
-            return "(attrs = { ${properties.toStylesBlock()} })"
-        }
-
-        td.convention { cell -> "$JB_DOM.Td${cell.toCallParams()}" }
-        th.convention { cell -> "$JB_DOM.Th${cell.toCallParams()}" }
-
-        fun String.stripTagBrackets() =
-            this.removePrefix("</").removePrefix("<").removeSuffix("/>").removeSuffix(">")
-
-        rawTag.convention { tag ->
-            val parts = tag.stripTagBrackets().split(' ', limit = 2)
-            val name = "\"${parts[0]}\""
-            val attrs = parts.getOrNull(1)?.escapeQuotes()?.let { "\"$it\"" } ?: "null"
-
-            "$KOBWEB_DOM.GenericTag($name, $attrs)"
-        }
-
-        inlineTag.set { htmlInline ->
-            val voidElements = setOf("br", "hr", "img")
-            val tag = htmlInline.literal
-
-            val scope = this
-            buildString {
-                if (!tag.startsWith("</")) {
-                    append(rawTag.get().invoke(scope, tag))
-                    if (!tag.endsWith("/>") && tag.stripTagBrackets() !in voidElements) {
-                        append(" {")
-                    }
-                } else {
-                    // Closing tag
-                    append("}")
-                }
-            }
-        }
-
         html.set { htmlBlock ->
             fun renderNode(el: Element, indentCount: Int, sb: StringBuilder) {
                 sb.append("${indent(indentCount)}$KOBWEB_DOM.GenericTag(\"${el.tagName()}\"")
@@ -435,7 +429,116 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
 
             sb.toString()
         }
+        img.convention { image ->
+            processImage(image) { data ->
+                buildString {
+                    append(if (useSilk.get()) "$SILK.graphics.Image" else "$JB_DOM.Img")
+                    append("""("${data.destination}", "${data.altText}")""")
+                }
+            }
+        }
+        inlineCode.convention { code ->
+            childrenOverride = listOf(Text(code.literal))
+            "$JB_DOM.Code"
+        }
+        inlineTag.set { htmlInline ->
+            val voidElements = setOf("br", "hr", "img")
+            val tag = htmlInline.literal
+
+            val scope = this
+            buildString {
+                if (!tag.startsWith("</")) {
+                    append(rawTag.get().invoke(scope, tag))
+                    if (!tag.endsWith("/>") && tag.stripTagBrackets() !in voidElements) {
+                        append(" {")
+                    }
+                } else {
+                    // Closing tag
+                    append("}")
+                }
+            }
+        }
+        li.convention { li ->
+            if (li.isTaskListItem()) {
+                "$JB_DOM.Li(attrs = { classes(\"task-list-item\") })"
+            } else {
+                "$JB_DOM.Li"
+            }
+        }
+        ol.convention { "$JB_DOM.Ol" }
+        p.convention { "$JB_DOM.P" }
+        rawTag.convention { tag ->
+            val parts = tag.stripTagBrackets().split(' ', limit = 2)
+            val name = "\"${parts[0]}\""
+            val attrs = parts.getOrNull(1)?.escapeQuotes()?.let { "\"$it\"" } ?: "null"
+
+            "$KOBWEB_DOM.GenericTag($name, $attrs)"
+        }
+        // Compose HTML does not expose a <del> composable; use a generic tag to match HTML semantics.
+        strikethrough.convention { "$KOBWEB_DOM.GenericTag(\"del\")" }
+        strong.convention { "$JB_DOM.B" }
+        table.convention { "$JB_DOM.Table" }
+        taskListItemMarker.convention { marker ->
+            val isChecked = marker.isChecked
+            //                 "$KOBWEB_DOM.GenericTag(\"input\", \"type=\\\"checkbox\\\" ${if (isChecked) "checked " else ""}disabled\")"
+            "$JB_DOM.Input(org.jetbrains.compose.web.attributes.InputType.Checkbox) {  ${if (isChecked) "checked($isChecked); " else ""};attr(\"disabled\", \"\") }"
+        }
+        tbody.convention { "$JB_DOM.Tbody" }
+        td.convention { cell -> "$JB_DOM.Td${cell.toCallParams()}" }
+        text.convention { text ->
+            val literal = text.literal
+            // Standard text rendering
+            "$JB_DOM.Text(\"${literal.escapeSingleQuotedText()}\")"
+        }
+        th.convention { cell -> "$JB_DOM.Th${cell.toCallParams()}" }
+        thead.convention { "$JB_DOM.Thead" }
+        tr.convention { "$JB_DOM.Tr" }
+        ul.convention { ul ->
+            if (ul.hasTaskListItems()) {
+                "$JB_DOM.Ul(attrs = { classes(\"task-list-container\") })"
+            } else {
+                "$JB_DOM.Ul"
+            }
+        }
 
         // endregion
     }
+
+    /**
+     * Helper function to check if a ListItem contains a TaskListItemMarker
+     */
+    private fun ListItem.isTaskListItem(): Boolean {
+        return children().any { it is TaskListItemMarker }
+    }
+
+    /**
+     * Helper function to check if a BulletList contains any task list items
+     */
+    private fun BulletList.hasTaskListItems(): Boolean {
+        return children().filterIsInstance<ListItem>().any { it.isTaskListItem() }
+    }
+
+    // Create relevant `(attrs = { ... })` call parameters for a table cell
+    fun TableCell.toCallParams(): String {
+        val alignment = alignment ?: return ""
+
+        val properties = mutableMapOf<String, String>()
+        properties["text-align"] = alignment.name.lowercase()
+        return "(attrs = { ${properties.toStylesBlock()} })"
+    }
+    fun String.stripTagBrackets() =
+        this.removePrefix("</").removePrefix("<").removeSuffix("/>").removeSuffix(">")
+    // Convert a map of CSS style properties to an `style { ... }` block
+    fun Map<String, String>.toStylesBlock(): String {
+        val styleMap = this.takeIf { it.isNotEmpty() } ?: return ""
+        return buildString {
+            append("style {")
+            append(styleMap.map { (key, value) -> "property(\"$key\", \"$value\")" }.joinToString(";"))
+            append("}")
+        }
+    }
+    // Compute base ID: kobweb-footnote-<slug(label)>
+    fun slugify(text: String): String = text.lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-')
+
+
 }

@@ -13,11 +13,16 @@ import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
 import com.varabyte.kobwebx.gradle.markdown.handlers.NodeScope
 import com.varabyte.kobwebx.gradle.markdown.util.NodeCache
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
+import com.varabyte.kobwebx.gradle.markdown.util.unescapeQuotes
+import org.commonmark.ext.footnotes.FootnoteDefinition
+import org.commonmark.ext.footnotes.FootnoteReference
+import org.commonmark.ext.gfm.strikethrough.Strikethrough
 import org.commonmark.ext.gfm.tables.TableBlock
 import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell
 import org.commonmark.ext.gfm.tables.TableHead
 import org.commonmark.ext.gfm.tables.TableRow
+import org.commonmark.ext.task.list.items.TaskListItemMarker
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.BlockQuote
 import org.commonmark.node.BulletList
@@ -338,6 +343,7 @@ class KotlinRenderer internal constructor(
         override fun visit(code: Code) {
             doVisit(code, handlers.inlineCode)
         }
+        
 
         override fun visit(emphasis: Emphasis) {
             doVisit(emphasis, handlers.em)
@@ -396,7 +402,7 @@ class KotlinRenderer internal constructor(
 
                     val route = Route(
                         frontMatterData?.routeOverride
-                        ?: nodeCache.metadata.getValue(destinationNode).routeWithSlug!! // Guaranteed set for a page
+                            ?: nodeCache.metadata.getValue(destinationNode).routeWithSlug!! // Guaranteed set for a page
                     )
                     if (route.isDynamic) {
                         error("Markdown file link '${link.destination}' links to file with dynamic route override. This is not supported!")
@@ -433,12 +439,47 @@ class KotlinRenderer internal constructor(
             }
         }
 
+        private fun visit(strikethrough: Strikethrough) {
+            doVisit(strikethrough, handlers.strikethrough)
+        }
+
         override fun visit(strongEmphasis: StrongEmphasis) {
             doVisit(strongEmphasis, handlers.strong)
         }
 
         override fun visit(text: Text) {
             doVisit(text, handlers.text)
+        }
+        override fun visit(customBlock: CustomBlock) {
+            when (customBlock) {
+                is FootnoteDefinition -> {
+                    doVisit(customBlock, handlers.footnoteDefinition)
+                }
+                is FrontMatterBlock -> {
+                    // No-op. We don't need to do anything here because we already handled parsing front matter earlier.
+                }
+                is KobwebCallBlock -> {
+                    val visitor = KobwebCallBlockVisitor()
+                    customBlock.accept(visitor)
+                    visitor.call?.let { call ->
+                        visit(call)
+                        visitor.childrenNodes?.let { children ->
+                            ++indentCount
+                            children.forEach { node -> node.accept(this) }
+                            --indentCount
+                            output.appendLine("$indent}")
+                        }
+                    }
+                }
+                is TableBlock -> visit(customBlock)
+
+                else -> {
+                    val simple = customBlock::class.simpleName
+                    val unhandledBlockName = simple!!
+                    reporter.warn("Unhandled Markdown custom block: $unhandledBlockName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20block%20%22$unhandledBlockName%22")
+
+                }
+            }
         }
 
         override fun visit(customNode: CustomNode) {
@@ -447,16 +488,23 @@ class KotlinRenderer internal constructor(
                     output.appendLine("$indent${customNode.toFqn(projectGroup)}")
                 }
 
+                is FootnoteReference -> visit(customNode)
+                is Strikethrough -> visit(customNode)
                 is TableHead -> visit(customNode)
                 is TableBody -> visit(customNode)
                 is TableRow -> visit(customNode)
                 is TableCell -> visit(customNode)
+                is TaskListItemMarker -> visit(customNode)
 
                 else -> {
                     val unhandledNodeName = customNode::class.simpleName!!
                     reporter.warn("Unhandled Markdown custom node: $unhandledNodeName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20node%20%22$unhandledNodeName%22")
                 }
             }
+        }
+
+        private fun visit(footnoteReference: FootnoteReference) {
+            doVisit(footnoteReference, handlers.footnoteReference)
         }
 
         private fun visit(table: TableBlock) {
@@ -482,34 +530,8 @@ class KotlinRenderer internal constructor(
                 doVisit(tableCell, handlers.td)
             }
         }
-
-        override fun visit(customBlock: CustomBlock) {
-            when (customBlock) {
-                is KobwebCallBlock -> {
-                    val visitor = KobwebCallBlockVisitor()
-                    customBlock.accept(visitor)
-                    visitor.call?.let { call ->
-                        visit(call)
-                        visitor.childrenNodes?.let { children ->
-                            ++indentCount
-                            children.forEach { node -> node.accept(this) }
-                            --indentCount
-                            output.appendLine("$indent}")
-                        }
-                    }
-                }
-
-                is FrontMatterBlock -> {
-                    // No-op. We don't need to do anything here because we already handled parsing front matter earlier.
-                }
-
-                is TableBlock -> visit(customBlock)
-
-                else -> {
-                    val unhandledBlockName = customBlock::class.simpleName!!
-                    reporter.warn("Unhandled Markdown custom block: $unhandledBlockName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20block%20%22$unhandledBlockName%22")
-                }
-            }
+        private fun visit(taskListItemMarker: TaskListItemMarker) {
+            doVisit(taskListItemMarker, handlers.taskListItemMarker)
         }
     }
 }
