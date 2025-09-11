@@ -333,7 +333,7 @@ abstract class AppBlock @Inject constructor(
     /**
      * A sub-block for defining properties related to sitemap generation for SEO.
      */
-    abstract class SitemapBlock @Inject constructor() : ExtensionAware {
+    abstract class SitemapBlock : ExtensionAware {
 
 
         /**
@@ -373,7 +373,7 @@ abstract class AppBlock @Inject constructor(
          * 
          * @see [SitemapFilterContext]
          */
-        @get:Internal // Avoid serialization issues with lambdas
+        @get:Nested // Avoid serialization issues with lambdas
         abstract val filter: Property<SitemapFilterContext.() -> Boolean>
 
         /**
