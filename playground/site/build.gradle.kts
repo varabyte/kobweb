@@ -22,14 +22,10 @@ kobweb {
         //testing new feature
         generateSitemap("http://localhost:8080") {
             // Define routes to exclude from sitemap
-            val excludedPrefixes = listOf("/fruits", "/markdown", "/api")
+            val excludedPrefixes = listOf("/fruits", "/markdown")
             filter.set {
-                // Exclude dynamic routes (default behavior)
-//                val hasDynamicRoute = route.contains('{') && route.contains('}')
-                // Exclude routes with specified prefixes
+             // Exclude routes with specified prefixes
                 val hasExcludedPrefix = excludedPrefixes.any { prefix -> route.startsWith(prefix) }
-                // Include only if both conditions are false
-               hasExcludedPrefix
                !hasExcludedPrefix
             }
         }
