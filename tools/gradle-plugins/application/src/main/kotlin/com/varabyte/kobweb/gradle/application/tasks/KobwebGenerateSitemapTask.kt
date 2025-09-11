@@ -1,13 +1,11 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
-import com.varabyte.kobweb.gradle.application.extensions.sitemap
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -81,7 +79,9 @@ abstract class KobwebGenerateSitemapTask : KobwebGenerateTask("Generate an XML s
             logger.warn("Generated sitemap is ${sitemapXml.length / (1024 * 1024)}MB, exceeding the 50MB limit.")
         }
 
-        sitemapFile.get().asFile.writeText(sitemapXml)
+        val outputFile = sitemapFile.get().asFile
+        outputFile.parentFile.mkdirs()
+        outputFile.writeText(sitemapXml)
 
         logger.info("Generated sitemap with ${filteredRoutes.size} routes.")
     }
