@@ -24,6 +24,7 @@ val includedProjects = setOf(
     projects.frontend.silkWidgets,
     projects.frontend.silkWidgetsKobweb,
     projects.frontend.silkIconsFa,
+    projects.frontend.silkIconsLucide,
     projects.frontend.silkIconsMdi,
     projects.frontend.kobwebxMarkdown,
     projects.frontend.composeHtmlExt,
