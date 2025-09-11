@@ -75,6 +75,8 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import javax.inject.Inject
 import kotlin.io.path.exists
 import org.gradle.api.Task
+import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Delete
 
 val Project.kobwebFolder: KobwebFolder
     get() = KobwebFolder.fromChildPath(layout.projectDirectory.asFile.toPath())
@@ -287,11 +289,12 @@ class KobwebApplicationPlugin @Inject constructor(
                 KobwebGenSiteEntryConfInputs(kobwebConf),
             )
 
-            val kobwebCacheAppFrontendDataTask = project.tasks.register<KobwebCacheAppFrontendDataTask>("kobwebCacheAppFrontendData") {
-                appFrontendMetadataFile.set(project.kspFrontendFile(jsTarget))
-                compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
-                appDataFile.set(this.kobwebCacheFile("appData.json"))
-            }
+            val kobwebCacheAppFrontendDataTask =
+                project.tasks.register<KobwebCacheAppFrontendDataTask>("kobwebCacheAppFrontendData") {
+                    appFrontendMetadataFile.set(project.kspFrontendFile(jsTarget))
+                    compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
+                    appDataFile.set(this.kobwebCacheFile("appData.json"))
+                }
 
             kobwebGenSiteEntryTask.configure {
                 appDataFile.set(kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile })
@@ -378,74 +381,145 @@ class KobwebApplicationPlugin @Inject constructor(
                 ) {
                     routes.set(project.kobwebSiteRoutes)
                     basePath.set(kobwebConf.site.basePath)
+
+                    // Generate to a temporary location first
                     sitemapFile.set(
-                        appBlock.genDir.flatMap { genDir ->
-                            project.layout.buildDirectory.dir("$genDir/sitemap/src/${jsTarget.mainSourceSet}/resources")
-                        }.map { it.file("public/sitemap.xml") }
+                        project.layout.buildDirectory.file("tmp/sitemap/sitemap.xml")
                     )
+
                     sitemapBlock.set(appBlock.sitemap)
 
-                    // Use onlyIf to ensure proper Gradle task skipping behavior
-                    onlyIf { sitemapBlock.get().baseUrl.isPresent }
-                }
+                    // Ensure sitemap generation waits for app data to be cached
+                    dependsOn(kobwebCacheAppFrontendDataTask)
 
-                // Wire into resource processing - generate directly into resources structure
-                project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
-                    resources.srcDir(appBlock.genDir.flatMap { genDir ->
-                        project.layout.buildDirectory.dir("$genDir/sitemap/src/${jsTarget.mainSourceSet}/resources")
-                    })
-                }
-            }
-
-            project.buildTargets.withType<KotlinJvmTarget>().configureEach {
-                val jvmTarget = JvmTarget(this)
-
-                project.setupKspJvm(jvmTarget)
-
-                // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger
-                // much.
-                kobwebStartTask.configure {
-                    if (env == ServerEnvironment.DEV) {
-                        // If this site has server routes, make sure we built the jar that our servers can load
-                        dependsOn(project.tasks.namedOrNull(jvmTarget.jar))
+                    // Capture the baseUrl presence during configuration time
+                    val hasBaseUrl = appBlock.sitemap.baseUrl.isPresent
+                    onlyIf("baseUrl must be configured for sitemap generation") {
+                        if (!hasBaseUrl) {
+                            logger.info("Skipping sitemap generation: baseUrl not configured")
+                        }
+                        hasBaseUrl
                     }
                 }
 
-                val kobwebCacheAppBackendDataTask =
-                    project.tasks.register<KobwebCacheAppBackendDataTask>("kobwebCacheAppBackendData") {
-                        appBackendMetadataFile.set(project.kspBackendFile(jvmTarget))
-                        compileClasspath.from(project.configurations.named(jvmTarget.compileClasspath))
-                        appDataFile.set(this.kobwebCacheFile("appData.json"))
+                // Copy the generated sitemap to the source resources directory
+                val copySitemapToResourcesTask = project.tasks.register<Copy>("copySitemapToResources") {
+                    group = "kobweb"
+                    description = "Copy generated sitemap to source resources directory"
+
+                    from(kobwebGenerateSitemapTask.flatMap { it.sitemapFile })
+
+                    val targetDirProvider = project.provider {
+                        project.file("src/${jsTarget.mainSourceSet}/resources/${kobwebBlock.publicPath.get()}")
                     }
+                    into(targetDirProvider)
 
-                val kobwebGenApisFactoryTask = project.tasks
-                    .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock.app)
+                    dependsOn(kobwebGenerateSitemapTask)
 
-                // If a user adds "includeServer = true" but doesn't add a dependency on the API artifact, we want to give
-                // them a clear message now; otherwise they'll get a cryptic compilation error later.
-                val hasKobwebApiDepProvider =
-                    project.getJvmDependencyResults().hasDependencyNamed("com.varabyte.kobweb:kobweb-api")
-                kobwebGenApisFactoryTask.configure {
-                    appDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
+                    // Capture the baseUrl presence during configuration time
+                    val hasBaseUrl = appBlock.sitemap.baseUrl.isPresent
+                    onlyIf {
+                        if (!hasBaseUrl) {
+                            logger.info("Skipping sitemap copy: baseUrl not configured")
+                        }
+                        hasBaseUrl
+                    }
 
                     doFirst {
-                        if (!hasKobwebApiDepProvider.get()) {
-                            throw GradleException("e: A required jvm dependency for a Kobweb project with includeServer=true was not found. To fix, add compilerOnly(\"com.varabyte.kobweb:kobweb-api\"), or compileOnly(libs.kobweb.api) if using the standard Kobweb template, to the jvmMain.sourceSet block.")
-                        }
+                        val targetDir = targetDirProvider.get()
+                        targetDir.mkdirs()
+                        logger.info("Copying sitemap to: ${targetDir.absolutePath}")
+                    }
+
+                    doLast {
+                        logger.info("Successfully copied sitemap.xml to source resources")
                     }
                 }
 
-                kobwebExportTask.configure {
-                    appBackendDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
+                // Make sure sitemap is copied before resources are processed
+                project.tasks.named<ProcessResources>(jsTarget.processResources) {
+                    dependsOn(copySitemapToResourcesTask)
                 }
 
-                project.kspExcludedSources.from(kobwebGenApisFactoryTask)
-                project.kotlin.sourceSets.named(jvmTarget.mainSourceSet) {
-                    kotlin.srcDir(kobwebGenApisFactoryTask)
+                // Also ensure sitemap is available during development
+                kobwebStartTask.configure {
+                    dependsOn(copySitemapToResourcesTask)
+                }
+
+                // Make the copy task part of the general generation tasks
+                project.tasks.matching { it.name == "kobwebGenAll" }.configureEach {
+                    dependsOn(copySitemapToResourcesTask)
+                }
+
+                // For production builds, ensure sitemap is copied before webpack
+                project.tasks.matching { it.name == jsTarget.browserProductionWebpack }.configureEach {
+                    dependsOn(copySitemapToResourcesTask)
+                }
+
+                // Add a cleanup task for sitemap files
+                project.tasks.register<Delete>("cleanSitemap") {
+                    group = "kobweb"
+                    description = "Clean generated sitemap files"
+
+                    delete(project.layout.buildDirectory.file("tmp/sitemap"))
+                    delete(project.provider {
+                        project.file("src/${jsTarget.mainSourceSet}/resources/${kobwebBlock.publicPath.get()}/sitemap.xml")
+                    })
+
+                    doLast {
+                        logger.info("Cleaned sitemap files")
+                    }
                 }
             }
         }
 
+        project.buildTargets.withType<KotlinJvmTarget>().configureEach {
+            val jvmTarget = JvmTarget(this)
+
+            project.setupKspJvm(jvmTarget)
+
+            // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger
+            // much.
+            kobwebStartTask.configure {
+                if (env == ServerEnvironment.DEV) {
+                    // If this site has server routes, make sure we built the jar that our servers can load
+                    dependsOn(project.tasks.namedOrNull(jvmTarget.jar))
+                }
+            }
+
+            val kobwebCacheAppBackendDataTask =
+                project.tasks.register<KobwebCacheAppBackendDataTask>("kobwebCacheAppBackendData") {
+                    appBackendMetadataFile.set(project.kspBackendFile(jvmTarget))
+                    compileClasspath.from(project.configurations.named(jvmTarget.compileClasspath))
+                    appDataFile.set(this.kobwebCacheFile("appData.json"))
+                }
+
+            val kobwebGenApisFactoryTask = project.tasks
+                .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock.app)
+
+            // If a user adds "includeServer = true" but doesn't add a dependency on the API artifact, we want to give
+            // them a clear message now; otherwise they'll get a cryptic compilation error later.
+            val hasKobwebApiDepProvider =
+                project.getJvmDependencyResults().hasDependencyNamed("com.varabyte.kobweb:kobweb-api")
+            kobwebGenApisFactoryTask.configure {
+                appDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
+
+                doFirst {
+                    if (!hasKobwebApiDepProvider.get()) {
+                        throw GradleException("e: A required jvm dependency for a Kobweb project with includeServer=true was not found. To fix, add compilerOnly(\"com.varabyte.kobweb:kobweb-api\"), or compileOnly(libs.kobweb.api) if using the standard Kobweb template, to the jvmMain.sourceSet block.")
+                    }
+                }
+            }
+
+            kobwebExportTask.configure {
+                appBackendDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
+            }
+
+            project.kspExcludedSources.from(kobwebGenApisFactoryTask)
+            project.kotlin.sourceSets.named(jvmTarget.mainSourceSet) {
+                kotlin.srcDir(kobwebGenApisFactoryTask)
+            }
+        }
         // Convenience task in case you quickly want to run all "kobwebGen..." tasks
         project.tasks.register("kobwebGenAll") {
             group = "kobweb"
