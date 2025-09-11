@@ -346,7 +346,9 @@ abstract class AppBlock @Inject constructor(
          * This will be prepended to all routes in the sitemap.
          *
          * IMPORTANT: If your site is deployed under a base path (e.g., GitHub Pages project site),
-         * include it in the baseUrl: "https://username.github.io/project-name"
+         * include it in the baseUrl: "https://username.github.io/project-name".
+         * If the base path is configured and not included in the baseUrl, a warning will be printed and the
+         * generated links may be incorrect.
          */
         @get:Input
         abstract val baseUrl: Property<String>

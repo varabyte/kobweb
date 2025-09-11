@@ -105,10 +105,10 @@ abstract class KobwebGenerateSitemapTask : KobwebGenerateTask("Generate an XML s
             try {
                 val baseUrlPath = java.net.URI(baseUrl).path
                 if (baseUrlPath.isNotEmpty() && !baseUrlPath.endsWith("/$basePathValue")) {
-                    throw GradleException(
+                    logger.warn(
                         "sitemap.baseUrl path ('$baseUrlPath') does not end with the project's configured " +
-                            "base path ('/$basePathValue'). This will result in incorrect sitemap links. " +
-                            "Please set baseUrl to include the base path, e.g., \"https://example.com/$basePathValue\"."
+                            "base path ('/$basePathValue'). Sitemap URLs may be incorrect. " +
+                            "Consider setting baseUrl to include the base path, e.g., \"https://example.com/$basePathValue\"."
                     )
                 }
             } catch (e: java.net.URISyntaxException) {
