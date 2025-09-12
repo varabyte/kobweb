@@ -74,6 +74,7 @@ fun createIndexFile(
     title: String,
     lang: String,
     headElements: Iterable<String>,
+    bodyElements: Iterable<String>,
     src: String,
     scriptAttributes: Map<String, String>,
     buildTarget: BuildTarget
@@ -106,6 +107,11 @@ fun createIndexFile(
                     script {
                         this.src = src
                         attributes.putAll(scriptAttributes)
+                    }
+
+                    // Add user body elements
+                    bodyElements.forEach { elements ->
+                        unsafe { raw(elements) }
                     }
                 }
             }
