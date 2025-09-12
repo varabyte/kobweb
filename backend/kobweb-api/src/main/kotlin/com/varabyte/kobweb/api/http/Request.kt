@@ -1,6 +1,9 @@
 package com.varabyte.kobweb.api.http
 
 import com.varabyte.kobweb.api.ApiContext
+import com.varabyte.kobweb.api.data.Data
+import com.varabyte.kobweb.api.data.MutableData
+import com.varabyte.kobweb.api.intercept.ApiInterceptor
 
 /**
  * Information passed into an API endpoint from the client.
@@ -22,29 +25,48 @@ import com.varabyte.kobweb.api.ApiContext
  * }
  * ```
  *
- * @property connection Information about the connection that carried the request.
- * @property method The type of http method this call was sent with.
- * @property params A list of key/value pairs extracted either from the user's [query string](https://en.wikipedia.org/wiki/Query_string)
- *   or from any dynamic path parts.
- * @property queryParams Like [params] but only for the query string, just in case a user needs to disambiguate between
- *   a dynamic path part and a query parameter with the same name.
- * @property headers All headers sent with the request.
- * @property cookies Any cookies sent with the request. Note the value of the cookies will be in a raw format, so you
- *   may need to decode them yourself.
- * @property body An (optional) payload sent with the request. Will only potentially be set with appropriate methods that
- * are allowed to send data, i.e. [HttpMethod.POST], [HttpMethod.PUT], and [HttpMethod.PATCH]
- * @property contentType The content type of the [body], if set and sent.
- *
  * @see Response
  */
 interface Request {
+    /** Information about the connection that carried the request. */
     val connection: Connection
+    /** The type of http method this call was sent with. */
     val method: HttpMethod
+    /**
+     * A list of key/value pairs extracted either from the user's [query string](https://en.wikipedia.org/wiki/Query_string)
+     * or from any dynamic path parts.
+     */
     val params: Map<String, String>
+    /**
+     * Like [params] but only for the query string.
+     *
+     * This is provided just in case a user needs to disambiguate between a dynamic path part and a query parameter with
+     * the same name.
+     */
     val queryParams: Map<String, String>
+    /** All headers sent with the request. */
     val headers: Map<String, List<String>>
+    /**
+     * Any cookies sent with the request.
+     *
+     * Note the value of the cookies will be in a raw format, so you may need to decode them yourself.
+     */
     val cookies: Map<String, String>
+    /**
+     * A holder of user data that can be added to this request.
+     *
+     * This will only be relevant for a project that uses an [ApiInterceptor]; in other words, this allows optional
+     * communication from an API interceptor to an API interceptor (such as storing some calculated auth value).
+     */
+    val data: Data
+    /**
+     * An (optional) payload sent with the request.
+     *
+     * Will only potentially be set with appropriate methods that are allowed to send data, i.e. [HttpMethod.POST],
+     * [HttpMethod.PUT], and [HttpMethod.PATCH]
+     */
     val body: ByteArray?
+    /** The content type of the [body], if set and sent. */
     val contentType: String?
 
     /**
@@ -103,6 +125,7 @@ class MutableRequest(
     cookies: Map<String, String>,
     override var body: ByteArray?,
     override var contentType: String?,
+    override val data: MutableData = MutableData(),
 ) : Request {
     constructor(request: Request) : this(
         request.connection,
@@ -113,6 +136,7 @@ class MutableRequest(
         request.cookies,
         request.body,
         request.contentType,
+        request.data.toMutableData(),
     )
 
     override val params: MutableMap<String, String> = params.toMutableMap()

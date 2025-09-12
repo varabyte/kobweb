@@ -28,18 +28,11 @@ class Apis(
         suspend fun dispatch(path: String = defaultPath): Response {
             return apiHandlers.resolve(path, allowRedirects = false)?.let { entries ->
                 val captured = entries.captureDynamicValues()
-                // Captured params, if any, should take precedence over query parameters
-                val request = if (captured.isEmpty()) request else
-                    MutableRequest(
-                        request.connection,
-                        request.method,
-                        request.queryParams + captured,
-                        request.queryParams,
-                        request.headers,
-                        request.cookies,
-                        request.body,
-                        request.contentType
-                    )
+                val request = if (captured.isEmpty()) {
+                    request
+                } else MutableRequest(request).apply {
+                    params += captured
+                }
 
                 val apiCtx = ApiContext(env, request, data, logger)
                 entries.last().node.data!!.invoke(apiCtx)
@@ -62,13 +55,12 @@ class Apis(
     }
 
     suspend fun handle(path: String, request: Request): Response {
-        val dispatcher = Dispatcher(path, request)
         return apiInterceptor?.let { intercept ->
             val mutableRequest = MutableRequest(request)
-            val ctx = ApiInterceptorContext(env, dispatcher, path, mutableRequest, data, logger)
+            val ctx = ApiInterceptorContext(env, Dispatcher(path, mutableRequest), path, mutableRequest, data, logger)
             intercept(ctx)
         } ?: run {
-            dispatcher.dispatch()
+            Dispatcher(path, request).dispatch()
         }
     }
 
