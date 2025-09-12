@@ -218,21 +218,22 @@ class KobwebApplicationPlugin @Inject constructor(
             browser.set(kobwebBlock.app.export.browser)
         }
 
-        val taskListenerService = project.gradle.sharedServices
-            .registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {
-                project.gradle.taskGraph.whenReady {
-                    parameters.kobwebFolderFiles.set(
-                        allTasks
-                            .filter { it is KobwebStartTask }
-                            .associate { it.path to it.project.kobwebFolder.path.toFile() }
-                    )
-                }
-            }
         // Tasks may include a project prefix (e.g. `site:kobwebStart`), so we compare just the base task name
         val isKobwebStartBuild = project.gradle.startParameter.taskNames
             .any { it.substringAfterLast(':') == kobwebStartTask.name }
         if (isKobwebStartBuild) {
-            buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
+            project.gradle.taskGraph.whenReady {
+                // Register a listener only if a kobwebStart task from this project is part of the build.
+                // If there are kobwebStart tasks from multiple projects, each will be tracked by its own listener.
+                val startTask = allTasks.find { it.name == kobwebStartTask.name && it.project == project }
+                    ?: return@whenReady
+                val taskListenerService = project.gradle.sharedServices
+                    .registerIfAbsent("kobweb-task-listener_${project.path}", KobwebTaskListener::class.java) {
+                        parameters.kobwebStartTaskPath.set(startTask.path)
+                        parameters.kobwebFolderFile.set(kobwebFolder.path.toFile())
+                    }
+                buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
+            }
         }
 
         project.tasks.withType<KotlinWebpack>().configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()
