@@ -38,12 +38,14 @@ import org.jetbrains.kotlin.gradle.utils.named
  * ```
  */
 val Project.kobwebSiteRoutes: Provider<List<String>>
-    get() = tasks.named<KobwebCacheAppFrontendDataTask>("kobwebCacheAppFrontendData").map { task ->
-        val pageEntries =
-            Json.decodeFromString<AppFrontendData>(task.appDataFile.get().asFile.readText()).frontendData.pages
-        pageEntries
-            .asSequence()
-            .map { it.route }
-            .sorted()
-            .toList()
+    get() = tasks.named<KobwebCacheAppFrontendDataTask>("kobwebCacheAppFrontendData").flatMap { task ->
+        task.appDataFile.map { file ->
+            val pageEntries =
+                Json.decodeFromString<AppFrontendData>(file.asFile.readText()).frontendData.pages
+            pageEntries
+                .asSequence()
+                .map { it.route }
+                .sorted()
+                .toList()
+        }
     }
