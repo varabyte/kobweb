@@ -99,6 +99,72 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifyBorderBlockColor() {
+        assertThat(modifierToText {
+            Modifier.borderBlockColor(Colors.Red)
+        }).isEqualTo("border-block-color: red")
+
+        assertThat(modifierToText {
+            Modifier.borderBlockColor(Color("#FFF"))
+        }).isEqualTo("border-block-color: #FFF")
+    }
+
+    @Test
+    fun verifyBorderBlockEndColor() {
+        assertThat(modifierToText {
+            Modifier.borderBlockEndColor(Colors.Red)
+        }).isEqualTo("border-block-end-color: red")
+
+        assertThat(modifierToText {
+            Modifier.borderBlockEndColor(Color("#FFF"))
+        }).isEqualTo("border-block-end-color: #FFF")
+    }
+
+    @Test
+    fun verifyBorderBlockStartColor() {
+        assertThat(modifierToText {
+            Modifier.borderBlockStartColor(Colors.Red)
+        }).isEqualTo("border-block-start-color: red")
+
+        assertThat(modifierToText {
+            Modifier.borderBlockStartColor(Color("#FFF"))
+        }).isEqualTo("border-block-start-color: #FFF")
+    }
+
+    @Test
+    fun verifyBorderInlineColor() {
+        assertThat(modifierToText {
+            Modifier.borderInlineColor(Colors.White)
+        }).isEqualTo("border-inline-color: white")
+
+        assertThat(modifierToText {
+            Modifier.borderInlineColor(Color("#000"))
+        }).isEqualTo("border-inline-color: #000")
+    }
+
+    @Test
+    fun verifyBorderInlineEndColor() {
+        assertThat(modifierToText {
+            Modifier.borderInlineEndColor(Colors.White)
+        }).isEqualTo("border-inline-end-color: white")
+
+        assertThat(modifierToText {
+            Modifier.borderInlineEndColor(Color("#000"))
+        }).isEqualTo("border-inline-end-color: #000")
+    }
+
+    @Test
+    fun verifyBorderInlineStartColor() {
+        assertThat(modifierToText {
+            Modifier.borderInlineStartColor(Colors.White)
+        }).isEqualTo("border-inline-start-color: white")
+
+        assertThat(modifierToText {
+            Modifier.borderInlineStartColor(Color("#000"))
+        }).isEqualTo("border-inline-start-color: #000")
+    }
+
+    @Test
     fun verifyBox() {
         assertThat(modifierToText {
             Modifier.boxDecorationBreak(BoxDecorationBreak.Clone)
