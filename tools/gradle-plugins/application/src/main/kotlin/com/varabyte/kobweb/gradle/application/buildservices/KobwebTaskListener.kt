@@ -4,6 +4,7 @@ import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
 import com.varabyte.kobweb.server.api.ServerStateFile
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.tooling.events.FailureResult
@@ -35,13 +36,13 @@ abstract class KobwebTaskListener : BuildService<KobwebTaskListener.Parameters>,
          *
          * This should contain exactly the start tasks that will run in the current build.
          */
-        var kobwebFolderFiles: Map<String, File>
+        val kobwebFolderFiles: MapProperty<String, File>
     }
 
     // The build service is shared across all projects in the build. Thus, if the user's project has multiple
     // Kobweb sites, potentially running at the same time, it must track each such site so that live reloading
     // can work for all of them
-    private val kobwebProjects = parameters.kobwebFolderFiles
+    private val kobwebProjects = parameters.kobwebFolderFiles.get()
         .map { KobwebSiteProject(it.key, KobwebFolder(it.value.toPath())) }
     private var isBuilding = false
 
