@@ -9,7 +9,8 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 @Composable
 fun CodeIcon(modifier: Modifier = Modifier) {
     createIcon(
-        viewBox = ViewBox(0, 0, 24, 24),
+        // Updated viewbox (instead of path, which would have been harder) to appear larger and more centered.
+        viewBox = ViewBox(4, 4, 16, 16),
         renderStyle = IconRenderStyle.Stroke(2),
         attrs = modifier.toAttrs()
     ) {
@@ -19,7 +20,7 @@ fun CodeIcon(modifier: Modifier = Modifier) {
         }
         // Forward slash /
         Path {
-            d("M12 16l4-8")
+            d("M10 16l4-8")
         }
         // Right angle bracket >
         Path {
