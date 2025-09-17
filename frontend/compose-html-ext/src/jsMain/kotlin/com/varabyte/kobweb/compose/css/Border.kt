@@ -3,33 +3,102 @@ package com.varabyte.kobweb.compose.css
 import com.varabyte.kobweb.compose.css.functions.CSSImage
 import org.jetbrains.compose.web.css.*
 
-fun StyleScope.borderStyle(lineStyle: LineStyle) {
-    property("border-style", lineStyle.value)
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-color
+sealed interface BorderBlockColor : StylePropertyValue {
+    companion object : CssGlobalValues<BorderBlockColor> {
+        fun of(color: CSSColorValue) = color.unsafeCast<BorderBlockColor>()
+    }
 }
 
-fun StyleScope.borderStyle(topBottom: LineStyle = LineStyle.None, leftRight: LineStyle = LineStyle.None) {
-    property("border-style", "$topBottom $leftRight")
+fun StyleScope.borderBlockColor(borderBlockColor: BorderBlockColor) {
+    property("border-block-color", borderBlockColor)
 }
 
-fun StyleScope.borderStyle(
-    top: LineStyle = LineStyle.None,
-    leftRight: LineStyle = LineStyle.None,
-    bottom: LineStyle = LineStyle.None
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end-color
+sealed interface BorderBlockEndColor : StylePropertyValue {
+    companion object : CssGlobalValues<BorderBlockEndColor> {
+        fun of(color: CSSColorValue) = color.unsafeCast<BorderBlockEndColor>()
+    }
+}
+
+fun StyleScope.borderBlockEndColor(borderBlockEndColor: BorderBlockEndColor) {
+    property("border-block-end-color", borderBlockEndColor)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-end-style
+sealed interface BorderBlockEndStyle : StylePropertyValue {
+    companion object : CssGlobalValues<BorderBlockEndStyle>, CommonBorderStyle<BorderBlockEndStyle>
+}
+
+fun StyleScope.borderBlockEndStyle(borderBlockStartStyle: BorderBlockEndStyle) {
+    property("border-block-end-style", borderBlockStartStyle)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start-color
+sealed interface BorderBlockStartColor : StylePropertyValue {
+    companion object : CssGlobalValues<BorderBlockStartColor> {
+        fun of(color: CSSColorValue) = color.unsafeCast<BorderBlockStartColor>()
+    }
+}
+
+fun StyleScope.borderBlockStartColor(borderBlockEndColor: BorderBlockStartColor) {
+    property("border-block-start-color", borderBlockEndColor)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-start-style
+sealed interface BorderBlockStartStyle : StylePropertyValue {
+    companion object : CssGlobalValues<BorderBlockStartStyle>, CommonBorderStyle<BorderBlockStartStyle>
+}
+
+fun StyleScope.borderBlockStartStyle(borderBlockStartStyle: BorderBlockStartStyle) {
+    property("border-block-start-style", borderBlockStartStyle)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-block-style
+sealed interface BorderBlockStyle : StylePropertyValue {
+    companion object : CssGlobalValues<BorderBlockStyle>, CommonBorderStyle<BorderBlockStyle>
+}
+
+fun StyleScope.borderBlockStyle(borderBlockStyle: BorderBlockStyle) {
+    property("border-block-style", borderBlockStyle)
+}
+
+fun StyleScope.borderBottomLeftRadius(radius: CSSLengthOrPercentageNumericValue) {
+    property("border-bottom-left-radius", radius)
+}
+
+fun StyleScope.borderBottomLeftRadius(
+    horizontal: CSSLengthOrPercentageNumericValue = 0.px,
+    vertical: CSSLengthOrPercentageNumericValue = 0.px
 ) {
-    property("border-style", "$top $leftRight $bottom")
+    property("border-bottom-left-radius", "$horizontal $vertical")
 }
 
-fun StyleScope.borderStyle(
-    top: LineStyle = LineStyle.None,
-    right: LineStyle = LineStyle.None,
-    bottom: LineStyle = LineStyle.None,
-    left: LineStyle = LineStyle.None
+fun StyleScope.borderBottomRightRadius(radius: CSSLengthOrPercentageNumericValue) {
+    property("border-bottom-right-radius", radius)
+}
+
+fun StyleScope.borderBottomRightRadius(
+    horizontal: CSSLengthOrPercentageNumericValue = 0.px,
+    vertical: CSSLengthOrPercentageNumericValue = 0.px
 ) {
-    property("border-style", "$top $right $bottom $left")
+    property("border-bottom-right-radius", "$horizontal $vertical")
 }
 
-fun StyleScope.borderWidth(width: CSSLengthNumericValue) {
-    property("border-width", width)
+fun StyleScope.borderBottom(borderBuild: CSSBorder.() -> Unit) {
+    property("border-bottom", CSSBorder().apply(borderBuild))
+}
+
+fun StyleScope.borderBottom(
+    width: CSSLengthNumericValue? = null,
+    style: LineStyle? = null,
+    color: CSSColorValue? = null
+) {
+    borderBottom {
+        width?.let { width(it) }
+        style?.let { style(it) }
+        color?.let { color(it) }
+    }
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-collapse
@@ -73,38 +142,6 @@ fun StyleScope.borderColor(
     property("border-color", "$top $right $bottom $left")
 }
 
-fun StyleScope.borderTop(borderBuild: CSSBorder.() -> Unit) {
-    property("border-top", CSSBorder().apply(borderBuild))
-}
-
-fun StyleScope.borderTop(
-    width: CSSLengthNumericValue? = null,
-    style: LineStyle? = null,
-    color: CSSColorValue? = null
-) {
-    borderTop {
-        width?.let { width(it) }
-        style?.let { style(it) }
-        color?.let { color(it) }
-    }
-}
-
-fun StyleScope.borderBottom(borderBuild: CSSBorder.() -> Unit) {
-    property("border-bottom", CSSBorder().apply(borderBuild))
-}
-
-fun StyleScope.borderBottom(
-    width: CSSLengthNumericValue? = null,
-    style: LineStyle? = null,
-    color: CSSColorValue? = null
-) {
-    borderBottom {
-        width?.let { width(it) }
-        style?.let { style(it) }
-        color?.let { color(it) }
-    }
-}
-
 fun StyleScope.borderLeft(borderBuild: CSSBorder.() -> Unit) {
     property("border-left", CSSBorder().apply(borderBuild))
 }
@@ -137,6 +174,22 @@ fun StyleScope.borderRight(
     }
 }
 
+fun StyleScope.borderTop(borderBuild: CSSBorder.() -> Unit) {
+    property("border-top", CSSBorder().apply(borderBuild))
+}
+
+fun StyleScope.borderTop(
+    width: CSSLengthNumericValue? = null,
+    style: LineStyle? = null,
+    color: CSSColorValue? = null
+) {
+    borderTop {
+        width?.let { width(it) }
+        style?.let { style(it) }
+        color?.let { color(it) }
+    }
+}
+
 fun StyleScope.borderTopLeftRadius(radius: CSSLengthOrPercentageNumericValue) {
     property("border-top-left-radius", radius)
 }
@@ -157,28 +210,6 @@ fun StyleScope.borderTopRightRadius(
     vertical: CSSLengthOrPercentageNumericValue = 0.px
 ) {
     property("border-top-right-radius", "$horizontal $vertical")
-}
-
-fun StyleScope.borderBottomLeftRadius(radius: CSSLengthOrPercentageNumericValue) {
-    property("border-bottom-left-radius", radius)
-}
-
-fun StyleScope.borderBottomLeftRadius(
-    horizontal: CSSLengthOrPercentageNumericValue = 0.px,
-    vertical: CSSLengthOrPercentageNumericValue = 0.px
-) {
-    property("border-bottom-left-radius", "$horizontal $vertical")
-}
-
-fun StyleScope.borderBottomRightRadius(radius: CSSLengthOrPercentageNumericValue) {
-    property("border-bottom-right-radius", radius)
-}
-
-fun StyleScope.borderBottomRightRadius(
-    horizontal: CSSLengthOrPercentageNumericValue = 0.px,
-    vertical: CSSLengthOrPercentageNumericValue = 0.px
-) {
-    property("border-bottom-right-radius", "$horizontal $vertical")
 }
 
 // Helper class to reduce duplication between BorderImageOutset, BorderImageSlice, & BorderImageWidth
@@ -365,4 +396,106 @@ sealed interface BorderImage : StylePropertyValue {
 
 fun StyleScope.borderImage(borderImage: BorderImage) {
     property("border-image", borderImage)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-color
+sealed interface BorderInlineColor : StylePropertyValue {
+    companion object : CssGlobalValues<BorderInlineColor> {
+        fun of(color: CSSColorValue) = color.unsafeCast<BorderInlineColor>()
+    }
+}
+
+fun StyleScope.borderInlineColor(borderInlineColor: BorderInlineColor) {
+    property("border-inline-color", borderInlineColor)
+}
+
+// See:https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-style
+sealed interface BorderInlineStyle: StylePropertyValue {
+    companion object: CssGlobalValues<BorderInlineStyle>, CommonBorderStyle<BorderInlineStyle>
+}
+
+fun StyleScope.borderInlineStyle(borderInlineStyle: BorderInlineStyle){
+    property("border-inline-style", borderInlineStyle)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end-color
+sealed interface BorderInlineEndColor : StylePropertyValue {
+    companion object : CssGlobalValues<BorderInlineEndColor> {
+        fun of(color: CSSColorValue) = color.unsafeCast<BorderInlineEndColor>()
+    }
+}
+
+fun StyleScope.borderInlineEndColor(borderInlineEndColor: BorderInlineEndColor) {
+    property("border-inline-end-color", borderInlineEndColor)
+}
+
+// See:https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-end-style
+sealed interface BorderInlineEndStyle: StylePropertyValue {
+    companion object: CssGlobalValues<BorderInlineEndStyle>, CommonBorderStyle<BorderInlineEndStyle>
+}
+
+fun StyleScope.borderInlineEndStyle(borderInlineEndStyle: BorderInlineEndStyle){
+    property("border-inline-end-style", borderInlineEndStyle)
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-start-color
+sealed interface BorderInlineStartColor : StylePropertyValue {
+    companion object : CssGlobalValues<BorderInlineStartColor> {
+        fun of(color: CSSColorValue) = color.unsafeCast<BorderInlineStartColor>()
+    }
+}
+
+fun StyleScope.borderInlineStartColor(borderInlineStartColor: BorderInlineStartColor) {
+    property("border-inline-start-color", borderInlineStartColor)
+}
+
+// See:https://developer.mozilla.org/en-US/docs/Web/CSS/border-inline-style
+sealed interface BorderInlineStartStyle: StylePropertyValue {
+    companion object: CssGlobalValues<BorderInlineStartStyle>, CommonBorderStyle<BorderInlineStartStyle>
+}
+
+fun StyleScope.borderInlineStartStyle(borderInlineStartStyle: BorderInlineStartStyle){
+    property("border-inline-start-style", borderInlineStartStyle)
+}
+
+fun StyleScope.borderStyle(lineStyle: LineStyle) {
+    property("border-style", lineStyle.value)
+}
+
+fun StyleScope.borderStyle(topBottom: LineStyle = LineStyle.None, leftRight: LineStyle = LineStyle.None) {
+    property("border-style", "$topBottom $leftRight")
+}
+
+fun StyleScope.borderStyle(
+    top: LineStyle = LineStyle.None,
+    leftRight: LineStyle = LineStyle.None,
+    bottom: LineStyle = LineStyle.None
+) {
+    property("border-style", "$top $leftRight $bottom")
+}
+
+fun StyleScope.borderStyle(
+    top: LineStyle = LineStyle.None,
+    right: LineStyle = LineStyle.None,
+    bottom: LineStyle = LineStyle.None,
+    left: LineStyle = LineStyle.None
+) {
+    property("border-style", "$top $right $bottom $left")
+}
+
+fun StyleScope.borderWidth(width: CSSLengthNumericValue) {
+    property("border-width", width)
+}
+
+internal sealed interface CommonBorderStyle<T : StylePropertyValue> {
+    val None get() = "none".unsafeCast<T>()
+    val Hidden get() = "hidden".unsafeCast<T>()
+    val Dotted get() = "dotted".unsafeCast<T>()
+    val Dashed get() = "dashed".unsafeCast<T>()
+    val Solid get() = "solid".unsafeCast<T>()
+    val Double get() = "double".unsafeCast<T>()
+    val Groove get() = "groove".unsafeCast<T>()
+    val Ridge get() = "ridge".unsafeCast<T>()
+    val Inset get() = "inset".unsafeCast<T>()
+    val Outset get() = "outset".unsafeCast<T>()
 }
