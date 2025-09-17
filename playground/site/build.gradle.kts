@@ -19,6 +19,16 @@ kobweb {
                 enableSelfHosting()
             }
         }
+        //testing new feature
+        generateSitemap("http://localhost:8080") {
+            // Define routes to exclude from sitemap
+            val excludedPrefixes = listOf("/fruits", "/markdown")
+            filter.set {
+             // Exclude routes with specified prefixes
+                val hasExcludedPrefix = excludedPrefixes.any { prefix -> route.startsWith(prefix) }
+               !hasExcludedPrefix
+            }
+        }
     }
     markdown {
         defaultLayout.set(".components.layouts.MarkdownLayout")

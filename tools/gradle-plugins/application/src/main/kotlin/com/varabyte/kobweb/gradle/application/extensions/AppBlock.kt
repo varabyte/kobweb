@@ -12,6 +12,7 @@ import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.HEAD
 import kotlinx.html.link
 import kotlinx.html.meta
+import org.gradle.api.GradleException
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
@@ -328,6 +329,78 @@ abstract class AppBlock @Inject constructor(
         }
     }
 
+
+    /**
+     * A sub-block for defining properties related to sitemap generation for SEO.
+     */
+    abstract class SitemapBlock : ExtensionAware {
+
+
+        /**
+         * Context for sitemap route filtering, providing extensible information about each route.
+         */
+        class SitemapFilterContext(val route: String)
+
+        /**
+         * The base URL for the site (e.g., "https://example.com").
+         * This will be prepended to all routes in the sitemap.
+         *
+         * IMPORTANT: If your site is deployed under a base path (e.g., GitHub Pages project site),
+         * include it in the baseUrl: "https://username.github.io/project-name".
+         * If the base path is configured and not included in the baseUrl, a warning will be printed and the
+         * generated links may be incorrect.
+         */
+        @get:Input
+        abstract val baseUrl: Property<String>
+
+        /**
+         * Additional routes to include that may not be discovered automatically.
+         * Useful for dynamic content routes where you know the specific URLs.
+         *
+         * For markdown-generated pages: these are already discovered automatically.
+         * For dynamic templates like @Page("/blog/{slug}"): add concrete URLs like "/blog/my-post".
+         */
+        @get:Input
+        abstract val extraRoutes: ListProperty<String>
+
+        /**
+         * A filter to determine which routes should be included in the sitemap.
+         * Return true to include the route, false to exclude it.
+         *
+         * Note: This property is marked as `@Internal` to avoid serialization issues with lambdas,
+         * which can affect Gradle's configuration cache.
+         *
+         * IMPORTANT: Dynamic routes (containing '{' and '}') are ALWAYS excluded automatically,
+         * even if you provide a custom filter. This is enforced by the framework.
+         * 
+         * @see [SitemapFilterContext]
+         */
+        @get:Nested // Avoid serialization issues with lambdas
+        abstract val filter: Property<SitemapFilterContext.() -> Boolean>
+
+        /**
+         * Internal flag to track whether sitemap generation has been enabled.
+         * This is used to conditionally register the sitemap generation task.
+         */
+        @get:Internal
+        internal var isEnabled: Boolean = false
+            private set
+
+        /**
+         * Internal method to mark sitemap generation as enabled.
+         * Called by the generateSitemap function.
+         */
+        internal fun markAsEnabled() {
+            isEnabled = true
+        }
+
+        init {
+            extraRoutes.set(emptyList())
+            // Default filter accepts all routes (dynamic route exclusion is handled in the task)
+            filter.convention { true }
+        }
+    }
+
     /**
      * Configuration values for the backend of this Kobweb application.
      */
@@ -574,6 +647,18 @@ abstract class AppBlock @Inject constructor(
     @get:Input
     abstract val cssPrefix: Property<String>
 
+    /**
+     * Enable sitemap generation for this Kobweb application.
+     *
+     * @param baseUrl The base URL for the site (e.g., "https://example.com")
+     * @param config Configuration block for additional sitemap options
+     */
+    fun generateSitemap(baseUrl: String, config: SitemapBlock.() -> Unit = {}) {
+        sitemap.baseUrl.set(baseUrl)
+        config(sitemap)
+        sitemap.markAsEnabled()
+    }
+
     init {
         globals.set(mapOf("title" to conf.site.title))
         cleanUrls.convention(true)
@@ -581,6 +666,7 @@ abstract class AppBlock @Inject constructor(
 
         extensions.create<IndexBlock>("index", BasePath(conf.site.basePath))
         extensions.create<ServerBlock>("server")
+        extensions.create<SitemapBlock>("sitemap")
         extensions.create<ExportBlock>("export", kobwebFolder)
     }
 }
@@ -596,6 +682,9 @@ val AppBlock.export: AppBlock.ExportBlock
 
 val AppBlock.server: AppBlock.ServerBlock
     get() = extensions.getByType<AppBlock.ServerBlock>()
+
+val AppBlock.sitemap: AppBlock.SitemapBlock
+    get() = extensions.getByType<AppBlock.SitemapBlock>()
 
 val AppBlock.ServerBlock.remoteDebugging: AppBlock.ServerBlock.RemoteDebuggingBlock
     get() = extensions.getByType<AppBlock.ServerBlock.RemoteDebuggingBlock>()
