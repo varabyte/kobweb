@@ -1,15 +1,18 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
+import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverGradleSubplugin
 
 // Plugins declared here instead of settings.gradle.kts because otherwise I get an error saying the kotlin plugin was
 // applied multiple times.
 plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.jvm) apply false
-    `kotlin-dsl` apply false
+    alias(libs.plugins.kotlin.sam.receiver) apply false
     alias(libs.plugins.kotlinx.serialization) apply false
     alias(libs.plugins.vanniktech.publish) apply false
 }
@@ -46,6 +49,26 @@ subprojects {
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
         configure<KotlinJvmExtension> {
             compilerOptions.freeCompilerArgs.add("-Xjdk-release=${jvmTarget.target}")
+        }
+    }
+
+    // Configure the Kobweb Gradle plugins explicitly instead of using `kotlin-dsl` to avoid version conflicts
+    // See also: https://mbonnin.net/2025-07-10_the_case_against_kotlin_dsl/
+    pluginManager.withPlugin("java-gradle-plugin") {
+        pluginManager.apply(SamWithReceiverGradleSubplugin::class)
+        configure<SamWithReceiverExtension> {
+            annotation(HasImplicitReceiver::class.qualifiedName!!)
+        }
+        configure<KotlinJvmExtension> {
+            compilerOptions {
+                // Pin to the oldest supported language level to ensure compatibility with older Gradle versions.
+                // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
+                val target = @Suppress("DEPRECATION") KotlinVersion.KOTLIN_1_9
+                languageVersion = target
+                apiVersion = target
+                // Suppress warning about deprecated language version
+                freeCompilerArgs.add("-Xsuppress-version-warnings")
+            }
         }
     }
 }

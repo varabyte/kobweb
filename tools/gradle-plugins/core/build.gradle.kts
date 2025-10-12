@@ -1,7 +1,7 @@
 import java.util.*
 
 plugins {
-    `kotlin-dsl`
+    alias(libs.plugins.kotlin.jvm)
     id("kobweb-gradle-portal")
     id("com.varabyte.kobweb.internal.publish")
     alias(libs.plugins.kotlinx.serialization)
@@ -15,6 +15,8 @@ dependencies {
     compileOnly(kotlin("gradle-plugin"))
     // Get access to the Compose compiler gradle plugin extension
     compileOnly(libs.compose.compiler.plugin)
+    // Get access to Gradle Kotlin DSL
+    compileOnlyApi(gradleKotlinDsl())
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ksp.plugin)

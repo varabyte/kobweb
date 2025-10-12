@@ -1,5 +1,5 @@
 plugins {
-    `kotlin-dsl`
+    alias(libs.plugins.kotlin.jvm)
     id("kobweb-gradle-portal")
     id("com.varabyte.kobweb.internal.publish")
     alias(libs.plugins.kotlinx.serialization)
