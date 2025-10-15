@@ -21,6 +21,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import java.nio.file.Path
@@ -150,7 +151,7 @@ abstract class AppBlock @Inject constructor(
              *   logic.
              */
             fun enableSelfHosting(excludes: Set<String> = emptySet()) {
-                selfHosting.set(SelfHostingConfig(true, excludes.toList()))
+                selfHosting = SelfHostingConfig(true, excludes.toList())
             }
 
             init {
@@ -298,7 +299,7 @@ abstract class AppBlock @Inject constructor(
             faviconPath.convention("/favicon.ico")
             lang.convention("en")
 
-            head.set(listOf {
+            head = listOf {
                 description.orNull?.takeIf { it.isNotBlank() }?.let { description ->
                     meta {
                         name = "description"
@@ -315,7 +316,7 @@ abstract class AppBlock @Inject constructor(
                 // Viewport content chosen for a good mobile experience.
                 // See also: https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag#viewport_basics
                 meta("viewport", "width=device-width, initial-scale=1")
-            })
+            }
         }
     }
 
@@ -519,7 +520,7 @@ abstract class AppBlock @Inject constructor(
             filter: (String) -> Boolean = { true },
             showScreenshots: Boolean = true,
         ) {
-            traceConfig.set(TraceConfig(tracesRoot, filter, showScreenshots))
+            traceConfig = TraceConfig(tracesRoot, filter, showScreenshots)
             traceConfig.disallowChanges()
         }
 
@@ -566,7 +567,7 @@ abstract class AppBlock @Inject constructor(
     abstract val cssPrefix: Property<String>
 
     init {
-        globals.set(mapOf("title" to conf.site.title))
+        globals = mapOf("title" to conf.site.title)
         cleanUrls.convention(true)
         genDir.convention(baseGenDir.map { "$it/app" })
 
@@ -599,6 +600,6 @@ internal fun KobwebBlock.createAppBlock(kobwebFolder: KobwebFolder, conf: Kobweb
 }
 
 fun AppBlock.IndexBlock.excludeAllHtmlFromDependencies() {
-    excludeHtmlForDependencies.set(listOf(""))
+    excludeHtmlForDependencies = listOf("")
     excludeHtmlForDependencies.disallowChanges()
 }

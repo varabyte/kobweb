@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.gradle.core.util
 
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.findByType
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
@@ -39,13 +40,13 @@ fun Project.configureComposeCompiler() {
         try {
             // Trace markers are "pure overhead" for the JS target & needlessly increase the bundle size, but
             // must be explicitly disabled until https://youtrack.jetbrains.com/issue/KT-69900 is resolved.
-            composeCompilerExt.includeTraceMarkers.set(false)
+            composeCompilerExt.includeTraceMarkers = false
             // As per its KDoc, source information is meant to be removed in production builds, but is explicitly
             // disabled since Webpack does not remove it.
-            composeCompilerExt.includeSourceInformation.set(false)
+            composeCompilerExt.includeSourceInformation = false
             // Unlike standard multiplatform applications, Kobweb projects only use compose on the JS frontend,
             // so we disable the compiler plugin for other targets.
-            composeCompilerExt.targetKotlinPlatforms.set(setOf(KotlinPlatformType.js))
+            composeCompilerExt.targetKotlinPlatforms = setOf(KotlinPlatformType.js)
         } catch (_: NoSuchMethodError) {
             // Handle potential breaking changes in the compose plugin API
             project.logger.warn("$FAILURE_EXPLANATION $DISABLE_INSTRUCTIONS")

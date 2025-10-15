@@ -14,6 +14,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.newInstance
 
 /**
@@ -49,7 +50,7 @@ abstract class MarkdownBlock(
 
     internal fun createMarkdownFolder(): MarkdownFolder {
         return objects.newInstance<MarkdownFolder>().apply {
-            targetPackage.set(defaultPackage)
+            targetPackage = defaultPackage
         }
     }
 
@@ -92,7 +93,7 @@ abstract class MarkdownBlock(
     private fun _addSource(dir: Any, targetPackage: Provider<String>) {
         val folder = objects.newInstance<MarkdownFolder>()
         folder.roots.from(dir)
-        folder.targetPackage.set(targetPackage.orElse(defaultPackage))
+        folder.targetPackage = targetPackage.orElse(defaultPackage)
 
         folders.add(folder)
     }
@@ -267,7 +268,7 @@ abstract class MarkdownBlock(
         markdownPath.convention("markdown")
 
         defaultPackage.convention(pagesPackage)
-        imports.set(emptyList())
+        imports = emptyList()
         genDir.convention(baseGenDir.map { "$it/markdown" })
     }
 }

@@ -59,6 +59,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
 import org.gradle.api.tasks.Sync
 import org.gradle.build.event.BuildEventsListenerRegistry
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
@@ -132,7 +133,7 @@ class KobwebApplicationPlugin @Inject constructor(
         val kobwebUnpackServerJarTask = project.tasks.register<KobwebUnpackServerJarTask>("kobwebUnpackServerJar")
         val kobwebCreateServerScriptsTask = project.tasks
             .register<KobwebCreateServerScriptsTask>("kobwebCreateServerScripts") {
-                siteLayout.set(exportLayout)
+                siteLayout = exportLayout
             }
 
         val kobwebStartTask = run {
@@ -159,10 +160,10 @@ class KobwebApplicationPlugin @Inject constructor(
             // build scripts from all modules as inputs. Users with many non-kobweb modules may choose to override this
             // value to exclude build scripts from unrelated modules.
             watchFiles.from(project.provider { project.rootProject.subprojects.map { it.layout.getBuildScripts() } })
-            serverJar.set(kobwebUnpackServerJarTask.map { RegularFile { it.getServerJar() } })
-            serverPluginsDir.set(kobwebSyncServerPluginJarsTask.map {
+            serverJar = kobwebUnpackServerJarTask.map { RegularFile { it.getServerJar() } }
+            serverPluginsDir = kobwebSyncServerPluginJarsTask.map {
                 project.objects.directoryProperty().apply { set(it.destinationDir) }.get()
-            })
+            }
             val devScript = kobwebConf.server.files.dev.script
             val devScriptFile = project.file(devScript)
             doLast {
@@ -215,7 +216,7 @@ class KobwebApplicationPlugin @Inject constructor(
         val kobwebListRoutesTask = project.tasks.register<KobwebListRoutesTask>("kobwebListRoutes")
 
         project.tasks.register<KobwebBrowserCacheIdTask>("kobwebBrowserCacheId") {
-            browser.set(kobwebBlock.app.export.browser)
+            browser = kobwebBlock.app.export.browser
         }
 
         // Tasks may include a project prefix (e.g. `site:kobwebStart`), so we compare just the base task name
@@ -229,8 +230,8 @@ class KobwebApplicationPlugin @Inject constructor(
                     ?: return@whenReady
                 val taskListenerService = project.gradle.sharedServices
                     .registerIfAbsent("kobweb-task-listener_${project.path}", KobwebTaskListener::class.java) {
-                        parameters.kobwebStartTaskPath.set(startTask.path)
-                        parameters.kobwebFolderFile.set(kobwebFolder.path.toFile())
+                        parameters.kobwebStartTaskPath = startTask.path
+                        parameters.kobwebFolderFile = kobwebFolder.path.toFile()
                     }
                 buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
             }
@@ -286,20 +287,20 @@ class KobwebApplicationPlugin @Inject constructor(
             )
 
             val kobwebCacheAppFrontendDataTask = project.tasks.register<KobwebCacheAppFrontendDataTask>("kobwebCacheAppFrontendData") {
-                appFrontendMetadataFile.set(project.kspFrontendFile(jsTarget))
+                appFrontendMetadataFile = project.kspFrontendFile(jsTarget)
                 compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
-                appDataFile.set(this.kobwebCacheFile("appData.json"))
+                appDataFile = this.kobwebCacheFile("appData.json")
             }
 
             kobwebGenSiteEntryTask.configure {
-                appDataFile.set(kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile })
-                dependencies.set(project.getTransitiveJsDependencyResults())
+                appDataFile = kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile }
+                dependencies = project.getTransitiveJsDependencyResults()
             }
 
             kobwebGenSiteIndexTask.configure {
-                publicPath.set(kobwebBlock.publicPath)
+                publicPath = kobwebBlock.publicPath
                 compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
-                dependencies.set(project.getTransitiveJsDependencyResults())
+                dependencies = project.getTransitiveJsDependencyResults()
             }
 
             val jsRunTasks = listOf(jsTarget.browserDevelopmentRun, jsTarget.browserProductionRun)
@@ -316,7 +317,7 @@ class KobwebApplicationPlugin @Inject constructor(
 
             // configure both kobwebCopySupplementalResourcesTask & kobwebCopyWorkerJsOutputTask
             project.tasks.withType<KobwebCopyTask>().configureEach {
-                publicPath.set(kobwebBlock.publicPath)
+                publicPath = kobwebBlock.publicPath
                 runtimeClasspath.from(project.configurations.named(jsTarget.runtimeClasspath))
             }
 
@@ -348,8 +349,8 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             kobwebExportTask.configure {
-                appFrontendDataFile.set(kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile })
-                publicPath.set(kobwebBlock.publicPath)
+                appFrontendDataFile = kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile }
+                publicPath = kobwebBlock.publicPath
                 publicResources.from(kobwebBlock.publicPath.map { publicPath ->
                     project.getResourceSources(jsTarget).map { srcDirSet ->
                         srcDirSet.matching { include("$publicPath/**") }
@@ -366,7 +367,7 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             kobwebListRoutesTask.configure {
-                appDataFile.set(kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile })
+                appDataFile = kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile }
             }
         }
         project.buildTargets.withType<KotlinJvmTarget>().configureEach {
@@ -384,9 +385,9 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             val kobwebCacheAppBackendDataTask = project.tasks.register<KobwebCacheAppBackendDataTask>("kobwebCacheAppBackendData") {
-                appBackendMetadataFile.set(project.kspBackendFile(jvmTarget))
+                appBackendMetadataFile = project.kspBackendFile(jvmTarget)
                 compileClasspath.from(project.configurations.named(jvmTarget.compileClasspath))
-                appDataFile.set(this.kobwebCacheFile("appData.json"))
+                appDataFile = this.kobwebCacheFile("appData.json")
             }
 
             val kobwebGenApisFactoryTask = project.tasks
@@ -397,7 +398,7 @@ class KobwebApplicationPlugin @Inject constructor(
             val hasKobwebApiDepProvider =
                 project.getJvmDependencyResults().hasDependencyNamed("com.varabyte.kobweb:kobweb-api")
             kobwebGenApisFactoryTask.configure {
-                appDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
+                appDataFile = kobwebCacheAppBackendDataTask.flatMap { it.appDataFile }
 
                 doFirst {
                     if (!hasKobwebApiDepProvider.get()) {
@@ -407,7 +408,7 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             kobwebExportTask.configure {
-                appBackendDataFile.set(kobwebCacheAppBackendDataTask.flatMap { it.appDataFile })
+                appBackendDataFile = kobwebCacheAppBackendDataTask.flatMap { it.appDataFile }
             }
 
             project.kspExcludedSources.from(kobwebGenApisFactoryTask)

@@ -13,6 +13,7 @@ import com.varabyte.kobwebx.gradle.markdown.tasks.ProcessMarkdownTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
@@ -53,22 +54,21 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
 
             // Configures both ProcessMarkdownTask & ConvertMarkdownTask
             project.tasks.withType<MarkdownTask>().configureEach {
-                pagesPackage.set(kobwebBlock.pagesPackage)
-                projectGroup.set(project.group)
-                markdownFolders.set(markdownBlock.folders)
-                pagesPackage.set(kobwebBlock.pagesPackage)
+                pagesPackage = kobwebBlock.pagesPackage
+                projectGroup = project.group
+                markdownFolders = markdownBlock.folders
+                pagesPackage = kobwebBlock.pagesPackage
             }
 
             processTask.configure {
-                publicPath.set(kobwebBlock.publicPath)
+                publicPath = kobwebBlock.publicPath
             }
 
             convertTask.configure {
-                projectRoot.set(project.layout.projectDirectory.asFile.relativeTo(project.rootDir).invariantSeparatorsPath)
+                projectRoot = project.layout.projectDirectory.asFile.relativeTo(project.rootDir).invariantSeparatorsPath
 
-                dependsOnMarkdownArtifact.set(
-                    project.getJsDependencyResults().hasDependencyNamed("com.varabyte.kobwebx:kobwebx-markdown")
-                )
+                dependsOnMarkdownArtifact = project.getJsDependencyResults()
+                    .hasDependencyNamed("com.varabyte.kobwebx:kobwebx-markdown")
 
                 markdownFolders.add(
                     markdownBlock.createMarkdownFolder().apply {

@@ -5,7 +5,6 @@ import com.varabyte.kobweb.ksp.KOBWEB_METADATA_BACKEND
 import com.varabyte.kobweb.project.backend.AppBackendData
 import com.varabyte.kobweb.project.backend.BackendData
 import com.varabyte.kobweb.project.backend.merge
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -17,7 +16,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
-// NOTE: This task in meant as an internal API so it does not inherit from KobwebTask
+// NOTE: This task is meant as an internal API so it does not inherit from KobwebTask
 /**
  * Collect all backend app data from the current site and all library dependencies, writing the result to
  * [appDataFile].

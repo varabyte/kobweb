@@ -2,6 +2,7 @@ package com.varabyte.kobweb.gradle.worker.util
 
 import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
 import com.varabyte.kobweb.gradle.worker.extensions.worker
+import org.gradle.kotlin.dsl.assign
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.util.suffixIfNot
 
@@ -39,7 +40,7 @@ fun KotlinMultiplatformExtension.configAsKobwebWorker(
 
         val name = project.kobwebBlock.worker.name.get().removeSuffix(".js")
         binaries.executable()
-        outputModuleName.set(name)
+        outputModuleName = name
         browser {
             commonWebpackConfig {
                 outputFileName = name.suffixIfNot(".js")

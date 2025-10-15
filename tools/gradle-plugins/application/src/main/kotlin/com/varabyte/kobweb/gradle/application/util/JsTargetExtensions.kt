@@ -2,6 +2,7 @@ package com.varabyte.kobweb.gradle.application.util
 
 import com.varabyte.kobweb.common.text.suffixIfNot
 import com.varabyte.kobweb.gradle.core.util.suggestKobwebProjectName
+import org.gradle.kotlin.dsl.assign
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 
 /**
@@ -17,7 +18,7 @@ fun KotlinJsTargetDsl.kobwebApplicationBrowser(kobwebName: String? = null) {
     @Suppress("NAME_SHADOWING")
     val kobwebName = kobwebName ?: project.suggestKobwebProjectName()
 
-    this.outputModuleName.set(kobwebName)
+    this.outputModuleName = kobwebName
     browser {
         commonWebpackConfig {
             outputFileName = kobwebName.suffixIfNot(".js")
