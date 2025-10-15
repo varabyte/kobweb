@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.assignment.plugin.gradle.AssignmentExtension
+import org.jetbrains.kotlin.assignment.plugin.gradle.AssignmentSubplugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -13,6 +15,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.sam.receiver) apply false
+    alias(libs.plugins.kotlin.assignment) apply false
     alias(libs.plugins.kotlinx.serialization) apply false
     alias(libs.plugins.vanniktech.publish) apply false
 }
@@ -58,6 +61,10 @@ subprojects {
         pluginManager.apply(SamWithReceiverGradleSubplugin::class)
         configure<SamWithReceiverExtension> {
             annotation(HasImplicitReceiver::class.qualifiedName!!)
+        }
+        pluginManager.apply(AssignmentSubplugin::class)
+        configure<AssignmentExtension> {
+            annotation(SupportsKotlinAssignmentOverloading::class.qualifiedName!!)
         }
         configure<KotlinJvmExtension> {
             compilerOptions {
