@@ -221,53 +221,11 @@ sealed interface TextShadow : StylePropertyValue {
     }
 }
 
-@Deprecated("Use `textShadow(TextShadow.of(...))` instead", ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))"))
-class CSSTextShadow(
-    val offsetX: CSSLengthNumericValue,
-    val offsetY: CSSLengthNumericValue,
-    val blurRadius: CSSLengthNumericValue? = null,
-    val color: CSSColorValue? = null
-) : StylePropertyValue {
-    override fun toString() = buildString {
-        append(offsetX)
-        append(" ")
-        append(offsetY)
-        if (blurRadius != null) {
-            append(" ")
-            append(blurRadius)
-        }
-        if (color != null) {
-            append(" ")
-            append(color)
-        }
-    }
-}
 
 fun StyleScope.textShadow(textShadow: TextShadow) {
     property("text-shadow", textShadow)
 }
 
-@Deprecated("Use `textShadow(TextShadow.of(...))` instead", ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))"))
-fun StyleScope.textShadow(
-    offsetX: CSSLengthNumericValue,
-    offsetY: CSSLengthNumericValue,
-    blurRadius: CSSLengthNumericValue? = null,
-    color: CSSColorValue? = null
-) {
-    textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))
-}
-
-// Needed temporarily until we can remove the deprecated `vararg` version
-fun StyleScope.textShadow(textShadow: TextShadow.Listable) {
-    // Don't cast with "as", that breaks due to our internal unsafeCasting approach
-    val textShadow: TextShadow = textShadow
-    textShadow(textShadow)
-}
-// Remove the previous method too after removing this method
-@Deprecated("Use `textShadow(TextShadow.list(...))` instead", ReplaceWith("textShadow(TextShadow.list(*shadows))"))
-fun StyleScope.textShadow(vararg shadows: TextShadow.Listable) {
-    textShadow(TextShadow.list(*shadows))
-}
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-transform
 sealed interface TextTransform : StylePropertyValue {

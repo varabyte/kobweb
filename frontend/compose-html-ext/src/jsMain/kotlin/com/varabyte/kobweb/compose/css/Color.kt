@@ -20,11 +20,6 @@ fun StyleScope.accentColor(accentColor: AccentColor) {
     property("accent-color", accentColor)
 }
 
-@Deprecated("Use accentColor(AccentColor.of(color)) instead.", ReplaceWith("accentColor(AccentColor.of(color))"))
-fun StyleScope.accentColor(color: CSSColorValue) {
-    accentColor(AccentColor.of(color))
-}
-
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme
 sealed interface ColorScheme : StylePropertyValue {
     companion object : CssGlobalValues<ColorScheme> {

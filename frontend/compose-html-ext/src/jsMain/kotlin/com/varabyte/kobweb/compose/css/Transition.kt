@@ -20,18 +20,6 @@ fun StyleScope.transitionBehavior(behavior: TransitionBehavior) {
     property("transition-behavior", behavior)
 }
 
-// Needed temporarily until we can remove the deprecated `vararg` version
-fun StyleScope.transitionBehavior(behavior: TransitionBehavior.Listable) {
-    // Don't cast with "as", that breaks due to our internal unsafeCasting approach
-    val behavior: TransitionBehavior = behavior
-    transitionBehavior(behavior)
-}
-// Remove the previous method too after removing this method
-@Deprecated("Use transitionBehavior(TransitionBehavior.list(...)) instead.", ReplaceWith("transitionBehavior(TransitionBehavior.list(*behaviors))"))
-fun StyleScope.transitionBehavior(vararg behaviors: TransitionBehavior.Listable) {
-    transitionBehavior(TransitionBehavior.list(*behaviors))
-}
-
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-property
 sealed interface TransitionProperty : StylePropertyValue {
     sealed interface Name : TransitionProperty
@@ -185,16 +173,4 @@ sealed interface Transition : StylePropertyValue {
 
 fun StyleScope.transition(transition: Transition) {
     property("transition", transition)
-}
-
-// Needed temporarily until we can remove the deprecated `vararg` version
-fun StyleScope.transition(transition: Transition.Listable) {
-    // Don't cast with "as", that breaks due to our internal unsafeCasting approach
-    val transition: Transition = transition
-    transition(transition)
-}
-// Remove the previous method too after removing this method
-@Deprecated("Use transition(Transition.list(...)) instead.", ReplaceWith("transition(Transition.list(*transitions))"))
-fun StyleScope.transition(vararg transitions: Transition.Listable) {
-    transition(Transition.list(*transitions))
 }

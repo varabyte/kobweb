@@ -35,11 +35,6 @@ abstract class ApiStream {
         val env: Environment
         val data: Data
         val logger: Logger
-
-        @Deprecated("Moving forward you should use `stream.id` instead as we can now distinguish between multiple streams from the same client.",
-            ReplaceWith("stream.id"),
-        )
-        val clientId: StreamId get() = stream.id
     }
 
     interface StreamContext : LimitedStreamContext {

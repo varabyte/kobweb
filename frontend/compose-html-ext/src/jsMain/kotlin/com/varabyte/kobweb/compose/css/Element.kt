@@ -59,22 +59,6 @@ fun StyleScope.content(content: Content) {
     property("content", content)
 }
 
-// Needed temporarily until we can remove the deprecated `vararg` version
-fun StyleScope.content(content: Content.Listable) {
-    // Don't cast with "as", that breaks due to our internal unsafeCasting approach
-    val content: Content = content
-    content(content)
-}
-// Remove the previous method too after removing this method
-@Deprecated("Use content(Content.list(...)) instead.", ReplaceWith("content(Content.list(*contents))"))
-fun StyleScope.content(vararg contents: Content.Listable) {
-    content(Content.list(*contents))
-}
-@Deprecated("Use content(Content.list(...)) instead.", ReplaceWith("content(Content.list(altText, *contents))"))
-fun StyleScope.content(altText: String, vararg contents: Content.Listable) {
-    content(Content.list(altText, *contents))
-}
-
 /** Convenience function for an extremely common case, setting content to text. */
 fun StyleScope.content(value: String) {
     content(Content.of(value))

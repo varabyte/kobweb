@@ -34,9 +34,6 @@ interface BasePath {
      */
     fun prependTo(path: String): String
 
-    @Deprecated("Use `prependTo` instead, as this is consistent with the build script version and also is clearer.", ReplaceWith("prependTo(path)"))
-    fun prepend(path: String) = prependTo(path)
-
     companion object : BasePath {
         fun set(value: String) {
             BasePathImpl._instance = BasePathImpl(value)
@@ -89,4 +86,3 @@ internal class BasePathImpl(value: String) : BasePath {
 
     override fun toString() = value
 }
-

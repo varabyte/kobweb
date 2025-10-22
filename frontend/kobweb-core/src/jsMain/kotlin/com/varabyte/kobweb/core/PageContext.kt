@@ -170,15 +170,6 @@ class PageContext internal constructor(val router: Router, val data: Data) {
     }
 }
 
-/**
- * A property which indicates if this current page is being rendered as part of a Kobweb export.
- *
- * While it should be rare that you'll need to use it, it can be useful to check if you want to avoid doing some
- * side effect that shouldn't happen at export time, like sending page visit analytics to a server for example.
- */
-@Deprecated("Use `AppGlobals.isExporting` instead, as that is more universal.")
-val PageContext.isExporting: Boolean get() = AppGlobals.isExporting
-
 // Note: PageContext is technically a global, but we wrap it in a `PageContextLocal` as a way to ensure it is only
 // accessible when under a `@Page` composable.
 internal val PageContextLocal = staticCompositionLocalOf<PageContext?> { null }

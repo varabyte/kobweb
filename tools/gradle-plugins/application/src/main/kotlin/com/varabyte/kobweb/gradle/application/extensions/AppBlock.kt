@@ -292,15 +292,6 @@ abstract class AppBlock @Inject constructor(
         @get:Input
         abstract val excludeHtmlForDependencies: ListProperty<String>
 
-        /**
-         * A list of dependencies that you don't want the "excludeHtmlForDependencies" warning to show up for.
-         *
-         * @see excludeHtmlForDependencies
-         */
-        @get:Input
-        @Deprecated("We refactored how we show users excluded HTML dependencies and suppression is no longer possible. As a result, this property is no longer used.")
-        abstract val suppressHtmlWarningsForDependencies: ListProperty<String>
-
         init {
             extensions.create<InterceptUrlsBlock>("interceptUrls")
 

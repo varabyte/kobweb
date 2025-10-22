@@ -29,11 +29,6 @@ fun StyleScope.caretColor(caretColor: CaretColor) {
     property("caret-color", caretColor)
 }
 
-@Deprecated("Use `caretColor(CaretColor.of(color))` instead.", ReplaceWith("caretColor(CaretColor.of(color))"))
-fun StyleScope.caretColor(color: CSSColorValue) {
-    property("caret-color", color)
-}
-
 // endregion
 
 // region Touch Action, see https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action

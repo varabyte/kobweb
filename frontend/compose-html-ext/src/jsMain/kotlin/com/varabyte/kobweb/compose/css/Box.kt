@@ -109,18 +109,6 @@ fun StyleScope.boxShadow(boxShadow: BoxShadow) {
     boxShadow(boxShadow.toString())
 }
 
-// Needed temporarily until we can remove the deprecated `vararg` version
-fun StyleScope.boxShadow(boxShadow: BoxShadow.Listable) {
-    // Don't cast with "as", that breaks due to our internal unsafeCasting approach
-    val boxShadow: BoxShadow = boxShadow
-    boxShadow(boxShadow)
-}
-// Remove the previous method too after removing this method
-@Deprecated("Use `boxShadow(BoxShadow.list(*boxShadows))` instead", ReplaceWith("boxShadow(BoxShadow.list(*boxShadows))"))
-fun StyleScope.boxShadow(vararg boxShadows: BoxShadow.Listable) {
-    boxShadow(BoxShadow.list(*boxShadows))
-}
-
 /**
  * The Kotlin representation of the CSS box-shadow.
  */

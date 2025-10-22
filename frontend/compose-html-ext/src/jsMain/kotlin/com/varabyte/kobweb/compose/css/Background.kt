@@ -33,18 +33,6 @@ fun StyleScope.backgroundBlendMode(blendMode: BackgroundBlendMode) {
     property("background-blend-mode", blendMode)
 }
 
-// Needed temporarily until we can remove the deprecated `vararg` version
-fun StyleScope.backgroundBlendMode(blendMode: BackgroundBlendMode.Listable) {
-    // Don't cast with "as", that breaks due to our internal unsafeCasting approach
-    val blendMode: BackgroundBlendMode = blendMode
-    backgroundBlendMode(blendMode)
-}
-// Remove the previous method too after removing this method
-@Deprecated("Use `backgroundBlendMode(BackgroundBlendMode.list(...))` instead.", ReplaceWith("backgroundBlendMode(BackgroundBlendMode.list(*blendModes))"))
-fun StyleScope.backgroundBlendMode(vararg blendModes: BackgroundBlendMode.Listable) {
-    backgroundBlendMode(BackgroundBlendMode.list(*blendModes))
-}
-
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip
 sealed interface BackgroundClip : StylePropertyValue {
     companion object : CssGlobalValues<BackgroundClip> {
@@ -211,21 +199,6 @@ sealed interface Background : StylePropertyValue {
             attachment?.let { add(it) }
         }.joinToString(" ").unsafeCast<Listable>()
 
-        @Deprecated(
-            "Unfortunately, we need to deprecate supporting `blend` in `Background`. Moving forward, the value is ignored. It was a nice idea but we hit technical limitations. Instead, CSS offers a separate `backgroundBlendMode` property you should set directly.",
-            level = DeprecationLevel.ERROR
-        )
-        fun of(
-            image: BackgroundImage? = null,
-            repeat: BackgroundRepeat? = null,
-            size: BackgroundSize? = null,
-            position: BackgroundPosition? = null,
-            blend: BackgroundBlendMode?,
-            origin: BackgroundOrigin? = null,
-            clip: BackgroundClip? = null,
-            attachment: BackgroundAttachment? = null,
-        ): Listable = of(image, repeat, size, position, origin, clip, attachment)
-
         @Suppress("FunctionName")
         private fun _list(color: CSSColorValue?, backgrounds: List<Listable>) = buildString {
             if (color == null && backgrounds.isEmpty()) return@buildString
@@ -260,21 +233,4 @@ sealed interface Background : StylePropertyValue {
 
 fun StyleScope.background(background: Background) {
     property("background", background)
-}
-
-// Needed temporarily until we can remove the deprecated `vararg` version
-fun StyleScope.background(background: Background.Listable) {
-    // Don't cast with "as", that breaks due to our internal unsafeCasting approach
-    val background: Background = background
-    background(background)
-}
-// Remove the previous method too after removing this method
-@Deprecated("Use `background(Background.list(...))` instead.", ReplaceWith("background(Background.list(*backgrounds))"))
-fun StyleScope.background(vararg backgrounds: Background.Listable) {
-    background(Background.list(*backgrounds))
-}
-
-@Deprecated("Use `background(Background.list(...))` instead.", ReplaceWith("background(Background.list(color, *backgrounds))"))
-fun StyleScope.background(color: CSSColorValue, vararg backgrounds: Background.Listable) {
-    background(Background.list(color, *backgrounds))
 }

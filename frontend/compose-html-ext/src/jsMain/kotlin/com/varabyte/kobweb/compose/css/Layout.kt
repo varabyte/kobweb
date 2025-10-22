@@ -13,16 +13,6 @@ sealed interface AspectRatio : StylePropertyValue {
     }
 }
 
-@Deprecated("Use `aspectRatio(AspectRatio.of(ratio))` instead", ReplaceWith("aspectRatio(AspectRatio.of(ratio))"))
-fun StyleScope.aspectRatio(ratio: Number) {
-    aspectRatio(AspectRatio.of(ratio))
-}
-
-@Deprecated("Use `aspectRation(AspectRatio.of(width, height))` instead", ReplaceWith("aspectRatio(AspectRatio.of(width, height))"))
-fun StyleScope.aspectRatio(width: Number, height: Number) {
-    aspectRatio(AspectRatio.of(width, height))
-}
-
 fun StyleScope.aspectRatio(aspectRatio: AspectRatio) {
     property("aspect-ratio", aspectRatio)
 }

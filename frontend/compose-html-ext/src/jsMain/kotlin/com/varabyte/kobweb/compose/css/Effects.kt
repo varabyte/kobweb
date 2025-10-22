@@ -24,16 +24,6 @@ fun StyleScope.backdropFilter(backdropFilter: BackdropFilter) {
     property("-webkit-backdrop-filter", backdropFilter) // For safari
 }
 
-@Deprecated("Use `backdropFilter(BackdropFilter.list(...))` instead.", ReplaceWith("BackdropFilter.list(*filters.map { BackdropFilter.of(it) }.toTypedArray())"))
-fun StyleScope.backdropFilter(vararg filters: CSSFilter) {
-    backdropFilter(BackdropFilter.list(*filters.map { BackdropFilter.of(it) }.toTypedArray()))
-}
-
-@Deprecated("Use `backdropFilter(BackdropFilter.list(...))` instead.", ReplaceWith("backdropFilter(BackdropFilter.list(*filters))"))
-fun StyleScope.backdropFilter(vararg filters: BackdropFilter.Listable) {
-    backdropFilter(BackdropFilter.list(*filters))
-}
-
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/filter
 // See also: CSSFilter
 sealed interface Filter : StylePropertyValue {
@@ -44,14 +34,4 @@ sealed interface Filter : StylePropertyValue {
 
 fun StyleScope.filter(filter: Filter) {
     property("filter", filter)
-}
-
-@Deprecated("Use filter(Filter.list(...)) instead.", ReplaceWith("filter(Filter.list(*filters))"))
-fun StyleScope.filter(vararg filters: Filter.Listable) {
-    filter(Filter.list(*filters))
-}
-
-@Deprecated("Use filter(Filter.list(...)) instead.", ReplaceWith("filter(Filter.list(*filters))"))
-fun StyleScope.filter(vararg filters: CSSFilter) {
-    filter(Filter.list(*filters.map { Filter.of(it) }.toTypedArray()))
 }

@@ -364,13 +364,6 @@ class Router {
         }
     }
 
-    @Deprecated("Use `setErrorPage` instead. This old method required you take in a numeric value representing the error code, but it was always 404, so by moving towards a more standard format (that takes a `PageContext` as its main argument), we can simplify the codebase.")
-    fun setErrorHandler(layoutId: String? = "", @Suppress("DEPRECATION") errorPageMethod: ErrorPageMethod) {
-        setErrorPage(layoutId) { ctx ->
-            errorPageMethod(404)
-        }
-    }
-
     /**
      * If set, get a chance to modify the page's route before Kobweb navigates to it.
      *
