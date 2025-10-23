@@ -41,7 +41,7 @@ interface ContentSource {
 }
 
 /**
- * Extra information about content should be treated / displayed.
+ * Extra information about how content should be treated / displayed.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Disposition">Content-Disposition</a>
  */
@@ -81,7 +81,7 @@ suspend fun ContentSource.stream(): InputStream {
 }
 
 /**
- * Convenience method to convert a body's content into a raw byte array
+ * Convenience method to convert a body's content into a raw byte array.
  *
  * @param limit If set and the size of the body is larger than it, throw an exception.
  */

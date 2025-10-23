@@ -4,8 +4,6 @@ import com.varabyte.kobweb.api.ApiContext
 import com.varabyte.kobweb.api.data.Data
 import com.varabyte.kobweb.api.data.MutableData
 import com.varabyte.kobweb.api.intercept.ApiInterceptor
-import com.varabyte.kobweb.framework.annotations.DelicateApi
-import com.varabyte.kobweb.io.ByteSource
 
 /**
  * Information passed into an API endpoint from the client.
@@ -58,7 +56,7 @@ interface Request {
      * A holder of user data that can be added to this request.
      *
      * This will only be relevant for a project that uses an [ApiInterceptor]; in other words, this allows optional
-     * communication from an API interceptor to an API interceptor (such as storing some calculated auth value).
+     * communication from an API interceptor to an API handler (such as storing some calculated auth value).
      */
     val data: Data
     /**

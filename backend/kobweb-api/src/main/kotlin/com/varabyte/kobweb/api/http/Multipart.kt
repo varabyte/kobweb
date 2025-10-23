@@ -13,14 +13,14 @@ import java.io.Closeable
  *     val mp = ctx.req.body?.multipart() ?: return
  *
  *     mp.forEachPart { part ->
- *         // Here, part.openContent() gives you a ByteSource you can use to stream the content information.
+ *         // Here, part.consumeContent() gives you a ByteSource you can use to stream the content information.
  *         // If you are sure that the content is fairly limited in size, you can use `part.bytes()` or `part.text()`
  *         // instead to read everything directly.
  *
  *         // Also, if you sent file data, you can use
- *         // (part.extras as? Multipart.Part.Extras.File)?.originalFileName
+ *         // (part.extras as? Multipart.Extras.File)?.originalFileName
  *         // to get the original file name uploaded by the user.
- *     })
+ *     }
  * }
  * ```
  */
