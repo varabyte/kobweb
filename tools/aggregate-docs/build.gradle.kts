@@ -1,9 +1,14 @@
+import com.varabyte.kobweb.gradle.publish.configureDokka
+
 plugins {
     alias(libs.plugins.dokka)
+    id("com.varabyte.kobweb.internal.publish") apply false // to access the `configureDokka` function
 }
 
 group = "com.varabyte.kobweb"
 version = libs.versions.kobweb.get()
+
+configureDokka()
 
 dokka {
     moduleName = "kobweb"
@@ -60,11 +65,10 @@ gradle.projectsEvaluated {
     val dokkaId = libs.plugins.dokka.get().pluginId
 
     rootProject.subprojects {
-        if (referencedPaths.contains(project.path) && !project.plugins.hasPlugin(dokkaId)) {
+        if (referencedPaths.contains(project.path) && !project.pluginManager.hasPlugin(dokkaId)) {
             logger.warn("w: Project ${project.path} doesn't apply the dokka plugin and doesn't have to be included in `aggregate-docs`")
-        } else if (!referencedPaths.contains(project.path) && project.plugins.hasPlugin(dokkaId)) {
+        } else if (!referencedPaths.contains(project.path) && project.pluginManager.hasPlugin(dokkaId)) {
             logger.warn("w: Project ${project.path} has no dokka entry. Please make an explicit choice to include or exclude it in `aggregate-docs`")
         }
     }
 }
-

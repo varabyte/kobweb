@@ -1,0 +1,19 @@
+/**
+ * Show a crossfade transition when navigating between pages (on supported browsers).
+ * See also: https://developer.chrome.com/docs/web-platform/view-transitions/cross-document
+ */
+
+@media (prefers-reduced-motion: no-preference) {
+    @view-transition {
+        navigation: auto;
+    }
+}
+
+/* The animation does not work well for the sidebar, so we disable it for that section. */
+#leftColumn {
+    view-transition-name: leftColumn;
+}
+
+::view-transition-group(leftColumn) {
+    animation-duration: 0s;
+}
