@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.gradle.core.util
 
+import kotlinx.html.BODY
 import kotlinx.html.HEAD
 import kotlinx.html.STYLE
 import kotlinx.html.TagConsumer
@@ -7,16 +8,35 @@ import kotlinx.html.stream.createHTML
 import kotlinx.html.unsafe
 
 object HtmlUtil {
-    // Workaround for generating child nodes without the containing <head> tag
+
+    // Workaround for generating child nodes without the containing <body> tag
     // See: https://github.com/Kotlin/kotlinx.html/issues/228
+    private inline fun <T, C : TagConsumer<T>> C.bodyFragment(crossinline block: BODY.() -> Unit): T {
+        BODY(emptyMap(), this).block()
+        return this.finalize()
+    }
+
+    // Workaround for generating child nodes without the containing <head> tag
     private inline fun <T, C : TagConsumer<T>> C.headFragment(crossinline block: HEAD.() -> Unit): T {
         HEAD(emptyMap(), this).block()
         return this.finalize()
     }
 
+
+
     // Use `xhtmlCompatible = true` to include a closing slash as currently kotlinx.html needs them when adding raw text.
     // See: https://github.com/Kotlin/kotlinx.html/issues/247
     /**
+     * Serialize the child nodes created by [block], excluding the opening and closing `<body>` tag.
+     *
+     * This is useful when accumulating elements from several sources, which can then be wrapped altogether in a single
+     * `<body>` tag.
+     */
+    fun serializeBodyContents(block: BODY.() -> Unit): String =
+        createHTML(prettyPrint = false, xhtmlCompatible = true).bodyFragment(block)
+
+
+/**
      * Serialize the child nodes created by [block], excluding the opening and closing `<head>` tag.
      *
      * This is useful when accumulating elements from several sources, which can then be wrapped altogether in a single
