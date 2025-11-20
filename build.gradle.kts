@@ -1,3 +1,4 @@
+import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
 import org.jetbrains.kotlin.assignment.plugin.gradle.AssignmentExtension
 import org.jetbrains.kotlin.assignment.plugin.gradle.AssignmentSubplugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -76,6 +77,10 @@ subprojects {
                 // Suppress warning about deprecated language version
                 freeCompilerArgs.add("-Xsuppress-version-warnings")
             }
+        }
+        // Set minimum supported Gradle version
+        configurations.named(API_ELEMENTS_CONFIGURATION_NAME) {
+            attributes.attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named("8.3"))
         }
     }
 }
