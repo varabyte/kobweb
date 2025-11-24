@@ -2,7 +2,7 @@
 [![version: 0.9.21](https://img.shields.io/badge/kobweb_cli-0.9.21-blue)](https://github.com/varabyte/kobweb-cli)
 <br>
 [![kotlin: 2.2.20](https://img.shields.io/badge/kotlin-2.2.20-blue?logo=kotlin)](COMPATIBILITY.md)
-[![compose: 1.8.0](https://img.shields.io/badge/compose-1.8.0-blue?logo=jetpackcompose)](COMPATIBILITY.md)
+[![compose: 1.10.0](https://img.shields.io/badge/compose-1.10.0-blue?logo=jetpackcompose)](COMPATIBILITY.md)
 [![ktor: 3.3.3](https://img.shields.io/badge/ktor-3.3.3-blue)](https://ktor.io/)
 <br>
 <a href="https://kobweb.varabyte.com/docs">

@@ -1,11 +1,12 @@
 [versions]
-jetbrains-compose = "1.8.0"
+compose = "1.10.0"
+compose-html = "1.9.3"
 kotlin = "2.2.20"
 kotlinx-serialization = "1.9.0"
 
 [libraries]
-compose-html-core = { module = "org.jetbrains.compose.html:html-core", version.ref = "jetbrains-compose" }
-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "jetbrains-compose" }
+compose-html-core = { module = "org.jetbrains.compose.html:html-core", version.ref = "compose-html" }
+compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
 kobweb-core = { module = "com.varabyte.kobweb:kobweb-core" }
 kobweb-silk = { module = "com.varabyte.kobweb:kobweb-silk" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
