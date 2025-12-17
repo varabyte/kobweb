@@ -95,6 +95,7 @@ class StreamId(val clientId: Short, val localStreamId: Short) {
         // Odd values used for multiplication, taken from murmurhash3
         // See also: https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp
         private val M1 = 0xcc9e2d51.toInt()
+        @Suppress("REDUNDANT_CALL_OF_CONVERSION_METHOD") // For consistency
         private val M2 = 0x1b873593.toInt()
         // Random additive constants
         private val A1 = Random.nextInt()

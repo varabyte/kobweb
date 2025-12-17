@@ -29,7 +29,7 @@ class IntersectionObserver(options: Options? = null, resized: (List<Entry>, Inte
 
         internal fun toJson() = json().apply {
             root?.let { this["root"] = it }
-            rootMargin?.let { this["rootMargin"] = it.toString() }
+            rootMargin?.let { this["rootMargin"] = it }
             thresholds?.takeIf { it.isNotEmpty() }?.let { this["threshold"] = it.toTypedArray() }
         }
     }
