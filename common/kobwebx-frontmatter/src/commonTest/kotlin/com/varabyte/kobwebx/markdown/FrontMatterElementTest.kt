@@ -56,10 +56,10 @@ class FrontMatterElementTest {
         assertThat(fmElement["data.assets.font.Roboto"]).isNull()
 
         // Ensure getValue throws or not throws (as expected)
-        fmElement.getValue("title")
-        fmElement.getValue("data.assets.images")
-        fmElement.getValue("data.assets.images.0")
-        fmElement.getValue("data.assets.font")
+        val _ = fmElement.getValue("title")
+        val _ = fmElement.getValue("data.assets.images")
+        val _ = fmElement.getValue("data.assets.images.0")
+        val _ = fmElement.getValue("data.assets.font")
         assertThrows<NoSuchElementException> { fmElement.getValue("data") }
         assertThrows<NoSuchElementException> { fmElement.getValue("data.x.y.z") }
         assertThrows<NoSuchElementException> { fmElement.getValue("data.assets.images.5") }
@@ -87,7 +87,7 @@ class FrontMatterElementTest {
         }
 
         // Values are fine
-        FrontMatterElement.Builder {
+        val _ = FrontMatterElement.Builder {
             addScalar("validKey1", "valid.value")
             addList("validKey2") {
                 addScalar("valid.value")

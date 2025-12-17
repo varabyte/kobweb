@@ -353,6 +353,7 @@ class RouteTree<T : Any> {
     /**
      * Register [route] with this tree, or return false if it was already added.
      */
+    @IgnorableReturnValue
     fun register(route: String, data: T): Boolean {
         val routeSegments = route.split('/').toMutableList()
         var currNode: Node<T> = root

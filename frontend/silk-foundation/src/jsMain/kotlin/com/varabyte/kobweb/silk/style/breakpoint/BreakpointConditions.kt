@@ -4,9 +4,10 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.GenericTag
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.silk.addRule
+import com.varabyte.kobweb.silk.clearCSSRules
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLStyleElement
-import org.w3c.dom.css.CSSRule
 import org.w3c.dom.css.CSSStyleSheet
 
 private fun CSSMediaQuery.invert(): CSSMediaQuery {
@@ -61,17 +62,6 @@ internal fun SilkBreakpointDisplayStyles() {
                 cssStylesheet?.clearCSSRules()
             }
         }
-    }
-}
-
-private fun CSSStyleSheet.addRule(cssRule: String): CSSRule? {
-    val cssRuleIndex = this.insertRule(cssRule, this.cssRules.length)
-    return this.cssRules.item(cssRuleIndex)
-}
-
-private fun CSSStyleSheet.clearCSSRules() {
-    repeat(cssRules.length) {
-        deleteRule(0)
     }
 }
 

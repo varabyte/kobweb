@@ -102,6 +102,7 @@ interface CancellableIntervalScope {
  *
  * @return A [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
+@IgnorableReturnValue
 fun WindowOrWorkerGlobalScope.invokeLater(block: () -> Unit): CancellableActionHandle {
     return setTimeout(0.milliseconds, block)
 }
@@ -111,6 +112,7 @@ fun WindowOrWorkerGlobalScope.invokeLater(block: () -> Unit): CancellableActionH
  *
  * @return A [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
+@IgnorableReturnValue
 fun WindowOrWorkerGlobalScope.setTimeout(timeout: Duration, block: () -> Unit): CancellableActionHandle {
     val id = setTimeout(block, timeout.inWholeMilliseconds.toInt())
     return CancellableActionHandle(id)
@@ -121,6 +123,7 @@ fun WindowOrWorkerGlobalScope.setTimeout(timeout: Duration, block: () -> Unit): 
  *
  * @return A [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
+@IgnorableReturnValue
 fun WindowOrWorkerGlobalScope.setInterval(delay: Duration, block: CancellableIntervalScope.() -> Unit): CancellableActionHandle {
     lateinit var cancelHandle: CancellableActionHandle
     val scope = object : CancellableIntervalScope {
@@ -144,6 +147,7 @@ fun WindowOrWorkerGlobalScope.setInterval(delay: Duration, block: CancellableInt
  *
  * @return A [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
+@IgnorableReturnValue
 fun WindowOrWorkerGlobalScope.setInterval(initialDelay: Duration, delay: Duration, block: CancellableIntervalScope.() -> Unit): CancellableActionHandle {
     lateinit var cancelHandle: CancellableActionHandle
     val scope = object : CancellableIntervalScope {
@@ -169,6 +173,7 @@ fun WindowOrWorkerGlobalScope.setInterval(initialDelay: Duration, delay: Duratio
  *
  * @return A [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
+@IgnorableReturnValue
 fun WindowOrWorkerGlobalScope.invokeThenInterval(delay: Duration, block: CancellableIntervalScope.() -> Unit): CancellableActionHandle {
     var shouldContinueInterval = true
     val scope = object : CancellableIntervalScope {

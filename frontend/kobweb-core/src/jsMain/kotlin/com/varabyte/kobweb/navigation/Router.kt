@@ -429,6 +429,7 @@ class Router {
      *   abort early, which can be useful if you have additional code you want to run that will do additional
      *   processing.
      */
+    @IgnorableReturnValue
     fun tryRoutingTo(
         pathQueryAndFragment: String,
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,

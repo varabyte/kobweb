@@ -66,19 +66,20 @@ private fun CustomStyle(styleSheet: CSSRulesHolder) {
 
 // Based on https://github.com/JetBrains/compose-multiplatform/blob/master/html/core/src/jsMain/kotlin/org/jetbrains/compose/web/dom/Style.kt
 
-private fun CSSStyleSheet.clearCSSRules() {
+internal fun CSSStyleSheet.clearCSSRules() {
     repeat(cssRules.length) {
         deleteRule(0)
     }
 }
 
-private fun CSSStyleSheet.setCSSRules(cssRules: CSSRuleDeclarationList) {
+internal fun CSSStyleSheet.setCSSRules(cssRules: CSSRuleDeclarationList) {
     cssRules.forEach { cssRule ->
         addRule(cssRule.customStringPresentation())
     }
 }
 
-private fun CSSStyleSheet.addRule(cssRule: String): CSSRule? {
+@IgnorableReturnValue
+internal fun CSSStyleSheet.addRule(cssRule: String): CSSRule? {
     val cssRuleIndex = this.insertRule(cssRule, this.cssRules.length)
     return this.cssRules.item(cssRuleIndex)
 }

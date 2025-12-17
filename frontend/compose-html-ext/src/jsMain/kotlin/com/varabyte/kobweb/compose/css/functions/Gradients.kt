@@ -34,11 +34,21 @@ interface Gradient : CSSStyleValue {
             return entries.toTypedArray()
         }
 
-        fun add(color: CSSColorValue) = entries.add(Entry.Color.Simple(color))
-        fun add(color: CSSColorValue, stop: T) = entries.add(Entry.Color.Stop(color, stop))
-        fun add(color: CSSColorValue, from: T, to: T) = entries.add(Entry.Color.StopRange(color, from, to))
+        fun add(color: CSSColorValue) {
+            entries.add(Entry.Color.Simple(color))
+        }
 
-        fun setMidpoint(hint: T) = entries.add(Entry.Hint(hint))
+        fun add(color: CSSColorValue, stop: T) {
+            entries.add(Entry.Color.Stop(color, stop))
+        }
+
+        fun add(color: CSSColorValue, from: T, to: T) {
+            entries.add(Entry.Color.StopRange(color, from, to))
+        }
+
+        fun setMidpoint(hint: T) {
+            entries.add(Entry.Hint(hint))
+        }
     }
 }
 

@@ -204,7 +204,7 @@ internal object SilkStylesheetInstance : SilkStylesheet {
         }
         styles.forEach { cssStyle -> cssStyle.addStylesInto(siteStyleSheet) }
 
-        keyframes.map { (name, build) ->
+        keyframes.forEach { (name, build) ->
             val lightBuilder = KeyframesBuilder(ColorMode.LIGHT).apply(build)
             val darkBuilder = KeyframesBuilder(ColorMode.DARK).apply(build)
 

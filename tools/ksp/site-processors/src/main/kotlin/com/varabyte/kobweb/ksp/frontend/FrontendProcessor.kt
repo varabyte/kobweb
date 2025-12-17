@@ -55,9 +55,7 @@ import com.varabyte.kobweb.project.frontend.InitSilkEntry
 import com.varabyte.kobweb.project.frontend.KeyframesEntry
 import com.varabyte.kobweb.project.frontend.LayoutEntry
 import com.varabyte.kobweb.project.frontend.assertValid
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlin.collections.firstOrNull
 
 @OptIn(KspExperimental::class)
 class FrontendProcessor(
@@ -738,6 +736,7 @@ class FrontendProcessor(
 
     private fun reportErrorIfLayoutCycleDetected() {
         // Detect cycles in layout dependencies
+        @IgnorableReturnValue
         fun detectLayoutCycle(
             decl: KSFunctionDeclaration,
             path: MutableList<KSFunctionDeclaration> = mutableListOf(),
@@ -766,7 +765,7 @@ class FrontendProcessor(
             }
 
             return layoutsFor[decl]?.let { parentLayout ->
-                val hasChildCycle = detectLayoutCycle(layoutsFor[decl]!!.method, path, errorCtx)
+                val hasChildCycle = detectLayoutCycle(parentLayout.method, path, errorCtx)
                 path.removeLast()
                 hasChildCycle
             } ?: false

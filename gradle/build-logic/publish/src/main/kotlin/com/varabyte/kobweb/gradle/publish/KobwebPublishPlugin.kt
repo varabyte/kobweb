@@ -9,8 +9,8 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.register
-import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
+import org.jetbrains.kotlin.gradle.dsl.HasConfigurableKotlinCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import javax.inject.Inject
 
 abstract class KobwebPublicationConfig @Inject constructor(objects: ObjectFactory) {
@@ -84,6 +84,11 @@ class KobwebPublishPlugin : Plugin<Project> {
             apply("org.jetbrains.dokka")
             apply("com.vanniktech.maven.publish")
         }
+
+        // Opt in published artifacts to unused return value checker
+        // See: https://github.com/Kotlin/KEEP/blob/main/proposals/KEEP-0412-unused-return-value-checker.md#opting-in-your-library
+        (project.kotlinExtension as HasConfigurableKotlinCompilerOptions<*>)
+            .compilerOptions.freeCompilerArgs.add("-Xreturn-value-checker=full")
 
         project.configureDokka()
 

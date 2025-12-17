@@ -72,6 +72,7 @@ fun Modifier.thenUnless(condition: Boolean, other: Modifier): Modifier {
  */
 @OptIn(ExperimentalContracts::class, ExperimentalExtendedContracts::class)
 inline fun Modifier.thenIf(condition: Boolean, lazyProduce: () -> Modifier): Modifier {
+    @Suppress("RETURN_VALUE_NOT_USED") // `holdsIn` is incorrectly not marked as ignorable
     contract { condition holdsIn lazyProduce }
     return this.then(if (condition) lazyProduce() else Modifier)
 }
@@ -88,6 +89,7 @@ inline fun <T> Modifier.thenIfNotNull(value: T?, consume: (T) -> Modifier): Modi
  */
 @OptIn(ExperimentalContracts::class, ExperimentalExtendedContracts::class)
 inline fun Modifier.thenUnless(condition: Boolean, lazyProduce: () -> Modifier): Modifier {
+    @Suppress("RETURN_VALUE_NOT_USED") // `holdsIn` is incorrectly not marked as ignorable
     contract { !condition holdsIn lazyProduce }
     return this.thenIf(!condition, lazyProduce)
 }

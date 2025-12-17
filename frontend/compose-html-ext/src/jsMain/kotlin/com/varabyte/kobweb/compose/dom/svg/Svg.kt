@@ -312,9 +312,17 @@ interface SvgPointsAttrs<T : SVGElement> : AttrsScope<T> {
 }
 
 interface SvgPresentationAttrs<T : SVGElement> : AttrsScope<T> {
-    fun stroke(value: CSSColorValue) = this.attr("stroke", value.toString())
-    fun stroke(value: SVGStrokeType) = this.attr("stroke", value.toString())
-    fun stroke(id: SvgId) = this.attr("stroke", id.urlReference)
+    fun stroke(value: CSSColorValue) {
+        this.attr("stroke", value.toString())
+    }
+
+    fun stroke(value: SVGStrokeType) {
+        this.attr("stroke", value.toString())
+    }
+
+    fun stroke(id: SvgId) {
+        this.attr("stroke", id.urlReference)
+    }
 
     fun strokeDashArray(vararg values: Number) {
         this.attr("stroke-dasharray", values.joinToString(",") { it.toString() })
@@ -324,34 +332,73 @@ interface SvgPresentationAttrs<T : SVGElement> : AttrsScope<T> {
         this.attr("stroke-dasharray", values.joinToString(",") { it.toString() })
     }
 
-    fun strokeDashOffset(value: Number) = this.attr("stroke-dashoffset", value.toString())
-    fun strokeDashOffset(value: CSSLengthOrPercentageValue) = this.attr("stroke-dashoffset", value.toString())
+    fun strokeDashOffset(value: Number) {
+        this.attr("stroke-dashoffset", value.toString())
+    }
 
-    fun strokeLineCap(value: SVGStrokeLineCap) = this.attr("stroke-linecap", value.toString())
+    fun strokeDashOffset(value: CSSLengthOrPercentageValue) {
+        this.attr("stroke-dashoffset", value.toString())
+    }
 
-    fun strokeLineJoin(value: SVGStrokeLineJoin) = this.attr("stroke-linejoin", value.toString())
+    fun strokeLineCap(value: SVGStrokeLineCap) {
+        this.attr("stroke-linecap", value.toString())
+    }
 
-    fun strokeMiterLimit(value: Number) = this.attr("stroke-miterlimit", value.toString())
+    fun strokeLineJoin(value: SVGStrokeLineJoin) {
+        this.attr("stroke-linejoin", value.toString())
+    }
 
-    fun strokeOpacity(value: Number) = this.attr("stroke-opacity", value.toString())
+    fun strokeMiterLimit(value: Number) {
+        this.attr("stroke-miterlimit", value.toString())
+    }
 
-    fun strokeWidth(value: Number) = this.attr("stroke-width", value.toString())
-    fun strokeWidth(value: CSSLengthOrPercentageValue) = this.attr("stroke-width", value.toString())
+    fun strokeOpacity(value: Number) {
+        this.attr("stroke-opacity", value.toString())
+    }
 
-    fun fill(value: CSSColorValue) = this.attr("fill", value.toString())
-    fun fill(value: SVGFillType) = this.attr("fill", value.toString())
-    fun fill(id: SvgId) = this.attr("fill", id.urlReference)
+    fun strokeWidth(value: Number) {
+        this.attr("stroke-width", value.toString())
+    }
 
-    fun fillRule(value: SVGFillRule) = this.attr("fill-rule", value.toString())
+    fun strokeWidth(value: CSSLengthOrPercentageValue) {
+        this.attr("stroke-width", value.toString())
+    }
 
-    fun fillOpacity(value: Number) = this.attr("fill-opacity", value.toString())
+    fun fill(value: CSSColorValue) {
+        this.attr("fill", value.toString())
+    }
 
-    fun filter(id: SvgId) = this.attr("filter", id.urlReference)
+    fun fill(value: SVGFillType) {
+        this.attr("fill", value.toString())
+    }
 
-    fun floodColor(color: CSSColorValue) = attr("flood-color", color.toString())
-    fun floodOpacity(value: Number) = attr("flood-opacity", value.toString())
+    fun fill(id: SvgId) {
+        this.attr("fill", id.urlReference)
+    }
 
-    fun lightingColor(color: CSSColorValue) = attr("lighting-color", color.toString())
+    fun fillRule(value: SVGFillRule) {
+        this.attr("fill-rule", value.toString())
+    }
+
+    fun fillOpacity(value: Number) {
+        this.attr("fill-opacity", value.toString())
+    }
+
+    fun filter(id: SvgId) {
+        this.attr("filter", id.urlReference)
+    }
+
+    fun floodColor(color: CSSColorValue) {
+        attr("flood-color", color.toString())
+    }
+
+    fun floodOpacity(value: Number) {
+        attr("flood-opacity", value.toString())
+    }
+
+    fun lightingColor(color: CSSColorValue) {
+        attr("lighting-color", color.toString())
+    }
 }
 
 interface SvgPreserveAspectRatioAttrs<T : SVGElement> : AttrsScope<T> {

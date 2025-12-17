@@ -134,6 +134,7 @@ class Attachments private constructor(
         private val transferables = mutableMapOf<String, Any>()
         private val metadata = mutableMapOf<String, Any>()
 
+        @IgnorableReturnValue
         private fun MutableMap<String, Any>.add(key: String, type: String, value: Any): Builder {
             if (this.put(suffixedKey(key, type), value) != null) {
                 error("Attachment with key \"$key\" was added twice for the same type ($type).")
@@ -148,20 +149,37 @@ class Attachments private constructor(
         // the Kobweb team if they want us to support any of the missing types.
 
         //        fun add(key: String, value: AudioData) = cloneables.add(key, "AudioData", value)
+        @IgnorableReturnValue
         fun add(key: String, value: Blob) = cloneables.add(key, "Blob", value)
 //        fun add(key: String, value: CropTarget) = cloneables.add(key, "CropTarget", value)
 //        fun add(key: String, value: CryptoKey) = cloneables.add(key, "CryptoKey", value)
+        @IgnorableReturnValue
         fun add(key: String, value: DOMMatrix) = cloneables.add(key, "DOMMatrix", value)
+
+        @IgnorableReturnValue
         fun add(key: String, value: DOMMatrixReadOnly) = cloneables.add(key, "DOMMatrixReadOnly", value)
+
+        @IgnorableReturnValue
         fun add(key: String, value: DOMPoint) = cloneables.add(key, "DOMPoint", value)
+
+        @IgnorableReturnValue
         fun add(key: String, value: DOMPointReadOnly) = cloneables.add(key, "DOMPointReadOnly", value)
+
+        @IgnorableReturnValue
         fun add(key: String, value: DOMQuad) = cloneables.add(key, "DOMQuad", value)
+
+        @IgnorableReturnValue
         fun add(key: String, value: DOMRect) = cloneables.add(key, "DOMRect", value)
+
+        @IgnorableReturnValue
         fun add(key: String, value: DOMRectReadOnly) = cloneables.add(key, "DOMRectReadOnly", value)
 //        fun add(key: String, value: EncodedAudioChunk) = cloneables.add(key, "EncodedAudioChunk", value)
 //        fun add(key: String, value: EncodedVideoChunk) = cloneables.add(key, "EncodedVideoChunk", value)
 //        fun add(key: String, value: FencedFrameConfig) = cloneables.add(key, "FencedFrameConfig", value)
+        @IgnorableReturnValue
         fun add(key: String, value: File) = cloneables.add(key, "File", value)
+
+        @IgnorableReturnValue
         fun add(key: String, value: FileList) = cloneables.add(key, "FileList", value)
 //        fun add(key: String, value: FileSystemDirectoryHandle) = cloneables.add(key, "FileSystemDirectoryHandle", value)
 //        fun add(key: String, value: FileSystemFileHandle) = cloneables.add(key, "FileSystemFileHandle", value)
@@ -179,8 +197,13 @@ class Attachments private constructor(
 
         // region transferables
 
+        @IgnorableReturnValue
         fun add(key: String, value: ArrayBuffer) = transferables.add(key, "ArrayBuffer", value)
+
+        @IgnorableReturnValue
         fun add(key: String, value: MessagePort) = transferables.add(key, "MessagePort", value)
+
+        @IgnorableReturnValue
         fun add(key: String, value: ImageBitmap) = transferables.add(key, "ImageBitmap", value)
         // TODO: There are more official types that are supported, see
         //  https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects#supported_objects
@@ -194,15 +217,34 @@ class Attachments private constructor(
         // These methods allow adding values that themselves are not directly transferable but we can wrap transferable
         // concepts underneath them ourselves for user convenience.
 
+        @IgnorableReturnValue
         fun add(key: String, value: Int8Array) = transferables.add(key, "Int8Array", value.buffer)
+
+        @IgnorableReturnValue
         fun add(key: String, value: Uint8Array) = transferables.add(key, "Uint8Array", value.buffer)
+
+        @IgnorableReturnValue
         fun add(key: String, value: Uint8ClampedArray) = transferables.add(key, "Uint8ClampedArray", value.buffer)
+
+        @IgnorableReturnValue
         fun add(key: String, value: Int16Array) = transferables.add(key, "Int16Array", value.buffer)
+
+        @IgnorableReturnValue
         fun add(key: String, value: Uint16Array) = transferables.add(key, "Uint16Array", value.buffer)
+
+        @IgnorableReturnValue
         fun add(key: String, value: Int32Array) = transferables.add(key, "Int32Array", value.buffer)
+
+        @IgnorableReturnValue
         fun add(key: String, value: Uint32Array) = transferables.add(key, "Uint32Array", value.buffer)
+
+        @IgnorableReturnValue
         fun add(key: String, value: Float32Array) = transferables.add(key, "Float32Array", value.buffer)
+
+        @IgnorableReturnValue
         fun add(key: String, value: Float64Array) = transferables.add(key, "Float64Array", value.buffer)
+
+        @IgnorableReturnValue
         fun add(key: String, value: ImageData) {
             transferables.add(key, "ImageData_buffer", value.data.buffer)
             metadata[suffixedKey(key, "ImageData_width")] = value.width

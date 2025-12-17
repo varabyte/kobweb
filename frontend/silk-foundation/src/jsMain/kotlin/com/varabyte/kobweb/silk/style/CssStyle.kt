@@ -435,8 +435,10 @@ internal class SimpleCssStyle(
     extraModifier: @Composable () -> Modifier,
     val layer: String?
 ) : CssStyle<GeneralKind>(init, extraModifier) {
-    internal fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
-        return addStylesInto(selector, styleSheet, layer)
+    internal fun addStylesInto(styleSheet: StyleSheet) {
+        // Ignore the returned selectors as `SimpleCssStyle` wraps `stylesheet.registerStyle(...)` rules which are
+        // never applied to an element via `toModifier()`.
+        val _ = addStylesInto(selector, styleSheet, layer)
     }
 }
 

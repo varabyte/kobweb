@@ -52,6 +52,7 @@ inline fun <K : ComponentKind> CssStyleVariant<K>.thenIf(
     condition: Boolean,
     produce: () -> CssStyleVariant<K>
 ): CssStyleVariant<K> {
+    @Suppress("RETURN_VALUE_NOT_USED") // `holdsIn` is incorrectly not marked as ignorable
     contract { condition holdsIn produce }
     return if (condition) this.then(produce()) else this
 }
@@ -61,6 +62,7 @@ inline fun <K : ComponentKind> CssStyleVariant<K>.thenUnless(
     condition: Boolean,
     produce: () -> CssStyleVariant<K>
 ): CssStyleVariant<K> {
+    @Suppress("RETURN_VALUE_NOT_USED") // `holdsIn` is incorrectly not marked as ignorable
     contract { !condition holdsIn produce }
     return this.thenIf(!condition, produce)
 }

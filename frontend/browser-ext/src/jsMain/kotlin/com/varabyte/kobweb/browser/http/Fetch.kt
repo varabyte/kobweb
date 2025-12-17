@@ -33,7 +33,7 @@ enum class HttpMethod {
  */
 private suspend fun Response.getBodyBytes(): ByteArray {
     return suspendCoroutine { cont ->
-        this.arrayBuffer().then { responseBuffer ->
+        val _ = this.arrayBuffer().then { responseBuffer ->
             val int8Array = Int8Array(responseBuffer)
             cont.resume(ByteArray(int8Array.length) { i -> int8Array[i] })
         }.catch {
@@ -138,7 +138,7 @@ suspend fun Window.fetchBytes(
         requestInitDynamic["signal"] = abortController.signal
     }
 
-    window.fetch(resource, requestInit).then(
+    val _ = window.fetch(resource, requestInit).then(
         onFulfilled = { res ->
             if (res.ok) {
                 res.getBodyBytesAsync { bodyBytes -> responseBytesDeferred.complete(bodyBytes) }

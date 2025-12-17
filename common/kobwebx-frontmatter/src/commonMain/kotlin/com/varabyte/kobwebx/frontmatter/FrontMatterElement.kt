@@ -131,16 +131,22 @@ sealed class FrontMatterElement {
         @FrontMatterElementBuilder
         class Builder {
             private var map = mutableMapOf<String, FrontMatterElement>()
+
+            @IgnorableReturnValue
             fun addScalar(key: String, value: String): Builder {
                 map[key] = Scalar(value)
                 return this
             }
+
+            @IgnorableReturnValue
             fun addMap(key: String, populate: Builder.() -> Unit): Builder {
                 val builder = Builder()
                 builder.populate()
                 map[key] = builder.build()
                 return this
             }
+
+            @IgnorableReturnValue
             fun addList(key: String, populate: ValueList.Builder.() -> Unit): Builder {
                 val builder = ValueList.Builder()
                 builder.populate()
@@ -167,10 +173,14 @@ sealed class FrontMatterElement {
         @FrontMatterElementBuilder
         class Builder {
             private var list = mutableListOf<FrontMatterElement>()
+
+            @IgnorableReturnValue
             fun addScalar(value: String): Builder {
                 list.add(Scalar(value))
                 return this
             }
+
+            @IgnorableReturnValue
             fun addMap(populate: ValueMap.Builder.() -> Unit): Builder {
                 val builder = ValueMap.Builder()
                 builder.populate()

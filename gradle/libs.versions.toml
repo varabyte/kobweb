@@ -19,7 +19,7 @@ ktor = "3.3.3"
 logback = "1.5.15"
 playwright = "1.55.0"
 shadow = "9.1.0"
-truthish = "1.0.3"
+truthish = "1.0.4"
 vanniktech-publish = "0.34.0"
 
 [libraries]
