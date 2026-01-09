@@ -8,6 +8,7 @@ import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.gradle.core.util.getJsDependencyResults
 import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobwebx.gradle.markdown.children
+import com.varabyte.kobwebx.gradle.markdown.util.escapeBackslashes
 import com.varabyte.kobwebx.gradle.markdown.util.escapeDollars
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.escapeTripleQuotes
@@ -191,7 +192,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
     @get:Nested
     abstract val html: Property<NodeScope.(HtmlBlock) -> String>
 
-    fun String.escapeSingleQuotedText() = escapeQuotes().escapeDollars()
+    fun String.escapeSingleQuotedText() = escapeBackslashes().escapeQuotes().escapeDollars()
     fun String.escapeTripleQuotedText() = escapeDollars().escapeTripleQuotes()
 
     /**

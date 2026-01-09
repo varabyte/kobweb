@@ -41,3 +41,14 @@ internal fun String.escapeDollars() = this.replace("$", "\${'$'}")
  * `Text("""${"\"\"\""}""")`
  */
 internal fun String.escapeTripleQuotes() = this.replace("\"\"\"", "\${\"\\\"\\\"\\\"\"}")
+
+/**
+ * Escape backslash characters in strings, useful if they're going to be converted to code.
+ *
+ * For example, convert `hello\world` into `hello\\world` so that Markdown text can be converted into Kotlin code like
+ * `Text("hello\\world")`.
+ *
+ * Note that this should NOT be used for text that will be wrapped with triple quotes, as multiline strings do not
+ * support backslash escaping.
+ */
+internal fun String.escapeBackslashes() = this.replace("\\", "\\\\")
