@@ -412,7 +412,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
                                 // should be the string "test", not "\ntest"
                                 sb.appendLine(
                                     "${indent(indentCount + 1)}$JB_DOM.Text(\"\"\"${
-                                        child.wholeText.removePrefix("\n").escapeSingleQuotedText()
+                                        child.wholeText.removePrefix("\n").escapeTripleQuotedText()
                                     }\"\"\")"
                                 )
                             }
