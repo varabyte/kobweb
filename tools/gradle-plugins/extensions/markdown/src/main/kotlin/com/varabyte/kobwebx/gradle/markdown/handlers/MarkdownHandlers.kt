@@ -231,7 +231,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
             .joinToString("")
         this.childrenOverride = emptyList()
 
-        return output(ImageData(image.destination, altText, image.title))
+        return output(ImageData(image.destination.escapeDollars(), altText, image.title))
     }
 
     init {
@@ -293,9 +293,9 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
         br.convention { "$JB_DOM.Br" }
         a.convention { link ->
             if (useSilk.get()) {
-                "$SILK.navigation.Link(\"${link.destination}\")"
+                "$SILK.navigation.Link(\"${link.destination.escapeDollars()}\")"
             } else {
-                "$JB_DOM.A(\"${link.destination}\")"
+                "$JB_DOM.A(\"${link.destination.escapeDollars()}\")"
             }
         }
         em.convention { "$JB_DOM.Em" }
