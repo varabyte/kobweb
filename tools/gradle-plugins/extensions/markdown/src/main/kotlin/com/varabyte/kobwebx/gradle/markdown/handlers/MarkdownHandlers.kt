@@ -361,7 +361,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
         rawTag.convention { tag ->
             val parts = tag.stripTagBrackets().split(' ', limit = 2)
             val name = "\"${parts[0]}\""
-            val attrs = parts.getOrNull(1)?.escapeQuotes()?.let { "\"$it\"" } ?: "null"
+            val attrs = parts.getOrNull(1)?.escapeSingleQuotedText()?.let { "\"$it\"" } ?: "null"
 
             "$KOBWEB_DOM.GenericTag($name, $attrs)"
         }
