@@ -105,7 +105,7 @@ fun Modifier.displayBetween(breakpointLower: Breakpoint, breakpointUpper: Breakp
     require(breakpointLower.ordinal < breakpointUpper.ordinal) { "displayBetween breakpoints passed in wrong order: $breakpointLower should be smaller than $breakpointUpper" }
 
     return this.classNames(
-        "silk-display-if-${breakpointLower.name.lowercase()}",
+        "silk-display-if-at-least-${breakpointLower.name.lowercase()}",
         "silk-display-until-${breakpointUpper.name.lowercase()}"
     )
 }
