@@ -182,9 +182,11 @@ internal fun CssModifier.assertNoAttributes(selectorName: String, lazyExtraConte
         appendLine("Details:")
 
         append("\tCSS rule: ")
-        append("\"$selectorName")
-        if (mediaQuery != null) append(mediaQuery)
+        append("\"")
+        if (mediaQuery != null) append("@media $mediaQuery { ")
+        append(selectorName)
         if (suffix != null) append(suffix)
+        if (mediaQuery != null) append(" }")
         appendLine("\"")
         appendLine("\tAttribute(s): ${attrsScope.attributes.keys.joinToString(", ") { "\"$it\"" }}")
         appendLine()
