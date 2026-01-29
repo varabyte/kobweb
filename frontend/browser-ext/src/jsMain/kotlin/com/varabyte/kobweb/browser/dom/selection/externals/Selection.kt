@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.browser.dom.selection.externals
 
-import org.w3c.dom.DOMRect
 import org.w3c.dom.Node
 
 /**
@@ -8,7 +7,6 @@ import org.w3c.dom.Node
  *
  * See https://developer.mozilla.org/en-US/docs/Web/API/Selection
  */
-@Suppress("PropertyName")
 internal external class Selection {
     val anchorNode: Node?
     val anchorOffset: Int
