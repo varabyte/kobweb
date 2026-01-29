@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.browser.dom
 
 import org.w3c.dom.Node
+import org.w3c.dom.Range
 
 /**
  * Exposes the JavaScript [Selection](https://developer.mozilla.org/en-US/docs/Web/API/Selection) to Kotlin
