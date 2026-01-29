@@ -1,13 +1,13 @@
-package com.varabyte.kobweb.browser.dom.selection.externals
+package com.varabyte.kobweb.browser.dom
 
 import org.w3c.dom.Node
 
 /**
- * External declaration of the Selection API.
+ * Exposes the JavaScript [Selection](https://developer.mozilla.org/en-US/docs/Web/API/Selection) to Kotlin
  *
- * See https://developer.mozilla.org/en-US/docs/Web/API/Selection
+ * Represents the range of text selected by the user or the current position of the caret.
  */
-internal external class Selection {
+external class Selection {
     val anchorNode: Node?
     val anchorOffset: Int
     val focusNode: Node?
