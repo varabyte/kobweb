@@ -16,7 +16,7 @@ external class Selection {
     val rangeCount: Int
     val type: String
 
-    fun addRange(range: dynamic)
+    fun addRange(range: Range)
     fun collapse(node: Node?, offset: Int = definedExternally)
     fun collapseToEnd()
     fun collapseToStart()
@@ -24,9 +24,9 @@ external class Selection {
     fun deleteFromDocument()
     fun empty()
     fun extend(node: Node, offset: Int = definedExternally)
-    fun getRangeAt(index: Int): dynamic
+    fun getRangeAt(index: Int): Range
     fun removeAllRanges()
-    fun removeRange(range: dynamic)
+    fun removeRange(range: Range)
     fun selectAllChildren(node: Node)
     fun setBaseAndExtent(anchorNode: Node, anchorOffset: Int, focusNode: Node, focusOffset: Int)
     fun setPosition(node: Node?, offset: Int = definedExternally)
