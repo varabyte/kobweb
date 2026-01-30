@@ -17,7 +17,9 @@ external class Selection {
     val focusOffset: Int
     val isCollapsed: Boolean
     val rangeCount: Int
+    /** Returns "None", "Caret", or "Range". */
     val type: String
+    /** Returns "none", "forward", or "backward". */
     val direction: String
 
     fun addRange(range: Range)
