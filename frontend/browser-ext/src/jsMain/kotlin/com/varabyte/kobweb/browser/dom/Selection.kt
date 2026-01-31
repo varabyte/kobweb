@@ -5,7 +5,7 @@ import org.w3c.dom.Range
 import org.w3c.dom.ShadowRoot
 
 /**
- * [MDN Reference](https://developer.mozilla.org/en-US/docs/Web/API/Selection/getComposedRanges#options)
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Selection/getComposedRanges#options">getComposedRanges options</a>
  */
 external interface GetComposedRangesOptions {
     var shadowRoots: Array<ShadowRoot>?
@@ -20,7 +20,7 @@ fun GetComposedRangesOptions(shadowRoots: Array<ShadowRoot>? = null): GetCompose
 }
 
 /**
- * [MDN Reference](https://developer.mozilla.org/en-US/docs/Web/API/Selection)
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Selection">Selection API</a>
  */
 external class Selection private constructor() {
     val anchorNode: Node?

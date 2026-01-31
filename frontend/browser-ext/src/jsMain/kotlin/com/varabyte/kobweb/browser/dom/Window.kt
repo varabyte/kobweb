@@ -2,4 +2,5 @@ package com.varabyte.kobweb.browser.dom
 
 import org.w3c.dom.Window
 
-fun Window.getSelection(): Selection? = asDynamic().getSelection() as Selection?
+@Suppress("NOTHING_TO_INLINE")
+inline fun Window.getSelection(): Selection? = asDynamic().getSelection().unsafeCast<Selection?>()
