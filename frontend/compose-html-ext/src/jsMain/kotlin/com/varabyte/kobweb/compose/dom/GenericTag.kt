@@ -7,6 +7,8 @@ import org.jetbrains.compose.web.dom.ElementBuilder
 import org.jetbrains.compose.web.dom.ElementScope
 import org.jetbrains.compose.web.dom.TagElement
 import org.w3c.dom.Element
+import org.w3c.dom.HTMLTemplateElement
+import org.w3c.dom.asList
 
 /** A useful [ElementBuilder] for when you don't care about its specific type. */
 class GenericElementBuilder private constructor(private val name: String) : ElementBuilder<Element> {
@@ -63,40 +65,10 @@ fun GenericTag(
 ) {
     val attrs: AttrBuilderContext<Element>? = attrsStr?.let {
         {
-            // Handle input like "key=\"value\""
-            fun parseAttrAssignment(attrAssignment: String) {
-                val parts = attrAssignment.split('=', limit = 2)
-                val attr = parts[0]
-                val value = parts.getOrElse(1) { "" }
-                attr(attr, value.removeSurrounding("\""))
-            }
-
-            // Break into parts separated by spaces, but ignore spaces within quotes
-            val sb = StringBuilder()
-            var insideQuotes = false
-            for (c in attrsStr) {
-                when (c) {
-                    '"' -> {
-                        insideQuotes = !insideQuotes
-                        sb.append(c)
-                    }
-
-                    ' ' -> {
-                        if (insideQuotes) {
-                            sb.append(c)
-                        } else {
-                            parseAttrAssignment(sb.toString())
-                            sb.clear()
-                        }
-                    }
-
-                    else -> sb.append(c)
-                }
-            }
-            if (sb.isNotEmpty()) {
-                check(!insideQuotes) { "Got invalid attributes with unclosed string: $attrsStr" }
-                parseAttrAssignment(sb.toString())
-            }
+            val template = document.createElement("template").unsafeCast<HTMLTemplateElement>()
+            template.innerHTML = "<$name $attrsStr></$name>"
+            val el = template.content.firstElementChild!!
+            el.attributes.asList().forEach { attr(it.name, it.value) }
         }
     }
 
