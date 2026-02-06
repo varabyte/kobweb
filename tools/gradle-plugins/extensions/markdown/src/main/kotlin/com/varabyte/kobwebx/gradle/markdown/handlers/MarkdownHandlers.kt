@@ -391,11 +391,8 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
                 if (el.attributesSize() > 0) {
                     sb.append(", ")
                     sb.append('"')
-                    sb.append(
-                        el.attributes().joinToString(" ") { attr ->
-                            """${attr.key}=\"${attr.value.escapeSingleQuotedText()}\""""
-                        }
-                    )
+                    // html() returns an extra space at the start
+                    sb.append(el.attributes().html().drop(1).escapeSingleQuotedText())
                     sb.append('"')
                 }
 
