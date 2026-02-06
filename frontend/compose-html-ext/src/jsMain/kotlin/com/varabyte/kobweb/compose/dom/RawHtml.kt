@@ -4,7 +4,6 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.framework.annotations.DelicateApi
 import org.w3c.dom.Comment
 import org.w3c.dom.Element
-import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.w3c.dom.Text
@@ -16,10 +15,9 @@ import org.jetbrains.compose.web.dom.Text as JbText
 private fun walk(node: Node) {
     when (node) {
         is Element -> {
-            val attrsStr = node.attributes.asList().takeIf { it.isNotEmpty() }
-                ?.joinToString(" ") { attr -> "${attr.name}=\"${attr.value}\"" }
-
-            GenericTag(node.nodeName, attrsStr) {
+            GenericTag<Element>(node.nodeName, attrs = {
+                node.attributes.asList().forEach { attr -> attr(attr.name, attr.value) }
+            }) {
                 walk(node.childNodes)
             }
         }
