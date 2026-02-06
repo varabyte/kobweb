@@ -52,3 +52,13 @@ internal fun String.escapeTripleQuotes() = this.replace("\"\"\"", "\${\"\\\"\\\"
  * support backslash escaping.
  */
 internal fun String.escapeBackslashes() = this.replace("\\", "\\\\")
+
+
+/**
+ * Escape new line character in strings, useful if they're going to be converted to single-line strings in code.
+ *
+ * For example, convert `hello\nworld` into `hello\\nworld` so that Markdown text can be converted into Kotlin code like
+ * `Text("hello\\nworld")`.
+ *
+ */
+internal fun String.escapeNewLines() = this.replace("\n", "\\n")
