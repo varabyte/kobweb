@@ -50,6 +50,16 @@ fun createMainFunction(
     val frontendData = appFrontendData.frontendData
     val fileBuilder = FileSpec.builder("", "main").indent(" ".repeat(4))
 
+
+    // We don't want users to get compiler warnings coming from generated code, e.g. harmless unused return values from
+    // @InitSilk fun updateTheme(ctx: InitSilkContext) = ctx.config.apply { ... }
+    fileBuilder.addAnnotation(
+        AnnotationSpec.builder(Suppress::class)
+            .addMember("%S", "RETURN_VALUE_NOT_USED")
+            .addMember("%S", "RETURN_VALUE_NOT_USED_COERCION")
+            .build()
+    )
+
     buildSet {
         val defaultImports = listOf(
             "$KOBWEB_GROUP.core.AppGlobals",
