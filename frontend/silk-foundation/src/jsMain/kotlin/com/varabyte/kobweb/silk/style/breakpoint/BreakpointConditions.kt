@@ -20,6 +20,9 @@ private fun CSSMediaQuery.invert(): CSSMediaQuery {
     return CSSMediaQuery.Raw("not all and $this")
 }
 
+private val Breakpoint.displayIfAtLeastClass get() = "silk-display-if-at-least-${this.name.lowercase()}"
+private val Breakpoint.displayUntilClass get() = "silk-display-until-${this.name.lowercase()}"
+
 // Hack alert: Compose HTML does NOT support setting the !important flag on styles, which is in general a good thing
 // However, we really want to make an exception for display styles, because if someone uses a method like
 // "displayIfAtLeast(MD)" then we want the display to really be none even if inline styles are present.
@@ -53,9 +56,9 @@ internal fun SilkBreakpointDisplayStyles() {
                 val invertBreakpointQuery =
                     CSSMediaRuleDeclaration(breakpoint.toCSSMediaQuery().invert(), emptyList()).header
                 cssStylesheet
-                    ?.addRule("$invertBreakpointQuery { .silk-display-if-at-least-${breakpoint.name.lowercase()} { display: none !important; } }")
+                    ?.addRule("$invertBreakpointQuery { .${breakpoint.displayIfAtLeastClass} { display: none !important; } }")
                 cssStylesheet
-                    ?.addRule("$breakpointQuery { .silk-display-until-${breakpoint.name.lowercase()} { display: none !important; } }")
+                    ?.addRule("$breakpointQuery { .${breakpoint.displayUntilClass} { display: none !important; } }")
             }
             onDispose {
                 cssStylesheet?.clearCSSRules()
@@ -83,7 +86,7 @@ private fun CSSStyleSheet.clearCSSRules() {
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/display#none">display: none</a> documentation.
  */
 fun Modifier.displayIfAtLeast(breakpoint: Breakpoint) =
-    this.classNames("silk-display-if-at-least-${breakpoint.name.lowercase()}")
+    this.classNames(breakpoint.displayIfAtLeastClass)
 
 /**
  * Display this element only if the current screen is narrower than the specified breakpoint.
@@ -92,7 +95,7 @@ fun Modifier.displayIfAtLeast(breakpoint: Breakpoint) =
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/display#none">display: none</a> documentation.
  */
-fun Modifier.displayUntil(breakpoint: Breakpoint) = this.classNames("silk-display-until-${breakpoint.name.lowercase()}")
+fun Modifier.displayUntil(breakpoint: Breakpoint) = this.classNames(breakpoint.displayUntilClass)
 
 /**
  * Display this element only if the current screen's width lies between the lower breakpoint (inclusive) and upper
@@ -104,8 +107,5 @@ fun Modifier.displayUntil(breakpoint: Breakpoint) = this.classNames("silk-displa
 fun Modifier.displayBetween(breakpointLower: Breakpoint, breakpointUpper: Breakpoint): Modifier {
     require(breakpointLower.ordinal < breakpointUpper.ordinal) { "displayBetween breakpoints passed in wrong order: $breakpointLower should be smaller than $breakpointUpper" }
 
-    return this.classNames(
-        "silk-display-if-at-least-${breakpointLower.name.lowercase()}",
-        "silk-display-until-${breakpointUpper.name.lowercase()}"
-    )
+    return this.classNames(breakpointLower.displayIfAtLeastClass, breakpointUpper.displayUntilClass)
 }
