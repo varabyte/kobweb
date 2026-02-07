@@ -42,12 +42,14 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Attributes
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
 import javax.inject.Inject
 
 internal const val JB_DOM = "org.jetbrains.compose.web.dom"
 internal const val KOBWEB_DOM = "com.varabyte.kobweb.compose.dom"
+internal const val W3C_DOM = "org.w3c.dom"
 internal const val SILK = "com.varabyte.kobweb.silk.components"
 
 /**
@@ -344,6 +346,18 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
             }
         }
 
+        // Convert a set of HTML attributes to an `AttrBuilderContext` lambda block.
+        fun Attributes.toAttrsBlock(): String {
+            val styleMap = this.takeUnless { it.isEmpty } ?: return "{}"
+            return buildString {
+                append("{")
+                append(styleMap.joinToString(";") { (key, value) ->
+                    "attr(\"$key\", \"${value.escapeSingleQuotedText()}\")"
+                })
+                append("}")
+            }
+        }
+
         // Create relevant `(attrs = { ... })` call parameters for a table cell
         fun TableCell.toCallParams(): String {
             val alignment = alignment ?: return ""
@@ -360,11 +374,11 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
             this.removePrefix("</").removePrefix("<").removeSuffix("/>").removeSuffix(">")
 
         rawTag.convention { tag ->
-            val parts = tag.stripTagBrackets().split(' ', limit = 2)
-            val name = "\"${parts[0]}\""
-            val attrs = parts.getOrNull(1)?.escapeSingleQuotedText()?.let { "\"$it\"" } ?: "null"
+            val element = Jsoup.parseBodyFragment("<$tag />").body().child(0)
+            val name = "\"${element.tagName()}\""
+            val attrs = element.attributes().toAttrsBlock()
 
-            "$KOBWEB_DOM.GenericTag($name, $attrs)"
+            "$KOBWEB_DOM.GenericTag<$W3C_DOM.Element>($name, attrs = $attrs)"
         }
 
         inlineTag.set { htmlInline ->
@@ -387,14 +401,11 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
 
         html.set { htmlBlock ->
             fun renderNode(el: Element, indentCount: Int, sb: StringBuilder) {
-                sb.append("${indent(indentCount)}$KOBWEB_DOM.GenericTag(\"${el.tagName()}\"")
+                sb.append("${indent(indentCount)}$KOBWEB_DOM.GenericTag<$W3C_DOM.Element>(\"${el.tagName()}\"")
 
                 if (el.attributesSize() > 0) {
-                    sb.append(", ")
-                    sb.append('"')
-                    // html() returns an extra space at the start
-                    sb.append(el.attributes().html().drop(1).escapeSingleQuotedText())
-                    sb.append('"')
+                    val attrs = el.attributes().toAttrsBlock()
+                    sb.append(", attrs = $attrs")
                 }
 
                 if (el.childNodeSize() > 0) {
