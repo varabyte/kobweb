@@ -1,14 +1,13 @@
 package com.varabyte.kobweb.ksp.frontend
 
 import com.google.devtools.ksp.processing.KSPLogger
-import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
-import com.varabyte.kobweb.ksp.common.DynamicRouteSegment
 import com.varabyte.kobweb.ksp.common.processRoute
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.util.getArgumentValue
 import com.varabyte.kobweb.ksp.util.receiverClass
+import com.varabyte.kobweb.project.common.DynamicRouteSegment
 import com.varabyte.kobweb.project.frontend.PageEntry
 
 /**

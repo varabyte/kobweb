@@ -3,6 +3,7 @@ package com.varabyte.kobweb.ksp.common
 import com.google.devtools.ksp.symbol.KSFile
 import com.varabyte.kobweb.ksp.util.RouteUtils
 import com.varabyte.kobweb.ksp.util.toSlug
+import com.varabyte.kobweb.project.common.DynamicRouteSegment
 
 /**
  * Process all incoming information to produce a final route.

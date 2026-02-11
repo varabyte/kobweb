@@ -5,6 +5,7 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.util.RouteUtils
 import com.varabyte.kobweb.ksp.util.getArgumentValue
+import com.varabyte.kobweb.project.common.DynamicRouteSegment
 
 // pair corresponds to (current package, override)
 // in theory should only be one, but we'll return a sequence just in case

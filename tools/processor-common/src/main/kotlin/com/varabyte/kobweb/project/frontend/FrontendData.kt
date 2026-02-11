@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.project.frontend
 
+import com.varabyte.kobweb.project.common.DynamicRouteSegment
 import kotlinx.serialization.Serializable
 
 // A note on imports
@@ -60,7 +61,10 @@ private fun Iterable<PageEntry>.assertValidPages(throwError: (String) -> Unit) {
     // Remove contents of dynamic segments to ensure we don't have two routes that resolve to the same dynamic path,
     // e.g. a/{b}/c/{d} should conflict with "a/{x}/c/{y}"
     fun String.anonymizeDynamicSegments(): String {
-        return this.replace(Regex("\\{[^}]*}"), "{...}")
+        return this.split('/').joinToString("/") { originalSegment ->
+            val notDynamic = DynamicRouteSegment.tryCreate(originalSegment) == null
+            if (notDynamic) originalSegment else "{...}"
+        }
     }
 
     val entriesByRoute = this.groupBy { it.route.anonymizeDynamicSegments() }

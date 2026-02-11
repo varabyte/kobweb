@@ -1,6 +1,6 @@
-package com.varabyte.kobweb.ksp.common
+package com.varabyte.kobweb.project.common
 
-import com.varabyte.kobweb.common.text.isSurrounded
+private fun String.isSurrounded(prefix: String, suffix: String = prefix) = this.startsWith(prefix) && this.endsWith(suffix)
 
 /**
  * Class which represents a dynamic segment in a route (e.g. "{example}" in "/a/{example}/z").
