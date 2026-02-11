@@ -77,6 +77,28 @@ private fun Iterable<PageEntry>.assertValidPages(throwError: (String) -> Unit) {
             throwError("The route \"$route\" starts with \"api\", which is currently a reserved route path, so please choose another name. Used by ${pages.first().fqn}.")
         }
     }
+
+    // Collect all entries that end with an optional segment, e.g. "/a/b/c/{d?}", as we'll check if their parent dir is
+    // already registered separately, e.g. "/a/b/c/". If so, that means the former route can probably drop the ?, e.g.
+    // "/a/b/c/{d}", as the empty case will always be handled by the static route.
+    this.filter { entry ->
+        // Only the last segment in the route can be optional, so we only have to check that one
+        DynamicRouteSegment.tryCreate(entry.route.substringAfterLast('/'))?.isOptional ?: false
+    }.forEach { entry ->
+        val parentDir = entry.route.substringBeforeLast('/').anonymizeDynamicSegments() + "/"
+        val finalSegment = entry.route.substringAfterLast('/')
+        val matchingPageEntry = entriesByRoute[parentDir]?.first()
+        if (matchingPageEntry != null) {
+            throwError(
+                buildString {
+                    append("The route \"${parentDir}$finalSegment\" (${entry.fqn}) ends with a trailing optional segment, ")
+                    append("but \"$parentDir\" (${matchingPageEntry.fqn}) is also registered and will always take precedence in that case. ")
+                    append("To fix this issue, remove the question mark, ")
+                    append("i.e. \"$finalSegment\" -> \"${finalSegment.replace("?}", "}")}\".")
+                }
+            )
+        }
+    }
 }
 
 @Serializable
