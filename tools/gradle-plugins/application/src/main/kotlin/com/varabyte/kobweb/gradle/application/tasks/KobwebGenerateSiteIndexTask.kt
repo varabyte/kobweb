@@ -18,6 +18,7 @@ import kotlinx.html.dom.document
 import kotlinx.html.dom.serialize
 import kotlinx.html.head
 import kotlinx.html.link
+import kotlinx.html.script
 import kotlinx.html.unsafe
 import kotlinx.serialization.json.Json
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
@@ -77,6 +78,10 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:Input
     val hasFaDependency: Provider<Boolean>
         get() = dependencies.hasDependencyNamed("com.varabyte.kobwebx:silk-icons-fa")
+
+    @get:Input
+    val hasLucideDependency: Provider<Boolean>
+        get() = dependencies.hasDependencyNamed("com.varabyte.kobwebx:silk-icons-lucide")
 
     @get:Input
     val hasMdiDependency: Provider<Boolean>
@@ -290,6 +295,21 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 link {
                     rel = "stylesheet"
                     href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+                }
+            })
+        }
+
+        if (hasLucideDependency.get()) {
+            headElements.add(HtmlUtil.serializeHeadContents {
+                script(type = "text/javascript", "https://unpkg.com/lucide@0.574.0/dist/umd/lucide.min.js") {
+                    async = true
+                }
+
+                // Using `module` type because they are deferred to `DOMContentLoaded`
+                script(type = "module") {
+                    unsafe {
+                        +"lucide.createIcons()"
+                    }
                 }
             })
         }
