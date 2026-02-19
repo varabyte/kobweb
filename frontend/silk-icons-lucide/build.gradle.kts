@@ -59,9 +59,12 @@ val generateIconsTask = tasks.register("generateIcons") {
             }
         }
 
+        val iconParams = "modifier: Modifier = Modifier, absoluteStrokeWidth: Boolean = false, color: String? = null, size: Int? = null, strokeWidth: Number? = null"
+        val iconArgs = "modifier, absoluteStrokeWidth, color, size, strokeWidth"
+
         val activeMethodEntries = activeIcons.map { rawName ->
             val methodName = rawNameToMethodName(rawName)
-            "@Composable fun $methodName(modifier: Modifier = Modifier) = LucideIcon(\"$rawName\", modifier)"
+            "@Composable fun $methodName($iconParams) = LucideIcon(\"$rawName\", $iconArgs)"
         }
 
         val activeMethodNames = activeIcons.map { rawNameToMethodName(it) }.toSet()
@@ -73,7 +76,7 @@ val generateIconsTask = tasks.register("generateIcons") {
                 // Skip if the deprecated method name collides with an active icon's method name
                 if (deprecatedMethodName in activeMethodNames) return@mapNotNull null
                 val canonicalMethodName = rawNameToMethodName(canonicalName)
-                "@Deprecated(\"Use $canonicalMethodName instead.\", ReplaceWith(\"$canonicalMethodName(modifier)\"))\n@Composable fun $deprecatedMethodName(modifier: Modifier = Modifier) = LucideIcon(\"$canonicalName\", modifier)"
+                "@Deprecated(\"Use $canonicalMethodName instead.\", ReplaceWith(\"$canonicalMethodName(modifier)\"))\n@Composable fun $deprecatedMethodName($iconParams) = LucideIcon(\"$canonicalName\", $iconArgs)"
             }
 
         val activeIconsBlock = buildString {
@@ -121,10 +124,25 @@ val generateIconsTask = tasks.register("generateIcons") {
             |fun LucideIcon(
             |    name: String,
             |    modifier: Modifier = Modifier,
+            |    absoluteStrokeWidth: Boolean = false,
+            |    color: String? = null,
+            |    size: Int? = null,
+            |    strokeWidth: Number? = null,
             |) {
+            |    val effectiveStrokeWidth: Double? = when {
+            |        absoluteStrokeWidth -> (strokeWidth?.toDouble() ?: 2.0) * 24.0 / (size?.toDouble() ?: 24.0)
+            |        strokeWidth != null -> strokeWidth.toDouble()
+            |        else -> null
+            |    }
             |    I(
             |        attrs = modifier.toAttrs {
             |            attr("data-lucide", name)
+            |            if (color != null) attr("stroke", color)
+            |            if (size != null) {
+            |                attr("height", size.toString())
+            |                attr("width", size.toString())
+            |            }
+            |            if (effectiveStrokeWidth != null) attr("stroke-width", effectiveStrokeWidth.toString())
             |        }
             |    )
             |}

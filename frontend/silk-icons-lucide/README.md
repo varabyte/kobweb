@@ -40,6 +40,25 @@ KobwebApp {
 Each icon is rendered as an `<i data-lucide="icon-name">` element, which the Lucide JS library replaces with an
 inline SVG at runtime.
 
+## Icon parameters
+
+All icon composables (both `LucideIcon` and every named wrapper like `LucideHome`) share the same optional parameters:
+
+| Parameter            | Type      | Default        | Description                                                                                           |
+|----------------------|-----------|----------------|-------------------------------------------------------------------------------------------------------|
+| `modifier`           | `Modifier`| `Modifier`     | Standard Kobweb modifier; use it to set CSS classes, layout, etc. (replaces the `class` prop).       |
+| `absoluteStrokeWidth`| `Boolean` | `false`        | When `true`, keeps stroke thickness visually constant regardless of `size` (`strokeWidth × 24 / size`). |
+| `color`              | `String?` | `null` (→ `currentColor`) | Sets the `stroke` SVG attribute. Defaults to inheriting the CSS `color` property.      |
+| `size`               | `Int?`    | `null` (→ 24 px) | Sets both `width` and `height` on the SVG.                                                          |
+| `strokeWidth`        | `Number?` | `null` (→ 2)   | Sets the `stroke-width` SVG attribute.                                                                |
+
+Example:
+
+```kt
+LucideHome(size = 32, color = "red", strokeWidth = 1.5)
+LucideIcon("home", size = 32, absoluteStrokeWidth = true)
+```
+
 ---
 
 Note that this directory contains a file called `lucide-icon-list.txt`, which is parsed and used to generate code
