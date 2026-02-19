@@ -23,7 +23,7 @@ val fetchLucideIconsTask = tasks.register("fetchLucideIcons") {
     doLast {
         println("Fetching icons for version $lucideVersion...")
 
-        val activeIcons = mutableListOf<String>()
+        val activeIcons = mutableSetOf<String>()
         val deprecatedIcons = mutableMapOf<String, String>()
 
         val zipUrl = "${lucideRepoBase}/archive/refs/tags/$lucideVersion.zip"
@@ -54,7 +54,7 @@ val fetchLucideIconsTask = tasks.register("fetchLucideIcons") {
             }
         }
 
-        activeIcons.sort()
+        val sortedActiveIcons = activeIcons.sorted()
 
         outputFile.asFile.bufferedWriter().use { writer ->
             writer.write(
@@ -74,7 +74,7 @@ val fetchLucideIconsTask = tasks.register("fetchLucideIcons") {
                 """.trimMargin()
             )
             writer.newLine()
-            writer.write("lucide=${activeIcons.joinToString(",")}")
+            writer.write("lucide=${sortedActiveIcons.joinToString(",")}")
             writer.newLine()
             if (deprecatedIcons.isNotEmpty()) {
                 val sortedDeprecated = deprecatedIcons.keys.sorted()
@@ -146,7 +146,7 @@ val generateIconsTask = tasks.register("generateIcons") {
                 // Skip if the deprecated method name collides with an active icon's method name
                 if (deprecatedMethodName in activeMethodNames) return@mapNotNull null
                 val canonicalMethodName = rawNameToMethodName(canonicalName)
-                "@Deprecated(\"Use $canonicalMethodName instead.\", ReplaceWith(\"$canonicalMethodName(modifier)\"))\n@Composable fun $deprecatedMethodName($iconParams) = LucideIcon(\"$canonicalName\", $iconArgs)"
+                "@Deprecated(\"Use $canonicalMethodName instead.\", ReplaceWith(\"$canonicalMethodName(modifier = modifier, absoluteStrokeWidth = absoluteStrokeWidth, color = color, size = size, strokeWidth = strokeWidth)\"))\n@Composable fun $deprecatedMethodName($iconParams) = LucideIcon(\"$canonicalName\", $iconArgs)"
             }
 
         val activeIconsBlock = buildString {
