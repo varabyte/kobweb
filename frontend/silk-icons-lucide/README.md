@@ -1,18 +1,16 @@
 Support for integration of [Lucide icons](https://lucide.dev/) in your Kobweb project.
 
 Unlike Font Awesome or Material Design Icons, Lucide icons are rendered as inline SVGs via a small JavaScript
-library — no CSS font file is needed. You must load the Lucide JS library on your page, for example via CDN:
+library - no CSS font file is needed. You must load the Lucide JS library on your page, for example via CDN:
 
 ```html
-
 <script async src="https://unpkg.com/lucide@latest"></script>
-<script>lucide.createIcons();</script>
+<script type="module">lucide.createIcons()</script>
 ```
 
 Prefer using a specific version instead of `latest` to avoid breaking changes:
 
 ```html
-
 <script async src="https://unpkg.com/lucide@0.574.0/dist/umd/lucide.min.js"></script>
 ```
 
@@ -22,22 +20,10 @@ Or even directly in the `head` of your Kobweb:
 script(type = "text/javascript", src = "https://unpkg.com/lucide@0.574.0/dist/umd/lucide.min.js") {
     async = true // Using async to avoid blocking the page rendering
 }
-```
 
-Then inside of your Kobweb App or Page, you then create the icons:
-
-```kt
-external interface Lucide {
-    fun createIcons()
-}
-
-external val lucide: Lucide
-
-KobwebApp {
-    content()
-
-    LaunchedEffect(Unit) {
-        lucide.createIcons()
+script(type = "module") {
+    unsafe {
+        +"lucide.createIcons()"
     }
 }
 ```
@@ -72,7 +58,7 @@ used in this project.
 The generated `lucide-icon-list.txt` format is:
 
 ```
-# Lucide icon list — version X.Y.Z
+# Lucide icon list - version X.Y.Z
 lucide=icon1,icon2,...
 deprecated=old-name>canonical-name,...
 ```

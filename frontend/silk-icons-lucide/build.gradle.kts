@@ -1,5 +1,3 @@
-import java.util.Locale
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     id("kobweb-compose")
