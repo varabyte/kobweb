@@ -174,9 +174,13 @@ val generateIconsTask = tasks.register("generateIcons") {
             |package com.varabyte.kobweb.silk.components.icons.lucide
             |
             |import androidx.compose.runtime.*
+            |import com.varabyte.kobweb.browser.util.invokeLater
             |import com.varabyte.kobweb.compose.ui.Modifier
             |import com.varabyte.kobweb.compose.ui.toAttrs
             |import org.jetbrains.compose.web.dom.I
+            |import kotlinx.browser.window
+            |
+            |private var createIconsRequested = false
             |
             |/**
             | * Renders a Lucide icon using the `<i data-lucide="name">` convention.
@@ -186,7 +190,7 @@ val generateIconsTask = tasks.register("generateIcons") {
             | * <script src="https://unpkg.com/lucide@$lucideVersion/dist/umd/lucide.min.js"></script>
             | * <script type="module">lucide.createIcons()</script>
             | * ```
-            | * Version ${lucideVersion} is recommended.
+            | * Version $lucideVersion of the icons is expected, but the composables will work with any version as long as the icon names match.
             | *
             | * See also: https://lucide.dev/
             | */
@@ -215,6 +219,16 @@ val generateIconsTask = tasks.register("generateIcons") {
             |            if (effectiveStrokeWidth != null) attr("stroke-width", effectiveStrokeWidth.toString())
             |        }
             |    )
+            |    
+            |    SideEffect { 
+            |       if (!createIconsRequested) {
+            |           createIconsRequested = true
+            |           js("if (lucide) lucide.createIcons()")
+            |           window.invokeLater {
+            |               createIconsRequested = false
+            |           }
+            |       }
+            |    }
             |}
             |
             |$activeIconsBlock$deprecatedBlock
