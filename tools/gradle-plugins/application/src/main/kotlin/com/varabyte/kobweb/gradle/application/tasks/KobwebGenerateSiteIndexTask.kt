@@ -80,10 +80,6 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         get() = dependencies.hasDependencyNamed("com.varabyte.kobwebx:silk-icons-fa")
 
     @get:Input
-    val hasLucideDependency: Provider<Boolean>
-        get() = dependencies.hasDependencyNamed("com.varabyte.kobwebx:silk-icons-lucide")
-
-    @get:Input
     val hasMdiDependency: Provider<Boolean>
         get() = dependencies.hasDependencyNamed("com.varabyte.kobwebx:silk-icons-mdi")
 
@@ -295,21 +291,6 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 link {
                     rel = "stylesheet"
                     href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-                }
-            })
-        }
-
-        if (hasLucideDependency.get()) {
-            headElements.add(HtmlUtil.serializeHeadContents {
-                script(type = "text/javascript", "https://unpkg.com/lucide@0.574.0/dist/umd/lucide.min.js") {
-                    async = true
-                }
-
-                // Using `module` type because they are deferred to `DOMContentLoaded`
-                script(type = "module") {
-                    unsafe {
-                        +"lucide.createIcons()"
-                    }
                 }
             })
         }
