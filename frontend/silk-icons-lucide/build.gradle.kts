@@ -11,7 +11,6 @@ plugins {
 group = "com.varabyte.kobwebx"
 version = libs.versions.kobweb.get()
 
-private val GENERATED_SRC_ROOT = "build/generated/icons/src/jsMain/kotlin"
 val GENERATED_JSON_FILE = "lucide-icons.json"
 val LUCIDE_REPO_BASE = "https://github.com/lucide-icons/lucide"
 val LUCIDE_VERSION = "0.574.0"
@@ -39,88 +38,56 @@ abstract class GenerateIconsTask : DefaultTask() {
             }
         }
 
+        // Maps SVG element tags to their known attribute names for code generation
+        val simpleElementAttrs = mapOf(
+            "circle" to listOf("cx", "cy", "r"),
+            "ellipse" to listOf("cx", "cy", "rx", "ry"),
+            "line" to listOf("x1", "y1", "x2", "y2"),
+            "rect" to listOf("x", "y", "width", "height", "rx", "ry"),
+        )
+
         fun generateElementCode(tag: String, attributes: Map<String, String>): String {
-            return when (tag) {
-                "path" -> {
-                    val d = attributes["d"] ?: ""
-                    "        Path {\n            d(\"${escapeKotlin(d)}\")\n        }"
-                }
+            val tagCapitalized = tag.replaceFirstChar { it.uppercase() }
 
-                "circle" -> buildString {
-                    append("        Circle {\n")
-                    attributes["cx"]?.let { append("            cx(${it})\n") }
-                    attributes["cy"]?.let { append("            cy(${it})\n") }
-                    attributes["r"]?.let { append("            r(${it})\n") }
-                    append("        }")
-                }
-
-                "rect" -> buildString {
-                    append("        Rect {\n")
-                    attributes["x"]?.let { append("            x(${it})\n") }
-                    attributes["y"]?.let { append("            y(${it})\n") }
-                    attributes["width"]?.let { append("            width(${it})\n") }
-                    attributes["height"]?.let { append("            height(${it})\n") }
-                    attributes["rx"]?.let { append("            rx(${it})\n") }
-                    attributes["ry"]?.let { append("            ry(${it})\n") }
-                    append("        }")
-                }
-
-                "line" -> buildString {
-                    append("        Line {\n")
-                    attributes["x1"]?.let { append("            x1(${it})\n") }
-                    attributes["y1"]?.let { append("            y1(${it})\n") }
-                    attributes["x2"]?.let { append("            x2(${it})\n") }
-                    attributes["y2"]?.let { append("            y2(${it})\n") }
-                    append("        }")
-                }
-
-                "polyline" -> buildString {
-                    append("        Polyline {\n")
-                    attributes["points"]?.let { pointsStr ->
-                        val pairs = pointsStr.trim().split("\\s+".toRegex()).mapNotNull { point ->
-                            val coords = point.split(",")
-                            if (coords.size == 2) {
-                                val x = coords[0].toDoubleOrNull()
-                                val y = coords[1].toDoubleOrNull()
-                                if (x != null && y != null) "$x to $y" else null
-                            } else null
-                        }
-                        if (pairs.isNotEmpty()) {
-                            append("            points(${pairs.joinToString(", ")})\n")
-                        }
-                    }
-                    append("        }")
-                }
-
-                "polygon" -> buildString {
-                    append("        Polygon {\n")
-                    attributes["points"]?.let { pointsStr ->
-                        val pairs = pointsStr.trim().split("\\s+".toRegex()).mapNotNull { point ->
-                            val coords = point.split(",")
-                            if (coords.size == 2) {
-                                val x = coords[0].toDoubleOrNull()
-                                val y = coords[1].toDoubleOrNull()
-                                if (x != null && y != null) "$x to $y" else null
-                            } else null
-                        }
-                        if (pairs.isNotEmpty()) {
-                            append("            points(${pairs.joinToString(", ")})\n")
-                        }
-                    }
-                    append("        }")
-                }
-
-                "ellipse" -> buildString {
-                    append("        Ellipse {\n")
-                    attributes["cx"]?.let { append("            cx(${it})\n") }
-                    attributes["cy"]?.let { append("            cy(${it})\n") }
-                    attributes["rx"]?.let { append("            rx(${it})\n") }
-                    attributes["ry"]?.let { append("            ry(${it})\n") }
-                    append("        }")
-                }
-
-                else -> "        // Unsupported SVG element: $tag"
+            // Path has unique code generation (string attribute with escaping)
+            if (tag == "path") {
+                val d = attributes["d"] ?: ""
+                return "        Path {\n            d(\"${escapeKotlin(d)}\")\n        }"
             }
+
+            // Simple elements: open tag, emit each known attribute if present, close tag
+            simpleElementAttrs[tag]?.let { attrNames ->
+                return buildString {
+                    append("        $tagCapitalized {\n")
+                    for (attr in attrNames) {
+                        attributes[attr]?.let { append("            $attr($it)\n") }
+                    }
+                    append("        }")
+                }
+            }
+
+            // Points-based elements (polyline, polygon) share the same parsing logic
+            if (tag == "polyline" || tag == "polygon") {
+                return buildString {
+                    append("        $tagCapitalized {\n")
+                    attributes["points"]?.let { pointsStr ->
+                        val pairs = pointsStr.trim().split("\\s+".toRegex()).mapNotNull { point ->
+                            val coords = point.split(",")
+                            if (coords.size == 2) {
+                                val x = coords[0].toDoubleOrNull()
+                                val y = coords[1].toDoubleOrNull()
+                                if (x != null && y != null) "$x to $y" else null
+                            } else null
+                        }
+                        if (pairs.isNotEmpty()) {
+                            append("            points(${pairs.joinToString(", ")})\n")
+                        }
+                    }
+                    append("        }")
+                }
+            }
+
+            return "        // Unsupported SVG element: $tag"
         }
 
         val generatedJsonFile = generatedJsonFileName.get()
@@ -196,16 +163,10 @@ abstract class GenerateIconsTask : DefaultTask() {
             |package com.varabyte.kobweb.silk.components.icons.lucide
         """.trimMargin()
 
-        fun importsForTag(tag: String): String? = when (tag) {
-            "circle" -> "import com.varabyte.kobweb.compose.dom.svg.Circle"
-            "ellipse" -> "import com.varabyte.kobweb.compose.dom.svg.Ellipse"
-            "line" -> "import com.varabyte.kobweb.compose.dom.svg.Line"
-            "path" -> "import com.varabyte.kobweb.compose.dom.svg.Path"
-            "polygon" -> "import com.varabyte.kobweb.compose.dom.svg.Polygon"
-            "polyline" -> "import com.varabyte.kobweb.compose.dom.svg.Polyline"
-            "rect" -> "import com.varabyte.kobweb.compose.dom.svg.Rect"
-            else -> null
-        }
+        val supportedTags = setOf("circle", "ellipse", "line", "path", "polygon", "polyline", "rect")
+
+        fun importsForTag(tag: String): String? =
+            if (tag in supportedTags) "import com.varabyte.kobweb.compose.dom.svg.${tag.replaceFirstChar { it.uppercase() }}" else null
 
         fun importsForIcon(elements: List<Pair<String, Map<String, String>>>): String {
             val tags = elements.map { it.first }.toSet()
