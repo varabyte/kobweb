@@ -97,7 +97,6 @@ import com.varabyte.kobweb.silk.components.icons.lucide.LucideCloud
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideGithub
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideHeart
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideHouse
-import com.varabyte.kobweb.silk.components.icons.lucide.LucideIcon
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideSearch
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideSettings
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideStar
@@ -382,13 +381,17 @@ fun WidgetsPage() {
                                 Box(IconContainerStyle.toModifier()) { iconMethod() }
                                 Tooltip(ElementTarget.PreviousSibling, iconName)
                             }
+
+                            repeat(500) {
+                                LucideStar(size = 16.px)
+                            }
                         }
                         Row(Modifier.gap(0.5.cssRem), verticalAlignment = Alignment.CenterVertically) {
-                            LucideIcon("star", size = 16)
-                            LucideIcon("star", size = 24)
-                            LucideIcon("star", size = 32, color = "gold")
-                            LucideIcon("star", size = 32, strokeWidth = 1)
-                            LucideIcon("star", size = 32, absoluteStrokeWidth = true)
+                            LucideStar(size = 16.px)
+                            LucideStar(size = 24.px)
+                            LucideStar(size = 32.px, color = Colors.Gold)
+                            LucideStar(size = 32.px, strokeWidth = 1)
+                            LucideStar(size = 32.px, strokeWidth = 1)
                         }
                     }
                 }
