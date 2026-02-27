@@ -1,70 +1,41 @@
 Support for integration of [Lucide icons](https://lucide.dev/) in your Kobweb project.
 
-Unlike Font Awesome or Material Design Icons, Lucide icons are rendered as inline SVGs via a small JavaScript
-library - no CSS font file is needed. You must load the Lucide JS library on your page, for example via CDN:
-
-```html
-<script async src="https://unpkg.com/lucide@latest"></script>
-<script type="module">lucide.createIcons()</script>
-```
-
-Prefer using a specific version instead of `latest` to avoid breaking changes:
-
-```html
-<script async src="https://unpkg.com/lucide@0.574.0/dist/umd/lucide.min.js"></script>
-```
-
-Or even directly in the `head` of your Kobweb:
-
-```kt
-script(type = "text/javascript", src = "https://unpkg.com/lucide@0.574.0/dist/umd/lucide.min.js") {
-    async = true // Using async to avoid blocking the page rendering
-}
-
-script(type = "module") {
-    unsafe {
-        +"lucide.createIcons()"
-    }
-}
-```
-
-Each icon is rendered as an `<i data-lucide="icon-name">` element, which the Lucide JS library replaces with an
-inline SVG at runtime.
+Lucide icons are rendered as inline SVGs using Kobweb's `createIcon` API - no external JavaScript library or CDN
+is required. Each icon composable generates the SVG elements directly in the DOM.
 
 ## Icon parameters
 
-All icon composables (both `LucideIcon` and every named wrapper like `LucideHome`) share the same optional parameters:
+All icon composables share the same optional parameters:
 
-| Parameter             | Type       | Default                    | Description                                                                                             |
-|-----------------------|------------|----------------------------|---------------------------------------------------------------------------------------------------------|
-| `modifier`            | `Modifier` | `Modifier`                 | Standard Kobweb modifier; use it to set CSS classes, layout, etc. (replaces the `class` prop).          |
-| `absoluteStrokeWidth` | `Boolean`  | `false`                    | When `true`, keeps stroke thickness visually constant regardless of `size` (`strokeWidth × 24 / size`). |
-| `color`               | `String?`  | `null` (-> `currentColor`) | Sets the `stroke` SVG attribute. Defaults to inheriting the CSS `color` property.                       |
-| `size`                | `Int?`     | `null` (-> 24 px)          | Sets both `width` and `height` on the SVG.                                                              |
-| `strokeWidth`         | `Number?`  | `null` (-> 2)              | Sets the `stroke-width` SVG attribute.                                                                  |
+| Parameter     | Type              | Default        | Description                                                                                    |
+|---------------|-------------------|----------------|------------------------------------------------------------------------------------------------|
+| `modifier`    | `Modifier`        | `Modifier`     | Standard Kobweb modifier; use it to set CSS classes, layout, etc. (replaces the `class` prop). |
+| `size`        | `CSSLengthValue`  | `1.em`         | Sets the width of the SVG icon.                                                                |
+| `strokeWidth` | `Number`          | `2`            | Sets the `stroke-width` SVG attribute.                                                         |
+| `color`       | `CSSColorValue?`  | `null`         | Sets the `stroke` SVG attribute. Defaults to inheriting the CSS `color` property.              |
 
 Example:
 
 ```kt
-LucideHome(size = 32, color = "red", strokeWidth = 1.5)
-LucideIcon("home", size = 32, absoluteStrokeWidth = true)
+LucideHome(size = 32.px, color = Colors.Red, strokeWidth = 1.5)
 ```
 
 ---
 
-Note that this directory contains a file called `lucide-icon-list.txt`, which is parsed and used to generate code
+Note that this directory contains a file called `lucide-icons.json`, which is parsed and used to generate code
 used in this project.
 
-The generated `lucide-icon-list.txt` format is:
+Each icon is generated as a separate Kotlin file to enable dead code elimination in Kotlin/JS -
+only the icons you actually use will be included in the final bundle.
 
-```
-# Lucide icon list - version X.Y.Z
-lucide=icon1,icon2,...
-deprecated=old-name>canonical-name,...
-```
-
-After updating `lucide-icon-list.txt`, run the Gradle task to regenerate the Kotlin source:
+After updating `lucide-icons.json`, run the Gradle task to regenerate the Kotlin source:
 
 ```bash
 ./gradlew :frontend:silk-icons-lucide:generateIcons
+```
+
+To fetch the latest icon data from the Lucide repository (updating `lucide-icons.json`):
+
+```bash
+./gradlew :frontend:silk-icons-lucide:fetchLucideIcons
 ```
