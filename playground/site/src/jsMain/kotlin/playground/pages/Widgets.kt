@@ -381,10 +381,6 @@ fun WidgetsPage() {
                                 Box(IconContainerStyle.toModifier()) { iconMethod() }
                                 Tooltip(ElementTarget.PreviousSibling, iconName)
                             }
-
-                            repeat(500) {
-                                LucideStar(size = 16.px)
-                            }
                         }
                         Row(Modifier.gap(0.5.cssRem), verticalAlignment = Alignment.CenterVertically) {
                             LucideStar(size = 16.px)

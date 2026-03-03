@@ -18,7 +18,6 @@ import kotlinx.html.dom.document
 import kotlinx.html.dom.serialize
 import kotlinx.html.head
 import kotlinx.html.link
-import kotlinx.html.script
 import kotlinx.html.unsafe
 import kotlinx.serialization.json.Json
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
