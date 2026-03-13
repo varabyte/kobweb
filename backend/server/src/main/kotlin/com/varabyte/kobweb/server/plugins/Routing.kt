@@ -263,8 +263,8 @@ private suspend fun RoutingContext.handleApiCall(
         )
         try {
             val response = apiJar.apis.handle("/$pathStr", request)
-            response.headers.forEach { (key, value) ->
-                call.response.headers.append(key, value)
+            response.headers.names.forEach { name ->
+                response.headers.values(name).forEach { value -> call.response.headers.append(name, value) }
             }
             val body = response.body?.takeIf { httpMethod != HttpMethod.HEAD }
             @OptIn(DelicateApi::class)
