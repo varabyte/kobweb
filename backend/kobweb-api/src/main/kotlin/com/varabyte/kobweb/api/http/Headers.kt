@@ -11,7 +11,7 @@ class Headers : MutableMap<String, String> {
             .filterValues { it != null }
             .mapValues { it.value as String }
 
-    @Deprecated("DO NOT IGNORE. Please change to `tryOptionsBytes` instead. This method will be removed soon in a backwards incompatible way.", replaceWith = ReplaceWith("names"))
+    @Deprecated("DO NOT IGNORE. Please change to `names` instead. This method will be removed soon in a backwards incompatible way.", replaceWith = ReplaceWith("names"))
     override val keys: MutableSet<String>
         get() = names.toMutableSet()
     @Deprecated("DO NOT IGNORE. Please change to `values(<name>)` instead. This method will be removed soon in a backwards incompatible way.", replaceWith = ReplaceWith("values('name')"))
