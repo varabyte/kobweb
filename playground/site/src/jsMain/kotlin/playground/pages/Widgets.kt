@@ -364,7 +364,6 @@ fun WidgetsPage() {
                 WidgetSection("Web - Lucide") {
                     val lucideIcons = mapOf<String, @Composable () -> Unit>(
                         "Cloud" to { LucideCloud() },
-                        "GitHub" to { LucideGithub() },
                         "Heart" to { LucideHeart() },
                         "House" to { LucideHouse() },
                         "Search" to { LucideSearch() },
