@@ -1,25 +1,59 @@
 package com.varabyte.kobweb.api.http
 
-class Headers {
+/**
+ * A collection of HTTP header values.
+ *
+ * In a majority of cases, HTTP headers are normally a collection of simple key/value pairs,
+ * but per official spec, a header field can technically contain multiple values. As a result,
+ * users are expected to [append] new values, not simply set them.
+ *
+ * Also, according to the RFC, header field names are case-insensitive. In other words, accessing
+ * "Content-Type" is functionally identical to "content-type".
+ *
+ * @see <a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-5">HTTP Semantics Section 5</a>
+ */
+interface Headers {
+    /**
+     * Gets all present header field names
+     */
+    val names: Set<String>
+
+    /**
+     * Gets first value from the list of values associated with the given name, or null if the name is not present
+     */
+    operator fun get(key: String): String?
+
+    /**
+     * Gets all entries associated with the given name
+     */
+    fun values(name: String): List<String>
+
+    /**
+     * Checks if a header field with the given name exists
+     */
+    fun contains(name: String): Boolean
+}
+
+class MutableHeaders : Headers {
     private val headers: MutableMap<String, MutableList<String>> = mutableMapOf()
 
-    val names: Set<String>
+    override val names: Set<String>
         get() = headers.keys
 
-    operator fun get(key: String): String? {
-        return headers[key]?.firstOrNull()
+    override operator fun get(key: String): String? {
+        return headers[key.lowercase()]?.firstOrNull()
     }
 
-    fun contains(name: String): Boolean {
-        return headers.containsKey(name)
+    override fun values(name: String): List<String> {
+        return headers.getOrDefault(name.lowercase(), emptyList())
     }
 
-    fun values(name: String): List<String> {
-        return headers.getOrDefault(name, emptyList())
+    override fun contains(name: String): Boolean {
+        return headers.containsKey(name.lowercase())
     }
 
     fun append(name: String, value: String) {
-        headers.getOrPut(name) { mutableListOf() }.add(value)
+        headers.getOrPut(name.lowercase()) { mutableListOf() }.add(value)
     }
 
 }

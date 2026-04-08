@@ -55,7 +55,7 @@ class Response {
     /**
      * Any additional headers to send back to the client.
      */
-    val headers = Headers()
+    val headers = MutableHeaders()
 
     /**
      * A holder of user data that can be added to this response.
