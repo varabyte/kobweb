@@ -6,6 +6,7 @@ import com.varabyte.kobweb.api.http.Body
 import com.varabyte.kobweb.api.http.ContentDisposition
 import com.varabyte.kobweb.api.http.HttpMethod
 import com.varabyte.kobweb.api.http.Multipart
+import com.varabyte.kobweb.api.http.MutableHeaders
 import com.varabyte.kobweb.api.http.MutableRequest
 import com.varabyte.kobweb.api.http.Request
 import com.varabyte.kobweb.api.log.Logger
@@ -248,7 +249,7 @@ private suspend fun RoutingContext.handleApiCall(
             .flattenEntries()
             .toMap()
 
-        val headers = call.request.headers.entries().associate { it.key to it.value }
+        val headers = MutableHeaders(call.request.headers.entries().associate { it.key to it.value })
         val request = MutableRequest(
             Request.Connection(
                 origin = call.request.origin.toRequestConnectionDetails(),

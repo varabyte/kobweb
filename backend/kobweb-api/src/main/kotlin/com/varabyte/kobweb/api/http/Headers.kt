@@ -34,8 +34,20 @@ interface Headers {
     fun contains(name: String): Boolean
 }
 
-class MutableHeaders : Headers {
+class MutableHeaders() : Headers {
     private val headers: MutableMap<String, MutableList<String>> = mutableMapOf()
+
+    constructor(headers: Headers) : this() {
+        headers.names.forEach { name ->
+            headers.values(name).forEach { value -> append(name, value) }
+        }
+    }
+
+    constructor(headers: Map<String, List<String>>) : this() {
+        headers.entries.forEach { entry ->
+            entry.value.forEach { value -> append(entry.key, value) }
+        }
+    }
 
     override val names: Set<String>
         get() = headers.keys
@@ -52,6 +64,9 @@ class MutableHeaders : Headers {
         return headers.containsKey(name.lowercase())
     }
 
+    /**
+     * Appends a header value associated with the given name
+     */
     fun append(name: String, value: String) {
         headers.getOrPut(name.lowercase()) { mutableListOf() }.add(value)
     }
