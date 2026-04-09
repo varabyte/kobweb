@@ -45,7 +45,7 @@ interface Request {
      */
     val queryParams: Map<String, String>
     /** All headers sent with the request. */
-    val headers: Map<String, List<String>>
+    val headers: Headers
     /**
      * Any cookies sent with the request.
      *
@@ -119,7 +119,7 @@ class MutableRequest(
     override var method: HttpMethod,
     params: Map<String, String>,
     queryParams: Map<String, String>,
-    headers: Map<String, List<String>>,
+    headers: Headers,
     cookies: Map<String, String>,
     override var body: Body?,
     override val data: MutableData = MutableData(),
@@ -137,9 +137,7 @@ class MutableRequest(
 
     override val params: MutableMap<String, String> = params.toMutableMap()
     override val queryParams: MutableMap<String, String> = queryParams.toMutableMap()
-    override val headers: MutableMap<String, MutableList<String>> = headers
-        .mapValues { entry -> entry.value.toMutableList() }
-        .toMutableMap()
+    override val headers: MutableHeaders = MutableHeaders(headers)
 
     override val cookies: MutableMap<String, String> = cookies.toMutableMap()
 }
