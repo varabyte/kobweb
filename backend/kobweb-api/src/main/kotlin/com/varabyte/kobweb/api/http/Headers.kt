@@ -12,7 +12,12 @@ package com.varabyte.kobweb.api.http
  *
  * @see <a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-5">HTTP Semantics Section 5</a>
  */
-interface Headers : Iterable<Pair<String, List<String>>> {
+interface Headers : Iterable<Headers.Entry> {
+    /** A single entry of key/value pairs, useful for iteration. */
+    data class Entry(
+        val name: String,
+        val value: List<String>,
+    )
 
     val names: Set<String>
 
@@ -59,8 +64,8 @@ class MutableHeaders() : Headers {
         return headers.containsKey(name.lowercase())
     }
 
-    override fun iterator(): Iterator<Pair<String, List<String>>> {
-        return headers.entries.map { it.key to it.value.toList() }.iterator()
+    override fun iterator(): Iterator<Headers.Entry> {
+        return headers.entries.map { Headers.Entry(it.key, it.value.toList()) }.iterator()
     }
 
     /**
