@@ -13,9 +13,7 @@ package com.varabyte.kobweb.api.http
  * @see <a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-5">HTTP Semantics Section 5</a>
  */
 interface Headers : Iterable<Pair<String, List<String>>> {
-    /**
-     * Gets all present header field names
-     */
+
     val names: Set<String>
 
     /**
@@ -28,9 +26,6 @@ interface Headers : Iterable<Pair<String, List<String>>> {
      */
     fun values(name: String): List<String>
 
-    /**
-     * Checks if a header field with the given name exists
-     */
     fun contains(name: String): Boolean
 }
 
