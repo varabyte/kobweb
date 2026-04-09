@@ -90,7 +90,6 @@ fun Response.setBodyText(text: String) {
 fun Response.setAsRedirect(newPath: String, status: Int = 307, isApiPath: Boolean = false) {
     check(status in VALID_REDIRECT_STATUS_CODES) { "Redirect status code is invalid ($status); must be one of $VALID_REDIRECT_STATUS_CODES" }
     this.status = status
-    val location =
+    headers["Location"] =
         if (!isApiPath || newPath.startsWith(API_PREFIX_WITH_TRAILING_SLASH)) newPath else "$API_PREFIX$newPath"
-    headers.append("Location", location)
 }

@@ -5,7 +5,7 @@ package com.varabyte.kobweb.api.http
  *
  * In a majority of cases, HTTP headers are normally a collection of simple key/value pairs,
  * but per official spec, a header field can technically contain multiple values. As a result,
- * users are expected to [append] new values, not simply set them.
+ * users are able to [append] new values, besides simply [set] them.
  *
  * Also, according to the RFC, header field names are case-insensitive. In other words, accessing
  * "Content-Type" is functionally identical to "content-type".
@@ -69,6 +69,15 @@ class MutableHeaders() : Headers {
      */
     fun append(name: String, value: String) {
         headers.getOrPut(name.lowercase()) { mutableListOf() }.add(value)
+    }
+
+    /**
+     * Sets a single value associated with the given name
+     *
+     * Use [append] if the value should be added to the list of values instead
+     */
+    operator fun set(name: String, value: String) {
+        headers[name.lowercase()] = mutableListOf(value)
     }
 
 }
