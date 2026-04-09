@@ -12,7 +12,7 @@ package com.varabyte.kobweb.api.http
  *
  * @see <a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-5">HTTP Semantics Section 5</a>
  */
-interface Headers {
+interface Headers : Iterable<Pair<String, List<String>>> {
     /**
      * Gets all present header field names
      */
@@ -62,6 +62,10 @@ class MutableHeaders() : Headers {
 
     override fun contains(name: String): Boolean {
         return headers.containsKey(name.lowercase())
+    }
+
+    override fun iterator(): Iterator<Pair<String, List<String>>> {
+        return headers.entries.map { it.key to it.value.toList() }.iterator()
     }
 
     /**
