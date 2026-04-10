@@ -94,7 +94,6 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaStar
 import com.varabyte.kobweb.silk.components.icons.fa.FaUser
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideBell
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideCloud
-import com.varabyte.kobweb.silk.components.icons.lucide.LucideGithub
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideHeart
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideHouse
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideSearch
