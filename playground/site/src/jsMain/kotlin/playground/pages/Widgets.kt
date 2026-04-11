@@ -92,6 +92,15 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaGithub
 import com.varabyte.kobweb.silk.components.icons.fa.FaHouse
 import com.varabyte.kobweb.silk.components.icons.fa.FaStar
 import com.varabyte.kobweb.silk.components.icons.fa.FaUser
+import com.varabyte.kobweb.silk.components.icons.lucide.LucideBell
+import com.varabyte.kobweb.silk.components.icons.lucide.LucideCloud
+import com.varabyte.kobweb.silk.components.icons.lucide.LucideHeart
+import com.varabyte.kobweb.silk.components.icons.lucide.LucideHouse
+import com.varabyte.kobweb.silk.components.icons.lucide.LucideSearch
+import com.varabyte.kobweb.silk.components.icons.lucide.LucideSettings
+import com.varabyte.kobweb.silk.components.icons.lucide.LucideStar
+import com.varabyte.kobweb.silk.components.icons.lucide.LucideTrash
+import com.varabyte.kobweb.silk.components.icons.lucide.LucideUser
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiClose
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiHome
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiMenu
@@ -347,6 +356,36 @@ fun WidgetsPage() {
                         faIcons.forEach { (iconName, iconMethod) ->
                             Box(IconContainerStyle.toModifier()) { iconMethod() }
                             Tooltip(ElementTarget.PreviousSibling, iconName)
+                        }
+                    }
+                }
+
+                WidgetSection("Web - Lucide") {
+                    val lucideIcons = mapOf<String, @Composable () -> Unit>(
+                        "Cloud" to { LucideCloud() },
+                        "Heart" to { LucideHeart() },
+                        "House" to { LucideHouse() },
+                        "Search" to { LucideSearch() },
+                        "Settings" to { LucideSettings() },
+                        "Star" to { LucideStar() },
+                    )
+
+                    Column(Modifier.gap(0.5.cssRem)) {
+                        Row(
+                            Modifier.gap(0.5.cssRem).flexWrap(FlexWrap.Wrap),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            lucideIcons.forEach { (iconName, iconMethod) ->
+                                Box(IconContainerStyle.toModifier()) { iconMethod() }
+                                Tooltip(ElementTarget.PreviousSibling, iconName)
+                            }
+                        }
+                        Row(Modifier.gap(0.5.cssRem), verticalAlignment = Alignment.CenterVertically) {
+                            LucideStar(size = 16.px)
+                            LucideStar(size = 24.px)
+                            LucideStar(size = 32.px, color = Colors.Gold)
+                            LucideStar(size = 32.px, strokeWidth = 1)
+                            LucideStar(size = 32.px, strokeWidth = 1)
                         }
                     }
                 }
