@@ -82,6 +82,10 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     val hasMdiDependency: Provider<Boolean>
         get() = dependencies.hasDependencyNamed("com.varabyte.kobwebx:silk-icons-mdi")
 
+    @get:Input
+    val hasMsDependency: Provider<Boolean>
+        get() = dependencies.hasDependencyNamed("com.varabyte.kobwebx:silk-icons-ms")
+
     private val httpProtocolRegex = Regex("""^https?://""")
     // matches `url(https://example.com)`, `url('https://example.com')`, and `url("https://example.com")`
     // returning the juicy URL center as a match (without the outer quotes or parens)
@@ -300,6 +304,16 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                     rel = "stylesheet"
                     href =
                         "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Icons+Outlined&family=Material+Icons+Two+Tone&family=Material+Icons+Round&family=Material+Icons+Sharp"
+                }
+            })
+        }
+
+        if (hasMsDependency.get()) {
+            headElements.add(HtmlUtil.serializeHeadContents {
+                link {
+                    rel = "stylesheet"
+                    href =
+                        "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&family=Material+Symbols+Rounded&family=Material+Symbols+Sharp"
                 }
             })
         }
