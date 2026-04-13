@@ -1,0 +1,5 @@
+# See the README.md for more information about this file. It is parsed by this project's generateIcons gradle task.
+# Placeholder list. Run the `fetchMsIcons` Gradle task to populate from the upstream codepoints files.
+mso=home,search,menu,close
+msr=home,search,menu,close
+mss=home,search,menu,close
