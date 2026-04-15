@@ -2145,6 +2145,18 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyTabSize() {
+        assertThat(styleToText { tabSize(TabSize.of(10.px)) }).isEqualTo("tab-size: 10px")
+        assertThat(styleToText { tabSize(TabSize.of(4)) }).isEqualTo("tab-size: 4")
+
+        assertThat(styleToText { tabSize(TabSize.Inherit) }).isEqualTo("tab-size: inherit")
+        assertThat(styleToText { tabSize(TabSize.Initial) }).isEqualTo("tab-size: initial")
+        assertThat(styleToText { tabSize(TabSize.Revert) }).isEqualTo("tab-size: revert")
+        assertThat(styleToText { tabSize(TabSize.RevertLayer) }).isEqualTo("tab-size: revert-layer")
+        assertThat(styleToText { tabSize(TabSize.Unset) }).isEqualTo("tab-size: unset")
+    }
+
+    @Test
     fun verifyTableLayout() {
         assertThat(styleToText { tableLayout(TableLayout.Auto) }).isEqualTo("table-layout: auto")
         assertThat(styleToText { tableLayout(TableLayout.Fixed) }).isEqualTo("table-layout: fixed")
