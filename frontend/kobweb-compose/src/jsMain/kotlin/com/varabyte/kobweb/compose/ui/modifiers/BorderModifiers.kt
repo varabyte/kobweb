@@ -7,13 +7,6 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
-fun Modifier.border(
-    width: CSSLengthNumericValue? = null,
-    style: LineStyle? = null,
-    color: CSSColorValue? = null
-) = styleModifier {
-    border(width.unsafeCast<CSSLengthValue>(), style, color)
-}
 
 class BorderScope internal constructor(private val styleScope: StyleScope) {
     fun color(color: CSSColorValue) = styleScope.borderColor(color)
@@ -66,94 +59,27 @@ class BorderScope internal constructor(private val styleScope: StyleScope) {
     ) = styleScope.borderWidth(top, right, bottom, left)
 }
 
-fun Modifier.border(scope: BorderScope.() -> Unit) = styleModifier {
-    BorderScope(this).apply(scope)
-}
+class BorderImageScope internal constructor(private val styleScope: StyleScope) {
+    fun source(source: BorderImageSource) = styleScope.borderImageSource(source)
+    fun slice(slice: BorderImageSlice) = styleScope.borderImageSlice(slice)
+    fun width(width: BorderImageWidth) = styleScope.borderImageWidth(width)
+    fun outset(outset: BorderImageOutset) = styleScope.borderImageOutset(outset)
+    fun repeat(repeat: BorderImageRepeat) = styleScope.borderImageRepeat(repeat)
 
-fun Modifier.borderCollapse(borderCollapse: BorderCollapse) = styleModifier {
-    borderCollapse(borderCollapse)
-}
-
-class BorderSideScope internal constructor(private val styleScope: StyleScope, private val side: String) {
-    fun color(color: CSSColorValue) = styleScope.property("border$side-color", color)
-    fun style(lineStyle: LineStyle) = styleScope.property("border$side-style", lineStyle)
-    fun width(width: CSSLengthOrPercentageNumericValue) = styleScope.property("border$side-width", width)
-}
-
-fun Modifier.borderTop(
-    width: CSSLengthNumericValue? = null,
-    style: LineStyle? = null,
-    color: CSSColorValue? = null
-) = styleModifier {
-    borderTop(width, style, color)
-}
-
-fun Modifier.borderTop(scope: BorderSideScope.() -> Unit) = styleModifier {
-    BorderSideScope(this, "-top").apply(scope)
-}
-
-fun Modifier.borderBottom(
-    width: CSSLengthNumericValue? = null,
-    style: LineStyle? = null,
-    color: CSSColorValue? = null
-) = styleModifier {
-    borderBottom(width, style, color)
-}
-
-fun Modifier.borderBottom(scope: BorderSideScope.() -> Unit) = styleModifier {
-    BorderSideScope(this, "-bottom").apply(scope)
-}
-
-fun Modifier.borderLeft(
-    width: CSSLengthNumericValue? = null,
-    style: LineStyle? = null,
-    color: CSSColorValue? = null
-) = styleModifier {
-    borderLeft(width, style, color)
-}
-
-fun Modifier.borderLeft(scope: BorderSideScope.() -> Unit) = styleModifier {
-    BorderSideScope(this, "-left").apply(scope)
-}
-
-fun Modifier.borderRight(
-    width: CSSLengthNumericValue? = null,
-    style: LineStyle? = null,
-    color: CSSColorValue? = null
-) = styleModifier {
-    borderRight(width, style, color)
-}
-
-fun Modifier.borderRight(scope: BorderSideScope.() -> Unit) = styleModifier {
-    BorderSideScope(this, "-right").apply(scope)
-}
-
-fun Modifier.borderRadius(r: CSSLengthOrPercentageNumericValue) = styleModifier {
-    borderRadius(r)
-}
-
-fun Modifier.borderRadius(
-    topLeftAndBottomRight: CSSLengthOrPercentageNumericValue = 0.px,
-    topRightAndBottomLeft: CSSLengthOrPercentageNumericValue = 0.px
-) = styleModifier {
-    borderRadius(topLeftAndBottomRight, topRightAndBottomLeft)
-}
-
-fun Modifier.borderRadius(
-    topLeft: CSSLengthOrPercentageNumericValue = 0.px,
-    topRightAndBottomLeft: CSSLengthOrPercentageNumericValue = 0.px,
-    bottomRight: CSSLengthOrPercentageNumericValue = 0.px,
-) = styleModifier {
-    borderRadius(topLeft, topRightAndBottomLeft, bottomRight)
-}
-
-fun Modifier.borderRadius(
-    topLeft: CSSLengthOrPercentageNumericValue = 0.px,
-    topRight: CSSLengthOrPercentageNumericValue = 0.px,
-    bottomRight: CSSLengthOrPercentageNumericValue = 0.px,
-    bottomLeft: CSSLengthOrPercentageNumericValue = 0.px,
-) = styleModifier {
-    borderRadius(topLeft, topRight, bottomRight, bottomLeft)
+    // Helper functions
+    fun source(url: CSSUrl) = source(BorderImageSource.of(url))
+    fun source(gradient: Gradient) = source(BorderImageSource.of(gradient))
+    fun slice(all: CSSPercentageValue) = slice(BorderImageSlice.of(all))
+    fun slice(all: Number) = slice(BorderImageSlice.of(all))
+    fun slice(block: BorderImageSlice.Builder.() -> Unit) = slice(BorderImageSlice.of(block))
+    fun width(all: CSSLengthOrPercentageNumericValue) = width(BorderImageWidth.of(all))
+    fun width(all: Number) = width(BorderImageWidth.of(all))
+    fun width(block: BorderImageWidth.Builder.() -> Unit) = width(BorderImageWidth.of(block))
+    fun outset(all: CSSLengthNumericValue) = outset(BorderImageOutset.of(all))
+    fun outset(all: Number) = outset(BorderImageOutset.of(all))
+    fun outset(block: BorderImageOutset.Builder.() -> Unit) = outset(BorderImageOutset.of(block))
+    fun repeat(topBottom: BorderImageRepeat.Mode, leftRight: BorderImageRepeat.Mode) =
+        repeat(BorderImageRepeat.of(topBottom, leftRight))
 }
 
 class BorderRadiusScope internal constructor(private val styleScope: StyleScope) {
@@ -222,37 +148,181 @@ class BorderRadiusScope internal constructor(private val styleScope: StyleScope)
     ) = updateVertical("$top $right $bottom $left")
 }
 
-fun Modifier.borderRadius(scope: BorderRadiusScope.() -> Unit) = styleModifier {
-    BorderRadiusScope(this).apply(scope)
+class BorderSideScope internal constructor(private val styleScope: StyleScope, private val side: String) {
+    fun color(color: CSSColorValue) = styleScope.property("border$side-color", color)
+    fun style(lineStyle: LineStyle) = styleScope.property("border$side-style", lineStyle)
+    fun width(width: CSSLengthOrPercentageNumericValue) = styleScope.property("border$side-width", width)
+}
+
+fun Modifier.border(
+    width: CSSLengthNumericValue? = null,
+    style: LineStyle? = null,
+    color: CSSColorValue? = null
+) = styleModifier {
+    border(width.unsafeCast<CSSLengthValue>(), style, color)
+}
+
+fun Modifier.border(scope: BorderScope.() -> Unit) = styleModifier {
+    BorderScope(this).apply(scope)
+}
+
+fun Modifier.borderBlockColor(borderBlockColor: BorderBlockColor) = styleModifier {
+    borderBlockColor(borderBlockColor)
+}
+
+fun Modifier.borderBlockColor(color: CSSColorValue) = styleModifier {
+    borderBlockColor(BorderBlockColor.of(color))
+}
+
+fun Modifier.borderBlockEndColor(borderBlockEndColor: BorderBlockEndColor) = styleModifier {
+    borderBlockEndColor(borderBlockEndColor)
+}
+
+fun Modifier.borderBlockEndColor(color: CSSColorValue) = styleModifier {
+    borderBlockEndColor(BorderBlockEndColor.of(color))
+}
+
+fun Modifier.borderBlockEndStyle(borderBlockEndStyle: BorderBlockEndStyle) = styleModifier {
+    borderBlockEndStyle(borderBlockEndStyle)
+}
+
+fun Modifier.borderBlockStyle(borderBlockStyle: BorderBlockStyle) = styleModifier {
+    borderBlockStyle(borderBlockStyle)
+}
+
+fun Modifier.borderBlockStartColor(borderBlockStartColor: BorderBlockStartColor) = styleModifier {
+    borderBlockStartColor(borderBlockStartColor)
+}
+
+fun Modifier.borderBlockStartColor(color: CSSColorValue) = styleModifier {
+    borderBlockStartColor(BorderBlockStartColor.of(color))
+}
+
+fun Modifier.borderBottom(
+    width: CSSLengthNumericValue? = null,
+    style: LineStyle? = null,
+    color: CSSColorValue? = null
+) = styleModifier {
+    borderBottom(width, style, color)
+}
+
+fun Modifier.borderBottom(scope: BorderSideScope.() -> Unit) = styleModifier {
+    BorderSideScope(this, "-bottom").apply(scope)
+}
+
+fun Modifier.borderCollapse(borderCollapse: BorderCollapse) = styleModifier {
+    borderCollapse(borderCollapse)
 }
 
 fun Modifier.borderImage(image: BorderImage) = styleModifier {
     borderImage(image)
 }
 
-class BorderImageScope internal constructor(private val styleScope: StyleScope) {
-    fun source(source: BorderImageSource) = styleScope.borderImageSource(source)
-    fun slice(slice: BorderImageSlice) = styleScope.borderImageSlice(slice)
-    fun width(width: BorderImageWidth) = styleScope.borderImageWidth(width)
-    fun outset(outset: BorderImageOutset) = styleScope.borderImageOutset(outset)
-    fun repeat(repeat: BorderImageRepeat) = styleScope.borderImageRepeat(repeat)
-
-    // Helper functions
-    fun source(url: CSSUrl) = source(BorderImageSource.of(url))
-    fun source(gradient: Gradient) = source(BorderImageSource.of(gradient))
-    fun slice(all: CSSPercentageValue) = slice(BorderImageSlice.of(all))
-    fun slice(all: Number) = slice(BorderImageSlice.of(all))
-    fun slice(block: BorderImageSlice.Builder.() -> Unit) = slice(BorderImageSlice.of(block))
-    fun width(all: CSSLengthOrPercentageNumericValue) = width(BorderImageWidth.of(all))
-    fun width(all: Number) = width(BorderImageWidth.of(all))
-    fun width(block: BorderImageWidth.Builder.() -> Unit) = width(BorderImageWidth.of(block))
-    fun outset(all: CSSLengthNumericValue) = outset(BorderImageOutset.of(all))
-    fun outset(all: Number) = outset(BorderImageOutset.of(all))
-    fun outset(block: BorderImageOutset.Builder.() -> Unit) = outset(BorderImageOutset.of(block))
-    fun repeat(topBottom: BorderImageRepeat.Mode, leftRight: BorderImageRepeat.Mode) =
-        repeat(BorderImageRepeat.of(topBottom, leftRight))
-}
-
 fun Modifier.borderImage(scope: BorderImageScope.() -> Unit) = styleModifier {
     BorderImageScope(this).apply(scope)
 }
+
+fun Modifier.borderInlineColor(borderInlineColor: BorderInlineColor) = styleModifier {
+    borderInlineColor(borderInlineColor)
+}
+
+fun Modifier.borderInlineColor(color: CSSColorValue) = styleModifier {
+    borderInlineColor(BorderInlineColor.of(color))
+}
+
+fun Modifier.borderInlineStyle(borderInlineStyle: BorderInlineStyle) = styleModifier {
+    borderInlineStyle(borderInlineStyle)
+}
+
+fun Modifier.borderInlineEndColor(borderInlineEndColor: BorderInlineEndColor) = styleModifier {
+    borderInlineEndColor(borderInlineEndColor)
+}
+
+fun Modifier.borderInlineEndColor(color: CSSColorValue) = styleModifier {
+    borderInlineEndColor(BorderInlineEndColor.of(color))
+}
+
+fun Modifier.borderInlineEndStyle(borderInlineEndStyle: BorderInlineEndStyle) = styleModifier {
+    borderInlineEndStyle(borderInlineEndStyle)
+}
+
+fun Modifier.borderInlineStartColor(borderInlineStartColor: BorderInlineStartColor) = styleModifier {
+    borderInlineStartColor(borderInlineStartColor)
+}
+
+fun Modifier.borderInlineStartColor(color: CSSColorValue) = styleModifier {
+    borderInlineStartColor(BorderInlineStartColor.of(color))
+}
+
+fun Modifier.borderInlineStartStyle(borderInlineStartStyle: BorderInlineStartStyle) = styleModifier {
+    borderInlineStartStyle(borderInlineStartStyle)
+}
+
+fun Modifier.borderLeft(
+    width: CSSLengthNumericValue? = null,
+    style: LineStyle? = null,
+    color: CSSColorValue? = null
+) = styleModifier {
+    borderLeft(width, style, color)
+}
+
+fun Modifier.borderLeft(scope: BorderSideScope.() -> Unit) = styleModifier {
+    BorderSideScope(this, "-left").apply(scope)
+}
+
+fun Modifier.borderRadius(r: CSSLengthOrPercentageNumericValue) = styleModifier {
+    borderRadius(r)
+}
+
+fun Modifier.borderRadius(
+    topLeftAndBottomRight: CSSLengthOrPercentageNumericValue = 0.px,
+    topRightAndBottomLeft: CSSLengthOrPercentageNumericValue = 0.px
+) = styleModifier {
+    borderRadius(topLeftAndBottomRight, topRightAndBottomLeft)
+}
+
+fun Modifier.borderRadius(
+    topLeft: CSSLengthOrPercentageNumericValue = 0.px,
+    topRightAndBottomLeft: CSSLengthOrPercentageNumericValue = 0.px,
+    bottomRight: CSSLengthOrPercentageNumericValue = 0.px,
+) = styleModifier {
+    borderRadius(topLeft, topRightAndBottomLeft, bottomRight)
+}
+
+fun Modifier.borderRadius(
+    topLeft: CSSLengthOrPercentageNumericValue = 0.px,
+    topRight: CSSLengthOrPercentageNumericValue = 0.px,
+    bottomRight: CSSLengthOrPercentageNumericValue = 0.px,
+    bottomLeft: CSSLengthOrPercentageNumericValue = 0.px,
+) = styleModifier {
+    borderRadius(topLeft, topRight, bottomRight, bottomLeft)
+}
+
+fun Modifier.borderRadius(scope: BorderRadiusScope.() -> Unit) = styleModifier {
+    BorderRadiusScope(this).apply(scope)
+}
+
+fun Modifier.borderRight(
+    width: CSSLengthNumericValue? = null,
+    style: LineStyle? = null,
+    color: CSSColorValue? = null
+) = styleModifier {
+    borderRight(width, style, color)
+}
+
+fun Modifier.borderRight(scope: BorderSideScope.() -> Unit) = styleModifier {
+    BorderSideScope(this, "-right").apply(scope)
+}
+
+fun Modifier.borderTop(
+    width: CSSLengthNumericValue? = null,
+    style: LineStyle? = null,
+    color: CSSColorValue? = null
+) = styleModifier {
+    borderTop(width, style, color)
+}
+
+fun Modifier.borderTop(scope: BorderSideScope.() -> Unit) = styleModifier {
+    BorderSideScope(this, "-top").apply(scope)
+}
+
