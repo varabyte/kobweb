@@ -44,6 +44,18 @@ fun StyleScope.rubyPosition(rubyPosition: RubyPosition) {
     property("ruby-position", rubyPosition)
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/tab-size
+sealed interface TabSize : StylePropertyValue {
+    companion object : CssGlobalValues<TabSize> {
+        fun of(value: Number) = value.unsafeCast<TabSize>()
+        fun of(value: CSSLengthNumericValue) = value.unsafeCast<TabSize>()
+    }
+}
+
+fun StyleScope.tabSize(tabSize: TabSize) {
+    property("tab-size", tabSize)
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/CSS/text-align
 sealed interface TextAlign : StylePropertyValue {
     companion object : CssGlobalValues<TextAlign> {

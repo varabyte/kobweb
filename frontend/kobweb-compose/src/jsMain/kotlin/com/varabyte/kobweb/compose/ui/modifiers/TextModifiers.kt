@@ -39,6 +39,18 @@ fun Modifier.spellCheck(enabled: Boolean) = attrsModifier {
     spellCheck(enabled)
 }
 
+fun Modifier.tabSize(tabSize: TabSize) = styleModifier {
+    tabSize(tabSize)
+}
+
+fun Modifier.tabSize(value: Int) = styleModifier {
+    tabSize(TabSize.of(value))
+}
+
+fun Modifier.tabSize(value: CSSLengthNumericValue) = styleModifier {
+    tabSize(TabSize.of(value))
+}
+
 fun Modifier.textAlign(textAlign: TextAlign): Modifier = styleModifier {
     textAlign(textAlign)
 }

@@ -532,19 +532,6 @@ class StyleModifierTests {
     }
 
     @Test
-    fun verifyTabSize() {
-        assertThat(modifierToText {
-            Modifier.tabSize(TabSize.Initial)
-        }).isEqualTo("tab-size: initial")
-        assertThat(modifierToText {
-            Modifier.tabSize(25.px)
-        }).isEqualTo("tab-size: 25px")
-        assertThat(modifierToText {
-            Modifier.tabSize(10)
-        }).isEqualTo("tab-size: 10")
-    }
-
-    @Test
     fun verifyText() {
         assertThat(modifierToText {
             Modifier.hyphenateCharacter(HyphenateCharacter.Auto)
@@ -565,6 +552,16 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.rubyPosition(RubyPosition.Under)
         }).isEqualTo("ruby-position: under")
+
+        assertThat(modifierToText {
+            Modifier.tabSize(TabSize.Initial)
+        }).isEqualTo("tab-size: initial")
+        assertThat(modifierToText {
+            Modifier.tabSize(25.px)
+        }).isEqualTo("tab-size: 25px")
+        assertThat(modifierToText {
+            Modifier.tabSize(10)
+        }).isEqualTo("tab-size: 10")
 
         assertThat(modifierToText {
             Modifier.textAlign(TextAlign.Center)
