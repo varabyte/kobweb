@@ -287,6 +287,32 @@ fun StyleScope.textUnderlinePosition(textUnderlinePosition: TextUnderlinePositio
     property("text-underline-position", textUnderlinePosition)
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-wrap
+sealed interface TextWrap : StylePropertyValue {
+    sealed interface Mode : TextWrap
+    sealed interface Style : TextWrap
+
+    companion object : CssGlobalValues<TextWrap> {
+        val Wrap get() = "wrap".unsafeCast<Mode>()
+        val NoWrap get() = "nowrap".unsafeCast<Mode>()
+        val Balance get() = "balance".unsafeCast<Style>()
+        val Pretty get() = "pretty".unsafeCast<Style>()
+        val Stable get() = "stable".unsafeCast<Style>()
+    }
+}
+
+fun StyleScope.textWrap(textWrap: TextWrap) {
+    property("text-wrap", textWrap)
+}
+
+fun StyleScope.textWrapMode(value: TextWrap.Mode) {
+    property("text-wrap-mode", value)
+}
+
+fun StyleScope.textWrapStyle(value: TextWrap.Style) {
+    property("text-wrap-style", value)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
 sealed interface UserSelect : StylePropertyValue {
     companion object : CssGlobalValues<UserSelect> {

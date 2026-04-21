@@ -139,6 +139,19 @@ fun Modifier.textUnderlinePosition(
     textUnderlinePosition(TextUnderlinePosition.of(baseline, side))
 }
 
+class TextWrapScope internal constructor(private val styleScope: StyleScope) {
+    fun mode(value: TextWrap.Mode) = styleScope.textWrapMode(value)
+    fun style(value: TextWrap.Style) = styleScope.textWrapStyle(value)
+}
+
+fun Modifier.textWrap(textWrap: TextWrap) = styleModifier {
+    textWrap(textWrap)
+}
+
+fun Modifier.textWrap(scope: TextWrapScope.() -> Unit) = styleModifier {
+    TextWrapScope(this).scope()
+}
+
 fun Modifier.whiteSpace(whiteSpace: WhiteSpace): Modifier = styleModifier {
     whiteSpace(whiteSpace)
 }

@@ -643,6 +643,17 @@ class StyleModifierTests {
         }).isEqualTo("text-underline-position: from-font right")
 
         assertThat(modifierToText {
+            Modifier.textWrap(TextWrap.Pretty)
+        }).isEqualTo("text-wrap: pretty")
+
+        assertThat(modifierToText {
+            Modifier.textWrap {
+                mode(TextWrap.Wrap)
+                style(TextWrap.Pretty)
+            }
+        }).isEqualTo("text-wrap-mode: wrap; text-wrap-style: pretty")
+
+        assertThat(modifierToText {
             Modifier.textTransform(TextTransform.Capitalize)
         }).isEqualTo("text-transform: capitalize")
 

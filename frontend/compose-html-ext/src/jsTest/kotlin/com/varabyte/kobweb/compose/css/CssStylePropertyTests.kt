@@ -2363,6 +2363,21 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyTextWrap() {
+        assertThat(styleToText { textWrap(TextWrap.Wrap) }).isEqualTo("text-wrap: wrap")
+        assertThat(styleToText { textWrap(TextWrap.NoWrap) }).isEqualTo("text-wrap: nowrap")
+        assertThat(styleToText { textWrap(TextWrap.Balance) }).isEqualTo("text-wrap: balance")
+        assertThat(styleToText { textWrap(TextWrap.Pretty) }).isEqualTo("text-wrap: pretty")
+        assertThat(styleToText { textWrap(TextWrap.Stable) }).isEqualTo("text-wrap: stable")
+
+        assertThat(styleToText { textWrap(TextWrap.Inherit) }).isEqualTo("text-wrap: inherit")
+        assertThat(styleToText { textWrap(TextWrap.Initial) }).isEqualTo("text-wrap: initial")
+        assertThat(styleToText { textWrap(TextWrap.Revert) }).isEqualTo("text-wrap: revert")
+        assertThat(styleToText { textWrap(TextWrap.RevertLayer) }).isEqualTo("text-wrap: revert-layer")
+        assertThat(styleToText { textWrap(TextWrap.Unset) }).isEqualTo("text-wrap: unset")
+    }
+
+    @Test
     fun verifyTop() {
         assertThat(styleToText { top(Top.of(10.px)) }).isEqualTo("top: 10px")
 
