@@ -119,7 +119,7 @@ val generateIconsTask = tasks.register("generateIcons") {
                         throw GradleException("Unexpected icon entry with no styles: $entry")
                     }
 
-                    styles.size == IconStyle.values().size -> {
+                    styles.size == IconStyle.entries.size -> {
                         // This icon supports all styles. No need to assert input parameters.
                         "@Composable fun $methodName(modifier: Modifier = Modifier, style: MsIconStyle = OUTLINED) = MsIcon(\"$rawName\", modifier, style)"
                     }
