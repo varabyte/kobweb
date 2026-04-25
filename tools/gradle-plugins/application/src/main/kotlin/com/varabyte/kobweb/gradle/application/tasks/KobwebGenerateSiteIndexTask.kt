@@ -11,6 +11,7 @@ import com.varabyte.kobweb.gradle.core.util.HtmlUtil
 import com.varabyte.kobweb.gradle.core.util.downloadOrCached
 import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
+import com.varabyte.kobweb.gradle.core.util.toSha256
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_LIBRARY
 import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.dom.append
@@ -40,7 +41,6 @@ import org.jsoup.nodes.Element
 import java.io.File
 import java.net.URI
 import javax.inject.Inject
-import kotlin.math.min
 
 class KobwebGenIndexConfInputs(
     @get:Input val title: String,
@@ -100,26 +100,45 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             return resolve(name).also { it.parentFile.mkdirs() }
         }
 
-        val downloadResult = projectLayout.downloadOrCached(logger, URI(url).toURL())
+        val urlStr = url
+        @Suppress("NAME_SHADOWING") // String to actual URL
+        val url = URI(url).toURL()
+        val downloadResult = projectLayout.downloadOrCached(logger, url)
         val selfHostPrefix = "_kobweb/self-host"
         val selfHostRoot = getGenPublicRoot().resolve(selfHostPrefix)
 
-        var urlAsPath = url.substringAfterLast("://").substringBefore("?").substringBefore("#")
+        var urlPath = url.path.removePrefix("/")
+
+        // If the download URL has parameters, instead of dropping them, include them in the final URL. This can help us
+        // avoid conflicts if multiple modules end up otherwise resolving to the same base URL (which happens with
+        // Google MDI icons and Google MS icons, for example; same base path, different parameters).
+        // e.g. "a/b/c/slug?hello=world" -> "a/b/c/SOMEHASHHERE/slug"
+        if (url.query != null) {
+            val urlWithoutSlug = urlPath.substringBeforeLast("/", "")
+            val slug = urlPath.substringAfterLast("/")
+
+            urlPath = listOf(
+                urlWithoutSlug,
+                // Hash the params, as a lazy way to avoid characters that don't play nice with the filesystem.
+                url.query.toSha256(),
+                slug
+            ).filter { it.isNotEmpty() }.joinToString("/")
+        }
 
         // Slight hack: detecting CSS files is really important for self-hosting (since we search css files for internal
         // links that we also need to self-host), but in at least one case we've seen a URL that is a CSS file but had
         // no extension. Normally, when you download a file, its content type is included in the response, but we lose
         // that information when saving the file to disk. Appending an explicit css extension works around that.
         if (
-            !urlAsPath.substringAfterLast("/").contains(".")
+            !urlPath.substringAfterLast("/").contains(".")
             && downloadResult.metadata.contentType?.contains("text/css") == true
         ) {
-            urlAsPath += ".css"
+            urlPath += ".css"
         }
 
-        val selfHostedFile = selfHostRoot.resolveWithMkdirs(urlAsPath).apply { writeBytes(downloadResult.file.readBytes()) }
+        val selfHostedFile = selfHostRoot.resolveWithMkdirs(urlPath).apply { writeBytes(downloadResult.file.readBytes()) }
 
-        if (urlAsPath.endsWith(".css")) {
+        if (urlPath.endsWith(".css")) {
             val originalText = selfHostedFile.readText()
 
             selfHostedFile.writeText(buildString {
@@ -137,13 +156,12 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                             urlValue.contains(":") -> null // ignore other protocols, e.g. `data:`
                             else -> {
                                 // If here, the URL value is relative, e.g. ("ex", "./ex", "../ex").
-                                val paramsIndex = min(url.indexOf("?"), url.indexOf("#"))
-                                val urlBase = url.substringBeforeLast("/")
+                                val urlBase = urlStr.substringBeforeLast("/")
                                 // urlValue.removePrefix("./") removes useless "." in the middle of a URL that seems to
                                 // confuse the downloader.
                                 // Good: `/url/base` + './nested/value` -> "/url/base/nested/value`
                                 // Bad:  `/url/base` + './nested/value` -> "/url/base/./nested/value`
-                                urlBase + "/" + urlValue.removePrefix("./") + if (paramsIndex >= 0) url.substring(paramsIndex) else ""
+                                urlBase + "/" + urlValue.removePrefix("./") + url.query?.let { "?$it" }.orEmpty() + url.ref?.let { "#$it" }.orEmpty()
                             }
                         }?.let { makeLocalCopyOfUrl(it, basePath) }
 
@@ -163,7 +181,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             })
         }
 
-        return basePath.prependTo("/$selfHostPrefix/$urlAsPath")
+        return basePath.prependTo("/$selfHostPrefix/$urlPath")
     }
 
     private class ApplyUrlInterceptorsResult(

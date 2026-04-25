@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.gradle.core.util
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
 import org.gradle.api.file.Directory
@@ -80,7 +79,18 @@ private fun downloadFile(url: URL, targetFile: File): DownloadedFileMetadata {
 
 fun ProjectLayout.downloadOrCached(logger: Logger, url: URL): DownloadResult {
     // Convert URL to file path
-    val cachedFile = kobwebCacheFile(url.path.removePrefix("/").replace("/", File.separator)).get().asFile
+    val cachedFile = run {
+        val urlSegments = url.path.removePrefix("/").split("/").toMutableList()
+        // If a URL contains query params, encode them into the cached file path; otherwise, two different network
+        // requests might be cached into the same file
+        if (url.query != null) {
+            val slug = urlSegments.removeLast()
+            urlSegments.add(url.query.toSha256())
+            urlSegments.add(slug)
+        }
+        kobwebCacheFile(urlSegments.joinToString(File.separator)).get().asFile
+    }
+
     logger.info("Download requested: $url...")
     if (!cachedFile.exists()) {
         val metadata = downloadFile(url, cachedFile)
