@@ -105,6 +105,11 @@ import com.varabyte.kobweb.silk.components.icons.mdi.MdiClose
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiHome
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiMenu
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiSearch
+import com.varabyte.kobweb.silk.components.icons.ms.MsClose
+import com.varabyte.kobweb.silk.components.icons.ms.MsHome
+import com.varabyte.kobweb.silk.components.icons.ms.MsIconStyle
+import com.varabyte.kobweb.silk.components.icons.ms.MsMenu
+import com.varabyte.kobweb.silk.components.icons.ms.MsSearch
 import com.varabyte.kobweb.silk.components.layout.SimpleGrid
 import com.varabyte.kobweb.silk.components.layout.numColumns
 import com.varabyte.kobweb.silk.components.navigation.Link
@@ -403,6 +408,25 @@ fun WidgetsPage() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         mdiIcons.forEach { (iconName, iconMethod) ->
+                            Box(IconContainerStyle.toModifier()) { iconMethod() }
+                            Tooltip(ElementTarget.PreviousSibling, iconName)
+                        }
+                    }
+                }
+
+                WidgetSection("Web - Google Material Symbols") {
+                    val msIcons = mapOf<String, @Composable () -> Unit>(
+                        "Search (Outlined)" to { MsSearch() },
+                        "Home (Rounded)" to { MsHome(style = MsIconStyle.ROUNDED) },
+                        "Menu (Sharp)" to { MsMenu(style = MsIconStyle.SHARP) },
+                        "Close (Outlined)" to { MsClose() },
+                    )
+
+                    Row(
+                        Modifier.gap(0.5.cssRem).flexWrap(FlexWrap.Wrap),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        msIcons.forEach { (iconName, iconMethod) ->
                             Box(IconContainerStyle.toModifier()) { iconMethod() }
                             Tooltip(ElementTarget.PreviousSibling, iconName)
                         }
