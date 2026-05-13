@@ -500,7 +500,7 @@ private fun <T : Any?> _Input(
 
                 onInput { evt -> onValueChange(type.inputValue(evt.nativeEvent)) }
                 onKeyUp { evt ->
-                    if (valid && evt.code == "Enter") {
+                    if (valid && evt.key == "Enter") {
                         evt.preventDefault()
                         evt.stopPropagation()
                         onCommit()
