@@ -2446,6 +2446,17 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyTransform() {
+        assertThat(styleToText { transform(Transform.None) }).isEqualTo("transform: none")
+
+        assertThat(styleToText { transform(Transform.Inherit) }).isEqualTo("transform: inherit")
+        assertThat(styleToText { transform(Transform.Initial) }).isEqualTo("transform: initial")
+        assertThat(styleToText { transform(Transform.Revert) }).isEqualTo("transform: revert")
+        assertThat(styleToText { transform(Transform.RevertLayer) }).isEqualTo("transform: revert-layer")
+        assertThat(styleToText { transform(Transform.Unset) }).isEqualTo("transform: unset")
+    }
+
+    @Test
     fun verifyTransformBox() {
         assertThat(styleToText { transformBox(TransformBox.BorderBox) }).isEqualTo("transform-box: border-box")
         assertThat(styleToText { transformBox(TransformBox.ContentBox) }).isEqualTo("transform-box: content-box")

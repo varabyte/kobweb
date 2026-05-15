@@ -15,6 +15,10 @@ fun Modifier.transform(transformContext: TransformBuilder.() -> Unit) = styleMod
     transform(transformContext)
 }
 
+fun Modifier.transform(transform: Transform) = styleModifier {
+    transform(transform)
+}
+
 fun Modifier.rotate(a: CSSAngleValue) = styleModifier {
     rotate(a)
 }

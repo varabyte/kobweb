@@ -91,6 +91,19 @@ fun StyleScope.backfaceVisibility(backFaceVisibility: BackfaceVisibility) {
     property("backface-visibility", backFaceVisibility)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/transform
+// NOTE: stdlib already provides `fun StyleScope.transform(transformContext: TransformBuilder.() -> Unit)` so we don't
+// duplicate that here.
+sealed interface Transform : StylePropertyValue {
+    companion object : CssGlobalValues<Transform> {
+        // Keyword
+        val None get() = "none".unsafeCast<Transform>()
+    }
+}
+
+fun StyleScope.transform(transform: Transform) {
+    property("transform", transform)
+}
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/transform-box
 sealed interface TransformBox : StylePropertyValue {

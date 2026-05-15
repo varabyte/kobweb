@@ -703,6 +703,10 @@ class StyleModifierTests {
         }).isEqualTo("transform: translateX(10px) scale(2)")
 
         assertThat(modifierToText {
+            Modifier.transform(Transform.None)
+        }).isEqualTo("transform: none")
+
+        assertThat(modifierToText {
             Modifier.rotate(45.deg)
         }).isEqualTo("rotate: 45deg")
 
