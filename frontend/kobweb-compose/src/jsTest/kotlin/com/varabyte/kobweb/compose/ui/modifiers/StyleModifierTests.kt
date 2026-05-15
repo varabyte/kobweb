@@ -342,6 +342,17 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifyImage() {
+        assertThat(modifierToText {
+            Modifier.imageOrientation(ImageOrientation.FromImage)
+        }).isEqualTo("image-orientation: from-image")
+
+        assertThat(modifierToText {
+            Modifier.imageRendering(ImageRendering.Pixelated)
+        }).isEqualTo("image-rendering: pixelated")
+    }
+
+    @Test
     fun verifyOutline() {
         assertThat(modifierToText {
             Modifier.outline(

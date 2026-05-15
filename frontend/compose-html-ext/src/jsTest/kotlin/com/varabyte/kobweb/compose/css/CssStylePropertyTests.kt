@@ -1484,6 +1484,31 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyImageOrientation() {
+        assertThat(styleToText { imageOrientation(ImageOrientation.None) }).isEqualTo("image-orientation: none")
+        assertThat(styleToText { imageOrientation(ImageOrientation.FromImage) }).isEqualTo("image-orientation: from-image")
+
+        assertThat(styleToText { imageOrientation(ImageOrientation.Inherit) }).isEqualTo("image-orientation: inherit")
+        assertThat(styleToText { imageOrientation(ImageOrientation.Initial) }).isEqualTo("image-orientation: initial")
+        assertThat(styleToText { imageOrientation(ImageOrientation.Revert) }).isEqualTo("image-orientation: revert")
+        assertThat(styleToText { imageOrientation(ImageOrientation.RevertLayer) }).isEqualTo("image-orientation: revert-layer")
+        assertThat(styleToText { imageOrientation(ImageOrientation.Unset) }).isEqualTo("image-orientation: unset")
+    }
+
+    @Test
+    fun verifyImageRendering() {
+        assertThat(styleToText { imageRendering(ImageRendering.Auto) }).isEqualTo("image-rendering: auto")
+        assertThat(styleToText { imageRendering(ImageRendering.CrispEdges) }).isEqualTo("image-rendering: crisp-edges")
+        assertThat(styleToText { imageRendering(ImageRendering.Pixelated) }).isEqualTo("image-rendering: pixelated")
+
+        assertThat(styleToText { imageRendering(ImageRendering.Inherit) }).isEqualTo("image-rendering: inherit")
+        assertThat(styleToText { imageRendering(ImageRendering.Initial) }).isEqualTo("image-rendering: initial")
+        assertThat(styleToText { imageRendering(ImageRendering.Revert) }).isEqualTo("image-rendering: revert")
+        assertThat(styleToText { imageRendering(ImageRendering.RevertLayer) }).isEqualTo("image-rendering: revert-layer")
+        assertThat(styleToText { imageRendering(ImageRendering.Unset) }).isEqualTo("image-rendering: unset")
+    }
+
+    @Test
     fun verifyIsolation() {
         assertThat(styleToText { isolation(Isolation.Auto) }).isEqualTo("isolation: auto")
         assertThat(styleToText { isolation(Isolation.Isolate) }).isEqualTo("isolation: isolate")
