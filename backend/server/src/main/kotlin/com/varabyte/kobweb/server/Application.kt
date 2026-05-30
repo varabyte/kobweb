@@ -14,6 +14,7 @@ import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.io.ServerStateFile
 import com.varabyte.kobweb.server.plugin.KobwebServerPlugin
 import com.varabyte.kobweb.server.plugins.configureHTTP
+import com.varabyte.kobweb.server.plugins.configureRateLimiting
 import com.varabyte.kobweb.server.plugins.configureRouting
 import com.varabyte.kobweb.server.plugins.configureSerialization
 import io.ktor.server.application.*
@@ -77,8 +78,8 @@ suspend fun main() {
         System.setProperty(
             "LOG_MAX_HISTORY",
             maxFileCount?.takeIf { it > 0 }?.toString()
-                // Note: The "9999" hack value below used to be Int.MAX_VALUE, but this caused logback to break,
-                // consuming 100% of the thread. ~30 years (9999 days) of logs should be enough for anyone.
+            // Note: The "9999" hack value below used to be Int.MAX_VALUE, but this caused logback to break,
+            // consuming 100% of the thread. ~30 years (9999 days) of logs should be enough for anyone.
                 ?: if (totalSizeCap?.takeIf { it.inWholeBytes > 0 } == null) "0" else "9999")
         System.setProperty("LOG_SIZE_CAP", totalSizeCap?.inWholeBytes?.toString() ?: "0")
     }
@@ -123,6 +124,7 @@ suspend fun main() {
     val engine = embeddedServer(Netty, port) {
         log.info("Initializing server engine for Kobweb project \"${conf.site.title}\"")
 
+        configureRateLimiting(conf.server.rateLimiting)
         configureRouting(appProperties, env, siteLayout, conf, globals, events)
         configureSerialization()
         configureHTTP(appProperties, env, conf)
@@ -161,6 +163,7 @@ suspend fun main() {
                         globals.status.clear() // If we happen to be showing a message when paused, cancel it!
                     }
                 }
+
                 is ServerRequest.ResumeClientEvents -> {
                     if (pausedCopy != null) {
                         globals.set(pausedCopy)
@@ -168,9 +171,11 @@ suspend fun main() {
                         pausedCopy = null
                     }
                 }
+
                 is ServerRequest.IncrementVersion -> {
                     targetGlobals().version++
                 }
+
                 is ServerRequest.SetStatus -> {
                     targetGlobals().status.apply {
                         text = request.message

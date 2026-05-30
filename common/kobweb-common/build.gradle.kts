@@ -12,10 +12,10 @@ dependencies {
     // kobweb-common and your own different version of kaml can result in runtime exceptions, so just expose this one.
     api(libs.kaml)
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.truthish)
-    testImplementation(libs.kotlinx.serialization.json)
 }
 
 kobwebPublication {

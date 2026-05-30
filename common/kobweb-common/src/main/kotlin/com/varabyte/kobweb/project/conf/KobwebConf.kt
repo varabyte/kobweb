@@ -10,6 +10,7 @@ import com.varabyte.kobweb.common.time.DurationSerializer
 import com.varabyte.kobweb.common.yaml.nonStrictDefault
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.io.KobwebReadableTextFile
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import kotlin.time.Duration
@@ -36,6 +37,7 @@ class Server(
     val cors: Cors = Cors(),
     val redirects: List<Redirect> = emptyList(),
     val streaming: Streaming = Streaming(),
+    val rateLimiting: RateLimiting = RateLimiting(),
     val nativeLibraries: List<NativeLibrary> = emptyList(),
 ) {
     /**
@@ -222,6 +224,104 @@ class Server(
             require(name == "*" || schemes.isNotEmpty()) {
                 "Invalid host configuration values. Either the hostname should be '*' or at least one scheme should be specified."
             }
+        }
+    }
+
+    /**
+     * Configuration for Rate Limiting.
+     *
+     * Rate limiting helps protect the server from abuse, brute-force attacks, and unhandled bursts of traffic.
+     * By default, rate limiting is disabled. When enabled, requests are filtered by the provided [global] configuration
+     * and optionally overridden on a per-route basis via [routes].
+     *
+     * @param enabled Set to true to enable rate limiting.
+     * @param global The default rate limiting configuration applied to all routes unless overridden.
+     * @param routes A list of route-specific configurations that override the global configuration.
+     */
+    @Serializable
+    class RateLimiting(
+        val enabled: Boolean = false,
+        val global: Configuration = Configuration.TokenBucket(),
+        val routes: List<RouteConfiguration> = emptyList(),
+    ) {
+        /**
+         * A route-specific override for rate limiting.
+         *
+         * @param path The route path prefix (e.g., "/api/") where this configuration applies.
+         * @param configuration The rate limiting settings specific to this route.
+         */
+        @Serializable
+        class RouteConfiguration(
+            val path: String,
+            val configuration: Configuration,
+        )
+
+        /**
+         * The strategy and configuration used to limit requests.
+         *
+         * See [TokenBucket] and [FixedWindow] for available algorithms.
+         *
+         * The concrete subclass is selected by a `type` discriminator property in the YAML configuration
+         * (e.g. `type: TOKEN_BUCKET` or `type: FIXED_WINDOW`).
+         */
+        @Serializable
+        sealed class Configuration {
+            /** The strategy used to identify the client for rate limiting. */
+            abstract val key: Key
+
+            /**
+             * The Token Bucket algorithm configuration.
+             *
+             * A bucket is given a maximum [capacity]. Every [duration], [tokens] are added to the bucket (up to [capacity]).
+             * Each request consumes one token. If the bucket is empty, the request is rejected.
+             *
+             * @param key The identifier strategy for requests.
+             * @param capacity The maximum number of requests allowed in a burst.
+             * @param tokens The number of tokens added to the bucket per interval.
+             * @param duration The interval at which new tokens are added (e.g. "1s", "500ms").
+             * @param customHeader The HTTP header to inspect for rate limiting when using [Key.CUSTOM_HEADER].
+             */
+            @Serializable
+            @SerialName("TOKEN_BUCKET")
+            class TokenBucket(
+                override val key: Key = Key.IP,
+                val capacity: Int = 100,
+                val tokens: Int = 10,
+                val duration: Duration = 1.seconds,
+                val customHeader: String = "X-Api-Key",
+            ) : Configuration()
+
+            /**
+             * The Fixed Window algorithm configuration.
+             *
+             * Time is divided into discrete windows of [duration]. Within each window, a maximum of [size] requests
+             * are allowed. When the window resets, the counter resets.
+             *
+             * @param key The identifier strategy for requests.
+             * @param size The maximum number of requests allowed per window.
+             * @param duration The duration of the window (e.g. "1s", "500ms").
+             * @param customHeader The HTTP header to inspect for rate limiting when using [Key.CUSTOM_HEADER].
+             */
+            @Serializable
+            @SerialName("FIXED_WINDOW")
+            class FixedWindow(
+                override val key: Key = Key.IP,
+                val size: Int = 100,
+                val duration: Duration = 1.seconds,
+                val customHeader: String = "X-Api-Key",
+            ) : Configuration()
+        }
+
+        /** Key to identify client requests. */
+        enum class Key {
+            /** Use the direct connection IP to identify the request. */
+            IP,
+
+            /** Use the first value in the X-Forwarded-For header to identify the request. */
+            FORWARD_IP,
+
+            /** Use a custom header to identify the request. */
+            CUSTOM_HEADER
         }
     }
 }
