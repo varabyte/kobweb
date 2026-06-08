@@ -33,6 +33,7 @@ import kotlin.io.path.deleteExisting
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
+import kotlin.time.Duration.Companion.milliseconds
 
 private fun isPortInUse(port: Int): Boolean {
     try {
@@ -191,7 +192,7 @@ suspend fun main(): Unit = withContext(Dispatchers.IO) {
             requestsFile.enqueueRequest(ServerRequest.ClearStatus())
         }
 
-        delay(300)
+        delay(300.milliseconds)
     }
 
 
