@@ -1,13 +1,13 @@
 package com.varabyte.kobweb.browser.http
 
-import kotlinx.browser.window
+import com.varabyte.kobweb.browser.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.get
-import org.w3c.dom.Window
+import org.w3c.dom.WindowOrWorkerGlobalScope
 import org.w3c.fetch.RequestInit
 import org.w3c.fetch.RequestRedirect
 import org.w3c.fetch.Response
@@ -42,8 +42,8 @@ private suspend fun Response.getBodyBytes(): ByteArray {
     }
 }
 
-private fun Response.getBodyBytesAsync(result: (ByteArray) -> Unit) {
-    CoroutineScope(window.asCoroutineDispatcher()).launch {
+private fun Response.getBodyBytesAsync(dispatcher: CoroutineDispatcher, result: (ByteArray) -> Unit) {
+    CoroutineScope(dispatcher).launch {
         result(getBodyBytes())
     }
 }
@@ -84,7 +84,7 @@ object FetchDefaults {
 }
 
 @Deprecated("DO NOT IGNORE. Please change to `fetchBytes` instead. This method will be modified soon in a backwards incompatible way, in order to support additional cases that the current form doesn't support.", replaceWith = ReplaceWith("fetchBytes(method, resource, headers, body, redirect, abortController)"))
-suspend fun Window.fetch(
+suspend fun WindowOrWorkerGlobalScope.fetch(
     method: HttpMethod,
     resource: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
@@ -104,7 +104,7 @@ suspend fun Window.fetch(
  * @param headers An optional map of headers to send with the request. Note: If a body is specified, the
  *   `Content-Length` header will be automatically set. However, any headers set manually will always take precedence.
  */
-suspend fun Window.fetchBytes(
+suspend fun WindowOrWorkerGlobalScope.fetchBytes(
     method: HttpMethod,
     resource: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
@@ -138,12 +138,12 @@ suspend fun Window.fetchBytes(
         requestInitDynamic["signal"] = abortController.signal
     }
 
-    val _ = window.fetch(resource, requestInit).then(
+    val _ = fetch(resource, requestInit).then(
         onFulfilled = { res ->
             if (res.ok) {
-                res.getBodyBytesAsync { bodyBytes -> responseBytesDeferred.complete(bodyBytes) }
+                res.getBodyBytesAsync(this.asCoroutineDispatcher()) { bodyBytes -> responseBytesDeferred.complete(bodyBytes) }
             } else {
-                res.getBodyBytesAsync { bodyBytes ->
+                res.getBodyBytesAsync(this.asCoroutineDispatcher()) { bodyBytes ->
                     responseBytesDeferred.completeExceptionally(ResponseException(res, bodyBytes))
                 }
             }
@@ -154,7 +154,7 @@ suspend fun Window.fetchBytes(
 }
 
 @Deprecated("DO NOT IGNORE. Please change to `tryFetchBytes` instead. This method will be modified soon in a backwards incompatible way, in order to support additional cases that the current form doesn't support.", replaceWith = ReplaceWith("tryFetchBytes(method, resource, headers, body, redirect, logOnError, abortController)"))
-suspend fun Window.tryFetch(
+suspend fun WindowOrWorkerGlobalScope.tryFetch(
     method: HttpMethod,
     resource: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
@@ -167,7 +167,7 @@ suspend fun Window.tryFetch(
 /**
  * Like [fetchBytes] but returns null if the fetch fails for any reason instead of throwing.
  */
-suspend fun Window.tryFetchBytes(
+suspend fun WindowOrWorkerGlobalScope.tryFetchBytes(
     method: HttpMethod,
     resource: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,

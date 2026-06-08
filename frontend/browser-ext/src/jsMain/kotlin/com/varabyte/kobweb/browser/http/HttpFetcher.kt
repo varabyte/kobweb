@@ -2,6 +2,7 @@ package com.varabyte.kobweb.browser.http
 
 import kotlinx.browser.window
 import org.w3c.dom.Window
+import org.w3c.dom.WindowOrWorkerGlobalScope
 import org.w3c.fetch.RequestRedirect
 
 /**
@@ -50,7 +51,7 @@ class AbortController {
  *
  * The class additionally exposes a `logOnError` field which globally applies to all `try...` methods.
  */
-class HttpFetcher(private val window: Window) {
+class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
     /**
      * If true, when using any of the "try" methods, log any errors, if they occur, to the console.
      *
@@ -81,7 +82,7 @@ class HttpFetcher(private val window: Window) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray = window.fetchBytes(HttpMethod.DELETE, resource, headers, body = null, redirect, abortController)
+    ): ByteArray = fetchScope.fetchBytes(HttpMethod.DELETE, resource, headers, body = null, redirect, abortController)
 
     /**
      * Like [delete], but returns null if the request failed for any reason.
@@ -107,7 +108,7 @@ class HttpFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
     ): ByteArray? =
-        window.tryFetchBytes(HttpMethod.DELETE, resource, headers, body = null, redirect, logOnError, abortController)
+        fetchScope.tryFetchBytes(HttpMethod.DELETE, resource, headers, body = null, redirect, logOnError, abortController)
 
     /**
      * Call GET on a target resource.
@@ -132,7 +133,7 @@ class HttpFetcher(private val window: Window) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray = window.fetchBytes(HttpMethod.GET, resource, headers, body = null, redirect, abortController)
+    ): ByteArray = fetchScope.fetchBytes(HttpMethod.GET, resource, headers, body = null, redirect, abortController)
 
     /**
      * Like [get], but returns null if the request failed for any reason.
@@ -158,7 +159,7 @@ class HttpFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
     ): ByteArray? =
-        window.tryFetchBytes(HttpMethod.GET, resource, headers, body = null, redirect, logOnError, abortController)
+        fetchScope.tryFetchBytes(HttpMethod.GET, resource, headers, body = null, redirect, logOnError, abortController)
 
     /**
      * Call HEAD on a target resource.
@@ -183,7 +184,7 @@ class HttpFetcher(private val window: Window) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray = window.fetchBytes(HttpMethod.HEAD, resource, headers, body = null, redirect, abortController)
+    ): ByteArray = fetchScope.fetchBytes(HttpMethod.HEAD, resource, headers, body = null, redirect, abortController)
 
     /**
      * Like [head], but returns null if the request failed for any reason.
@@ -209,7 +210,7 @@ class HttpFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
     ): ByteArray? =
-        window.tryFetchBytes(HttpMethod.HEAD, resource, headers, body = null, redirect, logOnError, abortController)
+        fetchScope.tryFetchBytes(HttpMethod.HEAD, resource, headers, body = null, redirect, logOnError, abortController)
 
     /**
      * Call OPTIONS on a target resource.
@@ -234,7 +235,7 @@ class HttpFetcher(private val window: Window) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray = window.fetchBytes(HttpMethod.OPTIONS, resource, headers, body = null, redirect, abortController)
+    ): ByteArray = fetchScope.fetchBytes(HttpMethod.OPTIONS, resource, headers, body = null, redirect, abortController)
 
     /**
      * Like [options], but returns null if the request failed for any reason.
@@ -260,7 +261,7 @@ class HttpFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
     ): ByteArray? =
-        window.tryFetchBytes(HttpMethod.OPTIONS, resource, headers, body = null, redirect, logOnError, abortController)
+        fetchScope.tryFetchBytes(HttpMethod.OPTIONS, resource, headers, body = null, redirect, logOnError, abortController)
 
     /**
      * Call PATCH on a target resource.
@@ -289,7 +290,7 @@ class HttpFetcher(private val window: Window) {
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray = window.fetchBytes(HttpMethod.PATCH, resource, headers, body, redirect, abortController)
+    ): ByteArray = fetchScope.fetchBytes(HttpMethod.PATCH, resource, headers, body, redirect, abortController)
 
     /**
      * Like [patch], but returns null if the request failed for any reason.
@@ -317,7 +318,7 @@ class HttpFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
     ): ByteArray? =
-        window.tryFetchBytes(HttpMethod.PATCH, resource, headers, body, redirect, logOnError, abortController)
+        fetchScope.tryFetchBytes(HttpMethod.PATCH, resource, headers, body, redirect, logOnError, abortController)
 
     /**
      * Call POST on a target resource.
@@ -346,7 +347,7 @@ class HttpFetcher(private val window: Window) {
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray = window.fetchBytes(HttpMethod.POST, resource, headers, body, redirect, abortController)
+    ): ByteArray = fetchScope.fetchBytes(HttpMethod.POST, resource, headers, body, redirect, abortController)
 
     /**
      * Like [post], but returns null if the request failed for any reason.
@@ -374,7 +375,7 @@ class HttpFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
     ): ByteArray? =
-        window.tryFetchBytes(HttpMethod.POST, resource, headers, body, redirect, logOnError, abortController)
+        fetchScope.tryFetchBytes(HttpMethod.POST, resource, headers, body, redirect, logOnError, abortController)
 
     /**
      * Call PUT on a target resource.
@@ -403,7 +404,7 @@ class HttpFetcher(private val window: Window) {
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray = window.fetchBytes(HttpMethod.PUT, resource, headers, body, redirect, abortController)
+    ): ByteArray = fetchScope.fetchBytes(HttpMethod.PUT, resource, headers, body, redirect, abortController)
 
     /**
      * Like [put], but returns null if the request failed for any reason.
@@ -430,8 +431,10 @@ class HttpFetcher(private val window: Window) {
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray? = window.tryFetchBytes(HttpMethod.PUT, resource, headers, body, redirect, logOnError, abortController)
+    ): ByteArray? = fetchScope.tryFetchBytes(HttpMethod.PUT, resource, headers, body, redirect, logOnError, abortController)
 }
 
-@Suppress("unused") // We tie our class to the "Window" class on purpose, so it can be used instead of `fetch`
-val Window.http by lazy { HttpFetcher(window) }
+val WindowOrWorkerGlobalScope.http: HttpFetcher get() = with(this.asDynamic()) {
+    httpFetcher = httpFetcher ?: HttpFetcher(this)
+    httpFetcher
+}
