@@ -19,7 +19,9 @@ import com.varabyte.kobweb.server.plugins.configureSerialization
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.URLClassLoader
@@ -42,7 +44,7 @@ private fun isPortInUse(port: Int): Boolean {
     }
 }
 
-suspend fun main() {
+suspend fun main(): Unit = withContext(Dispatchers.IO) {
     val folder = KobwebFolder.inWorkingDirectory()
         ?: throw KobwebException("Server must be started in the root of a Kobweb project")
 
