@@ -52,3 +52,14 @@ sealed interface ObjectFit : StylePropertyValue {
 fun StyleScope.objectFit(objectFit: ObjectFit) {
     property("object-fit", objectFit)
 }
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/object-position
+sealed interface ObjectPosition : StylePropertyValue {
+    companion object : CssGlobalValues<ObjectPosition> {
+        fun of(position: CSSPosition): ObjectPosition = "$position".unsafeCast<ObjectPosition>()
+    }
+}
+
+fun StyleScope.objectPosition(objectPosition: ObjectPosition) {
+    property("object-position", objectPosition)
+}

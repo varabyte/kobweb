@@ -353,6 +353,22 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifyMedia() {
+        assertThat(modifierToText {
+            Modifier.objectFit(ObjectFit.ScaleDown)
+        }).isEqualTo("object-fit: scale-down")
+
+        assertThat(modifierToText {
+            Modifier.objectPosition(CSSPosition(25.percent, 75.percent))
+        }).isEqualTo("object-position: 25% 75%")
+
+
+        assertThat(modifierToText {
+            Modifier.mixBlendMode(MixBlendMode.ColorBurn)
+        }).isEqualTo("mix-blend-mode: color-burn")
+    }
+
+    @Test
     fun verifyOutline() {
         assertThat(modifierToText {
             Modifier.outline(

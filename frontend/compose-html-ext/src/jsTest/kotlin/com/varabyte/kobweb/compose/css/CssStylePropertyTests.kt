@@ -1839,6 +1839,25 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyObjectPosition() {
+        assertThat(styleToText { objectPosition(ObjectPosition.of(CSSPosition(25.percent, 75.percent))) })
+            .isEqualTo("object-position: 25% 75%")
+        assertThat(styleToText { objectPosition(ObjectPosition.of(CSSPosition(10.ch, 8.em))) })
+            .isEqualTo("object-position: 10ch 8em")
+
+        assertThat(styleToText { objectPosition(ObjectPosition.of(
+            CSSPosition(EdgeXOffset(Edge.Right, 3.em), EdgeYOffset(Edge.Bottom, 10.px))
+        )) })
+            .isEqualTo("object-position: right 3em bottom 10px")
+
+        assertThat(styleToText { objectPosition(ObjectPosition.Inherit) }).isEqualTo("object-position: inherit")
+        assertThat(styleToText { objectPosition(ObjectPosition.Initial) }).isEqualTo("object-position: initial")
+        assertThat(styleToText { objectPosition(ObjectPosition.Revert) }).isEqualTo("object-position: revert")
+        assertThat(styleToText { objectPosition(ObjectPosition.RevertLayer) }).isEqualTo("object-position: revert-layer")
+        assertThat(styleToText { objectPosition(ObjectPosition.Unset) }).isEqualTo("object-position: unset")
+    }
+
+    @Test
     fun verifyOpacity() {
         assertThat(styleToText { opacity(Opacity.of(0.5)) }).isEqualTo("opacity: 0.5")
         assertThat(styleToText { opacity(Opacity.of(50.percent)) }).isEqualTo("opacity: 50%")

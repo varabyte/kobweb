@@ -8,6 +8,12 @@ fun Modifier.objectFit(objectFit: ObjectFit) = styleModifier {
     objectFit(objectFit)
 }
 
+fun Modifier.objectPosition(position: CSSPosition) = objectPosition(ObjectPosition.of(position))
+
+fun Modifier.objectPosition(objectPosition: ObjectPosition) = styleModifier {
+    objectPosition(objectPosition)
+}
+
 fun Modifier.mixBlendMode(blendMode: MixBlendMode) = styleModifier {
     mixBlendMode(blendMode)
 }
