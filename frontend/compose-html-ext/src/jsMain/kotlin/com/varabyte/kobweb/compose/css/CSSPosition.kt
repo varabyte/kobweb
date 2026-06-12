@@ -99,14 +99,14 @@ class CSSPosition private constructor(private val value: String) : StyleProperty
 
     companion object {
         // Positions
-        val Top get() = CSSPosition(Edge.Top)
-        val TopRight get() = CSSPosition(Edge.Right, Edge.Top)
-        val Right get() = CSSPosition(Edge.Right)
-        val BottomRight get() = CSSPosition(Edge.Right, Edge.Bottom)
-        val Bottom get() = CSSPosition(Edge.Bottom)
-        val BottomLeft get() = CSSPosition(Edge.Left, Edge.Bottom)
-        val Left get() = CSSPosition(Edge.Left)
-        val TopLeft get() = CSSPosition(Edge.Left, Edge.Top)
-        val Center get() = CSSPosition(Edge.CenterX, Edge.CenterY)
+        val Top get() = "top".unsafeCast<CSSPosition>()
+        val TopRight get() = "right top".unsafeCast<CSSPosition>()
+        val Right get() = "right".unsafeCast<CSSPosition>()
+        val BottomRight get() = "right bottom".unsafeCast<CSSPosition>()
+        val Bottom get() = "bottom".unsafeCast<CSSPosition>()
+        val BottomLeft get() = "left bottom".unsafeCast<CSSPosition>()
+        val Left get() = "left".unsafeCast<CSSPosition>()
+        val TopLeft get() = "left top".unsafeCast<CSSPosition>()
+        val Center get() = "center".unsafeCast<CSSPosition>()
     }
 }

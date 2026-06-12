@@ -79,7 +79,7 @@ class StyleModifierTests {
 
         assertThat(modifierToText {
             Modifier.background { position(BackgroundPosition.of(CSSPosition.Center)) }
-        }).isEqualTo("background-position: left 50% top 50%")
+        }).isEqualTo("background-position: center")
 
         assertThat(modifierToText {
             Modifier.background { position { x(Edge.Left); y(Edge.CenterY) } }

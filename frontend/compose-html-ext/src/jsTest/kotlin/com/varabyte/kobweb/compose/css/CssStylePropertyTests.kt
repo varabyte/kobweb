@@ -355,7 +355,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { backgroundPosition(BackgroundPosition.of(CSSPosition(10.px, 20.px))) })
             .isEqualTo("background-position: 10px 20px")
         assertThat(styleToText { backgroundPosition(BackgroundPosition.of(CSSPosition.TopLeft)) })
-            .isEqualTo("background-position: left 0% top 0%")
+            .isEqualTo("background-position: left top")
 
         assertThat(styleToText { backgroundPosition(BackgroundPosition.Inherit) })
             .isEqualTo("background-position: inherit")
@@ -436,7 +436,7 @@ class CssStylePropertyTests {
                     size = BackgroundSize.of(100.px)
                 )
             )
-        }).isEqualTo("background: left 0% top 0% / 100px")
+        }).isEqualTo("background: left top / 100px")
 
         assertThat(styleToText {
             background(Background.list(
@@ -1840,6 +1840,8 @@ class CssStylePropertyTests {
 
     @Test
     fun verifyObjectPosition() {
+        assertThat(styleToText { objectPosition(ObjectPosition.of(CSSPosition.Top)) })
+            .isEqualTo("object-position: top")
         assertThat(styleToText { objectPosition(ObjectPosition.of(CSSPosition(25.percent, 75.percent))) })
             .isEqualTo("object-position: 25% 75%")
         assertThat(styleToText { objectPosition(ObjectPosition.of(CSSPosition(10.ch, 8.em))) })
