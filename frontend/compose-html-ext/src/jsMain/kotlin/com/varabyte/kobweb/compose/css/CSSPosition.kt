@@ -21,9 +21,20 @@ class EdgeX internal constructor(value: String) : EdgeXOrCenter(value) {
     operator fun invoke(offset: CSSLengthOrPercentageNumericValue) = EdgeXOffset(this, offset)
 }
 
+// If possible, discard 0 value lengths / percentages when indicating a default value. We might not be able to know this
+// if the value passed in is a variable.
+@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+private fun CSSLengthOrPercentageNumericValue.isDefinitelyZero(): Boolean {
+    val asSizeValue = this as? CSSSizeValue<*> ?: return false
+    return asSizeValue.value == 0f
+}
+
 class CenterX internal constructor() : EdgeXOrCenter("center")
 class EdgeXOffset internal constructor(val edgeX: EdgeX, val offset: CSSLengthOrPercentageNumericValue) : StylePropertyValue {
-    override fun toString() = "$edgeX $offset"
+    override fun toString() = buildString {
+        append(edgeX)
+        if (!offset.isDefinitelyZero()) append(" $offset")
+    }
 }
 
 sealed class EdgeYOrCenter(value: String) : Edge(value)
@@ -33,7 +44,10 @@ class EdgeY internal constructor(value: String) : EdgeYOrCenter(value) {
 
 class CenterY internal constructor() : EdgeYOrCenter("center")
 class EdgeYOffset internal constructor(val edgeY: EdgeY, val offset: CSSLengthOrPercentageNumericValue) : StylePropertyValue {
-    override fun toString() = "$edgeY $offset"
+    override fun toString() = buildString {
+        append(edgeY)
+        if (!offset.isDefinitelyZero()) append(" $offset")
+    }
 }
 
 // region CSS position 2-arg hack
@@ -81,12 +95,12 @@ class CSSPosition private constructor(private val value: String) : StyleProperty
     ) : this("$x $y")
 
     constructor(xAnchor: EdgeXOrCenter) : this("$xAnchor")
-    constructor(yAnchor: EdgeYOrCenter) : this("${Edge.CenterX.toOffset()} ${yAnchor.toOffset()}")
+    constructor(yAnchor: EdgeYOrCenter) : this("${yAnchor.toOffset()}")
     constructor(xAnchor: EdgeXOrCenter, yAnchor: EdgeYOrCenter) : this(xAnchor.toOffset(), yAnchor.toOffset())
 
-    constructor(xOffset: EdgeXOffset) : this(xOffset, Edge.CenterY.toOffset())
+    constructor(xOffset: EdgeXOffset) : this("$xOffset")
 
-    constructor(yOffset: EdgeYOffset) : this(Edge.CenterX.toOffset(), yOffset)
+    constructor(yOffset: EdgeYOffset) : this("$yOffset")
 
     constructor(xCenter: CenterX, y: CSSLengthOrPercentageNumericValue) : this("$xCenter $y")
     constructor(x: CSSLengthOrPercentageNumericValue, yCenter: CenterY) : this("$x $yCenter")
