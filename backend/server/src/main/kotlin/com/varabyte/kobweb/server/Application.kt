@@ -45,7 +45,7 @@ private fun isPortInUse(port: Int): Boolean {
     }
 }
 
-suspend fun main(): Unit = withContext(Dispatchers.IO) {
+suspend fun main(): Unit = withContext(Dispatchers.Default) {
     val folder = KobwebFolder.inWorkingDirectory()
         ?: throw KobwebException("Server must be started in the root of a Kobweb project")
 
