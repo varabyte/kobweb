@@ -5,6 +5,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.get
 import org.w3c.dom.WindowOrWorkerGlobalScope
@@ -12,7 +13,7 @@ import org.w3c.fetch.RequestInit
 import org.w3c.fetch.RequestRedirect
 import org.w3c.fetch.Response
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import kotlin.js.Promise
 import kotlin.js.json
 
 enum class HttpMethod {
@@ -28,24 +29,25 @@ enum class HttpMethod {
 /**
  * Returns the current body of the target [Response].
  *
- * Note that the returned bytes could be an empty array, which could mean the body wasn't set OR that it was set to
- * the empty string.
+ * The returned value may be null if the response was not OK or if it did not have a body.
  */
-private suspend fun Response.getBodyBytes(): ByteArray {
-    return suspendCoroutine { cont ->
+suspend fun Response.getBodyBytes(): ByteArray? {
+    if (!this.ok) return null
+    return suspendCancellableCoroutine { cont ->
         val _ = this.arrayBuffer().then { responseBuffer ->
             val int8Array = Int8Array(responseBuffer)
             cont.resume(ByteArray(int8Array.length) { i -> int8Array[i] })
         }.catch {
-            cont.resume(ByteArray(0))
+            cont.resume(null)
         }
     }
 }
+fun ByteArray?.orEmpty(): ByteArray {
+    return this ?: ByteArray(0)
+}
 
-private fun Response.getBodyBytesAsync(dispatcher: CoroutineDispatcher, result: (ByteArray) -> Unit) {
-    CoroutineScope(dispatcher).launch {
-        result(getBodyBytes())
-    }
+private fun Response.getBodyBytesAsync(dispatcher: CoroutineDispatcher, result: (ByteArray?) -> Unit) {
+    CoroutineScope(dispatcher).launch { result(getBodyBytes()) }
 }
 
 /**
@@ -83,40 +85,52 @@ object FetchDefaults {
     var Redirect: RequestRedirect? = null
 }
 
-@Deprecated("DO NOT IGNORE. Please change to `fetchBytes` instead. This method will be modified soon in a backwards incompatible way, in order to support additional cases that the current form doesn't support.", replaceWith = ReplaceWith("fetchBytes(method, resource, headers, body, redirect, abortController)"))
+/**
+ * A Kotlin-idiomatic version of the standard library's [Window.fetch][WindowOrWorkerGlobalScope.fetch] function.
+ *
+ * This method is a suspend function, so it returns a [Response] directly instead of returning a [Promise]. It also adds
+ * a slew of additional, useful parameters that help configure the fetch, without needing to use the [RequestInit]
+ * object or any `dynamic` values.
+ *
+ * If the request fails to connect, this method throws; but if the server replies that the response is bad, it will be
+ * returned. Just be sure to check [Response.ok] before using it.
+ *
+ * If all you care about is the response payload, you can use the [fetchBytes] convenience method instead, or the
+ * [getBodyBytes] extension method we provide on top of the [Response] class.
+ *
+ * @param headers An optional map of headers to send with the request. The "Content-Type" header may be automatically
+ *   set if the `body` parameter is present, but anything specified manually will take precedence.
+ */
 suspend fun WindowOrWorkerGlobalScope.fetch(
     method: HttpMethod,
     resource: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
-    body: ByteArray? = null,
+    body: RequestBody? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null
-): ByteArray = fetchBytes(method, resource, headers, body, redirect, abortController)
-
-/**
- * A Kotlin-idiomatic version of the standard library's [Window.fetch] function.
- *
- * This method receives a request body as a byte array for the request and returns a body of bytes extracted from the
- * response, making it good for designs where you implement a binary request / response design.
- *
- * This method throws if the response fails. You can use [tryFetchBytes] which will return null instead.
- *
- * @param headers An optional map of headers to send with the request. Note: If a body is specified, the
- *   `Content-Length` header will be automatically set. However, any headers set manually will always take precedence.
- */
-suspend fun WindowOrWorkerGlobalScope.fetchBytes(
-    method: HttpMethod,
-    resource: String,
-    headers: Map<String, Any>? = FetchDefaults.Headers,
-    body: ByteArray? = null,
-    redirect: RequestRedirect? = FetchDefaults.Redirect,
-    abortController: AbortController? = null
-): ByteArray {
-    val responseBytesDeferred = CompletableDeferred<ByteArray>()
+): Response {
     val headersJson = if (!headers.isNullOrEmpty() || body != null) {
         json().apply {
-            if (body != null) {
-                this["Content-Length"] = body.size
+            when (body) {
+                is RequestBody.OfBlob -> {
+                    body.blob.type
+                }
+                is RequestBody.OfArrayBuffer -> {
+                    body.contentType
+                }
+                is RequestBody.OfFormData -> {
+                    // Do nothing, handled by browser
+                    null
+                }
+                is RequestBody.OfText -> {
+                    body.contentType
+                }
+                is RequestBody.OfUrlEncoded -> {
+                    "application/x-www-form-urlencoded; charset=UTF-8"
+                }
+                null -> null
+            }?.let { contentType: String ->
+                this["Content-Type"] = contentType
             }
             headers?.let { headers ->
                 for ((key, value) in headers) {
@@ -129,7 +143,14 @@ suspend fun WindowOrWorkerGlobalScope.fetchBytes(
     val requestInit = RequestInit(
         method = method.name,
         headers = headersJson ?: undefined,
-        body = body ?: undefined,
+        body = when (body) {
+            is RequestBody.OfBlob -> body.blob
+            is RequestBody.OfArrayBuffer -> body.buffer
+            is RequestBody.OfFormData -> body.formData
+            is RequestBody.OfText -> body.text
+            is RequestBody.OfUrlEncoded -> body.params
+            null -> undefined
+        },
         redirect = redirect ?: undefined,
     )
     if (abortController != null) {
@@ -138,31 +159,65 @@ suspend fun WindowOrWorkerGlobalScope.fetchBytes(
         requestInitDynamic["signal"] = abortController.signal
     }
 
+    val responseDeferred = CompletableDeferred<Response>()
     val _ = fetch(resource, requestInit).then(
-        onFulfilled = { res ->
-            if (res.ok) {
-                res.getBodyBytesAsync(this.asCoroutineDispatcher()) { bodyBytes -> responseBytesDeferred.complete(bodyBytes) }
-            } else {
-                res.getBodyBytesAsync(this.asCoroutineDispatcher()) { bodyBytes ->
-                    responseBytesDeferred.completeExceptionally(ResponseException(res, bodyBytes))
-                }
-            }
-        },
-        onRejected = { t -> responseBytesDeferred.completeExceptionally(t) })
+        onFulfilled = { res -> responseDeferred.complete(res) },
+        onRejected = { t -> responseDeferred.completeExceptionally(t) })
 
-    return responseBytesDeferred.await()
+    return responseDeferred.await()
 }
 
-@Deprecated("DO NOT IGNORE. Please change to `tryFetchBytes` instead. This method will be modified soon in a backwards incompatible way, in order to support additional cases that the current form doesn't support.", replaceWith = ReplaceWith("tryFetchBytes(method, resource, headers, body, redirect, logOnError, abortController)"))
-suspend fun WindowOrWorkerGlobalScope.tryFetch(
+/**
+ * A convenience method for [fetch] built around the common case of sending / receiving raw bytes.
+ *
+ * Note that if a response is returned from the server with an error status (like permission denied, etc.), this
+ * method will throw. Otherwise, if a response does not have a body, an empty byte array will be returned.
+ */
+suspend fun WindowOrWorkerGlobalScope.fetchBytes(
     method: HttpMethod,
     resource: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
+    abortController: AbortController? = null
+): ByteArray {
+    val res = fetch(method, resource, headers, body?.let { bodyOf(it) }, redirect, abortController)
+
+    val responseBytesDeferred = CompletableDeferred<ByteArray>()
+    if (res.ok) {
+        res.getBodyBytesAsync(this.asCoroutineDispatcher()) { bodyBytes -> responseBytesDeferred.complete(bodyBytes.orEmpty()) }
+    } else {
+        res.getBodyBytesAsync(this.asCoroutineDispatcher()) { bodyBytes ->
+            responseBytesDeferred.completeExceptionally(ResponseException(res, bodyBytes))
+        }
+    }
+
+    return responseBytesDeferred.await()
+}
+
+private fun logFetchResourceError(resource: String, t: Throwable) {
+    console.log("Error fetching resource \"$resource\"\n\n$t")
+}
+
+/**
+ * Like [fetch] but returns null if the fetch fails for any reason instead of throwing.
+ */
+suspend fun WindowOrWorkerGlobalScope.tryFetch(
+    method: HttpMethod,
+    resource: String,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
+    body: RequestBody? = null,
+    redirect: RequestRedirect? = FetchDefaults.Redirect,
     logOnError: Boolean = false,
     abortController: AbortController? = null
-): ByteArray? = tryFetchBytes(method, resource, headers, body, redirect, logOnError, abortController)
+): Response? {
+    return try {
+        fetch(method, resource, headers, body, redirect, abortController)
+    } catch (t: Throwable) {
+        if (logOnError) logFetchResourceError(resource, t)
+        null
+    }
+}
 
 /**
  * Like [fetchBytes] but returns null if the fetch fails for any reason instead of throwing.
@@ -179,9 +234,7 @@ suspend fun WindowOrWorkerGlobalScope.tryFetchBytes(
     return try {
         fetchBytes(method, resource, headers, body, redirect, abortController)
     } catch (t: Throwable) {
-        if (logOnError) {
-            console.log("Error fetching resource \"$resource\"\n\n$t")
-        }
+        if (logOnError) logFetchResourceError(resource, t)
         null
     }
 }
