@@ -7,11 +7,16 @@ import org.w3c.files.Blob
 import org.w3c.xhr.FormData
 import kotlin.js.Json
 
+/**
+ * Body contents that can be set when calling [fetch].
+ *
+ * Instead of allocating directly, use the helper [bodyOf] methods.
+ */
 sealed class RequestBody {
-    class OfBlob(val blob: Blob) : RequestBody()
-    class OfArrayBuffer(val buffer: ArrayBuffer, val contentType: String) : RequestBody()
-    class OfFormData(val formData: FormData) : RequestBody()
-    class OfText(val text: String, contentType: String) : RequestBody() {
+    class OfBlob internal constructor(val blob: Blob) : RequestBody()
+    class OfArrayBuffer internal constructor(val buffer: ArrayBuffer, val contentType: String) : RequestBody()
+    class OfFormData internal constructor(val formData: FormData) : RequestBody()
+    class OfText internal constructor(val text: String, contentType: String) : RequestBody() {
         private fun String.addCharsetIfMissing(): String {
             return if (this.split(";").map { it.trimStart() }.none { it.startsWith("charset=") }) {
                 "$this; charset=UTF-8"
@@ -20,7 +25,7 @@ sealed class RequestBody {
 
         val contentType = contentType.addCharsetIfMissing()
     }
-    class OfUrlEncoded(val params: URLSearchParams) : RequestBody()
+    class OfUrlEncoded internal constructor(val params: URLSearchParams) : RequestBody()
 }
 
 fun bodyOf(blob: Blob): RequestBody = RequestBody.OfBlob(blob)
