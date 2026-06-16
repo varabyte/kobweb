@@ -1,6 +1,8 @@
 package playground.pages
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.browser.api
+import com.varabyte.kobweb.browser.http.bodyOf
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.core.Page
@@ -17,7 +19,6 @@ import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLInputElement
-import org.w3c.fetch.RequestInit
 import org.w3c.files.get
 import org.w3c.xhr.FormData
 import playground.components.layouts.PageLayoutData
@@ -39,17 +40,11 @@ fun MultipartPage() {
         val file = fileInput.files?.get(0)
         if (file != null) {
             scope.launch {
-                val formData = FormData().apply {
+                val response = window.api.post("multipart", body = bodyOf(FormData().apply {
                     append("file", file, file.name)
                     append("description", "Kobweb multipart test")
-                }
+                }))
 
-                val requestInit = RequestInit(
-                    method = "POST",
-                    body = formData,
-                )
-
-                val response = window.fetch("/api/multipart", requestInit).await()
                 if (response.ok) {
                     response.text().await().let { window.alert(it) }
                 } else {
