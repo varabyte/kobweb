@@ -139,7 +139,12 @@ class KobwebApplicationPlugin @Inject constructor(
         val kobwebStartTask = run {
             val reuseServer = project.findProperty("kobwebReuseServer")?.toString()?.toBoolean() ?: true
             project.tasks.register<KobwebStartTask>(
-                "kobwebStart", kobwebBlock.app.server.remoteDebugging, env, runLayout, reuseServer
+                "kobwebStart",
+                kobwebBlock.app.server.remoteDebugging,
+                env,
+                runLayout,
+                kobwebBlock.app.server.systemProperties,
+                reuseServer
             )
         }
 

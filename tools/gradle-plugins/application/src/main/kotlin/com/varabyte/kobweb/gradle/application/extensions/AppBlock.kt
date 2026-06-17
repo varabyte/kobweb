@@ -350,6 +350,20 @@ abstract class AppBlock @Inject constructor(
             }
         }
 
+        /**
+         * A collection of key / value pairs that will be made available within your Kobweb server via `System.getProperty("...")`.
+         *
+         * For example, `systemProperties.put("key", "value")` would let you write the following code in your Kobweb
+         * server:
+         *
+         * ```
+         * assertEquals("value", System.getProperty("key"))
+         * ```
+         *
+         * You can use this as a simple way to configure your server's behavior from your Kobweb build script.
+         */
+        abstract val systemProperties: MapProperty<String, String>
+
         init {
             extensions.create<RemoteDebuggingBlock>("remoteDebugging")
         }

@@ -12,6 +12,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -31,6 +32,7 @@ abstract class KobwebStartTask @Inject constructor(
     private val remoteDebuggingBlock: AppBlock.ServerBlock.RemoteDebuggingBlock,
     private val env: ServerEnvironment,
     private val siteLayout: Provider<SiteLayout>,
+    private val systemProperties: MapProperty<String, String>,
     private val reuseServer: Boolean,
 ) : KobwebTask("Start a Kobweb server") {
 
@@ -55,6 +57,17 @@ abstract class KobwebStartTask @Inject constructor(
 
     @TaskAction
     fun execute() {
+        val systemProperties = systemProperties.get()
+        val invalidSystemProperties = mutableListOf<Map.Entry<String, String>>()
+        systemProperties.entries.forEach { it ->
+            if (it.key.contains('=') || it.value.contains('=')) {
+                invalidSystemProperties.add(it)
+            }
+        }
+        if (invalidSystemProperties.isNotEmpty()) {
+            throw GradleException("Aborting due to the following invalid system properties: ${invalidSystemProperties.joinToString { "\"${it.key}\" to \"${it.value}\""}}")
+        }
+
         val stateFile = ServerStateFile(kobwebApplication.kobwebFolder)
         stateFile.content?.let { serverState ->
             if (serverState.isRunning()) {
@@ -77,6 +90,9 @@ abstract class KobwebStartTask @Inject constructor(
         val remoteDebuggingEnabled = (env == ServerEnvironment.DEV && remoteDebuggingBlock.enabled.get())
         val processParams = buildList<String> {
             add("${javaHome.invariantSeparatorsPath}/bin/java")
+            // Add user properties first, so that if anyone tries to be clever and clobber any of ours, it won't work,
+            // as ours will take precedence.
+            systemProperties.forEach { (key, value) -> add("-D${key}=${value}") }
             add(env.toSystemPropertyParam())
             add(siteLayout.get().toSystemPropertyParam())
             // See: https://ktor.io/docs/development-mode.html#system-property)
@@ -91,7 +107,7 @@ abstract class KobwebStartTask @Inject constructor(
         println(
             """
             Starting server by running:
-                ${processParams.joinToString(" ")}
+                ${processParams.joinToString(" ") { if (it.contains(' ')) "\"$it\"" else it } }
             """.trimIndent()
         )
         // Flush above println. Otherwise, it can end up mixed-up in exception reporting below.
