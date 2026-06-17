@@ -33,12 +33,7 @@ suspend inline fun <reified R> HttpFetcher.get(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer()
-): R = get(
-    resource,
-    headers,
-    redirect,
-    abortController,
-).tryDeserializeResponseBody(responseDeserializer)!!
+): R = get(resource, headers, redirect, abortController).tryDeserializeResponseBody(responseDeserializer)!!
 
 /**
  * Like [get], but returns null if the request failed for any reason.
@@ -52,12 +47,7 @@ suspend inline fun <reified R> HttpFetcher.tryGet(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer()
-): R? = tryGet(
-    resource,
-    headers,
-    redirect,
-    abortController,
-)?.tryDeserializeResponseBody(responseDeserializer)
+): R? = tryGet(resource, headers, redirect, abortController)?.tryDeserializeResponseBody(responseDeserializer)
 
 /**
  * A serialize-friendly version of [post] that expects a serializable body but does not expect a serialized response.
@@ -156,7 +146,7 @@ suspend inline fun <reified B> HttpFetcher.tryPost(
 @Deprecated(
     "We are migrating away from returning raw bytes to a more proper Respose object instead.",
     ReplaceWith(
-        "tryPost(resource, body, headers, redirect, abortController, bodySerializer).getBodyBytes().orEmpty()",
+        "tryPost(resource, body, headers, redirect, abortController, bodySerializer)?.getBodyBytes()?.orEmpty()",
         "com.varabyte.kobweb.browser.http.tryPost",
         "com.varabyte.kobweb.browser.http.getBodyBytes",
         "com.varabyte.kobweb.browser.http.orEmpty"
@@ -225,13 +215,7 @@ suspend inline fun <reified B> HttpFetcher.put(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-): Response = put(
-    resource,
-    headers,
-    body.toRequestBody(bodySerializer),
-    redirect,
-    abortController
-)
+): Response = put(resource, headers, body.toRequestBody(bodySerializer), redirect, abortController)
 
 /**
  * A serialize-friendly version of [put] that expects a serializable body but returns raw bytes instead of a serialized response.
@@ -252,13 +236,7 @@ suspend inline fun <reified B> HttpFetcher.putBytes(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-): ByteArray = put(
-    resource,
-    headers,
-    body.toRequestBody(bodySerializer),
-    redirect,
-    abortController
-).getBodyBytes().orEmpty()
+): ByteArray = put(resource, body, headers, redirect, abortController, bodySerializer).getBodyBytes().orEmpty()
 
 /**
  * Call PUT on a target resource with [R] as the expected return type.
@@ -337,14 +315,7 @@ suspend inline fun <reified B> HttpFetcher.tryPutBytes(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-): ByteArray? = tryPut(
-    resource,
-    body,
-    headers,
-    redirect,
-    abortController,
-    bodySerializer
-)?.getBodyBytes()?.orEmpty()
+): ByteArray? = tryPut(resource, body, headers, redirect, abortController, bodySerializer)?.getBodyBytes()?.orEmpty()
 
 /**
  * Like [put], but returns null if the request failed for any reason.
@@ -420,14 +391,7 @@ suspend inline fun <reified B> HttpFetcher.patchBytes(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-): ByteArray = patch(
-    resource,
-    body,
-    headers,
-    redirect,
-    abortController,
-    bodySerializer
-).getBodyBytes().orEmpty()
+): ByteArray = patch(resource, body, headers, redirect, abortController, bodySerializer).getBodyBytes().orEmpty()
 
 /**
  * Call PATCH on a target resource with [R] as the expected return type.
@@ -485,13 +449,7 @@ suspend inline fun <reified B> HttpFetcher.tryPatch(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-): Response? = tryPatch(
-    resource,
-    headers,
-    bodyOf(Json.encodeToString(bodySerializer, body).encodeToByteArray()),
-    redirect,
-    abortController
-)
+): Response? = tryPatch(resource, headers, body.toRequestBody(bodySerializer), redirect, abortController)
 
 /**
  * A serialize-friendly version of [patch] that expects a serializable body but returns raw bytes instead of a serialized response.
@@ -512,14 +470,7 @@ suspend inline fun <reified B> HttpFetcher.tryPatchBytes(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-): ByteArray? = tryPatch(
-    resource,
-    body,
-    headers,
-    redirect,
-    abortController,
-    bodySerializer
-)?.getBodyBytes()?.orEmpty()
+): ByteArray? = tryPatch(resource, body, headers, redirect, abortController, bodySerializer)?.getBodyBytes()?.orEmpty()
 
 /**
  * Like [patch], but returns null if the request failed for any reason.
@@ -579,12 +530,7 @@ suspend inline fun <reified R> HttpFetcher.delete(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer(),
-): R = delete(
-    resource,
-    headers,
-    redirect,
-    abortController
-).tryDeserializeResponseBody(responseDeserializer)!!
+): R = delete(resource, headers, redirect, abortController).tryDeserializeResponseBody(responseDeserializer)!!
 
 /**
  * A serialize-friendly version of [tryDelete].
@@ -595,12 +541,7 @@ suspend inline fun <reified R> HttpFetcher.tryDelete(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer(),
-): R? = tryDelete(
-    resource,
-    headers,
-    redirect,
-    abortController
-)?.tryDeserializeResponseBody(responseDeserializer)
+): R? = tryDelete(resource, headers, redirect, abortController)?.tryDeserializeResponseBody(responseDeserializer)
 
 /**
  * Call DELETE on a target resource with [R] as the expected return type.
@@ -617,12 +558,7 @@ suspend inline fun <reified R> HttpFetcher.options(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer(),
-): R = options(
-    resource,
-    headers,
-    redirect,
-    abortController
-).tryDeserializeResponseBody(responseDeserializer)!!
+): R = options(resource, headers, redirect, abortController).tryDeserializeResponseBody(responseDeserializer)!!
 
 /**
  * A serialize-friendly version of [tryDelete].
@@ -633,10 +569,5 @@ suspend inline fun <reified R> HttpFetcher.tryOptions(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer(),
-): R? = tryOptions(
-    resource,
-    headers,
-    redirect,
-    abortController
-)?.tryDeserializeResponseBody(responseDeserializer)
+): R? = tryOptions(resource, headers, redirect, abortController)?.tryDeserializeResponseBody(responseDeserializer)
 
