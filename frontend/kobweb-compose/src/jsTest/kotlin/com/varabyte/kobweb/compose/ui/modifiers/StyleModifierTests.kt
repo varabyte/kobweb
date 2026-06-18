@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.kobweb.compose.css.functions.url
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -21,6 +22,40 @@ class StyleModifierTests {
         modifier.toStyles().invoke(styleScope)
 
         return styleScope.properties.joinToString("; ") { "${it.name}: ${it.value}" }
+    }
+
+    @Test
+    fun verifyAnimation() {
+        assertThat(modifierToText {
+            Modifier.animation(Animation.None)
+        }).isEqualTo("animation: none")
+
+        assertThat(modifierToText {
+            Modifier.animation(
+                Animation.of("first", duration = 5.s, iterationCount = AnimationIterationCount.Infinite),
+                Animation.of("second", duration = 3.s, delay = 2.s, direction = AnimationDirection.Reverse, iterationCount = AnimationIterationCount.of(2)),
+            )
+        }).isEqualTo("animation: 5s infinite first, 3s 2s 2 reverse second")
+
+        assertThat(modifierToText {
+            Modifier.animation {
+                name("test")
+                delay(2.s)
+                duration(3.s)
+                direction(AnimationDirection.Alternate)
+                fillMode(AnimationFillMode.Both)
+                iterationCount(2)
+                playState(AnimationPlayState.Running)
+                timingFunction(AnimationTimingFunction.EaseIn)
+            }
+        }).isEqualTo("animation-name: test; animation-delay: 2s; animation-duration: 3s; animation-direction: alternate; animation-fill-mode: both; animation-iteration-count: 2; animation-play-state: running; animation-timing-function: ease-in")
+
+        assertThat(modifierToText {
+            Modifier.animation {
+                delay(0.s, 2.s)
+                duration(5.s, 3.s)
+            }
+        }).isEqualTo("animation-delay: 0s, 2s; animation-duration: 5s, 3s")
     }
 
     @Test

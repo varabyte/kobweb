@@ -3,8 +3,8 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 sealed interface AnimationIterationCount : StylePropertyValue {
-    companion object {
-        fun of(count: Number) = count.toString().unsafeCast<AnimationIterationCount>()
+    companion object : CssGlobalValues<AnimationIterationCount> {
+        fun of(count: Number) = count.unsafeCast<AnimationIterationCount>()
         val Infinite get() = "infinite".unsafeCast<AnimationIterationCount>()
     }
 }
