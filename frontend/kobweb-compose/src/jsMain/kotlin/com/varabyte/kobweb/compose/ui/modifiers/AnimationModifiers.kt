@@ -41,8 +41,6 @@ fun Modifier.onAnimationEnd(listener: (SyntheticAnimationEvent) -> Unit): Modifi
     onAnimationEnd(listener)
 }
 
-
-
 fun Modifier.onAnimationIteration(listener: (SyntheticAnimationEvent) -> Unit): Modifier = attrsModifier {
     onAnimationIteration(listener)
 }
