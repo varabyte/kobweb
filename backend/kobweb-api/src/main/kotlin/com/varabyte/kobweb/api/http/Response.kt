@@ -67,14 +67,6 @@ class Response {
 }
 
 /**
- * Convenience method for setting the body to a text value.
- */
-@Deprecated("We are migrating to creating body instances using `Body` factory methods instead.", ReplaceWith("body = Body.text(text)", "com.varabyte.kobweb.api.http.text"))
-fun Response.setBodyText(text: String) {
-    body = Body.text(text)
-}
-
-/**
  * Set this to a response that tells the client that the requested resource has moved to a new location.
  *
  * @param status The specific redirect status code to use. See

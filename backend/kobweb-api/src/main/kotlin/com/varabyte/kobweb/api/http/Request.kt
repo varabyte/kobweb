@@ -141,8 +141,3 @@ class MutableRequest(
 
     override val cookies: MutableMap<String, String> = cookies.toMutableMap()
 }
-
-@Deprecated("Use `req.body?.text()` instead", ReplaceWith("body?.text()"))
-suspend fun Request.readBodyText(): String? {
-    return body?.text()
-}

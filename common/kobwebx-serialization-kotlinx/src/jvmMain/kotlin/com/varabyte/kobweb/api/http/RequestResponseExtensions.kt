@@ -20,19 +20,9 @@ suspend inline fun <reified T> ContentSource.decode(bodyDeserializer: Deserializ
     }
 }
 
-@Deprecated("Use `body?.decode(...)` instead", ReplaceWith("body?.decode(bodyDeserializer)"))
-suspend inline fun <reified T> Request.readBody(bodyDeserializer: DeserializationStrategy<T> = serializer()): T? {
-    return body?.decode(bodyDeserializer)
-}
-
 /**
  * A serialization-aware convenience factory method that can be used to create [Body] instances.
  */
 inline fun <reified T> Body.Companion.encode(body: T, bodySerializer: SerializationStrategy<T> = serializer()): Body {
     return json(Json.encodeToString(bodySerializer, body))
-}
-
-@Deprecated("Use `body = Body.from(...)` instead", ReplaceWith("body = Body.encode(body, bodySerializer)", "com.varabyte.kobweb.api.http"))
-inline fun <reified T> Response.setBody(body: T, bodySerializer: SerializationStrategy<T> = serializer()) {
-    this.body = Body.encode(body, bodySerializer)
 }
