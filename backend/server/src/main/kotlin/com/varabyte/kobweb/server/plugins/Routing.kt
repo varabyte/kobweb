@@ -60,6 +60,7 @@ import kotlin.io.path.name
 import kotlin.io.path.readLines
 import kotlin.io.use
 import kotlin.text.toByteArray
+import kotlin.time.Duration.Companion.milliseconds
 
 /** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose by chance. */
 private const val KOBWEB_PARAMS = "kobweb-params"
@@ -532,7 +533,7 @@ private suspend fun RoutingContext.handleCatchAllRouting(
 }
 
 private fun List<Redirect>.toPatternMappers(): List<PatternMapper> {
-    return this.map { redirect -> PatternMapper("^${redirect.from}\$", redirect.to) }
+    return this.map { redirect -> PatternMapper("^${redirect.from}$", redirect.to) }
 }
 
 @Suppress("NAME_SHADOWING")
@@ -597,9 +598,9 @@ private fun Routing.configureCatchAllRouting(
                 if (fallbackResource != null) {
                     serveIndexFile(fallbackResource).also {
                         application.log.debug(
-                            "Served fallback file \"${fallbackResource.fileName}\" in response to \"/${
-                                pathSegments.joinToString("/")
-                            }\""
+                            "Served fallback file \"{}\" in response to \"/{}\"",
+                            fallbackResource.fileName,
+                            pathSegments.joinToString("/")
                         )
                     }
                     true
@@ -679,7 +680,7 @@ private fun Application.configureDevRouting(
                             send(event = "status", data = Json.encodeToString(statusData))
                         }
 
-                        delay(300)
+                        delay(300.milliseconds)
                     }
                 }
             } catch (t: Throwable) {
