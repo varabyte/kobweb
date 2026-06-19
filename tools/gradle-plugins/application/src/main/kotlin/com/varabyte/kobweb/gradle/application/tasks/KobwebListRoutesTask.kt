@@ -11,6 +11,15 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
+private fun List<PageEntry>.routes(excludeDynamicRoutes: Boolean): List<String> = this
+    .asSequence()
+    .map { it.route }
+    .filter { !(excludeDynamicRoutes && it.contains('{')) }
+    .sorted()
+    .toList()
+
+fun AppFrontendData.routes(excludeDynamicRoutes: Boolean): List<String> =
+    this.frontendData.pages.routes(excludeDynamicRoutes)
 
 /**
  * Print all routes for the current site to the console.
@@ -35,12 +44,8 @@ abstract class KobwebListRoutesTask : KobwebTask("Enumerate all routes for your 
     @TaskAction
     fun execute() {
         val excludeDynamicRoutes = excludeDynamicRoutes.getOrElse(false)
-        val routes = Json.decodeFromString<AppFrontendData>(appDataFile.get().asFile.readText()).frontendData.pages
-            .asSequence()
-            .map { it.route }
-            .filter { !(excludeDynamicRoutes && it.contains('{')) }
-            .sorted()
-            .toList()
+        val routes = Json.decodeFromString<AppFrontendData>(appDataFile.get().asFile.readText())
+            .routes(excludeDynamicRoutes)
 
         if (routes.isNotEmpty()) {
             println("Your site defines the following routes:")

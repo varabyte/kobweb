@@ -57,6 +57,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.name
+import kotlin.io.path.readLines
 import kotlin.io.use
 import kotlin.text.toByteArray
 
@@ -517,8 +518,16 @@ private suspend fun RoutingContext.handleCatchAllRouting(
 ) {
     val pathString = pathSegments.joinToString("/")
 
+    var handled = false
     for (handler in handlers) {
-        if (handler(pathString)) break
+        if (handler(pathString)) {
+            handled = true
+            break
+        }
+    }
+
+    if (!handled) {
+        call.respond(HttpStatusCode.NotFound)
     }
 }
 
@@ -556,13 +565,13 @@ private fun Routing.configureRedirects(basePath: String, redirects: List<Pattern
 // "index.html" most of the time is enough for the client to figure out what to render next.
 /**
  * @param script The path to the script.js file, which may be in a custom location depending on server configuration
- * @param index The path to the index.html file, which may be in a custom location depending on server configuration
+ * @param fallbackResource The path to an HTML file to serve if no existing resource is found.
  * @param findResource An optional handler so callers can notify this caller that a resource was found dynamically.
  */
 private fun Routing.configureCatchAllRouting(
     conf: KobwebConf,
     script: Path,
-    index: Path,
+    fallbackResource: Path?,
     basePath: String,
     findResource: (String) -> File? = { null }
 ) {
@@ -585,13 +594,16 @@ private fun Routing.configureCatchAllRouting(
             },
             { _ -> abortIfNotHtml() },
             {
-                serveIndexFile(index).also {
-                    application.log.debug(
-                        "Served fallback index.html file in response to \"/${
-                            pathSegments.joinToString("/")
-                        }\""
-                    )
-                }; true
+                if (fallbackResource != null) {
+                    serveIndexFile(fallbackResource).also {
+                        application.log.debug(
+                            "Served fallback file \"${fallbackResource.fileName}\" in response to \"/${
+                                pathSegments.joinToString("/")
+                            }\""
+                        )
+                    }
+                    true
+                } else false
             },
         )
     }
@@ -623,10 +635,16 @@ private fun Path?.createApiJar(
     return null
 }
 
+/**
+ * @param strictRouting If true, no fallback resource will be returned if a file can't be found at an exact location.
+ *   This is an important distinction between static vs. fullstack sites. Note that even if strict routing is set to
+ *   true, user redirect rules will still be followed.
+ */
 private fun Application.configureDevRouting(
     appProperties: AppProperties,
     apiJar: ApiJarFile?,
     conf: KobwebConf,
+    strictRouting: Boolean,
     globals: ServerGlobals,
     logger: Logger
 ) {
@@ -680,10 +698,26 @@ private fun Application.configureDevRouting(
         }
 
         val contentRootFile = contentRoot.toFile()
-        configureCatchAllRouting(conf, script, contentRoot.resolve("index.html"), basePath) { path ->
-            // We fetch resources dynamically in dev mode because things may get added, removed, or renamed while the
-            // server is running. In prod mode, files are registered at startup time instead.
-            contentRootFile.resolve(path).takeIf { it.isFile && it.exists() }
+        val fallbackResource = contentRoot.resolve("index.html")
+        val fallbackResourceFile = fallbackResource.toFile()
+        val routes = contentRoot.resolve("_kobweb/dev/static-routes.txt").readLines().toSet()
+
+        configureCatchAllRouting(conf, script, fallbackResource.takeIf { !strictRouting }, basePath) { path ->
+            // We fetch public resources dynamically in dev mode because things may get added, removed, or renamed while
+            // the server is running, e.g. `cat.gif` renamed to `cat.mp4`
+            var found = contentRootFile.resolve(path).takeIf { it.isFile && it.exists() }
+
+            // In dev mode, we want to return the global index.html file for each requested page, since pages haven't
+            // been exported yet like they will have been for prod mode. However, if this is a static layout dev server,
+            // it shouldn't know about dynamic paths (since those won't get exported), so we have to pretend like we
+            // can't see it in dev mode either. We can mimic this by checking the static-routes.txt file created by the
+            // Kobweb plugin. (Note that if strictRouting is false, then `configureCatchAllRouting` will handle this
+            // instead.)
+            if (found == null && strictRouting && routes.contains("/$path")) {
+                found = fallbackResourceFile
+            }
+
+            found
         }
     }
 }
@@ -703,7 +737,7 @@ private fun Application.configureFullstackDevRouting(
             events,
             conf.server.nativeLibraries.associate { it.name to it.path })
 
-    configureDevRouting(appProperties, apiJar, conf, globals, logger)
+    configureDevRouting(appProperties, apiJar, conf, strictRouting = false, globals, logger)
 }
 
 private fun Application.configureFullstackProdRouting(
@@ -788,7 +822,7 @@ private fun Application.configureStaticDevRouting(
     globals: ServerGlobals,
     logger: Logger
 ) {
-    configureDevRouting(appProperties, null, conf, globals, logger)
+    configureDevRouting(appProperties, null, conf, strictRouting = true, globals, logger)
 }
 
 

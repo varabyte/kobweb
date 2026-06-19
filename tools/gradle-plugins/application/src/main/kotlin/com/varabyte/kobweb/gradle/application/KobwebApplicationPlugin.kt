@@ -15,6 +15,7 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebCacheAppFrontendDataTa
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopySupplementalResourcesTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyWorkerJsOutputTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebCreatePublicDevFilesTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCreateServerScriptsTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebExportConfInputs
 import com.varabyte.kobweb.gradle.application.tasks.KobwebExportTask
@@ -129,6 +130,11 @@ class KobwebApplicationPlugin @Inject constructor(
         )
         val kobwebCopyWorkerJsOutputTask =
             project.tasks.register<KobwebCopyWorkerJsOutputTask>("kobwebCopyWorkerJsOutput", kobwebBlock.app)
+
+        val kobwebCreateDevPublicFilesTask = project.tasks.register<KobwebCreatePublicDevFilesTask>(
+            "kobwebCreateDevPublicFiles",
+            kobwebBlock.app,
+        )
 
         val kobwebUnpackServerJarTask = project.tasks.register<KobwebUnpackServerJarTask>("kobwebUnpackServerJar")
         val kobwebCreateServerScriptsTask = project.tasks
@@ -326,12 +332,18 @@ class KobwebApplicationPlugin @Inject constructor(
                 runtimeClasspath.from(project.configurations.named(jsTarget.runtimeClasspath))
             }
 
+            project.tasks.withType<KobwebCreatePublicDevFilesTask>().configureEach {
+                appDataFile = kobwebCacheAppFrontendDataTask.flatMap { it.appDataFile }
+                publicPath = kobwebBlock.publicPath
+            }
+
             project.kspExcludedSources.from(kobwebGenSiteEntryTask)
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
                 kotlin.srcDir(kobwebGenSiteEntryTask)
                 resources.srcDir(kobwebCopySupplementalResourcesTask)
                 resources.srcDir(kobwebCopyWorkerJsOutputTask)
                 resources.srcDir(kobwebGenSiteIndexTask.flatMap { it.getGenResDir() })
+                resources.srcDir(kobwebCreateDevPublicFilesTask)
             }
 
             // When exporting, both dev + production webpack actions are triggered - dev for the temporary server
@@ -358,7 +370,11 @@ class KobwebApplicationPlugin @Inject constructor(
                 publicPath = kobwebBlock.publicPath
                 publicResources.from(kobwebBlock.publicPath.map { publicPath ->
                     project.getResourceSources(jsTarget).map { srcDirSet ->
-                        srcDirSet.matching { include("$publicPath/**") }
+                        srcDirSet.matching {
+                            include("$publicPath/**")
+                            // See: KobwebCreatePublicDevFilesTask
+                            exclude("$publicPath/_kobweb/dev/**")
+                        }
                     }
                 })
                 // Exporting ALWAYS spins up a dev server, so that way it loads the files it needs from dev locations
