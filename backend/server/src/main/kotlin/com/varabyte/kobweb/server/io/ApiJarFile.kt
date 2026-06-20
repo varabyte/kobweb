@@ -101,6 +101,9 @@ class ApiJarFile(
         private val packagesFromServerClassLoader = listOf(
             "com.varabyte.kobweb.api.",
             "kotlin.",
+            // Some systems look for slf4j to determind if they should log or not (specifically, we ran into mongodb).
+            // ktor provides it to us so let's just pass it on to users and their dependencies.
+            "org.slf4j.",
         )
         override fun findClass(name: String): Class<*> {
             if (packagesFromServerClassLoader.any { name.startsWith(it) }) return serverClassLoader.loadClass(name)
