@@ -701,7 +701,13 @@ private fun Application.configureDevRouting(
         val contentRootFile = contentRoot.toFile()
         val fallbackResource = contentRoot.resolve("index.html")
         val fallbackResourceFile = fallbackResource.toFile()
-        val routes = contentRoot.resolve("_kobweb/dev/static-routes.txt").readLines().toSet()
+        val routes =
+            if (strictRouting) {
+                contentRoot
+                    .resolve("_kobweb/dev/static-routes.txt")
+                    .takeIf { it.exists() }
+                    ?.readLines().orEmpty().toSet()
+            } else emptySet()
 
         configureCatchAllRouting(conf, script, fallbackResource.takeIf { !strictRouting }, basePath) { path ->
             // We fetch public resources dynamically in dev mode because things may get added, removed, or renamed while
