@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.microsoft.playwright.Browser
+import com.microsoft.playwright.BrowserType
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.TimeoutError
@@ -211,11 +212,15 @@ abstract class KobwebExportTask @Inject constructor(
 
         frontendData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
             val browser = exportBlock.browser.get()
-            PlaywrightCache().install(browser)
+            val useSystemBrowser = exportBlock.useSystemBrowser.get()
+            if (!useSystemBrowser) {
+                PlaywrightCache().install(browser)
+            }
             Playwright.create(
                 Playwright.CreateOptions().setEnv(
                     mapOf(
                         // Should have been downloaded above, by PlaywrightCache()
+                        // (or we are using a system browser which will be preinstalled)
                         "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD" to "1"
                     )
                 )
@@ -227,7 +232,10 @@ abstract class KobwebExportTask @Inject constructor(
                     // Not technically necessary but quiets down a confused compiler warning
                     else -> playwright.chromium()
                 }
-                browserType.launch().use { browser ->
+
+                browserType.launch(BrowserType.LaunchOptions().apply {
+                    if (useSystemBrowser) setChannel(browser.channel)
+                }).use { browser ->
                     val basePath = BasePath(confInputs.basePath)
                     pages
                         .asSequence()

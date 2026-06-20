@@ -439,6 +439,16 @@ abstract class AppBlock @Inject constructor(
         abstract val browser: Property<Browser>
 
         /**
+         * If set to true, try to use a browser already installed on the system instead of downloading one.
+         *
+         * The export process can fail if you set this and don't have the relevant browser already preinstalled!
+         *
+         * Currently, only [Browser.Chromium] is supported. If you specify a different browser, the export process will
+         * throw an exception.
+         */
+        abstract val useSystemBrowser: Property<Boolean>
+
+        /**
          * Whether to include a source map when exporting your site.
          *
          * In release mode, source gets minified and obfuscated, but if you include your source map with your site, browsers
@@ -540,6 +550,7 @@ abstract class AppBlock @Inject constructor(
 
         init {
             browser.convention(Browser.Chromium)
+            useSystemBrowser.convention(false)
             includeSourceMap.convention(true)
             suppressLayoutWarning.convention(false)
             suppressNoRootWarning.convention(false)

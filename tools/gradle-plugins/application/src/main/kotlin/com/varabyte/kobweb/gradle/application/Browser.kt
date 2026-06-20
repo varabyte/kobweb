@@ -8,4 +8,12 @@ enum class Browser(internal val playwrightName: String) {
     // https://playwright.dev/docs/browsers#installing-google-chrome--microsoft-edge
     // Will skip for now but can investigate later if there's any interest.
     // Edge("msedge"),
+    ;
+
+    val channel get(): String {
+        return when (this) {
+            Chromium -> "chrome"
+            else -> error("The browser ${this.name} does not support searching for local installations")
+        }
+    }
 }
