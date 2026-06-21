@@ -9,7 +9,6 @@ import com.varabyte.kobweb.api.event.dispose.DisposeReason
 import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.project.io.LiveFile
 import com.varabyte.kobweb.server.api.ServerEnvironment
-import io.ktor.util.date.*
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.IOException
@@ -22,6 +21,7 @@ import java.nio.file.Path
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import kotlin.time.measureTimedValue
 
 // Must only ever call once or else we get a thrown Error
 private object UrlStreamHandlerFactoryInitializer {
@@ -248,17 +248,14 @@ class ApiJarFile(
 
         val apis: Apis = run {
             val classLoader = IsolatedZipClassLoader(content, logger, nativeLibraryMappings)
-            val startMs = getTimeMillis()
-
-            try {
+            val (apis, elapsed) = measureTimedValue {
                 val factory =
                     classLoader.loadClass("ApisFactoryImpl").getDeclaredConstructor().newInstance() as ApisFactory
                 events.reset()
                 factory.create(environment.toApiEnvironment(), events, logger)
-            } finally {
-                val elapsedMs = getTimeMillis() - startMs
-                logger.info("Loaded and initialized server API jar in ${elapsedMs}ms.")
             }
+            logger.info("Loaded and initialized server API jar in ${elapsed.inWholeMilliseconds}ms.")
+            apis
         }
     }
 
