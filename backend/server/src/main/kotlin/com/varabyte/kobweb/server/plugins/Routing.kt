@@ -65,6 +65,24 @@ import kotlin.time.Duration.Companion.milliseconds
 /** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose by chance. */
 private const val KOBWEB_PARAMS = "kobweb-params"
 
+/**
+ * Executes user-space code within a safe, isolated asynchronous context.
+ *
+ * This wrapper shifts execution from Ktor's default application/routing dispatcher to the system's elastic
+ * [Dispatchers.IO] thread pool.
+ *
+ * A critical reason for this is that Ktor, in development mode, can alter asynchronous behavior and thread local
+ * mechanics in a way that causes multithreaded code triggered by the user to deadlock. We saw this specifically
+ * when using MongoDB on macOS.
+ *
+ * Additionally, sandboxing user code here provides a major resilience benefit. Shifting user calls to [Dispatchers.IO]
+ * prevents user code from potentially starving Ktor's primary event-loop worker pool, keeping the core web server free
+ * to accept incoming network traffic at maximum throughput.
+ */
+private suspend inline fun <T> wrapUserCode(crossinline block: suspend () -> T): T {
+    return withContext(Dispatchers.IO) { block() }
+}
+
 // A version of `stackTraceToString` that stops including traces once it hits a certain condition. This is a good way
 // to filter out traces that are not relevant to the user.
 private fun Throwable.stackTraceToString(includeUntil: (StackTraceElement) -> Boolean): String {
@@ -265,7 +283,7 @@ private suspend fun RoutingContext.handleApiCall(
             body,
         )
         try {
-            val response = apiJar.apis.handle("/$pathStr", request)
+            val response = wrapUserCode { apiJar.apis.handle("/$pathStr", request) }
             response.headers.forEach { (name, values) ->
                 values.forEach { value -> call.response.headers.append(name, value) }
             }
@@ -339,7 +357,7 @@ private class StreamImpl(
     override suspend fun disconnect() {
         val sessionData = sessions.getValue(session)
         val route = sessionData.streamEntries.remove(id)!!.route
-        apiJar.apis.handle(route, StreamEvent.ClientDisconnected(this))
+        wrapUserCode { apiJar.apis.handle(route, StreamEvent.ClientDisconnected(this@StreamImpl)) }
         if (sessionData.streamEntries.isEmpty()) {
             session.close()
         }
@@ -388,19 +406,23 @@ private fun Routing.setupStreaming(
                                 sessions.getValue(session).apply {
                                     streamEntries[streamId] = WebSocketSessionData.StreamData(payload.route)
                                 }
-                                apiJar.apis.handle(
-                                    payload.route,
-                                    StreamEvent.ClientConnected(streamImpl)
-                                )
+                                wrapUserCode {
+                                    apiJar.apis.handle(
+                                        payload.route,
+                                        StreamEvent.ClientConnected(streamImpl)
+                                    )
+                                }
                             }
 
                             Payload.Client.Disconnect -> streamImpl.disconnect()
                             is Payload.Text -> {
                                 val route = sessions.getValue(session).streamEntries.getValue(streamId).route
-                                apiJar.apis.handle(
-                                    route,
-                                    StreamEvent.Text(streamImpl, payload.text)
-                                )
+                                wrapUserCode {
+                                    apiJar.apis.handle(
+                                        route,
+                                        StreamEvent.Text(streamImpl, payload.text)
+                                    )
+                                }
                             }
                         }
                     } catch (t: Throwable) {
@@ -445,7 +467,9 @@ private fun Routing.setupStreaming(
             sessions.remove(session)?.let { sessionData ->
                 sessionData.streamEntries.forEach { (streamId, streamData) ->
                     val streamImpl = StreamImpl(sessions, session, apiJar, streamId)
-                    apiJar.apis.handle(streamData.route, StreamEvent.ClientDisconnected(streamImpl))
+                    wrapUserCode {
+                        apiJar.apis.handle(streamData.route, StreamEvent.ClientDisconnected(streamImpl))
+                    }
                 }
             }
         }
