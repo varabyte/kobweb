@@ -85,6 +85,12 @@ class ApiJarFile(
         private val nativeLibraryMappings: Map<String, String>,
         private val serverClassLoader: ClassLoader = ApiJarFile::class.java.classLoader,
     ) : ClassLoader(serverClassLoader.parent) {
+        companion object {
+            init {
+                // Opt-in to potential multithreaded performance improvements when doing class loading
+                registerAsParallelCapable()
+            }
+        }
 
         private val zipFile: ZipFile = run {
             val file = File.createTempFile("KobwebApiJar", ".jar").also { it.deleteOnExit() }
