@@ -16,6 +16,7 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
@@ -32,6 +33,7 @@ import kotlin.time.Duration
  * A sub-block for defining all properties relevant to a Kobweb application.
  */
 abstract class AppBlock @Inject constructor(
+    providers: ProviderFactory,
     kobwebFolder: KobwebFolder,
     conf: KobwebConf,
     baseGenDir: Property<String>,
@@ -373,6 +375,7 @@ abstract class AppBlock @Inject constructor(
      * A sub-block for defining properties related to configuring the `kobweb export` step.
      */
     abstract class ExportBlock @Inject constructor(
+        providers: ProviderFactory,
         private val kobwebFolder: KobwebFolder,
     ) {
         /**
@@ -433,10 +436,28 @@ abstract class AppBlock @Inject constructor(
          *
          * Besides potentially affecting the snapshotted output and export times, this can also affect the download size.
          *
-         * Chromium is chosen as a default due to its ubiquity, but Firefox may also be a good choice as its download size
-         * is significantly smaller than Chromium's.
+         * Chromium is chosen as a default due to its ubiquity, but Firefox may also be a good choice as its download
+         * size is significantly smaller than Chromium's.
+         *
+         * A corresponding browser will be downloaded for you the first time an export is run. If you would rather use
+         * one installed on your system, setting [browserPath] will cause the download to be skipped.
+         *
+         * Instead of setting this in Gradle, you can also set the environment variable `KOBWEB_EXPORT_BROWSER_TYPE`
+         * (with values `Chromium`, `Firefox`, or `WebKit`). This can be useful if you also set the browser path via its
+         * associated environment variable as well.
          */
         abstract val browser: Property<Browser>
+
+        /**
+         * A path to a browser on your system which, if set, will be used instead of us downloading one for you.
+         *
+         * If you set this, it _must_ match the type of [browser] (which defaults to Chromium).
+         *
+         * Instead of setting this in Gradle, you can also set the environment variable `KOBWEB_EXPORT_BROWSER_PATH`.
+         * (which may be convenient as it allows you to use a different value based on which environment you are
+         * exporting in, e.g. home machine vs CI)
+         */
+        abstract val browserPath: Property<String>
 
         /**
          * Whether to include a source map when exporting your site.
@@ -539,7 +560,16 @@ abstract class AppBlock @Inject constructor(
         }
 
         init {
-            browser.convention(Browser.Chromium)
+            browser.convention(
+                providers.environmentVariable("KOBWEB_EXPORT_BROWSER_TYPE")
+                    .filter { it.isNotBlank() }
+                    .map { Browser.valueOf(it) }
+                    .orElse(Browser.Chromium)
+            )
+            browserPath.convention(
+                providers.environmentVariable("KOBWEB_EXPORT_BROWSER_PATH")
+                    .filter { it.isNotBlank() }
+            )
             includeSourceMap.convention(true)
             suppressLayoutWarning.convention(false)
             suppressNoRootWarning.convention(false)
@@ -587,7 +617,7 @@ abstract class AppBlock @Inject constructor(
 
         extensions.create<IndexBlock>("index", BasePath(conf.site.basePath))
         extensions.create<ServerBlock>("server")
-        extensions.create<ExportBlock>("export", kobwebFolder)
+        extensions.create<ExportBlock>("export", providers, kobwebFolder)
     }
 }
 
@@ -609,8 +639,8 @@ val AppBlock.ServerBlock.remoteDebugging: AppBlock.ServerBlock.RemoteDebuggingBl
 val KobwebBlock.app: AppBlock
     get() = extensions.getByType<AppBlock>()
 
-internal fun KobwebBlock.createAppBlock(kobwebFolder: KobwebFolder, conf: KobwebConf): AppBlock {
-    return extensions.create<AppBlock>("app", kobwebFolder, conf, baseGenDir)
+internal fun KobwebBlock.createAppBlock(providers: ProviderFactory, kobwebFolder: KobwebFolder, conf: KobwebConf): AppBlock {
+    return extensions.create<AppBlock>("app", providers, kobwebFolder, conf, baseGenDir)
 }
 
 fun AppBlock.IndexBlock.excludeAllHtmlFromDependencies() {

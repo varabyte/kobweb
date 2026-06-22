@@ -103,7 +103,7 @@ class KobwebApplicationPlugin @Inject constructor(
         }
 
         val kobwebBlock = project.kobwebBlock
-        val appBlock = kobwebBlock.createAppBlock(kobwebFolder, kobwebConf)
+        val appBlock = kobwebBlock.createAppBlock(project.providers, kobwebFolder, kobwebConf)
 
         val env =
             project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV

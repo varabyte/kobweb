@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.microsoft.playwright.Browser
+import com.microsoft.playwright.BrowserType
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.TimeoutError
@@ -30,6 +31,7 @@ import org.gradle.api.tasks.TaskAction
 import org.jsoup.Jsoup
 import java.io.File
 import javax.inject.Inject
+import kotlin.io.path.Path
 import kotlin.io.path.writeText
 import kotlin.system.measureTimeMillis
 import kotlin.time.DurationUnit
@@ -210,8 +212,15 @@ abstract class KobwebExportTask @Inject constructor(
         }
 
         frontendData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
-            val browser = exportBlock.browser.get()
-            PlaywrightCache().install(browser)
+            val browser: KobwebBrowser = exportBlock.browser.get()
+
+            // Only install if a user doesn't specify a browser path (not setting a path is expected))
+            if (!exportBlock.browserPath.isPresent) {
+                PlaywrightCache().install(browser)
+            } else {
+                logger.lifecycle("\nUser indicated a $browser browser is located at \"${exportBlock.browserPath.get()}\". We therefore skipped the download step.\nIf your export fails, check that the path exists and that it is a $browser browser at that location.\nIf you need to change the browser type, you can set the `kobweb.app.export.browser` property in your build script.\nIf you need to change the browser path, you can set the `kobweb.app.export.browserPath` property in your build script.\nClearing the browser path will go back to auto-downloading an appropriate browser.")
+            }
+
             Playwright.create(
                 Playwright.CreateOptions().setEnv(
                     mapOf(
@@ -224,10 +233,13 @@ abstract class KobwebExportTask @Inject constructor(
                     KobwebBrowser.Chromium -> playwright.chromium()
                     KobwebBrowser.Firefox -> playwright.firefox()
                     KobwebBrowser.WebKit -> playwright.webkit()
-                    // Not technically necessary but quiets down a confused compiler warning
-                    else -> playwright.chromium()
                 }
-                browserType.launch().use { browser ->
+                val launchOptions = BrowserType.LaunchOptions().apply {
+                    exportBlock.browserPath.orNull?.let { path ->
+                        setExecutablePath(Path(path))
+                    }
+                }
+                browserType.launch(launchOptions).use { browser ->
                     val basePath = BasePath(confInputs.basePath)
                     pages
                         .asSequence()
