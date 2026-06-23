@@ -338,6 +338,17 @@ abstract class AppBlock @Inject constructor(
             abstract val enabled: Property<Boolean>
 
             /**
+             * The network interface host the JDWP debugging agent will bind to.
+             *
+             * Defaults to "127.0.0.1" (localhost) for security-by-default, ensuring the debugging port is not exposed
+             * to the local network.
+             *
+             * Change to "*" or "0.0.0.0" if the debugger needs to connect from a different network segment (e.g. you
+             * are running the application inside a Docker container or a remote VM).
+             */
+            abstract val host: Property<String>
+
+            /**
              * The port to use for remote debugging.
              *
              * Defaults to `5005`, a common default for remote debugging.
@@ -348,6 +359,7 @@ abstract class AppBlock @Inject constructor(
 
             init {
                 enabled.convention(false)
+                host.convention("127.0.0.1")
                 port.convention(5005)
             }
         }

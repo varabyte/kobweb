@@ -98,7 +98,7 @@ abstract class KobwebStartTask @Inject constructor(
             // See: https://ktor.io/docs/development-mode.html#system-property)
             add("-Dio.ktor.development=${env == ServerEnvironment.DEV}")
             if (env == ServerEnvironment.DEV && remoteDebuggingEnabled) {
-                add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${remoteDebuggingBlock.port.get()}")
+                add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=${remoteDebuggingBlock.host.get()}:${remoteDebuggingBlock.port.get()}")
             }
             add("-jar")
             add(serverJar.get().asFile.absolutePath)
