@@ -16,6 +16,7 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
@@ -483,9 +484,9 @@ abstract class AppBlock @Inject constructor(
          * A corresponding browser will be downloaded for you the first time an export is run. If you would rather use
          * one installed on your system, setting [browserPath] will cause the download to be skipped.
          *
-         * Instead of setting this in Gradle, you can also set the environment variable `KOBWEB_EXPORT_BROWSER_TYPE`
-         * (with values `Chromium`, `Firefox`, or `WebKit`). This can be useful if you also set the browser path via its
-         * associated environment variable as well.
+         * Instead of setting this in Gradle, you can also set the system property `kobweb.export.browser.type` or the
+         * environment variable `KOBWEB_EXPORT_BROWSER_TYPE` (with values `Chromium`, `Firefox`, or `WebKit`). This can
+         * be useful if you also set the browser path via its associated environment variable as well.
          */
         abstract val browser: Property<Browser>
 
@@ -494,9 +495,9 @@ abstract class AppBlock @Inject constructor(
          *
          * If you set this, it _must_ match the type of [browser] (which defaults to Chromium).
          *
-         * Instead of setting this in Gradle, you can also set the environment variable `KOBWEB_EXPORT_BROWSER_PATH`.
-         * (which may be convenient as it allows you to use a different value based on which environment you are
-         * exporting in, e.g. home machine vs CI)
+         * Instead of setting this in Gradle, you can also set the system property `kobweb.export.browser.path` or the
+         * environment variable `KOBWEB_EXPORT_BROWSER_PATH` (which may be convenient as it allows you to use a
+         * different value based on which environment you are exporting in, e.g. home machine vs CI)
          */
         abstract val browserPath: Property<String>
 
@@ -601,15 +602,19 @@ abstract class AppBlock @Inject constructor(
         }
 
         init {
+            fun Provider<String>.filterNotBlank(): Provider<String> {
+                return this.filter { it.isNotBlank() }
+            }
+
             browser.convention(
-                providers.environmentVariable("KOBWEB_EXPORT_BROWSER_TYPE")
-                    .filter { it.isNotBlank() }
+                providers.systemProperty("kobweb.export.browser.type").filterNotBlank()
+                    .orElse(providers.environmentVariable("KOBWEB_EXPORT_BROWSER_TYPE").filterNotBlank())
                     .map { Browser.valueOf(it) }
                     .orElse(Browser.Chromium)
             )
             browserPath.convention(
-                providers.environmentVariable("KOBWEB_EXPORT_BROWSER_PATH")
-                    .filter { it.isNotBlank() }
+                providers.systemProperty("kobweb.export.browser.path").filterNotBlank()
+                    .orElse(providers.environmentVariable("KOBWEB_EXPORT_BROWSER_PATH").filterNotBlank())
             )
             includeSourceMap.convention(true)
             suppressLayoutWarning.convention(false)
