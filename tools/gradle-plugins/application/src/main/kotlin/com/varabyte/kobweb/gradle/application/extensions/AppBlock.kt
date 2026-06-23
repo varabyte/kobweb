@@ -325,15 +325,22 @@ abstract class AppBlock @Inject constructor(
     /**
      * Configuration values for the backend of this Kobweb application.
      */
-    abstract class ServerBlock : ExtensionAware {
+    abstract class ServerBlock @Inject constructor(providers: ProviderFactory) : ExtensionAware {
         /**
          * Configuration for remote debugging.
          */
-        abstract class RemoteDebuggingBlock : ExtensionAware {
+        abstract class RemoteDebuggingBlock @Inject constructor(providers: ProviderFactory) : ExtensionAware {
             /**
              * When `true`, enables remote debugging on the Kobweb server.
              *
              * Remote debugging will only work if the server is running in development mode.
+             *
+             * Instead of setting this via the build script, you can set it via the
+             * `kobweb.server.remote.debugging.enabled` property (since this is something you might want to be able to
+             * do from the command line or IDEA run configuration).
+             *
+             * So, for example, if you want to set this value from a `kobweb run` call in the terminal, you can use:
+             * `kobweb run --gradle-start -Dkobweb.server.remote.debugging.enabled=true`
              */
             abstract val enabled: Property<Boolean>
 
@@ -345,6 +352,10 @@ abstract class AppBlock @Inject constructor(
              *
              * Change to "*" or "0.0.0.0" if the debugger needs to connect from a different network segment (e.g. you
              * are running the application inside a Docker container or a remote VM).
+             *
+             * Instead of setting this via the build script, you can set it via the
+             * `kobweb.server.remote.debugging.host` property (since this is something you might want to be able to do
+             * from the command line or IDEA run configuration).
              */
             abstract val host: Property<String>
 
@@ -353,14 +364,32 @@ abstract class AppBlock @Inject constructor(
              *
              * Defaults to `5005`, a common default for remote debugging.
              *
+             * Instead of setting this via the build script, you can set it via the
+             * `kobweb.server.remote.debugging.port` property (since this is something you might want to be able to do
+             * from the command line or IDEA run configuration).
+             *
              * @see <a href="https://www.jetbrains.com/help/idea/attaching-to-local-process.html#attach-to-remote">Remote debugging documentation</a>
              */
             abstract val port: Property<Int>
 
             init {
-                enabled.convention(false)
-                host.convention("127.0.0.1")
-                port.convention(5005)
+                enabled.convention(
+                    providers
+                        .systemProperty("kobweb.server.remote.debugging.enabled")
+                        .map<Boolean> { it.toBooleanStrictOrNull() }
+                        .orElse(false)
+                )
+                host.convention(
+                    providers
+                        .systemProperty("kobweb.server.remote.debugging.host")
+                        .orElse("127.0.0.1")
+                )
+                port.convention(
+                    providers
+                        .systemProperty("kobweb.server.remote.debugging.port")
+                        .map<Int> { it.toIntOrNull() }
+                        .orElse(5005)
+                )
             }
         }
 
@@ -379,7 +408,7 @@ abstract class AppBlock @Inject constructor(
         abstract val systemProperties: MapProperty<String, String>
 
         init {
-            extensions.create<RemoteDebuggingBlock>("remoteDebugging")
+            extensions.create<RemoteDebuggingBlock>("remoteDebugging", providers)
         }
     }
 
@@ -628,7 +657,7 @@ abstract class AppBlock @Inject constructor(
         genDir.convention(baseGenDir.map { "$it/app" })
 
         extensions.create<IndexBlock>("index", BasePath(conf.site.basePath))
-        extensions.create<ServerBlock>("server")
+        extensions.create<ServerBlock>("server", providers)
         extensions.create<ExportBlock>("export", providers, kobwebFolder)
     }
 }
