@@ -30,17 +30,25 @@ class CSSPositionTest {
     }
 
     @Test
-    fun edgesBecomeExpectedTextValues() {
-        assertThat(CSSPosition(Edge.Left(10.px)).toString()).isEqualTo("left 10px")
-        assertThat(CSSPosition(Edge.Bottom(20.em)).toString()).isEqualTo("bottom 20em")
+    fun anchorsBecomeExpectedTextValues() {
+        // Note: CSSPosition only supports 1-, 2-, or 4-arg formats, which is why some of these might seem more complex
+        // than they should be (e.g. "left 10px top 50%" vs "left 10px center")
+
+        assertThat(CSSPosition(Edge.Left(10.px)).toString()).isEqualTo("left 10px top 50%")
+        assertThat(CSSPosition(Edge.Bottom(20.em)).toString()).isEqualTo("left 50% bottom 20em")
         assertThat(CSSPosition(Edge.Left(0.px)).toString()).isEqualTo("left")
         assertThat(CSSPosition(Edge.Bottom(0.percent)).toString()).isEqualTo("bottom")
         assertThat(CSSPosition(Edge.Left).toString()).isEqualTo("left")
         assertThat(CSSPosition(Edge.Bottom).toString()).isEqualTo("bottom")
-        assertThat(CSSPosition(Edge.Left(25.percent), Edge.Bottom(75.percent)).toString()).isEqualTo("left 25% bottom 75%")
-        assertThat(CSSPosition(Edge.Left, Edge.Bottom(75.percent)).toString()).isEqualTo("left bottom 75%")
-        assertThat(CSSPosition(Edge.Left(25.percent), Edge.Bottom).toString()).isEqualTo("left 25% bottom")
         assertThat(CSSPosition(Edge.Left, Edge.Bottom).toString()).isEqualTo("left bottom")
+        assertThat(CSSPosition(Edge.Left(25.percent), Edge.Bottom(75.percent)).toString()).isEqualTo("left 25% bottom 75%")
+        assertThat(CSSPosition(Edge.Left, Edge.Bottom(75.percent)).toString()).isEqualTo("left 0% bottom 75%")
+        assertThat(CSSPosition(Edge.Left(25.percent), Edge.Bottom).toString()).isEqualTo("left 25% bottom 0%")
+        assertThat(CSSPosition(Edge.CenterX).toString()).isEqualTo("center")
+        assertThat(CSSPosition(Edge.CenterY).toString()).isEqualTo("center")
+        assertThat(CSSPosition(Edge.Left, Edge.CenterY).toString()).isEqualTo("left center")
+        assertThat(CSSPosition(Edge.CenterX, Edge.Bottom).toString()).isEqualTo("center bottom")
+        assertThat(CSSPosition(Edge.CenterX, Edge.CenterY).toString()).isEqualTo("center")
     }
 
     private val dummyPercentValue by StyleVariable<CSSPercentageNumericValue>()
@@ -49,6 +57,6 @@ class CSSPositionTest {
     // fail when we counter a variable!
     @Test
     fun variablesWork() {
-        assertThat(CSSPosition(Edge.Left(dummyPercentValue.value())).toString()).isEqualTo("left var(--css-position-test-dummy-percent-value)")
+        assertThat(CSSPosition(Edge.Left(dummyPercentValue.value())).toString()).isEqualTo("left var(--css-position-test-dummy-percent-value) top 50%")
     }
 }

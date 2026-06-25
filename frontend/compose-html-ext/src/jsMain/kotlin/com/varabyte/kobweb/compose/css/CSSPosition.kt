@@ -86,6 +86,8 @@ private fun EdgeYOrCenter.toOffset(): EdgeYOffset {
  *
  * For more information about position values and what they mean, see: https://developer.mozilla.org/en-US/docs/Web/CSS/position_value
  */
+// NOTE: For maximum compatibility, we only support 1-, 2-, and 4-arg output formats. For example, radial gradients do
+// not support 3-arg versions.
 class CSSPosition private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
@@ -95,21 +97,79 @@ class CSSPosition private constructor(private val value: String) : StyleProperty
     ) : this("$x $y")
 
     constructor(xAnchor: EdgeXOrCenter) : this("$xAnchor")
-    constructor(yAnchor: EdgeYOrCenter) : this("${yAnchor.toOffset()}")
-    constructor(xAnchor: EdgeXOrCenter, yAnchor: EdgeYOrCenter) : this(xAnchor.toOffset(), yAnchor.toOffset())
+    constructor(yAnchor: EdgeYOrCenter) : this("$yAnchor")
+    constructor(xAnchor: EdgeXOrCenter, yAnchor: EdgeYOrCenter) : this(if (xAnchor !is CenterX || yAnchor !is CenterY) "$xAnchor $yAnchor" else "center")
 
-    constructor(xOffset: EdgeXOffset) : this("$xOffset")
+    constructor(xEdge: EdgeXOffset) : this(buildString {
+        val xEdgeStr = xEdge.toString()
+        append(xEdgeStr)
+        // If edge is just a keyword (e.g. left) no need to append center, but it is needed if an offset is specified
+        if (xEdgeStr.contains(' ')) append(" ${CenterY().toOffset()}")
+    })
 
-    constructor(yOffset: EdgeYOffset) : this("$yOffset")
+    constructor(yEdge: EdgeYOffset) : this(buildString {
+        val yEdgeStr = yEdge.toString()
+        // If edge is just a keyword (e.g. top) no need to prepend center, but it is needed if an offset is specified
+        if (yEdgeStr.contains(' ')) append("${CenterX().toOffset()} ")
+        append(yEdgeStr)
+    })
 
     constructor(xCenter: CenterX, y: CSSLengthOrPercentageNumericValue) : this("$xCenter $y")
     constructor(x: CSSLengthOrPercentageNumericValue, yCenter: CenterY) : this("$x $yCenter")
 
-    constructor(xOffset: EdgeXOffset, yAnchor: EdgeYOrCenter) : this(xOffset, yAnchor.toOffset())
+    constructor(xOffset: EdgeXOffset, yAnchor: EdgeYOrCenter) : this(
+        buildString {
+            val xOffsetStr = xOffset.toString()
+            append(xOffsetStr)
+            append(' ')
+            append(
+                if (xOffsetStr.contains(' ')) {
+                    val yOffsetStr = yAnchor.toOffset().toString()
+                    if (yOffsetStr.contains(' ')) yOffsetStr else "$yOffsetStr 0%"
+                } else yAnchor
+            )
+        }
+    )
 
-    constructor(xAnchor: EdgeXOrCenter, yOffset: EdgeYOffset) : this(xAnchor.toOffset(), yOffset)
+    constructor(xAnchor: EdgeXOrCenter, yOffset: EdgeYOffset) : this(
+        buildString {
+            val yOffsetStr = yOffset.toString()
+            append(
+                if (yOffsetStr.contains(' ')) {
+                    val xOffsetStr = xAnchor.toOffset().toString()
+                    if (xOffsetStr.contains(' ')) xOffsetStr else "$xOffsetStr 0%"
+                } else xAnchor
+            )
+            append(' ')
+            append(yOffsetStr)
+        }
+    )
 
-    constructor(xAnchor: EdgeXOffset, yAnchor: EdgeYOffset) : this("$xAnchor $yAnchor")
+    constructor(xOffset: EdgeXOffset, yOffset: EdgeYOffset) : this(
+        buildString {
+            val xOffsetStr = xOffset.toString()
+            val yOffsetStr = yOffset.toString()
+            val xHasOffset = xOffsetStr.contains(' ')
+            val yHasOffset = yOffsetStr.contains(' ')
+            if (xHasOffset && !yHasOffset) {
+                append(xOffsetStr)
+                append(' ')
+                append(yOffsetStr)
+                append(' ')
+                append("50%")
+            } else if (!xHasOffset && yHasOffset) {
+                append(xOffsetStr)
+                append(' ')
+                append("50%")
+                append(' ')
+                append(yOffsetStr)
+            } else {
+                append(xOffsetStr)
+                append(' ')
+                append(yOffsetStr)
+            }
+        }
+    )
 
     companion object {
         // Positions
