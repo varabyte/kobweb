@@ -1848,7 +1848,7 @@ class CssStylePropertyTests {
             .isEqualTo("object-position: 10ch 8em")
 
         assertThat(styleToText { objectPosition(ObjectPosition.of(
-            CSSPosition(EdgeXOffset(Edge.Right, 3.em), EdgeYOffset(Edge.Bottom, 10.px))
+            CSSPosition(Edge.Right(3.em), Edge.Bottom(10.px))
         )) })
             .isEqualTo("object-position: right 3em bottom 10px")
 
