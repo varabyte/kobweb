@@ -22,11 +22,9 @@ class EdgeX internal constructor(value: String) : EdgeXOrCenter(value) {
 }
 
 // If possible, discard 0 value lengths / percentages when indicating a default value. We might not be able to know this
-// if the value passed in is a variable.
-@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
 private fun CSSLengthOrPercentageNumericValue.isDefinitelyZero(): Boolean {
-    val asSizeValue = this as? CSSSizeValue<*> ?: return false
-    return asSizeValue.value == 0f
+    // If `this` is a `CSSSizeValue`, it will have a `value: Float` property'; otherwise, that will be undefined
+    return this.asDynamic().value == 0f
 }
 
 class CenterX internal constructor() : EdgeXOrCenter("center")
