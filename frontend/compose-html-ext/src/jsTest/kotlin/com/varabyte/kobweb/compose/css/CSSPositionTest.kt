@@ -83,8 +83,6 @@ class CSSPositionTest {
 
     private val dummyPercentValue by StyleVariable<CSSPercentageNumericValue>()
 
-    // We do an internal "as" check against the passed-in numeric value. We want to make sure that this logic doesn't
-    // fail when we counter a variable!
     @Test
     fun variablesWork() {
         assertThat(CSSPosition(Edge.Left(dummyPercentValue.value()))).isEqualTo("left var(--css-position-test-dummy-percent-value) top 50%")
