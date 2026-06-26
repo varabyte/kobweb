@@ -120,11 +120,16 @@ class CSSPosition private constructor(private val value: String) : StyleProperty
             val xHasZeroOffset = xOffset.offset.isDefinitelyZero()
             append(xOffset)
             append(' ')
+
             append(
                 if (xHasZeroOffset) {
-                    val yOffset = yAnchor.toOffset()
-                    val yHasZeroOffset = yOffset.offset.isDefinitelyZero()
-                    if (yHasZeroOffset) yOffset else yOffset.toString(dropZeroOffset = false)
+                    if (yAnchor is CenterY) {
+                        yAnchor
+                    } else {
+                        val yOffset = yAnchor.toOffset()
+                        val yHasZeroOffset = yOffset.offset.isDefinitelyZero()
+                        if (yHasZeroOffset) yOffset else yOffset.toString(dropZeroOffset = false)
+                    }
                 } else yAnchor.toOffset().toString(dropZeroOffset = false)
             )
         }
@@ -135,9 +140,13 @@ class CSSPosition private constructor(private val value: String) : StyleProperty
             val yHasZeroOffset = yOffset.offset.isDefinitelyZero()
             append(
                 if (yHasZeroOffset) {
-                    val xOffset = xAnchor.toOffset()
-                    val xHasZeroOffset = xOffset.offset.isDefinitelyZero()
-                    if (xHasZeroOffset) xOffset else xOffset.toString(dropZeroOffset = false)
+                    if (xAnchor is CenterX) {
+                        xAnchor
+                    } else {
+                        val xOffset = xAnchor.toOffset()
+                        val xHasZeroOffset = xOffset.offset.isDefinitelyZero()
+                        if (xHasZeroOffset) xOffset else xOffset.toString(dropZeroOffset = false)
+                    }
                 } else xAnchor.toOffset().toString(dropZeroOffset = false)
             )
             append(' ')

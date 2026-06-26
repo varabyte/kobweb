@@ -56,11 +56,18 @@ class CSSPositionTest {
 
         assertThat(CSSPosition(Edge.Left)).isEqualTo("left")
         assertThat(CSSPosition(Edge.Bottom)).isEqualTo("bottom")
+        assertThat(CSSPosition(Edge.CenterX)).isEqualTo("center")
+        assertThat(CSSPosition(Edge.CenterY)).isEqualTo("center")
+        assertThat(CSSPosition(Edge.CenterX, Edge.CenterY)).isEqualTo("center")
+        assertThat(CSSPosition(Edge.Left, Edge.CenterY)).isEqualTo("left center")
+        assertThat(CSSPosition(Edge.CenterX, Edge.Top)).isEqualTo("center top")
 
         // Drop zero offset when we can
         assertThat(CSSPosition(Edge.Left(0.px))).isEqualTo("left")
         assertThat(CSSPosition(Edge.Bottom(0.percent))).isEqualTo("bottom")
         assertThat(CSSPosition(Edge.Left(0.em), Edge.Bottom(0.vh))).isEqualTo("left bottom")
+        assertThat(CSSPosition(Edge.Left(0.px), Edge.CenterY)).isEqualTo("left center")
+        assertThat(CSSPosition(Edge.CenterX, Edge.Bottom(0.px))).isEqualTo("center bottom")
 
         assertThat(CSSPosition(Edge.Left(10.px))).isEqualTo("left 10px top 50%")
         assertThat(CSSPosition(Edge.Bottom(20.em))).isEqualTo("left 50% bottom 20em")
@@ -70,15 +77,12 @@ class CSSPositionTest {
         assertThat(CSSPosition(Edge.Left, Edge.Bottom(75.percent))).isEqualTo("left 0% bottom 75%")
         assertThat(CSSPosition(Edge.Left(25.percent), Edge.Bottom)).isEqualTo("left 25% bottom 0%")
 
+        assertThat(CSSPosition(Edge.Right(25.percent), Edge.CenterY)).isEqualTo("right 25% top 50%")
+        assertThat(CSSPosition(Edge.CenterX, Edge.Bottom(75.percent))).isEqualTo("left 50% bottom 75%")
+
         // Do not drop 0 offset if it needs to be part of the final output
         assertThat(CSSPosition(Edge.Left(0.em), Edge.Bottom(75.percent))).isEqualTo("left 0em bottom 75%")
         assertThat(CSSPosition(Edge.Left(25.percent), Edge.Bottom(0.px))).isEqualTo("left 25% bottom 0px")
-
-        assertThat(CSSPosition(Edge.CenterX)).isEqualTo("center")
-        assertThat(CSSPosition(Edge.CenterY)).isEqualTo("center")
-        assertThat(CSSPosition(Edge.Left, Edge.CenterY)).isEqualTo("left center")
-        assertThat(CSSPosition(Edge.CenterX, Edge.Bottom)).isEqualTo("center bottom")
-        assertThat(CSSPosition(Edge.CenterX, Edge.CenterY)).isEqualTo("center")
     }
 
     private val dummyPercentValue by StyleVariable<CSSPercentageNumericValue>()
