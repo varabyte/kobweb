@@ -59,15 +59,15 @@ class CSSPositionTest {
         assertThat(CSSPosition(Edge.CenterX)).isEqualTo("center")
         assertThat(CSSPosition(Edge.CenterY)).isEqualTo("center")
         assertThat(CSSPosition(Edge.CenterX, Edge.CenterY)).isEqualTo("center")
-        assertThat(CSSPosition(Edge.Left, Edge.CenterY)).isEqualTo("left center")
-        assertThat(CSSPosition(Edge.CenterX, Edge.Top)).isEqualTo("center top")
+        assertThat(CSSPosition(Edge.Left, Edge.CenterY)).isEqualTo("left")
+        assertThat(CSSPosition(Edge.CenterX, Edge.Top)).isEqualTo("top")
 
         // Drop zero offset when we can
         assertThat(CSSPosition(Edge.Left(0.px))).isEqualTo("left")
         assertThat(CSSPosition(Edge.Bottom(0.percent))).isEqualTo("bottom")
         assertThat(CSSPosition(Edge.Left(0.em), Edge.Bottom(0.vh))).isEqualTo("left bottom")
-        assertThat(CSSPosition(Edge.Left(0.px), Edge.CenterY)).isEqualTo("left center")
-        assertThat(CSSPosition(Edge.CenterX, Edge.Bottom(0.px))).isEqualTo("center bottom")
+        assertThat(CSSPosition(Edge.Left(0.px), Edge.CenterY)).isEqualTo("left")
+        assertThat(CSSPosition(Edge.CenterX, Edge.Bottom(0.px))).isEqualTo("bottom")
 
         assertThat(CSSPosition(Edge.Left(10.px))).isEqualTo("left 10px top 50%")
         assertThat(CSSPosition(Edge.Bottom(20.em))).isEqualTo("left 50% bottom 20em")
