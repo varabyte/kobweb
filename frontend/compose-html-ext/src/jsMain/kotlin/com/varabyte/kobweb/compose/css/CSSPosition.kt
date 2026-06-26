@@ -16,22 +16,23 @@ sealed class Edge(private val value: String) : StylePropertyValue {
     }
 }
 
-sealed class EdgeXOrCenter(value: String) : Edge(value)
-class EdgeX internal constructor(value: String) : EdgeXOrCenter(value) {
-    operator fun invoke(offset: CSSLengthOrPercentageNumericValue) = EdgeXOffset(this, offset)
-}
-
 // If possible, discard 0 value lengths / percentages when indicating a default value. We might not be able to know this
 private fun CSSLengthOrPercentageNumericValue.isDefinitelyZero(): Boolean {
     // If `this` is a `CSSSizeValue`, it will have a `value: Float` property'; otherwise, that will be undefined
     return this.asDynamic().value == 0f
 }
 
+sealed class EdgeXOrCenter(value: String) : Edge(value)
+class EdgeX internal constructor(value: String) : EdgeXOrCenter(value) {
+    operator fun invoke(offset: CSSLengthOrPercentageNumericValue) = EdgeXOffset(this, offset)
+}
+
 class CenterX internal constructor() : EdgeXOrCenter("center")
 class EdgeXOffset internal constructor(val edgeX: EdgeX, val offset: CSSLengthOrPercentageNumericValue) : StylePropertyValue {
-    override fun toString() = buildString {
+    override fun toString() = toString(dropZeroOffset = true)
+    internal fun toString(dropZeroOffset: Boolean) = buildString {
         append(edgeX)
-        if (!offset.isDefinitelyZero()) append(" $offset")
+        if (!(dropZeroOffset && offset.isDefinitelyZero())) append(" $offset")
     }
 }
 
@@ -42,9 +43,10 @@ class EdgeY internal constructor(value: String) : EdgeYOrCenter(value) {
 
 class CenterY internal constructor() : EdgeYOrCenter("center")
 class EdgeYOffset internal constructor(val edgeY: EdgeY, val offset: CSSLengthOrPercentageNumericValue) : StylePropertyValue {
-    override fun toString() = buildString {
+    override fun toString() = toString(dropZeroOffset = true)
+    internal fun toString(dropZeroOffset: Boolean) = buildString {
         append(edgeY)
-        if (!offset.isDefinitelyZero()) append(" $offset")
+        if (!(dropZeroOffset && offset.isDefinitelyZero())) append(" $offset")
     }
 }
 
@@ -98,18 +100,16 @@ class CSSPosition private constructor(private val value: String) : StyleProperty
     constructor(yAnchor: EdgeYOrCenter) : this("$yAnchor")
     constructor(xAnchor: EdgeXOrCenter, yAnchor: EdgeYOrCenter) : this(if (xAnchor !is CenterX || yAnchor !is CenterY) "$xAnchor $yAnchor" else "center")
 
-    constructor(xEdge: EdgeXOffset) : this(buildString {
-        val xEdgeStr = xEdge.toString()
-        append(xEdgeStr)
-        // If edge is just a keyword (e.g. left) no need to append center, but it is needed if an offset is specified
-        if (xEdgeStr.contains(' ')) append(" ${CenterY().toOffset()}")
+    constructor(xOffset: EdgeXOffset) : this(buildString {
+        // If xOffset is just a keyword (e.g. left) no need to append center, but it is needed if an offset is specified
+        append(xOffset)
+        if (!xOffset.offset.isDefinitelyZero()) append(" ${CenterY().toOffset()}")
     })
 
-    constructor(yEdge: EdgeYOffset) : this(buildString {
-        val yEdgeStr = yEdge.toString()
-        // If edge is just a keyword (e.g. top) no need to prepend center, but it is needed if an offset is specified
-        if (yEdgeStr.contains(' ')) append("${CenterX().toOffset()} ")
-        append(yEdgeStr)
+    constructor(yOffset: EdgeYOffset) : this(buildString {
+        // If yOffset is just a keyword (e.g. top) no need to prepend center, but it is needed if an offset is specified
+        if (!yOffset.offset.isDefinitelyZero()) append("${CenterX().toOffset()} ")
+        append(yOffset)
     })
 
     constructor(xCenter: CenterX, y: CSSLengthOrPercentageNumericValue) : this("$xCenter $y")
@@ -117,54 +117,50 @@ class CSSPosition private constructor(private val value: String) : StyleProperty
 
     constructor(xOffset: EdgeXOffset, yAnchor: EdgeYOrCenter) : this(
         buildString {
-            val xOffsetStr = xOffset.toString()
-            append(xOffsetStr)
+            val xHasZeroOffset = xOffset.offset.isDefinitelyZero()
+            append(xOffset)
             append(' ')
             append(
-                if (xOffsetStr.contains(' ')) {
-                    val yOffsetStr = yAnchor.toOffset().toString()
-                    if (yOffsetStr.contains(' ')) yOffsetStr else "$yOffsetStr 0%"
-                } else yAnchor
+                if (xHasZeroOffset) {
+                    val yOffset = yAnchor.toOffset()
+                    val yHasZeroOffset = yOffset.offset.isDefinitelyZero()
+                    if (yHasZeroOffset) yOffset else yOffset.toString(dropZeroOffset = false)
+                } else yAnchor.toOffset().toString(dropZeroOffset = false)
             )
         }
     )
 
     constructor(xAnchor: EdgeXOrCenter, yOffset: EdgeYOffset) : this(
         buildString {
-            val yOffsetStr = yOffset.toString()
+            val yHasZeroOffset = yOffset.offset.isDefinitelyZero()
             append(
-                if (yOffsetStr.contains(' ')) {
-                    val xOffsetStr = xAnchor.toOffset().toString()
-                    if (xOffsetStr.contains(' ')) xOffsetStr else "$xOffsetStr 0%"
-                } else xAnchor
+                if (yHasZeroOffset) {
+                    val xOffset = xAnchor.toOffset()
+                    val xHasZeroOffset = xOffset.offset.isDefinitelyZero()
+                    if (xHasZeroOffset) xOffset else xOffset.toString(dropZeroOffset = false)
+                } else xAnchor.toOffset().toString(dropZeroOffset = false)
             )
             append(' ')
-            append(yOffsetStr)
+            append(yOffset)
         }
     )
 
     constructor(xOffset: EdgeXOffset, yOffset: EdgeYOffset) : this(
         buildString {
-            val xOffsetStr = xOffset.toString()
-            val yOffsetStr = yOffset.toString()
-            val xHasOffset = xOffsetStr.contains(' ')
-            val yHasOffset = yOffsetStr.contains(' ')
-            if (xHasOffset && !yHasOffset) {
-                append(xOffsetStr)
+            val xHasZeroOffset = xOffset.offset.isDefinitelyZero()
+            val yHasZeroOffset = yOffset.offset.isDefinitelyZero()
+            if (!xHasZeroOffset && yHasZeroOffset) {
+                append(xOffset)
                 append(' ')
-                append(yOffsetStr)
+                append(yOffset.toString(dropZeroOffset = false))
+            } else if (xHasZeroOffset && !yHasZeroOffset) {
+                append(xOffset.toString(dropZeroOffset = false))
                 append(' ')
-                append("50%")
-            } else if (!xHasOffset && yHasOffset) {
-                append(xOffsetStr)
-                append(' ')
-                append("50%")
-                append(' ')
-                append(yOffsetStr)
+                append(yOffset)
             } else {
-                append(xOffsetStr)
+                append(xOffset)
                 append(' ')
-                append(yOffsetStr)
+                append(yOffset)
             }
         }
     )

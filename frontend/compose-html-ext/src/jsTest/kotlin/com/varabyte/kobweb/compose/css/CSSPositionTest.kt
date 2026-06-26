@@ -4,6 +4,7 @@ import com.varabyte.truthish.assertThat
 import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.vh
 import kotlin.test.Test
 
 class CSSPositionTest {
@@ -34,16 +35,26 @@ class CSSPositionTest {
         // Note: CSSPosition only supports 1-, 2-, or 4-arg formats, which is why some of these might seem more complex
         // than they should be (e.g. "left 10px top 50%" vs "left 10px center")
 
-        assertThat(CSSPosition(Edge.Left(10.px)).toString()).isEqualTo("left 10px top 50%")
-        assertThat(CSSPosition(Edge.Bottom(20.em)).toString()).isEqualTo("left 50% bottom 20em")
-        assertThat(CSSPosition(Edge.Left(0.px)).toString()).isEqualTo("left")
-        assertThat(CSSPosition(Edge.Bottom(0.percent)).toString()).isEqualTo("bottom")
         assertThat(CSSPosition(Edge.Left).toString()).isEqualTo("left")
         assertThat(CSSPosition(Edge.Bottom).toString()).isEqualTo("bottom")
+
+        // Drop zero offset when we can
+        assertThat(CSSPosition(Edge.Left(0.px)).toString()).isEqualTo("left")
+        assertThat(CSSPosition(Edge.Bottom(0.percent)).toString()).isEqualTo("bottom")
+        assertThat(CSSPosition(Edge.Left(0.em), Edge.Bottom(0.vh)).toString()).isEqualTo("left bottom")
+
+        assertThat(CSSPosition(Edge.Left(10.px)).toString()).isEqualTo("left 10px top 50%")
+        assertThat(CSSPosition(Edge.Bottom(20.em)).toString()).isEqualTo("left 50% bottom 20em")
         assertThat(CSSPosition(Edge.Left, Edge.Bottom).toString()).isEqualTo("left bottom")
+
         assertThat(CSSPosition(Edge.Left(25.percent), Edge.Bottom(75.percent)).toString()).isEqualTo("left 25% bottom 75%")
         assertThat(CSSPosition(Edge.Left, Edge.Bottom(75.percent)).toString()).isEqualTo("left 0% bottom 75%")
         assertThat(CSSPosition(Edge.Left(25.percent), Edge.Bottom).toString()).isEqualTo("left 25% bottom 0%")
+
+        // Do not drop 0 offset if it needs to be part of the final output
+        assertThat(CSSPosition(Edge.Left(0.em), Edge.Bottom(75.percent)).toString()).isEqualTo("left 0em bottom 75%")
+        assertThat(CSSPosition(Edge.Left(25.percent), Edge.Bottom(0.px)).toString()).isEqualTo("left 25% bottom 0px")
+
         assertThat(CSSPosition(Edge.CenterX).toString()).isEqualTo("center")
         assertThat(CSSPosition(Edge.CenterY).toString()).isEqualTo("center")
         assertThat(CSSPosition(Edge.Left, Edge.CenterY).toString()).isEqualTo("left center")
