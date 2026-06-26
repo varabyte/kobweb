@@ -7,55 +7,21 @@ import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.truthish.assertThat
 import com.varabyte.truthish.assertThrows
 import com.varabyte.truthish.assertWithMessage
-import kotlinx.browser.document
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.auto
-import org.w3c.dom.HTMLElement
 import kotlin.test.Test
 
 class CssStylePropertyTests {
-    /**
-     * Apply a style block to a temporary HTML element and return the inline style of the element, in the form
-     * `key: value; key2: value2;`.
-     *
-     * The exact text of the values may be altered by the browser's internal normalization
-     * (e.g. `property("margin", "10px 10px")` becomes `margin: 10px;`).
-     *
-     * This is useful for testing that the browser recognizes a style as valid CSS, because an invalid style will not
-     * get applied and thus output an empty string.
-     */
-    private fun styleToTextOnHtmlElement(block: StyleScope.() -> Unit): String {
-        val element = document.createElement("div").unsafeCast<HTMLElement>()
-        object : StyleScope {
-            override fun property(propertyName: String, value: StylePropertyValue) {
-                element.style.setProperty(propertyName, value.toString())
-            }
-
-            override fun variable(variableName: String, value: StylePropertyValue) {
-                element.style.setProperty(variableName, value.toString())
-            }
-        }.block()
-        return element.style.cssText
-    }
-
     /**
      * Convert all properties in a style to the String that would ultimately get put into an HTML style attribute.
      *
      * In other words, key / values will be split by a ':' and multiple properties by a ';'.
      */
     private fun styleToText(block: StyleScope.() -> Unit): String {
-        // We don't care about comparing -- but it's an easy way to construct a style scope, as Compose HTML doesn't
-        // give us an easy way otherwise.
-        val styleScope = ComparableStyleScope()
-        block.invoke(styleScope)
-
-        return styleScope.properties.joinToString("; ") { "${it.name}: ${it.value}" }.also {
-            // We don't match on the exact string as the browser may reformat it, so we just check that the browser did
-            // not reject the style.
-            assertWithMessage("Browser should recognize style `$it`")
-                .that(styleToTextOnHtmlElement(block))
-                .isNotBlank()
-        }
+        return CssTestUtils.styleToText(block)
+            .also {
+                assertWithMessage("Browser should recognize style `$it`").that(CssTestUtils.isValidCss(block))
+            }
     }
 
     @Test
