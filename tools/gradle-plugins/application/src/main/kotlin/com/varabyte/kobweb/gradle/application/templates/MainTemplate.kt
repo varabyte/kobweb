@@ -406,7 +406,7 @@ fun createMainFunction(
                         frontendData.cssStyleVariants.forEach { entry ->
                             addStatement(
                                 buildString {
-                                    addStatement("ctx.theme.registerVariant(\"${entry.name}\", ${entry.fqcn}")
+                                    append("ctx.theme.registerVariant(\"${entry.name}\", ${entry.fqcn}")
                                     entry.layer?.let { layer -> append(", layer = \"$layer\"") }
                                     append(")")
                                 }
