@@ -23,6 +23,16 @@ suspend inline fun <reified T> ContentSource.decode(bodyDeserializer: Deserializ
 /**
  * A serialization-aware convenience factory method that can be used to create [Body] instances.
  */
+@Deprecated("Use `bodyOf` method instead, for consistency with frontend APIs",
+    ReplaceWith("bodyOf(body, bodySerializer)"),
+)
 inline fun <reified T> Body.Companion.encode(body: T, bodySerializer: SerializationStrategy<T> = serializer()): Body {
-    return json(Json.encodeToString(bodySerializer, body))
+    return bodyOf(body, bodySerializer)
+}
+
+/**
+ * A serialization-aware convenience factory method that can be used to create [Body] instances.
+ */
+inline fun <reified T> bodyOf(body: T, bodySerializer: SerializationStrategy<T> = serializer()): Body {
+    return bodyOf(Json.encodeToString(bodySerializer, body), contentType = "application/json")
 }

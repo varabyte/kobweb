@@ -23,7 +23,7 @@ private const val API_PREFIX_WITH_TRAILING_SLASH = "$API_PREFIX/"
  * ```
  * @Api
  * fun demo(ctx: ApiContext) {
- *   ctx.res.body = Body.text("This is how you send text back to the client")
+ *   ctx.res.body = bodyOf("This is how you send text back to the client")
  * }
  * ```
  *

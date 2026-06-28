@@ -16,11 +16,11 @@ import com.varabyte.kobweb.api.intercept.ApiInterceptor
  * suspend fun echo(ctx: ApiContext) {
  *   val msg = ctx.req.params["msg"]
  *   if (msg != null) {
- *     ctx.res.body = Body.text("Received message: $msg")
+ *     ctx.res.body = bodyOf("Received message: $msg")
  *   }
  *   else {
  *     ctx.res.status = 400
- *     ctx.res.body = Body.text("Missing: required parameter 'msg'")
+ *     ctx.res.body = bodyOf("Missing: required parameter 'msg'")
  *   }
  * }
  * ```

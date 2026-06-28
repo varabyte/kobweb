@@ -1,11 +1,12 @@
 package com.varabyte.kobweb.api.http
 
+import com.varabyte.kobweb.api.http.Body.Companion.invoke
+import com.varabyte.kobweb.api.http.io.parseCharsetFromContentType
 import com.varabyte.kobweb.framework.annotations.DelicateApi
 import com.varabyte.kobweb.io.ByteSource
 import com.varabyte.kobweb.io.RawByteSource
 import com.varabyte.kobweb.io.toByteSource
 import java.io.InputStream
-import java.nio.charset.Charset
 
 /**
  * The body of a request or response.
@@ -73,19 +74,37 @@ class Body private constructor(
 
 // If you add a new method here, create an associated method on ContentSource (in Content.kt)
 
+@Deprecated("Use `bodyOf` method instead, for consistency with frontend APIs",
+    ReplaceWith("bodyOf(inputStream, contentType)")
+)
 fun Body.Companion.stream(inputStream: InputStream, contentType: String = "application/octet-stream") =
-    invoke(contentType) { inputStream.toByteSource() }
+    bodyOf(inputStream, contentType)
 
+@Deprecated("Use `bodyOf` method instead, for consistency with frontend APIs",
+    ReplaceWith("bodyOf(bytes, contentType)")
+)
 fun Body.Companion.bytes(bytes: ByteArray, contentType: String = "application/octet-stream") =
-    invoke(contentType) { RawByteSource(bytes) }
+    bodyOf(bytes, contentType)
 
+@Deprecated("Use `bodyOf` method instead, for consistency with frontend APIs",
+    ReplaceWith("bodyOf(text, contentType)")
+)
 fun Body.Companion.text(
     text: String,
-    charset: Charset = Charsets.UTF_8,
-    contentType: String = "text/plain; charset=${charset.name()}"
-) = bytes(text.toByteArray(charset), contentType)
+    contentType: String = "text/plain"
+) = bodyOf(text, contentType)
 
-fun Body.Companion.json(text: String, contentType: String = "application/json") =
-    text(text, contentType = contentType)
+@Deprecated("Use `bodyOf` method instead, for consistency with frontend APIs",
+    ReplaceWith("bodyOf(text, contentType = \"application/json\")"),
+)
+fun Body.Companion.json(text: String) =
+    bodyOf(text, contentType = "application/json")
+
+fun bodyOf(inputStream: InputStream, contentType: String = "application/octet-stream") =
+    invoke(contentType) { inputStream.toByteSource() }
+fun bodyOf(bytes: ByteArray, contentType: String = "application/octet-stream") =
+    invoke(contentType) { RawByteSource(bytes) }
+fun bodyOf(text: String, contentType: String = "text/plain") =
+    bodyOf(text.toByteArray(contentType.parseCharsetFromContentType()), contentType)
 
 // endregion
