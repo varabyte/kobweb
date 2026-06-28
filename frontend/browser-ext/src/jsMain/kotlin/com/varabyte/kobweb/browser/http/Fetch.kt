@@ -29,10 +29,11 @@ enum class HttpMethod {
 /**
  * Returns the current body of the target [Response].
  *
- * The returned value may be null if the response was not OK or if it did not have a body.
+ * The returned value will be null if the response did not have a body.
+ *
+ * Note that even if [Response.ok] is false, it might still have a body which will get returned here.
  */
 suspend fun Response.getBodyBytes(): ByteArray? {
-    if (!this.ok) return null
     return suspendCancellableCoroutine { cont ->
         val _ = this.arrayBuffer().then { responseBuffer ->
             val int8Array = Int8Array(responseBuffer)
@@ -61,12 +62,13 @@ class ResponseException(val response: Response, val bodyBytes: ByteArray?) : Exc
     buildString {
         append("URL = ${response.url}, Status = ${response.status}, Status Text = ${response.statusText}")
 
-        val bodyString = bodyBytes?.decodeToString()?.trim()?.takeIf { it.isNotBlank() }
+        val bodyString = bodyBytes?.decodeToString()
         if (bodyString != null) {
-            appendLine()
-            val lines = bodyString.split("\n")
-            val longestLineLength = lines.maxOfOrNull { it.length } ?: 0
             val indent = "  "
+            appendLine()
+            appendLine("${indent}Body:")
+            val lines = bodyString.split("\n")
+            val longestLineLength = (lines.maxOfOrNull { it.length } ?: 0).coerceAtLeast(10)
             val boundary = indent + "-".repeat(longestLineLength)
             appendLine(boundary)
             lines.forEach { line ->
