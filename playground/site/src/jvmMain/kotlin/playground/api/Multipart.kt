@@ -2,19 +2,18 @@ package playground.api
 
 import com.varabyte.kobweb.api.Api
 import com.varabyte.kobweb.api.ApiContext
-import com.varabyte.kobweb.api.http.Body
 import com.varabyte.kobweb.api.http.HttpMethod
 import com.varabyte.kobweb.api.http.Multipart
+import com.varabyte.kobweb.api.http.bodyOf
 import com.varabyte.kobweb.api.http.bytes
 import com.varabyte.kobweb.api.http.forEachPart
-import com.varabyte.kobweb.api.http.text
 
 @Api
 suspend fun multipart(ctx: ApiContext) {
     if (ctx.req.method != HttpMethod.POST) return
     val mp = ctx.req.body?.multipart() ?: return
 
-    ctx.res.body = Body.text(buildString {
+    ctx.res.body = bodyOf(buildString {
         appendLine("Received multipart request")
         var i = 0
         mp.forEachPart { part ->

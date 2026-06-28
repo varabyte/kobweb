@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.api.http
 
-import com.varabyte.kobweb.api.http.Body.Companion.multipart
 import com.varabyte.kobweb.api.http.io.parseCharsetFromContentType
 import com.varabyte.kobweb.framework.annotations.DelicateApi
 import com.varabyte.kobweb.io.ByteSource
@@ -70,7 +69,7 @@ class ContentDisposition(val disposition: String, val parameters: Map<String, St
 
 // region ContentSource content query helper methods
 
-// If you add a new method here, create an associated method on Body.Companion
+// If you add a new method here, make sure there is an associated bodyOf method as well for completeness (in Body.kt)
 
 /**
  * Convert this byte source into an [InputStream].
