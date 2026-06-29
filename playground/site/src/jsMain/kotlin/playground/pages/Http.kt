@@ -1,7 +1,7 @@
 package playground.pages
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.browser.http.get
+import com.varabyte.kobweb.browser.http.bodyAs
 import com.varabyte.kobweb.browser.http.http
 import com.varabyte.kobweb.browser.http.patch
 import com.varabyte.kobweb.browser.http.post
@@ -48,28 +48,28 @@ fun HttpPage() {
     LaunchedEffect(Unit) {
         delay(1.seconds)
 
-        post = window.http.post<Post, Post>(
+        post = window.http.post<Post>(
             "https://jsonplaceholder.typicode.com/posts",
             body = Post(title = "foo", body = "bar", userId = 1),
-        )
+        ).bodyAs<Post>()
         println("After posting: $post")
         delay(1.seconds)
 
-        post = window.http.put<Post, Post>(
+        post = window.http.put<Post>(
             "https://jsonplaceholder.typicode.com/posts/1",
             body = Post(title = "updated title", body = "updated body", userId = 1),
-        )
+        ).bodyAs<Post>()
         println("After putting: $post")
         delay(1.seconds)
 
-        post = window.http.patch<Post, Post>(
+        post = window.http.patch<Post>(
             "https://jsonplaceholder.typicode.com/posts/1",
             body = Post(title = "patched title"),
-        )
+        ).bodyAs<Post>()
         println("After patching: $post")
         delay(1.seconds)
 
-        posts = window.http.get<List<Post>>("https://jsonplaceholder.typicode.com/posts")
+        posts = window.http.get("https://jsonplaceholder.typicode.com/posts").bodyAs<List<Post>>()
     }
 
     Text("Post:")

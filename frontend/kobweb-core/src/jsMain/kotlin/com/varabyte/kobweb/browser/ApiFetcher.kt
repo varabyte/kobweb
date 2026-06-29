@@ -2,10 +2,12 @@ package com.varabyte.kobweb.browser
 
 import com.varabyte.kobweb.browser.http.AbortController
 import com.varabyte.kobweb.browser.http.FetchDefaults
+import com.varabyte.kobweb.browser.http.HttpFetcher
 import com.varabyte.kobweb.browser.http.RequestBody
+import com.varabyte.kobweb.browser.http.bodyAsBytes
+import com.varabyte.kobweb.browser.http.bodyOf
 import com.varabyte.kobweb.browser.http.http
 import com.varabyte.kobweb.navigation.BasePath
-import kotlinx.browser.window
 import org.w3c.dom.Window
 import org.w3c.fetch.RequestRedirect
 import org.w3c.fetch.Response
@@ -52,12 +54,36 @@ class ApiFetcher(private val window: Window) {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
+    @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
+        ReplaceWith(
+            "delete(apiPath, headers, redirect, abortController).bodyAsBytes()",
+            "com.varabyte.kobweb.browser.http.FetchDefaults",
+            "com.varabyte.kobweb.browser.http.bodyAsBytes",
+        )
+    )
     suspend fun deleteBytes(
         apiPath: String,
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray = window.http.deleteBytes(toResource(apiPath), headers, redirect, abortController)
+    ): ByteArray = delete(apiPath, headers, redirect, abortController).bodyAsBytes()
+
+    /**
+     * Like [delete], but returns null if the request failed for any reason.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
+     *
+     * @param transform A final step to convert the response into a different type. Any exception that is thrown while
+     *   this method's logic is run will automatically be caught and, if [logOnError] is true, reported.
+     */
+    suspend fun <T> tryDelete(
+        apiPath: String,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
+        abortController: AbortController? = null,
+        transform: suspend (Response) -> T
+    ): T? = window.http.tryDelete(toResource(apiPath), headers, redirect, abortController, transform)
 
     /**
      * Like [delete], but returns null if the request failed for any reason.
@@ -70,7 +96,7 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): Response? = window.http.tryDelete(toResource(apiPath), headers, redirect, abortController)
+    ): Response? = tryDelete(apiPath, headers, redirect, abortController, transform = { it })
 
     /**
      * Like [deleteBytes], but returns null if the request failed for any reason.
@@ -78,12 +104,19 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
+    @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
+        ReplaceWith(
+            "tryDelete(apiPath, headers, redirect, abortController, transform = { it.bodyAsBytes() })",
+            "com.varabyte.kobweb.browser.http.FetchDefaults",
+            "com.varabyte.kobweb.browser.http.bodyAsBytes",
+        )
+    )
     suspend fun tryDeleteBytes(
         apiPath: String,
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = window.http.tryDeleteBytes(toResource(apiPath), headers, redirect, abortController)
+    ): ByteArray? = tryDelete(apiPath, headers, redirect, abortController, transform = { it.bodyAsBytes() })
 
     /**
      * Call GET on a target API path.
@@ -106,12 +139,36 @@ class ApiFetcher(private val window: Window) {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
+    @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
+        ReplaceWith(
+            "get(apiPath, headers, redirect, abortController).bodyAsBytes()",
+            "com.varabyte.kobweb.browser.http.FetchDefaults",
+            "com.varabyte.kobweb.browser.http.bodyAsBytes",
+        )
+    )
     suspend fun getBytes(
         apiPath: String,
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray = window.http.getBytes(toResource(apiPath), headers, redirect, abortController)
+    ): ByteArray = get(apiPath, headers, redirect, abortController).bodyAsBytes()
+
+    /**
+     * Like [get], but returns null if the request failed for any reason.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
+     *
+     * @param transform A final step to convert the response into a different type. Any exception that is thrown while
+     *   this method's logic is run will automatically be caught and, if [logOnError] is true, reported.
+     */
+    suspend fun <T> tryGet(
+        apiPath: String,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
+        abortController: AbortController? = null,
+        transform: suspend (Response) -> T
+    ): T? = window.http.tryGet(toResource(apiPath), headers, redirect, abortController, transform)
 
     /**
      * Like [get], but returns null if the request failed for any reason.
@@ -124,7 +181,7 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): Response? = window.http.tryGet(toResource(apiPath), headers, redirect, abortController)
+    ): Response? = tryGet(apiPath, headers, redirect, abortController, transform = { it })
 
     /**
      * Like [getBytes], but returns null if the request failed for any reason.
@@ -132,12 +189,19 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
+    @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
+        ReplaceWith(
+            "tryGet(apiPath, headers, redirect, abortController, transform = { it.bodyAsBytes() })",
+            "com.varabyte.kobweb.browser.http.FetchDefaults",
+            "com.varabyte.kobweb.browser.http.bodyAsBytes",
+        )
+    )
     suspend fun tryGetBytes(
         apiPath: String,
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = window.http.tryGetBytes(toResource(apiPath), headers, redirect, abortController)
+    ): ByteArray? = tryGet(apiPath, headers, redirect, abortController, transform = { it.bodyAsBytes() })
 
     /**
      * Call HEAD on a target API path.
@@ -158,13 +222,30 @@ class ApiFetcher(private val window: Window) {
      *
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
+     *
+     * @param transform A final step to convert the response into a different type. Any exception that is thrown while
+     *   this method's logic is run will automatically be caught and, if [logOnError] is true, reported.
+     */
+    suspend fun <T> tryHead(
+        apiPath: String,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
+        abortController: AbortController? = null,
+        transform: suspend (Response) -> T
+    ): T? = window.http.tryHead(toResource(apiPath), headers, redirect, abortController, transform)
+
+    /**
+     * Like [head], but returns null if the request failed for any reason.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
      */
     suspend fun tryHead(
         apiPath: String,
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): Response? = window.http.tryHead(toResource(apiPath), headers, redirect, abortController)
+    ): Response? = tryHead(apiPath, headers, redirect, abortController, transform = { it })
 
     /**
      * Call OPTIONS on a target API path.
@@ -187,12 +268,36 @@ class ApiFetcher(private val window: Window) {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
+    @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
+        ReplaceWith(
+            "options(apiPath, headers, redirect, abortController).bodyAsBytes()",
+            "com.varabyte.kobweb.browser.http.FetchDefaults",
+            "com.varabyte.kobweb.browser.http.bodyAsBytes",
+        )
+    )
     suspend fun optionsBytes(
         apiPath: String,
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray = window.http.optionsBytes(toResource(apiPath), headers, redirect, abortController)
+    ): ByteArray = options(apiPath, headers, redirect, abortController).bodyAsBytes()
+
+    /**
+     * Like [options], but returns null if the request failed for any reason.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
+     *
+     * @param transform A final step to convert the response into a different type. Any exception that is thrown while
+     *   this method's logic is run will automatically be caught and, if [logOnError] is true, reported.
+     */
+    suspend fun <T> tryOptions(
+        apiPath: String,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
+        abortController: AbortController? = null,
+        transform: suspend (Response) -> T
+    ): T? = window.http.tryOptions(toResource(apiPath), headers, redirect, abortController, transform)
 
     /**
      * Like [options], but returns null if the request failed for any reason.
@@ -205,7 +310,7 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): Response? = window.http.tryOptions(toResource(apiPath), headers, redirect, abortController)
+    ): Response? = tryOptions(apiPath, headers, redirect, abortController, transform = { it })
 
     /**
      * Like [optionsBytes], but returns null if the request failed for any reason.
@@ -213,12 +318,19 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
+    @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
+        ReplaceWith(
+            "tryOptions(apiPath, headers, redirect, abortController, transform = { it.bodyAsBytes() })",
+            "com.varabyte.kobweb.browser.http.FetchDefaults",
+            "com.varabyte.kobweb.browser.http.bodyAsBytes",
+        )
+    )
     suspend fun tryOptionsBytes(
         apiPath: String,
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = window.http.tryOptionsBytes(toResource(apiPath), headers, redirect, abortController)
+    ): ByteArray? = tryOptions(apiPath, headers, redirect, abortController, transform = { it.bodyAsBytes() })
 
     /**
      * Call PATCH on a target API path.
@@ -244,13 +356,39 @@ class ApiFetcher(private val window: Window) {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
+    @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
+        ReplaceWith(
+            "patch(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController).bodyAsBytes()",
+            "com.varabyte.kobweb.browser.http.FetchDefaults",
+            "com.varabyte.kobweb.browser.http.bodyAsBytes",
+            "com.varabyte.kobweb.browser.http.bodyOf",
+        )
+    )
     suspend fun patchBytes(
         apiPath: String,
         headers: Map<String, Any>? = FetchDefaults.Headers,
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray = window.http.patchBytes(toResource(apiPath), headers, body, redirect, abortController)
+    ): ByteArray = patch(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController).bodyAsBytes()
+
+    /**
+     * Like [patch], but returns null if the request failed for any reason.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
+     *
+     * @param transform A final step to convert the response into a different type. Any exception that is thrown while
+     *   this method's logic is run will automatically be caught and, if [logOnError] is true, reported.
+     */
+    suspend fun <T> tryPatch(
+        apiPath: String,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
+        body: RequestBody? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
+        abortController: AbortController? = null,
+        transform: suspend (Response) -> T
+    ): T? = window.http.tryPatch(toResource(apiPath), headers, body, redirect, abortController, transform)
 
     /**
      * Like [patch], but returns null if the request failed for any reason.
@@ -264,7 +402,7 @@ class ApiFetcher(private val window: Window) {
         body: RequestBody? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): Response? = window.http.tryPatch(toResource(apiPath), headers, body, redirect, abortController)
+    ): Response? = tryPatch(apiPath, headers, body, redirect, abortController, transform = { it })
 
     /**
      * Like [patchBytes], but returns null if the request failed for any reason.
@@ -272,13 +410,21 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
+    @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
+        ReplaceWith(
+            "tryPatch(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { it.bodyAsBytes() })",
+            "com.varabyte.kobweb.browser.http.FetchDefaults",
+            "com.varabyte.kobweb.browser.http.bodyAsBytes",
+            "com.varabyte.kobweb.browser.http.bodyOf",
+        )
+    )
     suspend fun tryPatchBytes(
         apiPath: String,
         headers: Map<String, Any>? = FetchDefaults.Headers,
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = window.http.tryPatchBytes(toResource(apiPath), headers, body, redirect, abortController)
+    ): ByteArray? = tryPatch(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { it.bodyAsBytes() })
 
     /**
      * Call POST on a target API path.
@@ -304,13 +450,39 @@ class ApiFetcher(private val window: Window) {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
+    @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
+        ReplaceWith(
+            "post(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController).bodyAsBytes()",
+            "com.varabyte.kobweb.browser.http.FetchDefaults",
+            "com.varabyte.kobweb.browser.http.bodyAsBytes",
+            "com.varabyte.kobweb.browser.http.bodyOf",
+        )
+    )
     suspend fun postBytes(
         apiPath: String,
         headers: Map<String, Any>? = FetchDefaults.Headers,
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray = window.http.postBytes(toResource(apiPath), headers, body, redirect, abortController)
+    ): ByteArray = post(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController).bodyAsBytes()
+
+    /**
+     * Like [post], but returns null if the request failed for any reason.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
+     *
+     * @param transform A final step to convert the response into a different type. Any exception that is thrown while
+     *   this method's logic is run will automatically be caught and, if [logOnError] is true, reported.
+     */
+    suspend fun <T> tryPost(
+        apiPath: String,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
+        body: RequestBody? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
+        abortController: AbortController? = null,
+        transform: suspend (Response) -> T
+    ): T? = window.http.tryPost(toResource(apiPath), headers, body, redirect, abortController, transform)
 
     /**
      * Like [post], but returns null if the request failed for any reason.
@@ -324,7 +496,7 @@ class ApiFetcher(private val window: Window) {
         body: RequestBody? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): Response? = window.http.tryPost(toResource(apiPath), headers, body, redirect, abortController)
+    ): Response? = tryPost(apiPath, headers, body, redirect, abortController, transform = { it })
 
     /**
      * Like [postBytes], but returns null if the request failed for any reason.
@@ -332,13 +504,21 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
+    @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
+        ReplaceWith(
+            "tryPost(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { it.bodyAsBytes() })",
+            "com.varabyte.kobweb.browser.http.FetchDefaults",
+            "com.varabyte.kobweb.browser.http.bodyAsBytes",
+            "com.varabyte.kobweb.browser.http.bodyOf",
+        )
+    )
     suspend fun tryPostBytes(
         apiPath: String,
         headers: Map<String, Any>? = FetchDefaults.Headers,
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = window.http.tryPostBytes(toResource(apiPath), headers, body, redirect, abortController)
+    ): ByteArray? = tryPost(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { it.bodyAsBytes() })
 
     /**
      * Call PUT on a target API path.
@@ -364,13 +544,39 @@ class ApiFetcher(private val window: Window) {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
+    @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
+        ReplaceWith(
+            "put(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController).bodyAsBytes()",
+            "com.varabyte.kobweb.browser.http.FetchDefaults",
+            "com.varabyte.kobweb.browser.http.bodyAsBytes",
+            "com.varabyte.kobweb.browser.http.bodyOf",
+        )
+    )
     suspend fun putBytes(
         apiPath: String,
         headers: Map<String, Any>? = FetchDefaults.Headers,
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray = window.http.putBytes(toResource(apiPath), headers, body, redirect, abortController)
+    ): ByteArray = put(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController).bodyAsBytes()
+
+    /**
+     * Like [put], but returns null if the request failed for any reason.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
+     *
+     * @param transform A final step to convert the response into a different type. Any exception that is thrown while
+     *   this method's logic is run will automatically be caught and, if [logOnError] is true, reported.
+     */
+    suspend fun <T> tryPut(
+        apiPath: String,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
+        body: RequestBody? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
+        abortController: AbortController? = null,
+        transform: suspend (Response) -> T
+    ): T? = window.http.tryPut(toResource(apiPath), headers, body, redirect, abortController, transform)
 
     /**
      * Like [put], but returns null if the request failed for any reason.
@@ -384,7 +590,7 @@ class ApiFetcher(private val window: Window) {
         body: RequestBody? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): Response? = window.http.tryPut(toResource(apiPath), headers, body, redirect, abortController)
+    ): Response? = tryPut(apiPath, headers, body, redirect, abortController, transform = { it })
 
     /**
      * Like [putBytes], but returns null if the request failed for any reason.
@@ -392,14 +598,24 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
+    @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
+        ReplaceWith(
+            "tryPut(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { it.bodyAsBytes() })",
+            "com.varabyte.kobweb.browser.http.FetchDefaults",
+            "com.varabyte.kobweb.browser.http.bodyAsBytes",
+            "com.varabyte.kobweb.browser.http.bodyOf",
+        )
+    )
     suspend fun tryPutBytes(
         apiPath: String,
         headers: Map<String, Any>? = FetchDefaults.Headers,
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = window.http.tryPutBytes(toResource(apiPath), headers, body, redirect, abortController)
+    ): ByteArray? = tryPut(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { it.bodyAsBytes() })
 }
 
-@Suppress("unused") // We tie our class to the "Window" class on purpose, so it can be used instead of `fetch`
-val Window.api by lazy { ApiFetcher(window) }
+val Window.api: ApiFetcher get() = with(this.asDynamic()) {
+    apiFetcher = apiFetcher ?: ApiFetcher(this@api)
+    apiFetcher
+}

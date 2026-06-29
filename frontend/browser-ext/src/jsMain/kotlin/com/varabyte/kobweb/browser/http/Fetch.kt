@@ -1,18 +1,12 @@
 package com.varabyte.kobweb.browser.http
 
-import com.varabyte.kobweb.browser.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.await
 import org.khronos.webgl.Int8Array
-import org.khronos.webgl.get
 import org.w3c.dom.WindowOrWorkerGlobalScope
 import org.w3c.fetch.RequestInit
 import org.w3c.fetch.RequestRedirect
 import org.w3c.fetch.Response
-import kotlin.coroutines.resume
 import kotlin.js.Promise
 import kotlin.js.json
 
@@ -27,38 +21,13 @@ enum class HttpMethod {
 }
 
 /**
- * Returns the current body of the target [Response].
- *
- * The returned value will be null if the response did not have a body.
- *
- * Note that even if [Response.ok] is false, it might still have a body which will get returned here.
- */
-suspend fun Response.getBodyBytes(): ByteArray? {
-    return suspendCancellableCoroutine { cont ->
-        val _ = this.arrayBuffer().then { responseBuffer ->
-            val int8Array = Int8Array(responseBuffer)
-            cont.resume(ByteArray(int8Array.length) { i -> int8Array[i] })
-        }.catch {
-            cont.resume(null)
-        }
-    }
-}
-fun ByteArray?.orEmpty(): ByteArray {
-    return this ?: ByteArray(0)
-}
-
-private fun Response.getBodyBytesAsync(dispatcher: CoroutineDispatcher, result: (ByteArray?) -> Unit) {
-    CoroutineScope(dispatcher).launch { result(getBodyBytes()) }
-}
-
-/**
- * An exception that gets thrown if we receive a response whose code is not in the 200 (OK) range.
+ * An exception that gets thrown if we receive a response whose body cannot be converted into raw bytes.
  *
  * @property bodyBytes The raw bytes of the response body, if any. They are passed in directly instead of queried
  *   from the [Response] object because that needs to happen asynchronously, and we need to create the exception
  *   message immediately.
  */
-class ResponseException(val response: Response, val bodyBytes: ByteArray?) : Exception(
+class ResponseBytesException(val response: Response, val bodyBytes: ByteArray?, cause: Throwable? = null) : Exception(
     buildString {
         append("URL = ${response.url}, Status = ${response.status}, Status Text = ${response.statusText}")
 
@@ -68,7 +37,7 @@ class ResponseException(val response: Response, val bodyBytes: ByteArray?) : Exc
             appendLine()
             appendLine("${indent}Body:")
             val lines = bodyString.split("\n")
-            val longestLineLength = (lines.maxOfOrNull { it.length } ?: 0).coerceAtLeast(10)
+            val longestLineLength = (lines.maxOfOrNull { it.length } ?: 0).coerceIn(10, 120)
             val boundary = indent + "-".repeat(longestLineLength)
             appendLine(boundary)
             lines.forEach { line ->
@@ -76,8 +45,73 @@ class ResponseException(val response: Response, val bodyBytes: ByteArray?) : Exc
             }
             appendLine(boundary)
         }
-    }
+    },
+    cause
 )
+
+private fun Response.bodyAsBytesPromise(): Promise<ByteArray> {
+    return this.arrayBuffer().then { responseBuffer ->
+        // Zero-copy conversion since ByteArray is backed by Int8Array in JS
+        Int8Array(responseBuffer).unsafeCast<ByteArray>()
+    }
+}
+
+private suspend fun Response.getBodyBytes(): ByteArray {
+    return try {
+        bodyAsBytesPromise().await()
+    } catch (t: Throwable) {
+        throw ResponseBytesException(this, bodyBytes = null, cause = t)
+    }
+}
+
+/**
+ * Returns the current body of the target [Response].
+ *
+ * This method will throw [ResponseBytesException] if the body cannot be read. This can be due to a connection issue,
+ * for example.
+ *
+ * An exception will also be thrown if you try to read a body that has previously been read! So, you are only expected
+ * to call this method once per response. (Remember, you can call [Response.clone] if you plan to read the contents of a
+ * response more than that.)
+ *
+ * Be aware that responses that are not [ok][Response.ok] can still have bodies! For example, a server might add
+ * details about the error in there.
+ *
+ * However, by default, this method is designed for the happy path where good bytes go in with a request and good bytes
+ * come back out with a response. Therefore, it will throw for an response with an error code even if there's a body.
+ * You can change [requireOk] if you want the body of "bad" responses to also be returned.
+ */
+suspend fun Response.bodyAsBytes(requireOk: Boolean = true): ByteArray {
+    if (requireOk && !this.ok) {
+        var cause: Throwable? = null
+        val errorBytes = try {
+            // Here, we clone our response because we're just trying to extract the body delicately for error logging
+            // purposes, so we shouldn't consume the body as a side effect
+            this.clone().bodyAsBytesPromise().await()
+        } catch (t: Throwable) {
+            cause = t
+            null
+        }
+        throw ResponseBytesException(this, errorBytes, cause)
+    }
+
+    return getBodyBytes()
+}
+
+/**
+ * Like [bodyAsBytes] but returns null instead of throwing an exception if something goes wrong.
+ */
+suspend fun Response.bodyAsBytesOrNull(requireOk: Boolean = true): ByteArray? {
+    return try {
+        bodyAsBytes(requireOk)
+    } catch (_: ResponseBytesException) {
+        null
+    }
+}
+
+fun ByteArray?.orEmpty(): ByteArray {
+    return this ?: ByteArray(0)
+}
 
 /**
  * Default values for [fetch] (or methods that delegate to fetch).
@@ -98,7 +132,7 @@ object FetchDefaults {
  * returned. Just be sure to check [Response.ok] before using it.
  *
  * If all you care about is the response payload, you can use the [fetchBytes] convenience method instead, or the
- * [getBodyBytes] extension method we provide on top of the [Response] class.
+ * [bodyAsBytes] extension method we provide on top of the [Response] class.
  *
  * @param headers An optional map of headers to send with the request. The "Content-Type" header may be automatically
  *   set if the `body` parameter is present, but anything specified manually will take precedence.
@@ -175,6 +209,13 @@ suspend fun WindowOrWorkerGlobalScope.fetch(
  * Note that if a response is returned from the server with an error status (like permission denied, etc.), this
  * method will throw. Otherwise, if a response does not have a body, an empty byte array will be returned.
  */
+@Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
+    ReplaceWith(
+        "fetch(method, resource, headers, body?.let { bodyOf(it) }, redirect, abortController).bodyAsBytes()",
+        "com.varabyte.kobweb.browser.http.bodyAsBytes",
+        "com.varabyte.kobweb.browser.http.bodyOf",
+    )
+)
 suspend fun WindowOrWorkerGlobalScope.fetchBytes(
     method: HttpMethod,
     resource: String,
@@ -183,22 +224,37 @@ suspend fun WindowOrWorkerGlobalScope.fetchBytes(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null
 ): ByteArray {
-    val res = fetch(method, resource, headers, body?.let { bodyOf(it) }, redirect, abortController)
-
-    val responseBytesDeferred = CompletableDeferred<ByteArray>()
-    if (res.ok) {
-        res.getBodyBytesAsync(this.asCoroutineDispatcher()) { bodyBytes -> responseBytesDeferred.complete(bodyBytes.orEmpty()) }
-    } else {
-        res.getBodyBytesAsync(this.asCoroutineDispatcher()) { bodyBytes ->
-            responseBytesDeferred.completeExceptionally(ResponseException(res, bodyBytes))
-        }
-    }
-
-    return responseBytesDeferred.await()
+    return fetch(method, resource, headers, body?.let { bodyOf(it) }, redirect, abortController).bodyAsBytes()
 }
 
 private fun logFetchResourceError(resource: String, t: Throwable) {
     console.log("Error fetching resource \"$resource\"\n\n$t")
+}
+
+/**
+ * Like [fetch] but returns null if the fetch fails for any reason instead of throwing.
+ *
+ * @param transform A final step to convert the response into a different type. Any exception that is thrown while
+ *   this method's logic is being run will automatically be caught and, if [logOnError] is true, reported. You can use
+ *   the [tryFetch] method that returns a [Response?][Response] instead if you don't need to convert it.
+ */
+suspend fun <T> WindowOrWorkerGlobalScope.tryFetch(
+    method: HttpMethod,
+    resource: String,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
+    body: RequestBody? = null,
+    redirect: RequestRedirect? = FetchDefaults.Redirect,
+    logOnError: Boolean = false,
+    abortController: AbortController? = null,
+    transform: suspend (Response) -> T
+): T? {
+    return try {
+        val res = fetch(method, resource, headers, body, redirect, abortController)
+        transform(res)
+    } catch (t: Throwable) {
+        if (logOnError) logFetchResourceError(resource, t)
+        null
+    }
 }
 
 /**
@@ -211,19 +267,21 @@ suspend fun WindowOrWorkerGlobalScope.tryFetch(
     body: RequestBody? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     logOnError: Boolean = false,
-    abortController: AbortController? = null
+    abortController: AbortController? = null,
 ): Response? {
-    return try {
-        fetch(method, resource, headers, body, redirect, abortController)
-    } catch (t: Throwable) {
-        if (logOnError) logFetchResourceError(resource, t)
-        null
-    }
+    return tryFetch(method, resource, headers, body, redirect, logOnError, abortController, transform = { it })
 }
 
 /**
  * Like [fetchBytes] but returns null if the fetch fails for any reason instead of throwing.
  */
+@Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
+    ReplaceWith(
+        "tryFetch(method, resource, headers, body?.let { bodyOf(it) }, redirect, logOnError, abortController, transform = { it.bodyAsBytes() })",
+        "com.varabyte.kobweb.browser.http.bodyAsBytes",
+        "com.varabyte.kobweb.browser.http.bodyOf",
+    )
+)
 suspend fun WindowOrWorkerGlobalScope.tryFetchBytes(
     method: HttpMethod,
     resource: String,
@@ -233,10 +291,5 @@ suspend fun WindowOrWorkerGlobalScope.tryFetchBytes(
     logOnError: Boolean = false,
     abortController: AbortController? = null
 ): ByteArray? {
-    return try {
-        fetchBytes(method, resource, headers, body, redirect, abortController)
-    } catch (t: Throwable) {
-        if (logOnError) logFetchResourceError(resource, t)
-        null
-    }
+    return tryFetch(method, resource, headers, body?.let { bodyOf(it) }, redirect, logOnError, abortController, transform = { it.bodyAsBytes() })
 }
