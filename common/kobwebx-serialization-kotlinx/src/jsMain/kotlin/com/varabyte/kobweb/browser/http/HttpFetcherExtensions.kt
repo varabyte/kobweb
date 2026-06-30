@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.browser.http
 
-import com.varabyte.kobweb.browser.http.post
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
@@ -55,7 +54,7 @@ suspend inline fun <reified R> HttpFetcher.get(
 ): R = get(resource, headers, redirect, abortController).bodyAs(responseDeserializer)
 
 /**
- * Like [get], but returns null if the request fails.
+ * Like [get], but returns null if the request fails or the response can't be deserialized.
  *
  * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
  * will be true for debug builds and false for release builds.
@@ -93,8 +92,7 @@ suspend inline fun <reified B> HttpFetcher.post(
 ): Response = post(resource, body.toRequestBody(bodySerializer), headers, redirect, abortController)
 
 /**
- * A serialize-friendly version of [post] that accepts a serializable body but returns raw bytes instead of a serialized
- * response.
+ * A serialize-friendly version of [post] that accepts a serializable body and returns its response as a raw byte array.
  */
 @Deprecated(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
@@ -121,9 +119,6 @@ suspend inline fun <reified B> HttpFetcher.postBytes(
  * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
  * See also [tryPost], which will return null if the request fails.
- *
- * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- *  [bodySerializer].
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -152,7 +147,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.post(
 ).bodyAs(responseDeserializer)
 
 /**
- * A serialize-friendly version of [post] that has no body but expects a serialized response.
+ * A serialize-friendly version of [post] that has no body but provides a serialized response.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -215,11 +210,10 @@ suspend inline fun <reified B> HttpFetcher.tryPost(
 ): Response? = tryPost(resource, body, headers, redirect, abortController, bodySerializer) { this }
 
 /**
- * A serialize-friendly version of [post] that accepts a serializable body but returns raw bytes instead of a serialized
- * response.
+ * A version of [tryPost] that returns its response as a raw byte array.
  */
 @Deprecated(
-    "We are migrating away from returning raw bytes to a more proper Respose object instead.",
+    "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(
         "tryPost(resource, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }",
         "com.varabyte.kobweb.browser.http.tryPost",
@@ -238,13 +232,10 @@ suspend inline fun <reified B> HttpFetcher.tryPostBytes(
 ): ByteArray? = tryPost(resource, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
- * Like [post], but returns null if the request fails.
+ * Like [post], but returns null if the request fails or the response can't be deserialized.
  *
  * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
  * be true for debug builds and false for release builds.
- *
- * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- *  [bodySerializer].
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -273,7 +264,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.tryPost(
 ) { bodyAs(responseDeserializer) }
 
 /**
- * A serialize-friendly version of [tryPost] that has no body but expects a serialized response.
+ * A serialize-friendly version of [tryPost] that has no body but provides a serialized response.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -314,8 +305,7 @@ suspend inline fun <reified B> HttpFetcher.put(
 ): Response = put(resource, body.toRequestBody(bodySerializer), headers, redirect, abortController)
 
 /**
- * A serialize-friendly version of [put] that accepts a serializable body but returns raw bytes instead of a serialized
- * response.
+ * A serialize-friendly version of [put] that accepts a serializable body and returns its response as a raw byte array.
  */
 @Deprecated(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
@@ -342,9 +332,6 @@ suspend inline fun <reified B> HttpFetcher.putBytes(
  * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
  * See also [tryPut], which will return null if the request fails.
- *
- * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- *  [bodySerializer].
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -373,7 +360,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.put(
 ).bodyAs(responseDeserializer)
 
 /**
- * A serialize-friendly version of [put] that has no body but expects a serialized response.
+ * A serialize-friendly version of [put] that has no body but provides a serialized response.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -460,13 +447,10 @@ suspend inline fun <reified B> HttpFetcher.tryPutBytes(
     tryPut(resource, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
- * Like [put], but returns null if the request fails.
+ * Like [put], but returns null if the request fails or the response can't be deserialized.
  *
  * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
  * be true for debug builds and false for release builds.
- *
- * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- *  [bodySerializer].
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -495,7 +479,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.tryPut(
 ) { bodyAs(responseDeserializer) }
 
 /**
- * A serialize-friendly version of [tryPut] that has no body but expects a serialized response.
+ * A serialize-friendly version of [tryPut] that has no body but provides a serialized response.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -536,11 +520,10 @@ suspend inline fun <reified B> HttpFetcher.patch(
 ): Response = patch(resource, body.toRequestBody(bodySerializer), headers, redirect, abortController)
 
 /**
- * A serialize-friendly version of [patch] that accepts a serializable body but returns raw bytes instead of a
- * serialized response.
+ * A serialize-friendly version of [patch] that accepts a serializable body and returns its response as a raw byte array.
  */
 @Deprecated(
-    "We are migrating away from returning raw bytes to a more proper Respose object instead.",
+    "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(
         "patch(resource, body, headers, redirect, abortController, bodySerializer).bodyAsBytes()",
         "com.varabyte.kobweb.browser.http.patch",
@@ -564,9 +547,6 @@ suspend inline fun <reified B> HttpFetcher.patchBytes(
  * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
  * See also [tryPatch], which will return null if the request fails.
- *
- * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- *  [bodySerializer].
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -595,7 +575,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.patch(
 ).bodyAs(responseDeserializer)
 
 /**
- * A serialize-friendly version of [patch] that has no body but expects a serialized response.
+ * A serialize-friendly version of [patch] that has no body but provides a serialized response.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -681,13 +661,10 @@ suspend inline fun <reified B> HttpFetcher.tryPatchBytes(
 ): ByteArray? = tryPatch(resource, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
- * Like [patch], but returns null if the request fails.
+ * Like [patch], but returns null if the request fails or the response can't be deserialized.
  *
  * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
  * be true for debug builds and false for release builds.
- *
- * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- *  [bodySerializer].
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -716,7 +693,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.tryPatch(
 ) { bodyAs(responseDeserializer) }
 
 /**
- * A serialize-friendly version of [tryPatch] that has no body but expects a serialized response.
+ * A serialize-friendly version of [tryPatch] that has no body but provides a serialized response.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(

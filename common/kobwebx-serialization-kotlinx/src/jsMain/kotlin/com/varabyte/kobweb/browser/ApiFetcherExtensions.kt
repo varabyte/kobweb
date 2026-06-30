@@ -36,7 +36,7 @@ suspend inline fun <reified R> ApiFetcher.get(
 ): R = get(apiPath, headers, redirect, abortController).bodyAs(responseDeserializer)
 
 /**
- * Like [get], but returns null if the request fails.
+ * Like [get], but returns null if the request fails or the response can't be deserialized.
  *
  * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
  * be true for debug builds and false for release builds.
@@ -140,7 +140,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.post(
 ).bodyAs(responseDeserializer)
 
 /**
- * A serialize-friendly version of [post] that has no body but expects a serialized response.
+ * A serialize-friendly version of [post] that has no body but provides a serialized response.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
@@ -201,12 +201,12 @@ suspend inline fun <reified B> ApiFetcher.tryPost(
 ): Response? = tryPost(apiPath, body, headers, redirect, abortController, bodySerializer) { this }
 
 /**
- * A serialize-friendly version of [tryPost] that accepts a serializable body and returns its response as a raw byte array.
+ * A version of [tryPost] that returns its response as a raw byte array.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated(
-    "We are migrating away from returning raw bytes to a more proper Response object instead.",
+    "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(
         "tryPost(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }",
         "com.varabyte.kobweb.browser.tryPost",
@@ -225,15 +225,12 @@ suspend inline fun <reified B> ApiFetcher.tryPostBytes(
 ): ByteArray? = tryPost(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
- * Like [post], but returns null if the request fails.
+ * Like [post], but returns null if the request fails or the response can't be deserialized.
  *
  * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
  * be true for debug builds and false for release builds.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
- *
- * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- *  [bodySerializer].
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -262,7 +259,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPost(
 ) { bodyAs(responseDeserializer) }
 
 /**
- * A serialize-friendly version of [tryPost] that has no body but expects a serialized response.
+ * A serialize-friendly version of [tryPost] that has no body but provides a serialized response.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
@@ -338,9 +335,6 @@ suspend inline fun <reified B> ApiFetcher.putBytes(
  * See also [tryPut], which will return null if the request fails.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
- *
- * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- *  [bodySerializer].
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -369,7 +363,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.put(
 ).bodyAs(responseDeserializer)
 
 /**
- * A serialize-friendly version of [put] that has no body but expects a serialized response.
+ * A serialize-friendly version of [put] that has no body but provides a serialized response.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
@@ -460,15 +454,12 @@ suspend inline fun <reified B> ApiFetcher.tryPutBytes(
 ): ByteArray? = tryPut(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
- * Like [put], but returns null if the request fails.
+ * Like [put], but returns null if the request fails or the response can't be deserialized.
  *
  * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
  * be true for debug builds and false for release builds.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
- *
- * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- *  [bodySerializer].
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -497,7 +488,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPut(
 ) { bodyAs(responseDeserializer) }
 
 /**
- * A serialize-friendly version of [tryPut] that has no body but expects a serialized response.
+ * A serialize-friendly version of [tryPut] that has no body but provides a serialized response.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
@@ -574,9 +565,6 @@ suspend inline fun <reified B> ApiFetcher.patchBytes(
  * See also [tryPatch], which will return null if the request fails.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
- *
- * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- *  [bodySerializer].
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -605,7 +593,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.patch(
 ).bodyAs(responseDeserializer)
 
 /**
- * A serialize-friendly version of [patch] that has no body but expects a serialized response.
+ * A serialize-friendly version of [patch] that has no body but provides a serialized response.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
@@ -696,15 +684,12 @@ suspend inline fun <reified B> ApiFetcher.tryPatchBytes(
 ): ByteArray? = tryPatch(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
- * Like [patch], but returns null if the request fails.
+ * Like [patch], but returns null if the request fails or the response can't be deserialized.
  *
  * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
  * be true for debug builds and false for release builds.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
- *
- * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
- *  [bodySerializer].
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -733,7 +718,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPatch(
 ) { bodyAs(responseDeserializer) }
 
 /**
- * A serialize-friendly version of [tryPatch] that has no body but expects a serialized response.
+ * A serialize-friendly version of [tryPatch] that has no body but provides a serialized response.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
