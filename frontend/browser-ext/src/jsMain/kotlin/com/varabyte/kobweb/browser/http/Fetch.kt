@@ -99,21 +99,6 @@ suspend fun Response.bodyAsBytes(requireOk: Boolean = true): ByteArray {
 }
 
 /**
- * Like [bodyAsBytes] but returns null instead of throwing an exception if something goes wrong.
- */
-suspend fun Response.bodyAsBytesOrNull(requireOk: Boolean = true): ByteArray? {
-    return try {
-        bodyAsBytes(requireOk)
-    } catch (_: ResponseBytesException) {
-        null
-    }
-}
-
-fun ByteArray?.orEmpty(): ByteArray {
-    return this ?: ByteArray(0)
-}
-
-/**
  * Default values for [com.varabyte.kobweb.browser.http.fetch] (or methods that delegate to fetch).
  */
 object FetchDefaults {
