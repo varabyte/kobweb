@@ -40,7 +40,7 @@ fun MultipartPage() {
         val file = fileInput.files?.get(0)
         if (file != null) {
             scope.launch {
-                val response = window.api.post("multipart", body = bodyOf(FormData().apply {
+                val response = window.api.post("multipart", bodyOf(FormData().apply {
                     append("file", file, file.name)
                     append("description", "Kobweb multipart test")
                 }))
