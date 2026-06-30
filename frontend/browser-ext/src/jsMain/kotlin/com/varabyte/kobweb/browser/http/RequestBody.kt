@@ -8,7 +8,7 @@ import org.w3c.xhr.FormData
 import kotlin.js.Json
 
 /**
- * Body contents that can be set when calling [com.varabyte.kobweb.browser.http.fetch].
+ * Body contents that can be set when calling [fetch].
  *
  * Instead of allocating directly, use the helper [bodyOf] methods.
  */

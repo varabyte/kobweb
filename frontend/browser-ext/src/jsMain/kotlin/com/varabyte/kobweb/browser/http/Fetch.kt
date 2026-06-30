@@ -99,7 +99,7 @@ suspend fun Response.bodyAsBytes(requireOk: Boolean = true): ByteArray {
 }
 
 /**
- * Default values for [com.varabyte.kobweb.browser.http.fetch] (or methods that delegate to fetch).
+ * Default values for [fetch] (or methods that delegate to fetch).
  */
 object FetchDefaults {
     var Headers: Map<String, Any>? = null
@@ -107,7 +107,7 @@ object FetchDefaults {
 }
 
 /**
- * A Kotlin-idiomatic version of the standard library's [Window.fetch][WindowOrWorkerGlobalScope.fetch] function.
+ * A Kotlin-idiomatic version of the standard library's [WindowOrWorkerGlobalScope.fetch] function.
  *
  * This method is a suspend function, so it returns a [Response] directly instead of returning a [Promise]. It also adds
  * a slew of additional, useful parameters that help configure the fetch, without needing to use the [RequestInit]
@@ -217,7 +217,7 @@ private fun logFetchResourceError(resource: String, t: Throwable) {
 }
 
 /**
- * Like [com.varabyte.kobweb.browser.http.fetch] but returns null if the fetch fails for any reason instead of throwing.
+ * Like [fetch][com.varabyte.kobweb.browser.http.fetch] but returns null if the fetch fails for any reason instead of throwing.
  *
  * @param transform A final step to convert the response into a different type. Any exception that is thrown while
  *   this method's logic is being run will automatically be caught and, if [logOnError] is true, reported. You can use
@@ -242,7 +242,7 @@ suspend fun <T> WindowOrWorkerGlobalScope.tryFetch(
 }
 
 /**
- * Like [com.varabyte.kobweb.browser.http.fetch] but returns null if the fetch fails for any reason instead of throwing.
+ * Like [fetch][com.varabyte.kobweb.browser.http.fetch] but returns null if the fetch fails for any reason instead of throwing.
  */
 suspend fun WindowOrWorkerGlobalScope.tryFetch(
     method: HttpMethod,
