@@ -74,7 +74,7 @@ fun createMainFunction(
         addAll(defaultImports)
         if (target == BuildTarget.DEBUG) {
             val debugImports = listOf(
-                "$KOBWEB_GROUP.browser.api",
+                "$KOBWEB_GROUP.browser.http.http",
                 "kotlinx.dom.hasClass",
                 "kotlinx.dom.removeClass",
                 "org.w3c.dom.EventSource",
@@ -250,7 +250,7 @@ fun createMainFunction(
             if (target == BuildTarget.DEBUG) {
                 addStatement("handleServerStatusEvents()")
                 addStatement("")
-                addStatement("window.api.logOnError = true")
+                addStatement("window.http.logOnError = true")
                 addStatement("")
             }
 
