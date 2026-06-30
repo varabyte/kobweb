@@ -12,7 +12,19 @@ fun <B> B.toRequestBody(strategy: SerializationStrategy<B>): RequestBody {
     return bodyOf(Json.encodeToString(strategy, this), "application/json")
 }
 
-// Needs to be public so inline methods can access it, but users probably won't ever need to call this themselves
+/**
+ * Convert the receiving [Response] into an object of type [R] (where that class should be marked `@Serializable`).
+ *
+ * This method will throw if the response body cannot be converted for any reason (usually a deserialization issue).
+ *
+ * For example, if you had two serializable classes, `EchoRequset` and `EchoReply`, your calling code might look
+ * something like this:
+ *
+ * ```kotlin
+ * val echoReply = window.http.post("echo", EchoRequest("hello")).bodyAs<EchoReply>()
+ * console.log("Echo: ${echoReply.message}")
+ * ```
+ */
 suspend inline fun <reified R> Response.bodyAs(strategy: DeserializationStrategy<R> = serializer()): R {
     if (R::class == Unit::class) return Unit as R
 
