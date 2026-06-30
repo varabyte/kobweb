@@ -2,7 +2,6 @@ package com.varabyte.kobweb.browser
 
 import com.varabyte.kobweb.browser.http.AbortController
 import com.varabyte.kobweb.browser.http.FetchDefaults
-import com.varabyte.kobweb.browser.http.HttpFetcher
 import com.varabyte.kobweb.browser.http.RequestBody
 import com.varabyte.kobweb.browser.http.bodyAsBytes
 import com.varabyte.kobweb.browser.http.bodyOf
@@ -96,7 +95,7 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): Response? = tryDelete(apiPath, headers, redirect, abortController, transform = { this })
+    ): Response? = tryDelete(apiPath, headers, redirect, abortController) { this }
 
     /**
      * Like [deleteBytes], but returns null if the request failed for any reason.
@@ -106,7 +105,7 @@ class ApiFetcher(private val window: Window) {
      */
     @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
         ReplaceWith(
-            "tryDelete(apiPath, headers, redirect, abortController, transform = { bodyAsBytes() })",
+            "tryDelete(apiPath, headers, redirect, abortController) { bodyAsBytes() }",
             "com.varabyte.kobweb.browser.http.FetchDefaults",
             "com.varabyte.kobweb.browser.http.bodyAsBytes",
         )
@@ -116,7 +115,7 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = tryDelete(apiPath, headers, redirect, abortController, transform = { bodyAsBytes() })
+    ): ByteArray? = tryDelete(apiPath, headers, redirect, abortController) { bodyAsBytes() }
 
     /**
      * Call GET on a target API path.
@@ -181,7 +180,7 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): Response? = tryGet(apiPath, headers, redirect, abortController, transform = { this })
+    ): Response? = tryGet(apiPath, headers, redirect, abortController) { this }
 
     /**
      * Like [getBytes], but returns null if the request failed for any reason.
@@ -191,7 +190,7 @@ class ApiFetcher(private val window: Window) {
      */
     @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
         ReplaceWith(
-            "tryGet(apiPath, headers, redirect, abortController, transform = { bodyAsBytes() })",
+            "tryGet(apiPath, headers, redirect, abortController) { bodyAsBytes() }",
             "com.varabyte.kobweb.browser.http.FetchDefaults",
             "com.varabyte.kobweb.browser.http.bodyAsBytes",
         )
@@ -201,7 +200,7 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = tryGet(apiPath, headers, redirect, abortController, transform = { bodyAsBytes() })
+    ): ByteArray? = tryGet(apiPath, headers, redirect, abortController) { bodyAsBytes() }
 
     /**
      * Call HEAD on a target API path.
@@ -245,7 +244,7 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): Response? = tryHead(apiPath, headers, redirect, abortController, transform = { this })
+    ): Response? = tryHead(apiPath, headers, redirect, abortController) { this }
 
     /**
      * Call OPTIONS on a target API path.
@@ -310,7 +309,7 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): Response? = tryOptions(apiPath, headers, redirect, abortController, transform = { this })
+    ): Response? = tryOptions(apiPath, headers, redirect, abortController) { this }
 
     /**
      * Like [optionsBytes], but returns null if the request failed for any reason.
@@ -320,7 +319,7 @@ class ApiFetcher(private val window: Window) {
      */
     @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
         ReplaceWith(
-            "tryOptions(apiPath, headers, redirect, abortController, transform = { bodyAsBytes() })",
+            "tryOptions(apiPath, headers, redirect, abortController) { bodyAsBytes() }",
             "com.varabyte.kobweb.browser.http.FetchDefaults",
             "com.varabyte.kobweb.browser.http.bodyAsBytes",
         )
@@ -330,7 +329,7 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = tryOptions(apiPath, headers, redirect, abortController, transform = { bodyAsBytes() })
+    ): ByteArray? = tryOptions(apiPath, headers, redirect, abortController) { bodyAsBytes() }
 
     /**
      * Call PATCH on a target API path.
@@ -402,7 +401,7 @@ class ApiFetcher(private val window: Window) {
         body: RequestBody? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): Response? = tryPatch(apiPath, headers, body, redirect, abortController, transform = { this })
+    ): Response? = tryPatch(apiPath, headers, body, redirect, abortController) { this }
 
     /**
      * Like [patchBytes], but returns null if the request failed for any reason.
@@ -412,7 +411,7 @@ class ApiFetcher(private val window: Window) {
      */
     @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
         ReplaceWith(
-            "tryPatch(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { bodyAsBytes() })",
+            "tryPatch(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController) { bodyAsBytes() }",
             "com.varabyte.kobweb.browser.http.FetchDefaults",
             "com.varabyte.kobweb.browser.http.bodyAsBytes",
             "com.varabyte.kobweb.browser.http.bodyOf",
@@ -424,7 +423,7 @@ class ApiFetcher(private val window: Window) {
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = tryPatch(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { bodyAsBytes() })
+    ): ByteArray? = tryPatch(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController) { bodyAsBytes() }
 
     /**
      * Call POST on a target API path.
@@ -496,7 +495,7 @@ class ApiFetcher(private val window: Window) {
         body: RequestBody? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): Response? = tryPost(apiPath, headers, body, redirect, abortController, transform = { this })
+    ): Response? = tryPost(apiPath, headers, body, redirect, abortController) { this }
 
     /**
      * Like [postBytes], but returns null if the request failed for any reason.
@@ -506,7 +505,7 @@ class ApiFetcher(private val window: Window) {
      */
     @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
         ReplaceWith(
-            "tryPost(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { bodyAsBytes() })",
+            "tryPost(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController) { bodyAsBytes() }",
             "com.varabyte.kobweb.browser.http.FetchDefaults",
             "com.varabyte.kobweb.browser.http.bodyAsBytes",
             "com.varabyte.kobweb.browser.http.bodyOf",
@@ -518,7 +517,7 @@ class ApiFetcher(private val window: Window) {
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = tryPost(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { bodyAsBytes() })
+    ): ByteArray? = tryPost(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController) { bodyAsBytes() }
 
     /**
      * Call PUT on a target API path.
@@ -590,7 +589,7 @@ class ApiFetcher(private val window: Window) {
         body: RequestBody? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): Response? = tryPut(apiPath, headers, body, redirect, abortController, transform = { this })
+    ): Response? = tryPut(apiPath, headers, body, redirect, abortController) { this }
 
     /**
      * Like [putBytes], but returns null if the request failed for any reason.
@@ -600,7 +599,7 @@ class ApiFetcher(private val window: Window) {
      */
     @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
         ReplaceWith(
-            "tryPut(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { bodyAsBytes() })",
+            "tryPut(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController) { bodyAsBytes() }",
             "com.varabyte.kobweb.browser.http.FetchDefaults",
             "com.varabyte.kobweb.browser.http.bodyAsBytes",
             "com.varabyte.kobweb.browser.http.bodyOf",
@@ -612,7 +611,7 @@ class ApiFetcher(private val window: Window) {
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = tryPut(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { bodyAsBytes() })
+    ): ByteArray? = tryPut(apiPath, headers, body?.let { bodyOf(it) }, redirect, abortController) { bodyAsBytes() }
 }
 
 val Window.api: ApiFetcher get() = with(this.asDynamic()) {

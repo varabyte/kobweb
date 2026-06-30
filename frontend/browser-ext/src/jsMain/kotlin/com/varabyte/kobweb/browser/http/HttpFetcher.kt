@@ -124,7 +124,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): Response? = tryDelete(resource, headers, redirect, abortController, transform = { this })
+    ): Response? = tryDelete(resource, headers, redirect, abortController) { this }
 
     /**
      * Like [deleteBytes], but returns null if the request failed for any reason.
@@ -133,7 +133,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
      */
     @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
         ReplaceWith(
-            "tryDelete(resource, headers, redirect, abortController, transform = { bodyAsBytes() })",
+            "tryDelete(resource, headers, redirect, abortController) { bodyAsBytes() }",
             "com.varabyte.kobweb.browser.http.FetchDefaults",
             "com.varabyte.kobweb.browser.http.bodyAsBytes",
         )
@@ -143,7 +143,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray? = tryDelete(resource, headers, redirect, abortController, transform = { bodyAsBytes() })
+    ): ByteArray? = tryDelete(resource, headers, redirect, abortController) { bodyAsBytes() }
 
     /**
      * Call GET on a target resource.
@@ -211,7 +211,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): Response? = tryGet(resource, headers, redirect, abortController, transform = { this })
+    ): Response? = tryGet(resource, headers, redirect, abortController) { this }
 
     /**
      * Like [getBytes], but returns null if the request failed for any reason.
@@ -220,7 +220,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
      */
     @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
         ReplaceWith(
-            "tryGet(resource, headers, redirect, abortController, transform = { bodyAsBytes() })",
+            "tryGet(resource, headers, redirect, abortController) { bodyAsBytes() }",
             "com.varabyte.kobweb.browser.http.FetchDefaults",
             "com.varabyte.kobweb.browser.http.bodyAsBytes",
         )
@@ -230,7 +230,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray? = tryGet(resource, headers, redirect, abortController, transform = { bodyAsBytes() })
+    ): ByteArray? = tryGet(resource, headers, redirect, abortController) { bodyAsBytes() }
 
     /**
      * Call HEAD on a target resource.
@@ -279,7 +279,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): Response? = tryHead(resource, headers, redirect, abortController, transform = { this })
+    ): Response? = tryHead(resource, headers, redirect, abortController) { this }
 
     /**
      * Call OPTIONS on a target resource.
@@ -340,7 +340,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): Response? = tryOptions(resource, headers, redirect, abortController, transform = { this })
+    ): Response? = tryOptions(resource, headers, redirect, abortController) { this }
 
     /**
      * Like [optionsBytes], but returns null if the request failed for any reason.
@@ -349,7 +349,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
      */
     @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
         ReplaceWith(
-            "tryOptions(resource, headers, redirect, abortController, transform = { bodyAsBytes() })",
+            "tryOptions(resource, headers, redirect, abortController) { bodyAsBytes() }",
             "com.varabyte.kobweb.browser.http.FetchDefaults",
             "com.varabyte.kobweb.browser.http.bodyAsBytes",
         )
@@ -359,7 +359,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
         headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray? = tryOptions(resource, headers, redirect, abortController, transform = { bodyAsBytes() })
+    ): ByteArray? = tryOptions(resource, headers, redirect, abortController) { bodyAsBytes() }
 
     /**
      * Call PATCH on a target resource.
@@ -426,7 +426,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
         body: RequestBody? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): Response? = tryPatch(resource, headers, body, redirect, abortController, transform = { this })
+    ): Response? = tryPatch(resource, headers, body, redirect, abortController) { this }
 
     /**
      * Like [patchBytes], but returns null if the request failed for any reason.
@@ -435,7 +435,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
      */
     @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
         ReplaceWith(
-            "tryPatch(resource, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { bodyAsBytes() })",
+            "tryPatch(resource, headers, body?.let { bodyOf(it) }, redirect, abortController) { bodyAsBytes() }",
             "com.varabyte.kobweb.browser.http.FetchDefaults",
             "com.varabyte.kobweb.browser.http.bodyAsBytes",
             "com.varabyte.kobweb.browser.http.bodyOf",
@@ -447,7 +447,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray? = tryPatch(resource, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { bodyAsBytes() })
+    ): ByteArray? = tryPatch(resource, headers, body?.let { bodyOf(it) }, redirect, abortController) { bodyAsBytes() }
 
     /**
      * Call POST on a target resource.
@@ -514,7 +514,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
         body: RequestBody? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): Response? = tryPost(resource, headers, body, redirect, abortController, transform = { this })
+    ): Response? = tryPost(resource, headers, body, redirect, abortController) { this }
 
     /**
      * Like [postBytes], but returns null if the request failed for any reason.
@@ -523,7 +523,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
      */
     @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
         ReplaceWith(
-            "tryPost(resource, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { bodyAsBytes() })",
+            "tryPost(resource, headers, body?.let { bodyOf(it) }, redirect, abortController) { bodyAsBytes() }",
             "com.varabyte.kobweb.browser.http.FetchDefaults",
             "com.varabyte.kobweb.browser.http.bodyAsBytes",
             "com.varabyte.kobweb.browser.http.bodyOf",
@@ -540,9 +540,8 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
         headers,
         body?.let { bodyOf(it) },
         redirect,
-        abortController,
-        transform = { bodyAsBytes() }
-    )
+        abortController
+    ) { bodyAsBytes() }
 
     /**
      * Call PUT on a target resource.
@@ -609,7 +608,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
         body: RequestBody? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): Response? = tryPut(resource, headers, body, redirect, abortController, transform = { this })
+    ): Response? = tryPut(resource, headers, body, redirect, abortController) { this }
 
     /**
      * Like [putBytes], but returns null if the request failed for any reason.
@@ -618,7 +617,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
      */
     @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
         ReplaceWith(
-            "tryPut(resource, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { bodyAsBytes() })",
+            "tryPut(resource, headers, body?.let { bodyOf(it) }, redirect, abortController) { bodyAsBytes() }",
             "com.varabyte.kobweb.browser.http.FetchDefaults",
             "com.varabyte.kobweb.browser.http.bodyAsBytes",
             "com.varabyte.kobweb.browser.http.bodyOf",
@@ -630,7 +629,7 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray? = tryPut(resource, headers, body?.let { bodyOf(it) }, redirect, abortController, transform = { bodyAsBytes() })
+    ): ByteArray? = tryPut(resource, headers, body?.let { bodyOf(it) }, redirect, abortController) { bodyAsBytes() }
 }
 
 val WindowOrWorkerGlobalScope.http: HttpFetcher get() = with(this.asDynamic()) {

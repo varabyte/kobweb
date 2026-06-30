@@ -43,7 +43,7 @@ suspend inline fun <reified R> ApiFetcher.get(
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "tryGet(apiPath, headers, redirect, abortController, transform = { bodyAs(responseDeserializer) })",
+        "tryGet(apiPath, headers, redirect, abortController) { bodyAs(responseDeserializer) }",
         "com.varabyte.kobweb.browser.tryGet",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
@@ -56,7 +56,7 @@ suspend inline fun <reified R> ApiFetcher.tryGet(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer()
-): R? = tryGet(apiPath, headers, redirect, abortController, transform = { bodyAs(responseDeserializer) })
+): R? = tryGet(apiPath, headers, redirect, abortController) { bodyAs(responseDeserializer) }
 
 /**
  * A serialize-friendly version of [post] that expects a serializable body but does not expect a serialized response.
@@ -176,7 +176,7 @@ suspend inline fun <reified B> ApiFetcher.tryPost(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-): Response? = tryPost(apiPath, body, headers, redirect, abortController, bodySerializer, transform = { this })
+): Response? = tryPost(apiPath, body, headers, redirect, abortController, bodySerializer) { this }
 
 /**
  * A serialize-friendly version of [tryPost] that expects a body and returns its response as a raw byte array.
@@ -184,7 +184,7 @@ suspend inline fun <reified B> ApiFetcher.tryPost(
 @Deprecated(
     "We are migrating away from returning raw bytes to a more proper Response object instead.",
     ReplaceWith(
-        "tryPost(apiPath, body, headers, redirect, abortController, bodySerializer, transform = { bodyAsBytes() })",
+        "tryPost(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }",
         "com.varabyte.kobweb.browser.tryPost",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAsBytes",
@@ -198,7 +198,7 @@ suspend inline fun <reified B> ApiFetcher.tryPostBytes(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-): ByteArray? = tryPost(apiPath, body, headers, redirect, abortController, bodySerializer, transform = { bodyAsBytes() })
+): ByteArray? = tryPost(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
  * Like [post], but returns null if the request failed for any reason.
@@ -211,7 +211,7 @@ suspend inline fun <reified B> ApiFetcher.tryPostBytes(
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "tryPost(apiPath, body, headers, redirect, abortController, bodySerializer, transform = { bodyAs(responseDeserializer) })",
+        "tryPost(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAs(responseDeserializer) }",
         "com.varabyte.kobweb.browser.tryPost",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
@@ -232,16 +232,15 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPost(
     headers,
     redirect,
     abortController,
-    bodySerializer,
-    transform = { bodyAs(responseDeserializer) }
-)
+    bodySerializer
+) { bodyAs(responseDeserializer) }
 
 /**
  * A serialize-friendly version of [tryPost] that has no body but expects a serialized response.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "tryPost(apiPath, headers, body = null, redirect, abortController, transform = { bodyAs(responseDeserializer) })",
+        "tryPost(apiPath, headers, body = null, redirect, abortController) { bodyAs(responseDeserializer) }",
         "com.varabyte.kobweb.browser.tryPost",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
@@ -259,9 +258,8 @@ suspend inline fun <reified R> ApiFetcher.tryPost(
     headers,
     body = null,
     redirect,
-    abortController,
-    transform = { bodyAs(responseDeserializer) }
-)
+    abortController
+) { bodyAs(responseDeserializer) }
 
 /**
  * A serialize-friendly version of [put] that expects a body but does not expect a serialized response.
@@ -387,7 +385,7 @@ suspend inline fun <reified B> ApiFetcher.tryPut(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-): Response? = tryPut(apiPath, body, headers, redirect, abortController, bodySerializer, transform = { this })
+): Response? = tryPut(apiPath, body, headers, redirect, abortController, bodySerializer) { this }
 
 /**
  * A serialize-friendly version of [tryPut] that expects a body and returns its response as a raw byte array.
@@ -395,7 +393,7 @@ suspend inline fun <reified B> ApiFetcher.tryPut(
 @Deprecated(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(
-        "tryPut(apiPath, body, headers, redirect, abortController, bodySerializer, transform = { bodyAsBytes() })",
+        "tryPut(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }",
         "com.varabyte.kobweb.browser.tryPut",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAsBytes",
@@ -409,7 +407,7 @@ suspend inline fun <reified B> ApiFetcher.tryPutBytes(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-): ByteArray? = tryPut(apiPath, body, headers, redirect, abortController, bodySerializer, transform = { bodyAsBytes() })
+): ByteArray? = tryPut(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
  * Like [put], but returns null if the request failed for any reason.
@@ -422,7 +420,7 @@ suspend inline fun <reified B> ApiFetcher.tryPutBytes(
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "tryPut(apiPath, body, headers, redirect, abortController, bodySerializer, transform = { bodyAs(responseDeserializer) })",
+        "tryPut(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAs(responseDeserializer) }",
         "com.varabyte.kobweb.browser.tryPut",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
@@ -443,16 +441,15 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPut(
     headers,
     redirect,
     abortController,
-    bodySerializer,
-    transform = { bodyAs(responseDeserializer) }
-)
+    bodySerializer
+) { bodyAs(responseDeserializer) }
 
 /**
  * A serialize-friendly version of [tryPut] that has no body but expects a serialized response.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "tryPut(apiPath, headers, body = null, redirect, abortController, transform = { bodyAs(responseDeserializer) })",
+        "tryPut(apiPath, headers, body = null, redirect, abortController) { bodyAs(responseDeserializer) }",
         "com.varabyte.kobweb.browser.tryPut",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
@@ -470,9 +467,9 @@ suspend inline fun <reified R> ApiFetcher.tryPut(
     headers,
     body = null,
     redirect,
-    abortController,
-    transform = { bodyAs(responseDeserializer) }
-)
+    abortController
+) { bodyAs(responseDeserializer) }
+
 
 /**
  * A serialize-friendly version of [patch] that expects a body but does not expect a serialized response.
@@ -598,7 +595,7 @@ suspend inline fun <reified B> ApiFetcher.tryPatch(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-): Response? = tryPatch(apiPath, body, headers, redirect, abortController, bodySerializer, transform = { this })
+): Response? = tryPatch(apiPath, body, headers, redirect, abortController, bodySerializer) { this }
 
 /**
  * A serialize-friendly version of [tryPatch] that expects a body and returns its response as a raw byte array.
@@ -606,7 +603,7 @@ suspend inline fun <reified B> ApiFetcher.tryPatch(
 @Deprecated(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(
-        "tryPatch(apiPath, body, headers, redirect, abortController, bodySerializer, transform = { bodyAsBytes() })",
+        "tryPatch(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }",
         "com.varabyte.kobweb.browser.tryPatch",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAsBytes",
@@ -620,7 +617,7 @@ suspend inline fun <reified B> ApiFetcher.tryPatchBytes(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-): ByteArray? = tryPatch(apiPath, body, headers, redirect, abortController, bodySerializer, transform = { bodyAsBytes() })
+): ByteArray? = tryPatch(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
  * Like [patch], but returns null if the request failed for any reason.
@@ -633,7 +630,7 @@ suspend inline fun <reified B> ApiFetcher.tryPatchBytes(
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "tryPatch(apiPath, body, headers, redirect, abortController, bodySerializer, transform = { bodyAs(responseDeserializer) })",
+        "tryPatch(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAs(responseDeserializer) }",
         "com.varabyte.kobweb.browser.tryPatch",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
@@ -654,16 +651,15 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPatch(
     headers,
     redirect,
     abortController,
-    bodySerializer,
-    transform = { bodyAs(responseDeserializer) }
-)
+    bodySerializer
+) { bodyAs(responseDeserializer) }
 
 /**
  * A serialize-friendly version of [tryPatch] that has no body but expects a serialized response.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "tryPatch(apiPath, headers, body = null, redirect, abortController, transform = { bodyAs(responseDeserializer) })",
+        "tryPatch(apiPath, headers, body = null, redirect, abortController) { bodyAs(responseDeserializer) }",
         "com.varabyte.kobweb.browser.tryPatch",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
@@ -681,9 +677,8 @@ suspend inline fun <reified R> ApiFetcher.tryPatch(
     headers,
     body = null,
     redirect,
-    abortController,
-    transform = { bodyAs(responseDeserializer) }
-)
+    abortController
+) { bodyAs(responseDeserializer) }
 
 /**
  * Call DELETE on a target API path with [R] as the expected return type.
@@ -716,7 +711,7 @@ suspend inline fun <reified R> ApiFetcher.delete(
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "tryDelete(apiPath, headers, redirect, abortController, transform = { bodyAs(responseDeserializer) })",
+        "tryDelete(apiPath, headers, redirect, abortController) { bodyAs(responseDeserializer) }",
         "com.varabyte.kobweb.browser.tryDelete",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
@@ -729,7 +724,7 @@ suspend inline fun <reified R> ApiFetcher.tryDelete(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer(),
-): R? = tryDelete(apiPath, headers, redirect, abortController, transform = { bodyAs(responseDeserializer) })
+): R? = tryDelete(apiPath, headers, redirect, abortController) { bodyAs(responseDeserializer) }
 
 /**
  * Call OPTIONS on a target API path with [R] as the expected return type.
@@ -762,7 +757,7 @@ suspend inline fun <reified R> ApiFetcher.options(
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "tryOptions(apiPath, headers, redirect, abortController, transform = { bodyAs(responseDeserializer) })",
+        "tryOptions(apiPath, headers, redirect, abortController) { bodyAs(responseDeserializer) }",
         "com.varabyte.kobweb.browser.tryOptions",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
@@ -775,4 +770,4 @@ suspend inline fun <reified R> ApiFetcher.tryOptions(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer(),
-): R? = tryOptions(apiPath, headers, redirect, abortController, transform = { bodyAs(responseDeserializer) })
+): R? = tryOptions(apiPath, headers, redirect, abortController) { bodyAs(responseDeserializer) }
