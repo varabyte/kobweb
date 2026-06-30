@@ -125,8 +125,8 @@ object FetchDefaults {
 suspend fun WindowOrWorkerGlobalScope.fetch(
     method: HttpMethod,
     resource: String,
-    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: RequestBody? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null
 ): Response {
@@ -209,7 +209,7 @@ suspend fun WindowOrWorkerGlobalScope.fetchBytes(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null
 ): ByteArray {
-    return fetch(method, resource, headers, body?.let { bodyOf(it) }, redirect, abortController).bodyAsBytes()
+    return fetch(method, resource, body?.let { bodyOf(it) }, headers, redirect, abortController).bodyAsBytes()
 }
 
 private fun logFetchResourceError(resource: String, t: Throwable) {
@@ -226,15 +226,15 @@ private fun logFetchResourceError(resource: String, t: Throwable) {
 suspend fun <T> WindowOrWorkerGlobalScope.tryFetch(
     method: HttpMethod,
     resource: String,
-    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: RequestBody? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     logOnError: Boolean = false,
     abortController: AbortController? = null,
     transform: suspend Response.() -> T
 ): T? {
     return try {
-        fetch(method, resource, headers, body, redirect, abortController).transform()
+        fetch(method, resource, body, headers, redirect, abortController).transform()
     } catch (t: Throwable) {
         if (logOnError) logFetchResourceError(resource, t)
         null
@@ -247,13 +247,13 @@ suspend fun <T> WindowOrWorkerGlobalScope.tryFetch(
 suspend fun WindowOrWorkerGlobalScope.tryFetch(
     method: HttpMethod,
     resource: String,
-    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: RequestBody? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     logOnError: Boolean = false,
     abortController: AbortController? = null,
 ): Response? {
-    return tryFetch(method, resource, headers, body, redirect, logOnError, abortController) { this }
+    return tryFetch(method, resource, body, headers, redirect, logOnError, abortController) { this }
 }
 
 /**
@@ -275,5 +275,5 @@ suspend fun WindowOrWorkerGlobalScope.tryFetchBytes(
     logOnError: Boolean = false,
     abortController: AbortController? = null
 ): ByteArray? {
-    return tryFetch(method, resource, headers, body?.let { bodyOf(it) }, redirect, logOnError, abortController) { bodyAsBytes() }
+    return tryFetch(method, resource, body?.let { bodyOf(it) }, headers, redirect, logOnError, abortController) { bodyAsBytes() }
 }
