@@ -246,11 +246,10 @@ suspend fun <T> WindowOrWorkerGlobalScope.tryFetch(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     logOnError: Boolean = false,
     abortController: AbortController? = null,
-    transform: suspend (Response) -> T
+    transform: suspend Response.() -> T
 ): T? {
     return try {
-        val res = fetch(method, resource, headers, body, redirect, abortController)
-        transform(res)
+        fetch(method, resource, headers, body, redirect, abortController).transform()
     } catch (t: Throwable) {
         if (logOnError) logFetchResourceError(resource, t)
         null
@@ -269,7 +268,7 @@ suspend fun WindowOrWorkerGlobalScope.tryFetch(
     logOnError: Boolean = false,
     abortController: AbortController? = null,
 ): Response? {
-    return tryFetch(method, resource, headers, body, redirect, logOnError, abortController, transform = { it })
+    return tryFetch(method, resource, headers, body, redirect, logOnError, abortController, transform = { this })
 }
 
 /**
@@ -277,7 +276,7 @@ suspend fun WindowOrWorkerGlobalScope.tryFetch(
  */
 @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(
-        "tryFetch(method, resource, headers, body?.let { bodyOf(it) }, redirect, logOnError, abortController, transform = { it.bodyAsBytes() })",
+        "tryFetch(method, resource, headers, body?.let { bodyOf(it) }, redirect, logOnError, abortController, transform = { bodyAsBytes() })",
         "com.varabyte.kobweb.browser.http.bodyAsBytes",
         "com.varabyte.kobweb.browser.http.bodyOf",
     )
@@ -291,5 +290,5 @@ suspend fun WindowOrWorkerGlobalScope.tryFetchBytes(
     logOnError: Boolean = false,
     abortController: AbortController? = null
 ): ByteArray? {
-    return tryFetch(method, resource, headers, body?.let { bodyOf(it) }, redirect, logOnError, abortController, transform = { it.bodyAsBytes() })
+    return tryFetch(method, resource, headers, body?.let { bodyOf(it) }, redirect, logOnError, abortController, transform = { bodyAsBytes() })
 }
