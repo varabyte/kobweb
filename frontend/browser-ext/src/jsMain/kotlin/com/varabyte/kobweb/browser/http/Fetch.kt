@@ -116,8 +116,10 @@ object FetchDefaults {
  * If the request fails to connect, this method throws; but if the server replies that the response is bad, it will be
  * returned. Just be sure to check [Response.ok] before using it.
  *
- * If all you care about is the response payload, you can use the [fetchBytes] convenience method instead, or the
- * [bodyAsBytes] extension method we provide on top of the [Response] class.
+ * If all you care about is the response payload, you can use the [bodyAsBytes] extension method we provide on top of
+ * the [Response] class.
+ *
+ * If you want to call this code without worrying about throwing, see [tryFetch] instead.
  *
  * @param headers An optional map of headers to send with the request. The "Content-Type" header may be automatically
  *   set if the `body` parameter is present, but anything specified manually will take precedence.
@@ -217,11 +219,26 @@ private fun logFetchResourceError(resource: String, t: Throwable) {
 }
 
 /**
- * Like [fetch][com.varabyte.kobweb.browser.http.fetch] but returns null if the fetch fails for any reason instead of throwing.
+ * A convenience version of [fetch][com.varabyte.kobweb.browser.http.fetch] that safely converts the initial request
+ * into some target object of type [T].
  *
- * @param transform A final step to convert the response into a different type. Any exception that is thrown while
- *   this method's logic is being run will automatically be caught and, if [logOnError] is true, reported. You can use
- *   the [tryFetch] method that returns a [Response?][Response] instead if you don't need to convert it.
+ * Essentially, if an exception is thrown at any point between making the request and converting it into its final form,
+ * it will be swallowed and null will be returned. If [logOnError] is set to true, logs about what went wrong will be
+ * added to the console.
+ *
+ * You are expected to pass conversion logic into the [transform] callback. In other words, you should prefer
+ * ```
+ * tryFetch(/*...*/) { convert() }
+ * ```
+ * over
+ * ```
+ * tryFetch(/*...*/)?.convert()
+ * ```
+ * as the former will handle catching any exceptions around the conversion process as well as report if (if [logOnError]
+ * is true).
+ *
+ * If you don't care about converting the response to some other format, you should use the [tryFetch] method that
+ * returns a [Response?][Response] instead.
  */
 suspend fun <T> WindowOrWorkerGlobalScope.tryFetch(
     method: HttpMethod,
@@ -242,7 +259,7 @@ suspend fun <T> WindowOrWorkerGlobalScope.tryFetch(
 }
 
 /**
- * Like [fetch][com.varabyte.kobweb.browser.http.fetch] but returns null if the fetch fails for any reason instead of throwing.
+ * A convenience version of [fetch][com.varabyte.kobweb.browser.http.fetch] that returns null instead of throwing if the request fails.
  */
 suspend fun WindowOrWorkerGlobalScope.tryFetch(
     method: HttpMethod,
@@ -257,7 +274,7 @@ suspend fun WindowOrWorkerGlobalScope.tryFetch(
 }
 
 /**
- * Like [fetchBytes] but returns null if the fetch fails for any reason instead of throwing.
+ * Like [fetchBytes] but returns null if the fetch fails or the body can't be read.
  */
 @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(

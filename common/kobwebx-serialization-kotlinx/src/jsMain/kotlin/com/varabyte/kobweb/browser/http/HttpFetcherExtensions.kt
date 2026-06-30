@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.browser.http
 
+import com.varabyte.kobweb.browser.http.post
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
@@ -15,7 +16,7 @@ fun <B> B.toRequestBody(strategy: SerializationStrategy<B>): RequestBody {
 /**
  * Convert the receiving [Response] into an object of type [R] (where that class should be marked `@Serializable`).
  *
- * This method will throw if the response body cannot be converted for any reason (usually a deserialization issue).
+ * This method will throw if the response body cannot be converted (usually a deserialization issue).
  *
  * For example, if you had two serializable classes, `EchoRequset` and `EchoReply`, your calling code might look
  * something like this:
@@ -34,9 +35,7 @@ suspend inline fun <reified R> Response.bodyAs(strategy: DeserializationStrategy
 /**
  * Call GET on a target resource with [R] as the expected return type.
  *
- * See also [tryGet], which will return null if the request fails for any reason.
- *
- * Note: you should NOT prepend your path with "api/", as that will be added automatically.
+ * See also [tryGet], which will return null if the request fails.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -56,10 +55,10 @@ suspend inline fun <reified R> HttpFetcher.get(
 ): R = get(resource, headers, redirect, abortController).bodyAs(responseDeserializer)
 
 /**
- * Like [get], but returns null if the request failed for any reason.
+ * Like [get], but returns null if the request fails.
  *
- * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -79,7 +78,10 @@ suspend inline fun <reified R> HttpFetcher.tryGet(
 ): R? = tryGet(resource, headers, redirect, abortController) { bodyAs(responseDeserializer) }
 
 /**
- * A serialize-friendly version of [post] that expects a serializable body but does not expect a serialized response.
+ * A version of [post] that accepts a serializable body.
+ *
+ * Use [bodyAs] on the returned [Response] if you want to deserialize returned bytes, e.g.
+ * `post<RequestClass>(/*...*/).bodyAs<ReplyClass>()`.
  */
 suspend inline fun <reified B> HttpFetcher.post(
     resource: String,
@@ -91,7 +93,8 @@ suspend inline fun <reified B> HttpFetcher.post(
 ): Response = post(resource, body.toRequestBody(bodySerializer), headers, redirect, abortController)
 
 /**
- * A serialize-friendly version of [post] that expects a serializable body but returns raw bytes instead of a serialized response.
+ * A serialize-friendly version of [post] that accepts a serializable body but returns raw bytes instead of a serialized
+ * response.
  */
 @Deprecated(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
@@ -117,9 +120,7 @@ suspend inline fun <reified B> HttpFetcher.postBytes(
  *
  * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
- * See also [tryPost], which will return null if the request fails for any reason.
- *
- * Note: you should NOT prepend your path with "api/", as that will be added automatically.
+ * See also [tryPost], which will return null if the request fails.
  *
  * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
  *  [bodySerializer].
@@ -177,10 +178,19 @@ suspend inline fun <reified R> HttpFetcher.post(
 ).bodyAs(responseDeserializer)
 
 /**
- * A serialize-friendly version of [tryPost] that expects a serializable body but does not expect a serialized response.
+ * A serialize-friendly version of [tryPost] that accepts a serializable body and logic to convert the response to some
+ * desired target object of type [T].
  *
- * @param transform A final step to convert the response into a different type. Any exception that is thrown while
- *   this method's logic is run will automatically be caught and, if [logOnError] is true, reported.
+ * A [transform] callback is provided allowing you to convert the response into a different type.
+ * You are generally encouraged to call `tryPost(...) { convert() }` over `tryPost(...)?.convert()` as the former will
+ * ensure that exception handling is covered in that case.
+ *
+ * Additionally, if [logOnError] is set to true, any failure will be logged to the console (including the logic in
+ * the [transform] block).
+ *
+ * If you do not care about converting the result to some arbitrary type, use the [tryPost] version that returns
+ * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
+ * this version. Instead, via the [Response] version, use `tryPost<RequestClass>().bodyAs<ReplyClass>()`
  */
 suspend inline fun <reified B, T> HttpFetcher.tryPost(
     resource: String,
@@ -193,7 +203,7 @@ suspend inline fun <reified B, T> HttpFetcher.tryPost(
 ): T? = tryPost(resource, body.toRequestBody(bodySerializer), headers, redirect, abortController, transform)
 
 /**
- * A serialize-friendly version of [tryPost] that expects a serializable body but does not expect a serialized response.
+ * Like [post] but returns null instead of throwing if the request fails.
  */
 suspend inline fun <reified B> HttpFetcher.tryPost(
     resource: String,
@@ -205,7 +215,8 @@ suspend inline fun <reified B> HttpFetcher.tryPost(
 ): Response? = tryPost(resource, body, headers, redirect, abortController, bodySerializer) { this }
 
 /**
- * A serialize-friendly version of [post] that expects a serializable body but returns raw bytes instead of a serialized response.
+ * A serialize-friendly version of [post] that accepts a serializable body but returns raw bytes instead of a serialized
+ * response.
  */
 @Deprecated(
     "We are migrating away from returning raw bytes to a more proper Respose object instead.",
@@ -227,7 +238,7 @@ suspend inline fun <reified B> HttpFetcher.tryPostBytes(
 ): ByteArray? = tryPost(resource, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
- * Like [post], but returns null if the request failed for any reason.
+ * Like [post], but returns null if the request fails.
  *
  * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
  * be true for debug builds and false for release builds.
@@ -288,7 +299,10 @@ suspend inline fun <reified R> HttpFetcher.tryPost(
 ) { bodyAs(responseDeserializer) }
 
 /**
- * A serialize-friendly version of [put] that expects a serializable body but does not expect a serialized response.
+ * A version of [put] that accepts a serializable body.
+ *
+ * Use [bodyAs] on the returned [Response] if you want to deserialize returned bytes, e.g.
+ * `put<RequestClass>(/*...*/).bodyAs<ReplyClass>()`.
  */
 suspend inline fun <reified B> HttpFetcher.put(
     resource: String,
@@ -300,7 +314,8 @@ suspend inline fun <reified B> HttpFetcher.put(
 ): Response = put(resource, body.toRequestBody(bodySerializer), headers, redirect, abortController)
 
 /**
- * A serialize-friendly version of [put] that expects a serializable body but returns raw bytes instead of a serialized response.
+ * A serialize-friendly version of [put] that accepts a serializable body but returns raw bytes instead of a serialized
+ * response.
  */
 @Deprecated(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
@@ -326,9 +341,7 @@ suspend inline fun <reified B> HttpFetcher.putBytes(
  *
  * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
- * See also [tryPut], which will return null if the request fails for any reason.
- *
- * Note: you should NOT prepend your path with "api/", as that will be added automatically.
+ * See also [tryPut], which will return null if the request fails.
  *
  * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
  *  [bodySerializer].
@@ -386,10 +399,19 @@ suspend inline fun <reified R> HttpFetcher.put(
 ).bodyAs(responseDeserializer)
 
 /**
- * A serialize-friendly version of [tryPut] that expects a serializable body but does not expect a serialized response.
+ * A serialize-friendly version of [tryPut] that accepts a serializable body and logic to convert the response to some
+ * desired target object of type [T].
  *
- * @param transform A final step to convert the response into a different type. Any exception that is thrown while
- *   this method's logic is run will automatically be caught and, if [logOnError] is true, reported.
+ * A [transform] callback is provided allowing you to convert the response into a different type.
+ * You are generally encouraged to call `tryPut(...) { convert() }` over `tryPut(...)?.convert()` as the former will
+ * ensure that exception handling is covered in that case.
+ *
+ * Additionally, if [logOnError] is set to true, any failure will be logged to the console (including the logic in
+ * the [transform] block).
+ *
+ * If you do not care about converting the result to some arbitrary type, use the [tryPut] version that returns
+ * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
+ * this version. Instead, via the [Response] version, use `tryPut<RequestClass>().bodyAs<ReplyClass>()`
  */
 suspend inline fun <reified B, T> HttpFetcher.tryPut(
     resource: String,
@@ -402,7 +424,7 @@ suspend inline fun <reified B, T> HttpFetcher.tryPut(
 ): T? = tryPut(resource, body.toRequestBody(bodySerializer), headers, redirect, abortController, transform)
 
 /**
- * A serialize-friendly version of [tryPut] that expects a serializable body but does not expect a serialized response.
+ * Like [put] but returns null instead of throwing if the request fails.
  */
 suspend inline fun <reified B> HttpFetcher.tryPut(
     resource: String,
@@ -414,7 +436,8 @@ suspend inline fun <reified B> HttpFetcher.tryPut(
 ): Response? = tryPut(resource, body, headers, redirect, abortController, bodySerializer) { this }
 
 /**
- * A serialize-friendly version of [put] that expects a serializable body but returns raw bytes instead of a serialized response.
+ * A serialize-friendly version of [put] that accepts a serializable body but returns raw bytes instead of a serialized
+ * response.
  */
 @Deprecated(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
@@ -437,7 +460,7 @@ suspend inline fun <reified B> HttpFetcher.tryPutBytes(
     tryPut(resource, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
- * Like [put], but returns null if the request failed for any reason.
+ * Like [put], but returns null if the request fails.
  *
  * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
  * be true for debug builds and false for release builds.
@@ -498,7 +521,10 @@ suspend inline fun <reified R> HttpFetcher.tryPut(
 ) { bodyAs(responseDeserializer) }
 
 /**
- * A serialize-friendly version of [patch] that expects a serializable body but does not expect a serialized response.
+ * A version of [patch] that accepts a serializable body.
+ *
+ * Use [bodyAs] on the returned [Response] if you want to deserialize returned bytes, e.g.
+ * `patch<RequestClass>(/*...*/).bodyAs<ReplyClass>()`.
  */
 suspend inline fun <reified B> HttpFetcher.patch(
     resource: String,
@@ -510,7 +536,8 @@ suspend inline fun <reified B> HttpFetcher.patch(
 ): Response = patch(resource, body.toRequestBody(bodySerializer), headers, redirect, abortController)
 
 /**
- * A serialize-friendly version of [patch] that expects a serializable body but returns raw bytes instead of a serialized response.
+ * A serialize-friendly version of [patch] that accepts a serializable body but returns raw bytes instead of a
+ * serialized response.
  */
 @Deprecated(
     "We are migrating away from returning raw bytes to a more proper Respose object instead.",
@@ -536,9 +563,7 @@ suspend inline fun <reified B> HttpFetcher.patchBytes(
  *
  * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
- * See also [tryPatch], which will return null if the request fails for any reason.
- *
- * Note: you should NOT prepend your path with "api/", as that will be added automatically.
+ * See also [tryPatch], which will return null if the request fails.
  *
  * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
  *  [bodySerializer].
@@ -596,10 +621,19 @@ suspend inline fun <reified R> HttpFetcher.patch(
 ).bodyAs(responseDeserializer)
 
 /**
- * A serialize-friendly version of [tryPatch] that expects a serializable body but does not expect a serialized response.
+ * A serialize-friendly version of [tryPatch] that accepts a serializable body and logic to convert the response to some
+ * desired target object of type [T].
  *
- * @param transform A final step to convert the response into a different type. Any exception that is thrown while
- *   this method's logic is run will automatically be caught and, if [logOnError] is true, reported.
+ * A [transform] callback is provided allowing you to convert the response into a different type.
+ * You are generally encouraged to call `tryPatch(...) { convert() }` over `tryPatch(...)?.convert()` as the former will
+ * ensure that exception handling is covered in that case.
+ *
+ * Additionally, if [logOnError] is set to true, any failure will be logged to the console (including the logic in
+ * the [transform] block).
+ *
+ * If you do not care about converting the result to some arbitrary type, use the [tryPatch] version that returns
+ * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
+ * this version. Instead, via the [Response] version, use `tryPatch<RequestClass>().bodyAs<ReplyClass>()`
  */
 suspend inline fun <reified B, T> HttpFetcher.tryPatch(
     resource: String,
@@ -612,7 +646,7 @@ suspend inline fun <reified B, T> HttpFetcher.tryPatch(
 ): T? = tryPatch(resource, body.toRequestBody(bodySerializer), headers, redirect, abortController, transform)
 
 /**
- * A serialize-friendly version of [tryPatch] that expects a serializable body but does not expect a serialized response.
+ * Like [patch] but returns null instead of throwing if the request fails.
  */
 suspend inline fun <reified B> HttpFetcher.tryPatch(
     resource: String,
@@ -624,7 +658,8 @@ suspend inline fun <reified B> HttpFetcher.tryPatch(
 ): Response? = tryPatch(resource, body, headers, redirect, abortController, bodySerializer) { this }
 
 /**
- * A serialize-friendly version of [patch] that expects a serializable body but returns raw bytes instead of a serialized response.
+ * A serialize-friendly version of [patch] that accepts a serializable body but returns raw bytes instead of a
+ * serialized response.
  */
 @Deprecated(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
@@ -646,7 +681,7 @@ suspend inline fun <reified B> HttpFetcher.tryPatchBytes(
 ): ByteArray? = tryPatch(resource, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
- * Like [patch], but returns null if the request failed for any reason.
+ * Like [patch], but returns null if the request fails.
  *
  * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
  * be true for debug builds and false for release builds.
@@ -711,9 +746,7 @@ suspend inline fun <reified R> HttpFetcher.tryPatch(
  *
  * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
- * See also [tryDelete], which will return null if the request fails for any reason.
- *
- * Note: you should NOT prepend your path with "api/", as that will be added automatically.
+ * See also [tryDelete], which will return null if the request fails.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -762,9 +795,7 @@ suspend inline fun <reified R> HttpFetcher.tryDelete(
  *
  * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
- * See also [tryDelete], which will return null if the request fails for any reason.
- *
- * Note: you should NOT prepend your path with "api/", as that will be added automatically.
+ * See also [tryDelete], which will return null if the request fails.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(

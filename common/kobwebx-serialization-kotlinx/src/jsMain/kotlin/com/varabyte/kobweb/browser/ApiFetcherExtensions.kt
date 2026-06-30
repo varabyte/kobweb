@@ -14,7 +14,7 @@ import org.w3c.fetch.Response
 /**
  * Call GET on a target API path with [R] as the expected return type.
  *
- * See also [tryGet], which will return null if the request fails for any reason.
+ * See also [tryGet], which will return null if the request fails.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
@@ -36,10 +36,12 @@ suspend inline fun <reified R> ApiFetcher.get(
 ): R = get(apiPath, headers, redirect, abortController).bodyAs(responseDeserializer)
 
 /**
- * Like [get], but returns null if the request failed for any reason.
+ * Like [get], but returns null if the request fails.
  *
  * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
  * be true for debug builds and false for release builds.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -59,7 +61,12 @@ suspend inline fun <reified R> ApiFetcher.tryGet(
 ): R? = tryGet(apiPath, headers, redirect, abortController) { bodyAs(responseDeserializer) }
 
 /**
- * A serialize-friendly version of [post] that expects a serializable body but does not expect a serialized response.
+ * A version of [post] that accepts a serializable body.
+ *
+ * Use [bodyAs] on the returned [Response] if you want to deserialize returned bytes, e.g.
+ * `post<RequestClass>(/*...*/).bodyAs<ReplyClass>()`.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 suspend inline fun <reified B> ApiFetcher.post(
     apiPath: String,
@@ -71,7 +78,9 @@ suspend inline fun <reified B> ApiFetcher.post(
 ): Response = post(apiPath, body.toRequestBody(bodySerializer), headers, redirect, abortController)
 
 /**
- * A serialize-friendly version of [post] that expects a body and returns its response as a raw byte array.
+ * A serialize-friendly version of [post] that accepts a serializable body and returns its response as a raw byte array.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
@@ -97,7 +106,7 @@ suspend inline fun <reified B> ApiFetcher.postBytes(
  *
  * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
- * See also [tryPost], which will return null if the request fails for any reason.
+ * See also [tryPost], which will return null if the request fails.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
@@ -132,6 +141,8 @@ suspend inline fun <reified B, reified R> ApiFetcher.post(
 
 /**
  * A serialize-friendly version of [post] that has no body but expects a serialized response.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -151,10 +162,19 @@ suspend inline fun <reified R> ApiFetcher.post(
 ): R = post(apiPath, body = null, headers, redirect, abortController).bodyAs(responseDeserializer)
 
 /**
- * A serialize-friendly version of [tryPost] that expects a body but does not expect a serialized response.
+ * A serialize-friendly version of [tryPost] that accepts a serializable body and logic to convert the response to some
+ * desired target object of type [T].
  *
- * @param transform A final step to convert the response into a different type. Any exception that is thrown while
- *   this method's logic is run will automatically be caught and, if [ApiFetcher.logOnError] is true, reported.
+ * A [transform] callback is provided allowing you to convert the response into a different type.
+ * You are generally encouraged to call `tryPost(...) { convert() }` over `tryPost(...)?.convert()` as the former will
+ * ensure that exception handling is covered in that case.
+ *
+ * Additionally, if [logOnError] is set to true, any failure will be logged to the console (including the logic in
+ * the [transform] block).
+ *
+ * If you do not care about converting the result to some arbitrary type, use the [tryPost] version that returns
+ * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
+ * this version. Instead, via the [Response] version, use `tryPost<RequestClass>().bodyAs<ReplyClass>()`
  */
 suspend inline fun <reified B, T> ApiFetcher.tryPost(
     apiPath: String,
@@ -167,7 +187,9 @@ suspend inline fun <reified B, T> ApiFetcher.tryPost(
 ): T? = tryPost(apiPath, body.toRequestBody(bodySerializer), headers, redirect, abortController, transform)
 
 /**
- * A serialize-friendly version of [tryPost] that expects a body but does not expect a serialized response.
+ * Like [post] but returns null instead of throwing if the request fails.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 suspend inline fun <reified B> ApiFetcher.tryPost(
     apiPath: String,
@@ -179,7 +201,9 @@ suspend inline fun <reified B> ApiFetcher.tryPost(
 ): Response? = tryPost(apiPath, body, headers, redirect, abortController, bodySerializer) { this }
 
 /**
- * A serialize-friendly version of [tryPost] that expects a body and returns its response as a raw byte array.
+ * A serialize-friendly version of [tryPost] that accepts a serializable body and returns its response as a raw byte array.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated(
     "We are migrating away from returning raw bytes to a more proper Response object instead.",
@@ -201,10 +225,12 @@ suspend inline fun <reified B> ApiFetcher.tryPostBytes(
 ): ByteArray? = tryPost(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
- * Like [post], but returns null if the request failed for any reason.
+ * Like [post], but returns null if the request fails.
  *
  * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
  * be true for debug builds and false for release builds.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
  * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
  *  [bodySerializer].
@@ -237,6 +263,8 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPost(
 
 /**
  * A serialize-friendly version of [tryPost] that has no body but expects a serialized response.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -262,7 +290,12 @@ suspend inline fun <reified R> ApiFetcher.tryPost(
 ) { bodyAs(responseDeserializer) }
 
 /**
- * A serialize-friendly version of [put] that expects a body but does not expect a serialized response.
+ * A version of [put] that accepts a serializable body.
+ *
+ * Use [bodyAs] on the returned [Response] if you want to deserialize returned bytes, e.g.
+ * `put<RequestClass>(/*...*/).bodyAs<ReplyClass>()`.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 suspend inline fun <reified B> ApiFetcher.put(
     apiPath: String,
@@ -274,7 +307,9 @@ suspend inline fun <reified B> ApiFetcher.put(
 ): Response = put(apiPath, body.toRequestBody(bodySerializer), headers, redirect, abortController)
 
 /**
- * A serialize-friendly version of [put] that expects a body and returns its response as a raw byte array.
+ * A serialize-friendly version of [put] that accepts a serializable body and returns its response as a raw byte array.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
@@ -300,7 +335,7 @@ suspend inline fun <reified B> ApiFetcher.putBytes(
  *
  * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
- * See also [tryPut], which will return null if the request fails for any reason.
+ * See also [tryPut], which will return null if the request fails.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
@@ -335,6 +370,8 @@ suspend inline fun <reified B, reified R> ApiFetcher.put(
 
 /**
  * A serialize-friendly version of [put] that has no body but expects a serialized response.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -360,10 +397,19 @@ suspend inline fun <reified R> ApiFetcher.put(
 ).bodyAs(responseDeserializer)
 
 /**
- * A serialize-friendly version of [tryPut] that expects a body but does not expect a serialized response.
+ * A serialize-friendly version of [tryPut] that accepts a serializable body and logic to convert the response to some
+ * desired target object of type [T].
  *
- * @param transform A final step to convert the response into a different type. Any exception that is thrown while
- *   this method's logic is run will automatically be caught and, if [ApiFetcher.logOnError] is true, reported.
+ * A [transform] callback is provided allowing you to convert the response into a different type.
+ * You are generally encouraged to call `tryPut(...) { convert() }` over `tryPut(...)?.convert()` as the former will
+ * ensure that exception handling is covered in that case.
+ *
+ * Additionally, if [logOnError] is set to true, any failure will be logged to the console (including the logic in
+ * the [transform] block).
+ *
+ * If you do not care about converting the result to some arbitrary type, use the [tryPut] version that returns
+ * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
+ * this version. Instead, via the [Response] version, use `tryPut<RequestClass>().bodyAs<ReplyClass>()`
  */
 suspend inline fun <reified B, T> ApiFetcher.tryPut(
     apiPath: String,
@@ -376,7 +422,9 @@ suspend inline fun <reified B, T> ApiFetcher.tryPut(
 ): T? = tryPut(apiPath, body.toRequestBody(bodySerializer), headers, redirect, abortController, transform)
 
 /**
- * A serialize-friendly version of [tryPut] that expects a body but does not expect a serialized response.
+ * Like [put] but returns null instead of throwing if the request fails.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 suspend inline fun <reified B> ApiFetcher.tryPut(
     apiPath: String,
@@ -388,7 +436,9 @@ suspend inline fun <reified B> ApiFetcher.tryPut(
 ): Response? = tryPut(apiPath, body, headers, redirect, abortController, bodySerializer) { this }
 
 /**
- * A serialize-friendly version of [tryPut] that expects a body and returns its response as a raw byte array.
+ * A serialize-friendly version of [tryPut] that accepts a serializable body and returns its response as a raw byte array.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
@@ -410,10 +460,12 @@ suspend inline fun <reified B> ApiFetcher.tryPutBytes(
 ): ByteArray? = tryPut(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
- * Like [put], but returns null if the request failed for any reason.
+ * Like [put], but returns null if the request fails.
  *
  * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
  * be true for debug builds and false for release builds.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
  * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
  *  [bodySerializer].
@@ -446,6 +498,8 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPut(
 
 /**
  * A serialize-friendly version of [tryPut] that has no body but expects a serialized response.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -472,7 +526,12 @@ suspend inline fun <reified R> ApiFetcher.tryPut(
 
 
 /**
- * A serialize-friendly version of [patch] that expects a body but does not expect a serialized response.
+ * A version of [patch] that accepts a serializable body.
+ *
+ * Use [bodyAs] on the returned [Response] if you want to deserialize returned bytes, e.g.
+ * `patch<RequestClass>(/*...*/).bodyAs<ReplyClass>()`.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 suspend inline fun <reified B> ApiFetcher.patch(
     apiPath: String,
@@ -484,7 +543,9 @@ suspend inline fun <reified B> ApiFetcher.patch(
 ): Response = patch(apiPath, body.toRequestBody(bodySerializer), headers, redirect, abortController)
 
 /**
- * A serialize-friendly version of [patch] that expects a body and returns its response as a raw byte array.
+ * A serialize-friendly version of [patch] that accepts a serializable body and returns its response as a raw byte array.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
@@ -510,7 +571,7 @@ suspend inline fun <reified B> ApiFetcher.patchBytes(
  *
  * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
- * See also [tryPatch], which will return null if the request fails for any reason.
+ * See also [tryPatch], which will return null if the request fails.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
@@ -545,6 +606,8 @@ suspend inline fun <reified B, reified R> ApiFetcher.patch(
 
 /**
  * A serialize-friendly version of [patch] that has no body but expects a serialized response.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -570,10 +633,19 @@ suspend inline fun <reified R> ApiFetcher.patch(
 ).bodyAs(responseDeserializer)
 
 /**
- * A serialize-friendly version of [tryPatch] that expects a body but does not expect a serialized response.
+ * A serialize-friendly version of [tryPatch] that accepts a serializable body and logic to convert the response to some
+ * desired target object of type [T].
  *
- * @param transform A final step to convert the response into a different type. Any exception that is thrown while
- *   this method's logic is run will automatically be caught and, if [ApiFetcher.logOnError] is true, reported.
+ * A [transform] callback is provided allowing you to convert the response into a different type.
+ * You are generally encouraged to call `tryPatch(...) { convert() }` over `tryPatch(...)?.convert()` as the former will
+ * ensure that exception handling is covered in that case.
+ *
+ * Additionally, if [logOnError] is set to true, any failure will be logged to the console (including the logic in
+ * the [transform] block).
+ *
+ * If you do not care about converting the result to some arbitrary type, use the [tryPatch] version that returns
+ * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
+ * this version. Instead, via the [Response] version, use `tryPatch<RequestClass>().bodyAs<ReplyClass>()`
  */
 suspend inline fun <reified B, T> ApiFetcher.tryPatch(
     apiPath: String,
@@ -586,7 +658,9 @@ suspend inline fun <reified B, T> ApiFetcher.tryPatch(
 ): T? = tryPatch(apiPath, body.toRequestBody(bodySerializer), headers, redirect, abortController, transform)
 
 /**
- * A serialize-friendly version of [tryPatch] that expects a body but does not expect a serialized response.
+ * Like [patch] but returns null instead of throwing if the request fails.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 suspend inline fun <reified B> ApiFetcher.tryPatch(
     apiPath: String,
@@ -598,7 +672,9 @@ suspend inline fun <reified B> ApiFetcher.tryPatch(
 ): Response? = tryPatch(apiPath, body, headers, redirect, abortController, bodySerializer) { this }
 
 /**
- * A serialize-friendly version of [tryPatch] that expects a body and returns its response as a raw byte array.
+ * A serialize-friendly version of [tryPatch] that accepts a serializable body and returns its response as a raw byte array.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
@@ -620,10 +696,12 @@ suspend inline fun <reified B> ApiFetcher.tryPatchBytes(
 ): ByteArray? = tryPatch(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }
 
 /**
- * Like [patch], but returns null if the request failed for any reason.
+ * Like [patch], but returns null if the request fails.
  *
  * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
  * be true for debug builds and false for release builds.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
  * @param body The body to send with the request. Make sure your class is marked with @Serializable or provide a custom
  *  [bodySerializer].
@@ -656,6 +734,8 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPatch(
 
 /**
  * A serialize-friendly version of [tryPatch] that has no body but expects a serialized response.
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -685,7 +765,7 @@ suspend inline fun <reified R> ApiFetcher.tryPatch(
  *
  * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
- * See also [tryDelete], which will return null if the request fails for any reason.
+ * See also [tryDelete], which will return null if the request fails.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
@@ -708,6 +788,8 @@ suspend inline fun <reified R> ApiFetcher.delete(
 
 /**
  * A serialize-friendly version of [tryDelete].
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -731,7 +813,7 @@ suspend inline fun <reified R> ApiFetcher.tryDelete(
  *
  * You can set [R] to `Unit` if this request doesn't expect a response body.
  *
- * See also [tryOptions], which will return null if the request fails for any reason.
+ * See also [tryOptions], which will return null if the request fails.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
@@ -754,6 +836,8 @@ suspend inline fun <reified R> ApiFetcher.options(
 
 /**
  * A serialize-friendly version of [tryOptions].
+ *
+ * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
