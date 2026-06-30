@@ -3,7 +3,7 @@ Support for integration of [Lucide icons](https://lucide.dev/) in your Kobweb pr
 This directory contains a file called `lucide-icons.json`, which is parsed and used to generate code
 used in this project.
 
-To update it:
+To update it (e.g. after changing the `LUCIDE_VERSION` value in `build.gradle.kts`):
 
 ```bash
 ./gradlew :frontend:silk-icons-lucide:fetchLucideIcons
