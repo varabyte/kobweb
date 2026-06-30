@@ -114,7 +114,7 @@ fun ByteArray?.orEmpty(): ByteArray {
 }
 
 /**
- * Default values for [fetch] (or methods that delegate to fetch).
+ * Default values for [com.varabyte.kobweb.browser.http.fetch] (or methods that delegate to fetch).
  */
 object FetchDefaults {
     var Headers: Map<String, Any>? = null
@@ -232,7 +232,7 @@ private fun logFetchResourceError(resource: String, t: Throwable) {
 }
 
 /**
- * Like [fetch] but returns null if the fetch fails for any reason instead of throwing.
+ * Like [com.varabyte.kobweb.browser.http.fetch] but returns null if the fetch fails for any reason instead of throwing.
  *
  * @param transform A final step to convert the response into a different type. Any exception that is thrown while
  *   this method's logic is being run will automatically be caught and, if [logOnError] is true, reported. You can use
@@ -258,7 +258,7 @@ suspend fun <T> WindowOrWorkerGlobalScope.tryFetch(
 }
 
 /**
- * Like [fetch] but returns null if the fetch fails for any reason instead of throwing.
+ * Like [com.varabyte.kobweb.browser.http.fetch] but returns null if the fetch fails for any reason instead of throwing.
  */
 suspend fun WindowOrWorkerGlobalScope.tryFetch(
     method: HttpMethod,
