@@ -213,7 +213,7 @@ suspend fun WindowOrWorkerGlobalScope.fetchBytes(
 }
 
 private fun logFetchResourceError(resource: String, t: Throwable) {
-    console.log("Error fetching resource \"$resource\"\n\n$t")
+    console.warn("Error fetching resource \"$resource\"\n\n$t")
 }
 
 /**
