@@ -24,12 +24,21 @@ fun <B> B.toRequestBody(strategy: SerializationStrategy<B>): RequestBody {
  * val echoReply = window.http.post("echo", EchoRequest("hello")).bodyAs<EchoReply>()
  * console.log("Echo: ${echoReply.message}")
  * ```
+ *
+ * @param requireOk If true and [Response.ok] is false, this method will throw. Even responses that are `!ok` can still
+ *   have bodies, so you may still want to opt in to reading the body. However, while a successful response will have a
+ *   valid value designed for deserialization, error responses sometimes have generic error messages instead, which is
+ *   why this value defaults to true.
  */
-suspend inline fun <reified R> Response.bodyAs(strategy: DeserializationStrategy<R> = serializer()): R {
+suspend inline fun <reified R> Response.bodyAs(requireOk: Boolean = true, strategy: DeserializationStrategy<R> = serializer()): R {
     if (R::class == Unit::class) return Unit as R
 
-    return Json.decodeFromString(strategy, bodyAsBytes().decodeToString())
+    return Json.decodeFromString(strategy, bodyAsBytes(requireOk).decodeToString())
 }
+
+// Users won't need to use this version, but it's a convenient form for deprecated methods below. I intend to remove it
+// after the deprecated methods are eventually removed.
+suspend inline fun <reified R> Response.bodyAs(strategy: DeserializationStrategy<R>): R = bodyAs(requireOk = true, strategy)
 
 /**
  * Call GET on a target resource with [R] as the expected return type.
