@@ -160,7 +160,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.post(
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "post(resource, headers, body = null, redirect, abortController, bodySerializer).bodyAs(responseDeserializer)",
+        "post(resource, body = null, headers, redirect, abortController, bodySerializer).bodyAs(responseDeserializer)",
         "com.varabyte.kobweb.browser.http.post",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
@@ -277,7 +277,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.tryPost(
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "tryPost(resource, headers, body = null, redirect, abortController) { bodyAs(responseDeserializer) }",
+        "tryPost(resource, body = null, headers, redirect, abortController) { bodyAs(responseDeserializer) }",
         "com.varabyte.kobweb.browser.http.post",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
@@ -373,7 +373,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.put(
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "put(resource, headers, body = null, redirect, abortController).bodyAs(responseDeserializer)",
+        "put(resource, body = null, headers, redirect, abortController).bodyAs(responseDeserializer)",
         "com.varabyte.kobweb.browser.http.put",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
@@ -492,7 +492,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.tryPut(
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "tryPut(resource, headers, body = null, redirect, abortController) { bodyAs(responseDeserializer) }",
+        "tryPut(resource, body = null, headers, redirect, abortController) { bodyAs(responseDeserializer) }",
         "com.varabyte.kobweb.browser.http.tryPut",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
@@ -588,7 +588,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.patch(
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "patch(resource, headers, body = null, redirect, abortController).bodyAs(responseDeserializer)",
+        "patch(resource, body = null, headers, redirect, abortController).bodyAs(responseDeserializer)",
         "com.varabyte.kobweb.browser.http.patch",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
@@ -706,7 +706,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.tryPatch(
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
-        "tryPatch(resource, headers, body = null, redirect, abortController) { bodyAs(responseDeserializer) }",
+        "tryPatch(resource, body = null, headers, redirect, abortController) { bodyAs(responseDeserializer) }",
         "com.varabyte.kobweb.browser.http.tryPatch",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
