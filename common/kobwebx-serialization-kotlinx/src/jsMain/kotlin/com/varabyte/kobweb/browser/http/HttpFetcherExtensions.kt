@@ -1,5 +1,7 @@
 package com.varabyte.kobweb.browser.http
 
+import com.varabyte.kobweb.browser.http.tryPost
+import com.varabyte.kobweb.browser.tryPost
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
@@ -208,6 +210,13 @@ suspend inline fun <reified B, T> HttpFetcher.tryPost(
 
 /**
  * Like [post] but returns null instead of throwing if the request fails.
+ *
+ * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+ * be true for debug builds and false for release builds.
+ *
+ * If you plan to do additional operations on the response and would also like to have logging / exception
+ * protection for them, consider using the other [tryPost] call which lets you pass in a `transform` callback.
+ * You are generally encouraged to call `tryPost(...) { convert() }` over `tryPost(...)?.convert()`.
  */
 suspend inline fun <reified B> HttpFetcher.tryPost(
     resource: String,
@@ -421,6 +430,13 @@ suspend inline fun <reified B, T> HttpFetcher.tryPut(
 
 /**
  * Like [put] but returns null instead of throwing if the request fails.
+ *
+ * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+ * be true for debug builds and false for release builds.
+ *
+ * If you plan to do additional operations on the response and would also like to have logging / exception
+ * protection for them, consider using the other [tryPut] call which lets you pass in a `transform` callback.
+ * You are generally encouraged to call `tryPut(...) { convert() }` over `tryPut(...)?.convert()`.
  */
 suspend inline fun <reified B> HttpFetcher.tryPut(
     resource: String,
@@ -636,6 +652,13 @@ suspend inline fun <reified B, T> HttpFetcher.tryPatch(
 
 /**
  * Like [patch] but returns null instead of throwing if the request fails.
+ *
+ * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+ * be true for debug builds and false for release builds.
+ *
+ * If you plan to do additional operations on the response and would also like to have logging / exception
+ * protection for them, consider using the other [tryPatch] call which lets you pass in a `transform` callback.
+ * You are generally encouraged to call `tryPatch(...) { convert() }` over `tryPatch(...)?.convert()`.
  */
 suspend inline fun <reified B> HttpFetcher.tryPatch(
     resource: String,

@@ -96,6 +96,10 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryDelete] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryDelete(...) { convert() }` over `tryDelete(...)?.convert()`.
+     *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
     suspend fun tryDelete(
@@ -191,6 +195,10 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryGet] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryGet(...) { convert() }` over `tryGet(...)?.convert()`.
+     *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
     suspend fun tryGet(
@@ -265,6 +273,10 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryHead] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryHead(...) { convert() }` over `tryHead(...)?.convert()`.
+     *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
     suspend fun tryHead(
@@ -337,6 +349,10 @@ class ApiFetcher(private val window: Window) {
      *
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
+     *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryOptions] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryOptions(...) { convert() }` over `tryOptions(...)?.convert()`.
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
@@ -438,6 +454,10 @@ class ApiFetcher(private val window: Window) {
      *
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
+     *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryPatch] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryPatch(...) { convert() }` over `tryPatch(...)?.convert()`.
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
@@ -543,6 +563,10 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryPost] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryPost(...) { convert() }` over `tryPost(...)?.convert()`.
+     *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
     suspend fun tryPost(
@@ -646,6 +670,10 @@ class ApiFetcher(private val window: Window) {
      *
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
+     *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryPut] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryPut(...) { convert() }` over `tryPut(...)?.convert()`.
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */

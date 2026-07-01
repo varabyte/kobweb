@@ -259,7 +259,23 @@ suspend fun <T> WindowOrWorkerGlobalScope.tryFetch(
 }
 
 /**
- * A convenience version of [fetch][com.varabyte.kobweb.browser.http.fetch] that returns null instead of throwing if the request fails.
+ * A convenience version of [fetch][com.varabyte.kobweb.browser.http.fetch] that returns null instead of throwing if the
+ * request fails.
+ *
+ * Essentially, if an exception is thrown at any point between sending the request and receiving the response, it will
+ * be swallowed and null will be returned. If [logOnError] is set to true, logs about what went wrong will be added to
+ * the console.
+ *
+ * If you plan to do additional operations on the response and would also like to have logging / exception protection
+ * for them, consider using the other [tryFetch] call which lets you pass in a `transform` callback. In other words,
+ * you should prefer
+ * ```
+ * tryFetch(/*...*/) { convert() }
+ * ```
+ * over
+ * ```
+ * tryFetch(/*...*/)?.convert()
+ * ```
  */
 suspend fun WindowOrWorkerGlobalScope.tryFetch(
     method: HttpMethod,

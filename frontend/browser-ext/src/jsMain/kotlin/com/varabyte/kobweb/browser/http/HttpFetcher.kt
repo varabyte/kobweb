@@ -126,6 +126,10 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
      * Like [delete], but returns null instead of throwing if the request fails.
      *
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console.
+     *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryDelete] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryDelete(...) { convert() }` over `tryDelete(...)?.convert()`.
      */
     suspend fun tryDelete(
         resource: String,
@@ -218,6 +222,10 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
      * Like [get], but returns null instead of throwing if the request fails.
      *
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console.
+     *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryGet] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryGet(...) { convert() }` over `tryGet(...)?.convert()`.
      */
     suspend fun tryGet(
         resource: String,
@@ -291,6 +299,10 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
      * Like [head], but returns null instead of throwing if the request fails.
      *
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console.
+     *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryHead] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryHead(...) { convert() }` over `tryHead(...)?.convert()`.
      */
     suspend fun tryHead(
         resource: String,
@@ -357,6 +369,10 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
      * Like [options], but returns null instead of throwing if the request fails.
      *
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console.
+     *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryOptions] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryOptions(...) { convert() }` over `tryOptions(...)?.convert()`.
      */
     suspend fun tryOptions(
         resource: String,
@@ -447,6 +463,10 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
      * Like [patch], but returns null instead of throwing if the request fails.
      *
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console.
+     *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryPatch] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryPatch(...) { convert() }` over `tryPatch(...)?.convert()`.
      */
     suspend fun tryPatch(
         resource: String,
@@ -540,6 +560,10 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
      * Like [post], but returns null instead of throwing if the request fails.
      *
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console.
+     *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryPost] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryPost(...) { convert() }` over `tryPost(...)?.convert()`.
      */
     suspend fun tryPost(
         resource: String,
@@ -639,6 +663,10 @@ class HttpFetcher(private val fetchScope: WindowOrWorkerGlobalScope) {
      * Like [put], but returns null instead of throwing if the request fails.
      *
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console.
+     *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryPut] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryPut(...) { convert() }` over `tryPut(...)?.convert()`.
      */
     suspend fun tryPut(
         resource: String,

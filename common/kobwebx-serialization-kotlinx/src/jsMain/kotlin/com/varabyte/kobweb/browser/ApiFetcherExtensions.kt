@@ -5,6 +5,7 @@ import com.varabyte.kobweb.browser.http.FetchDefaults
 import com.varabyte.kobweb.browser.http.bodyAsBytes
 import com.varabyte.kobweb.browser.http.bodyAs
 import com.varabyte.kobweb.browser.http.toRequestBody
+import com.varabyte.kobweb.browser.tryPost
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.serializer
@@ -188,6 +189,13 @@ suspend inline fun <reified B, T> ApiFetcher.tryPost(
 
 /**
  * Like [post] but returns null instead of throwing if the request fails.
+ *
+ * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+ * be true for debug builds and false for release builds.
+ *
+ * If you plan to do additional operations on the response and would also like to have logging / exception
+ * protection for them, consider using the other [tryPost] call which lets you pass in a `transform` callback.
+ * You are generally encouraged to call `tryPost(...) { convert() }` over `tryPost(...)?.convert()`.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
@@ -418,6 +426,13 @@ suspend inline fun <reified B, T> ApiFetcher.tryPut(
 /**
  * Like [put] but returns null instead of throwing if the request fails.
  *
+ * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+ * be true for debug builds and false for release builds.
+ *
+ * If you plan to do additional operations on the response and would also like to have logging / exception
+ * protection for them, consider using the other [tryPut] call which lets you pass in a `transform` callback.
+ * You are generally encouraged to call `tryPut(...) { convert() }` over `tryPut(...)?.convert()`.
+ *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
 suspend inline fun <reified B> ApiFetcher.tryPut(
@@ -647,6 +662,13 @@ suspend inline fun <reified B, T> ApiFetcher.tryPatch(
 
 /**
  * Like [patch] but returns null instead of throwing if the request fails.
+ *
+ * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+ * be true for debug builds and false for release builds.
+ *
+ * If you plan to do additional operations on the response and would also like to have logging / exception
+ * protection for them, consider using the other [tryPatch] call which lets you pass in a `transform` callback.
+ * You are generally encouraged to call `tryPatch(...) { convert() }` over `tryPatch(...)?.convert()`.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
