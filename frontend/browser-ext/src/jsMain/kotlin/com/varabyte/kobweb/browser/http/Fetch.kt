@@ -198,7 +198,7 @@ suspend fun WindowOrWorkerGlobalScope.fetch(
  */
 @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(
-        "fetch(method, resource, headers, body?.let { bodyOf(it) }, redirect, abortController).bodyAsBytes()",
+        "fetch(method, resource, body?.let { bodyOf(it) }, headers, redirect, abortController).bodyAsBytes()",
         "com.varabyte.kobweb.browser.http.bodyAsBytes",
         "com.varabyte.kobweb.browser.http.bodyOf",
     )
@@ -278,7 +278,7 @@ suspend fun WindowOrWorkerGlobalScope.tryFetch(
  */
 @Deprecated("We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(
-        "tryFetch(method, resource, headers, body?.let { bodyOf(it) }, redirect, logOnError, abortController) { bodyAsBytes() }",
+        "tryFetch(method, resource, body?.let { bodyOf(it) }, headers, redirect, logOnError, abortController) { bodyAsBytes() }",
         "com.varabyte.kobweb.browser.http.bodyAsBytes",
         "com.varabyte.kobweb.browser.http.bodyOf",
     )
