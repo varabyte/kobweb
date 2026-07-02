@@ -1,3 +1,5 @@
+import kotlin.sequences.groupBy
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     id("kobweb-compose")
@@ -17,8 +19,8 @@ enum class IconCategory {
 
 val generateIconsTask = tasks.register("generateIcons") {
     val srcFile = layout.projectDirectory.file("fa-icon-list.txt")
-    val dstFile =
-        layout.projectDirectory.file("$GENERATED_SRC_ROOT/com/varabyte/kobweb/silk/components/icons/fa/FaIcons.kt")
+    val dstDir =
+        layout.projectDirectory.dir("$GENERATED_SRC_ROOT/com/varabyte/kobweb/silk/components/icons/fa")
 
     inputs.files(srcFile)
     outputs.dir(GENERATED_SRC_ROOT)
@@ -28,7 +30,7 @@ val generateIconsTask = tasks.register("generateIcons") {
         val iconRawNames = srcFile.asFile
             .readLines().asSequence()
             .filter { line -> !line.startsWith("#") }
-            .map { line ->
+            .associate { line ->
                 // Convert icon name to function name, e.g.
                 // align-left -> FaAlignLeft
                 line.split("=", limit = 2).let { parts ->
@@ -40,10 +42,15 @@ val generateIconsTask = tasks.register("generateIcons") {
                     }
                     val names = parts[1]
 
-                    category to names.split(",")
+                    category to names
+                        .split(",")
+                        // Each icon gets written to its own file, so to prevent file name collisions from ever
+                        // happening, normalize each name to its version without dashes (since those get removed later)
+                        // and keep only the longest version (e.g. "print-shop" would win out over "printshop".
+                        .groupBy { it.replace("-", "") }
+                        .map { (_, values) -> values.maxBy { it.length } }
                 }
             }
-            .toMap()
 
         // For each icon name, figure out what categories they are in. This will affect the function signature we generate.
         // {ad=[SOLID], address-book=[SOLID, REGULAR], address-card=[SOLID, REGULAR], ...
@@ -77,7 +84,7 @@ val generateIconsTask = tasks.register("generateIcons") {
                 val methodName = "Fa${rawName.split("-").joinToString("") { it.capitalize() }}"
                 val categories = entry.value
 
-                when {
+                methodName to when {
                     categories.size == 2 -> {
                         "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = IconStyle.OUTLINE, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, style.category, size)"
                     }
@@ -94,11 +101,11 @@ val generateIconsTask = tasks.register("generateIcons") {
                         "@Composable fun $methodName(modifier: Modifier = Modifier, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, IconCategory.BRAND, size)"
                     }
 
-                    else -> GradleException("Unhandled icon entry: $entry")
+                    else -> throw GradleException("Unhandled icon entry: $entry")
                 }
-            }
+            }.toMap()
 
-        val iconsCode =
+        val iconsHeader =
             """
             |//@formatter:off
             |@file:Suppress("unused", "SpellCheckingInspection")
@@ -114,66 +121,79 @@ val generateIconsTask = tasks.register("generateIcons") {
             |
             |import androidx.compose.runtime.*
             |import com.varabyte.kobweb.compose.ui.Modifier
-            |import com.varabyte.kobweb.compose.ui.toAttrs
-            |import org.jetbrains.compose.web.dom.Span
             |
-            |enum class IconCategory(internal val className: String) {
-            |    REGULAR("far"),
-            |    SOLID("fas"),
-            |    BRAND("fab");
-            |}
-            |
-            |enum class IconStyle(internal val category: IconCategory) {
-            |    FILLED(IconCategory.SOLID),
-            |    OUTLINE(IconCategory.REGULAR);
-            |}
-            |
-            |// See: https://fontawesome.com/docs/web/style/size
-            |enum class IconSize(internal val className: String) {
-            |    // Relative sizes
-            |    XXS("fa-2xs"),
-            |    XS("fa-xs"),
-            |    SM("fa-sm"),
-            |    LG("fa-lg"),
-            |    XL("fa-xl"),
-            |    XXL("fa-2xl"),
-            |
-            |    // Literal sizes
-            |    X1("fa-1x"),
-            |    X2("fa-2x"),
-            |    X3("fa-3x"),
-            |    X4("fa-4x"),
-            |    X5("fa-5x"),
-            |    X6("fa-6x"),
-            |    X7("fa-7x"),
-            |    X8("fa-8x"),
-            |    X9("fa-9x"),
-            |    X10("fa-10x");
-            |}
-            |
-            |@Composable
-            |fun FaIcon(
-            |    name: String,
-            |    modifier: Modifier,
-            |    style: IconCategory = IconCategory.REGULAR,
-            |    size: IconSize? = null,
-            |) {
-            |    Span(
-            |        attrs = modifier.toAttrs {
-            |            classes(style.className, "fa-${'$'}name")
-            |            if (size != null) {
-            |                classes(size.className)
-            |            }
-            |        }
-            |    )
-            |}
-            |
-            |${iconMethodEntries.joinToString("\n")}
             """.trimMargin()
 
-        dstFile.asFile.apply {
-            parentFile.mkdirs()
-            writeText(iconsCode)
+        dstDir.asFile.mkdirs()
+
+        with(dstDir.file("_FaIcon.kt").asFile) {
+            writeText(iconsHeader)
+            appendText(
+                $$"""
+                |import com.varabyte.kobweb.compose.ui.toAttrs
+                |import org.jetbrains.compose.web.dom.Span
+                |
+                |enum class IconCategory(internal val className: String) {
+                |    REGULAR("far"),
+                |    SOLID("fas"),
+                |    BRAND("fab");
+                |}
+                |
+                |enum class IconStyle(internal val category: IconCategory) {
+                |    FILLED(IconCategory.SOLID),
+                |    OUTLINE(IconCategory.REGULAR);
+                |}
+                |
+                |// See: https://fontawesome.com/docs/web/style/size
+                |enum class IconSize(internal val className: String) {
+                |    // Relative sizes
+                |    XXS("fa-2xs"),
+                |    XS("fa-xs"),
+                |    SM("fa-sm"),
+                |    LG("fa-lg"),
+                |    XL("fa-xl"),
+                |    XXL("fa-2xl"),
+                |
+                |    // Literal sizes
+                |    X1("fa-1x"),
+                |    X2("fa-2x"),
+                |    X3("fa-3x"),
+                |    X4("fa-4x"),
+                |    X5("fa-5x"),
+                |    X6("fa-6x"),
+                |    X7("fa-7x"),
+                |    X8("fa-8x"),
+                |    X9("fa-9x"),
+                |    X10("fa-10x");
+                |}
+                |
+                |@Composable
+                |fun FaIcon(
+                |    name: String,
+                |    modifier: Modifier,
+                |    style: IconCategory = IconCategory.REGULAR,
+                |    size: IconSize? = null,
+                |) {
+                |    Span(
+                |        attrs = modifier.toAttrs {
+                |            classes(style.className, "fa-$name")
+                |            if (size != null) {
+                |                classes(size.className)
+                |            }
+                |        }
+                |    )
+                |}
+                |
+                """.trimMargin()
+            )
+        }
+
+        iconMethodEntries.forEach { (methodName, iconCode) ->
+            with(dstDir.file("$methodName.kt").asFile) {
+                writeText(iconsHeader)
+                appendText("\n")
+                appendText(iconCode)
+            }
         }
     }
 }

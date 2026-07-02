@@ -19,8 +19,8 @@ enum class IconStyle {
 
 val generateIconsTask = tasks.register("generateIcons") {
     val srcFile = layout.projectDirectory.file("md-icon-list.txt")
-    val dstFile =
-        layout.projectDirectory.file("$GENERATED_SRC_ROOT/com/varabyte/kobweb/silk/components/icons/mdi/MdIcons.kt")
+    val dstDir =
+        layout.projectDirectory.dir("$GENERATED_SRC_ROOT/com/varabyte/kobweb/silk/components/icons/mdi")
 
     inputs.files(srcFile)
     outputs.dir(GENERATED_SRC_ROOT)
@@ -44,7 +44,14 @@ val generateIconsTask = tasks.register("generateIcons") {
                     }
                     val names = parts[1]
 
-                    style to names.split(",")
+                    style to names
+                        .split(",")
+                        // Each icon gets written to its own file, so to prevent file name collisions from ever happening,
+                        // normalize each name to its version without underscores (since those get removed later) and keep
+                        // only the longest version (e.g. "print_shop" would win out over "printshop".
+                        .groupBy { it.replace("_", "") }
+                        .map { (_, values) -> values.maxBy { it.length } }
+                        .toList()
                 }
             }
 
@@ -67,7 +74,7 @@ val generateIconsTask = tasks.register("generateIcons") {
                 val methodName = "Mdi" + rawName.split("_").joinToString("") { it.capitalize() }
                 val styles = entry.value
 
-                when {
+                methodName to when {
                     // A rare solo-style icon? No need to allow a user to pass in a style parameter in that case
                     styles.size == 1 -> {
                         "@Composable fun $methodName(modifier: Modifier = Modifier) = MdIcon(\"$rawName\", modifier, ${styles.first().name})"
@@ -84,14 +91,14 @@ val generateIconsTask = tasks.register("generateIcons") {
                     }
 
                     else -> {
-                        // Not all styles are valid. For now, we throw an exception to inform the user about this, but we
-                        // can always decide to relax this later.
+                        // Not all styles are valid. For now, we throw a runtime exception (via assertValidStyle) to
+                        // inform the user about this, but we can always decide to relax this later.
                         "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = ${styles.first().name}) = MdIcon(\"$rawName\", modifier, style.also { it.assertValidStyle(\"$methodName\", ${styles.joinToString { it.name }}) })"
                     }
                 }
-            }
+            }.toMap()
 
-        val iconsCode =
+        val iconsHeader =
             """
             |//@formatter:off
             |@file:Suppress("unused", "SpellCheckingInspection")
@@ -107,58 +114,67 @@ val generateIconsTask = tasks.register("generateIcons") {
             |
             |import androidx.compose.runtime.*
             |import com.varabyte.kobweb.compose.ui.Modifier
-            |import com.varabyte.kobweb.compose.ui.toAttrs
-            |import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle.FILLED
-            |import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle.OUTLINED
-            |import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle.ROUNDED
-            |import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle.SHARP
-            |import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle.TWO_TONED
-            |import org.jetbrains.compose.web.dom.Span
-            |import org.jetbrains.compose.web.dom.Text
+            |import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle.*
             |
-            |enum class IconStyle {
-            |    FILLED,
-            |    OUTLINED,
-            |    ROUNDED,
-            |    SHARP,
-            |    TWO_TONED;
-            |}
-            |
-            |private fun IconStyle.toClassNameSuffix(): String {
-            |    return when (this) {
-            |        FILLED -> ""
-            |        OUTLINED -> "-outlined"
-            |        ROUNDED -> "-round"
-            |        SHARP -> "-sharp"
-            |        TWO_TONED -> "-two-tone"
-            |    }
-            |}
-            |
-            |private fun IconStyle.assertValidStyle(methodName: String, vararg validStyles: IconStyle) {
-            |    if (this !in validStyles) {
-            |        error("Attempted to render \"${'$'}methodName\" with style ${'$'}this. Must be one of: ${'$'}{validStyles.joinToString()}")
-            |    }
-            |}
-            |
-            |@Composable
-            |fun MdIcon(
-            |    name: String,
-            |    modifier: Modifier,
-            |    style: IconStyle = FILLED,
-            |) {
-            |    Span(
-            |        attrs = modifier.toAttrs { classes("material-icons${'$'}{style.toClassNameSuffix()}") }
-            |    ) {
-            |        Text(name)
-            |    }
-            |}
-            |
-            |${iconMethodEntries.joinToString("\n")}
             """.trimMargin()
 
-        dstFile.asFile.apply {
-            parentFile.mkdirs()
-            writeText(iconsCode)
+        dstDir.asFile.mkdirs()
+
+        with(dstDir.file("_MdIcon.kt").asFile) {
+            writeText(iconsHeader)
+            appendText(
+                $$"""
+                |import com.varabyte.kobweb.compose.ui.toAttrs
+                |import org.jetbrains.compose.web.dom.Span
+                |import org.jetbrains.compose.web.dom.Text
+                |
+                |enum class IconStyle {
+                |    FILLED,
+                |    OUTLINED,
+                |    ROUNDED,
+                |    SHARP,
+                |    TWO_TONED;
+                |}
+                |
+                |private fun IconStyle.toClassNameSuffix(): String {
+                |    return when (this) {
+                |        FILLED -> ""
+                |        OUTLINED -> "-outlined"
+                |        ROUNDED -> "-round"
+                |        SHARP -> "-sharp"
+                |        TWO_TONED -> "-two-tone"
+                |    }
+                |}
+                |
+                |internal fun IconStyle.assertValidStyle(methodName: String, vararg validStyles: IconStyle) {
+                |    if (this !in validStyles) {
+                |        error("Attempted to render \"$methodName\" with style $this. Must be one of: ${validStyles.joinToString()}")
+                |    }
+                |}
+                |
+                |@Composable
+                |fun MdIcon(
+                |    name: String,
+                |    modifier: Modifier,
+                |    style: IconStyle = FILLED,
+                |) {
+                |    Span(
+                |        attrs = modifier.toAttrs { classes("material-icons${style.toClassNameSuffix()}") }
+                |    ) {
+                |        Text(name)
+                |    }
+                |}
+                |
+                """.trimMargin()
+            )
+        }
+
+        iconMethodEntries.forEach { (methodName, iconCode) ->
+            with(dstDir.file("$methodName.kt").asFile) {
+                writeText(iconsHeader)
+                appendText("\n")
+                appendText(iconCode)
+            }
         }
     }
 }
