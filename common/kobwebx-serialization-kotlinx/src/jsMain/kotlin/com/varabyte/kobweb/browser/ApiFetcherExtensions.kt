@@ -5,7 +5,6 @@ import com.varabyte.kobweb.browser.http.FetchDefaults
 import com.varabyte.kobweb.browser.http.bodyAsBytes
 import com.varabyte.kobweb.browser.http.bodyAs
 import com.varabyte.kobweb.browser.http.toRequestBody
-import com.varabyte.kobweb.browser.tryPost
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.serializer
@@ -39,8 +38,8 @@ suspend inline fun <reified R> ApiFetcher.get(
 /**
  * Like [get], but returns null if the request fails or the response can't be deserialized.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
@@ -170,8 +169,8 @@ suspend inline fun <reified R> ApiFetcher.post(
  * You are generally encouraged to call `tryPost(...) { convert() }` over `tryPost(...)?.convert()` as the former will
  * ensure that exception handling is covered in that case.
  *
- * Additionally, if [logOnError] is set to true, any failure will be logged to the console (including the logic in
- * the [transform] block).
+ * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console (including the
+ * logic in the [transform] block).
  *
  * If you do not care about converting the result to some arbitrary type, use the [tryPost] version that returns
  * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
@@ -190,8 +189,8 @@ suspend inline fun <reified B, T> ApiFetcher.tryPost(
 /**
  * Like [post] but returns null instead of throwing if the request fails.
  *
- * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
  *
  * If you plan to do additional operations on the response and would also like to have logging / exception
  * protection for them, consider using the other [tryPost] call which lets you pass in a `transform` callback.
@@ -235,8 +234,8 @@ suspend inline fun <reified B> ApiFetcher.tryPostBytes(
 /**
  * Like [post], but returns null if the request fails or the response can't be deserialized.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
@@ -406,8 +405,8 @@ suspend inline fun <reified R> ApiFetcher.put(
  * You are generally encouraged to call `tryPut(...) { convert() }` over `tryPut(...)?.convert()` as the former will
  * ensure that exception handling is covered in that case.
  *
- * Additionally, if [logOnError] is set to true, any failure will be logged to the console (including the logic in
- * the [transform] block).
+ * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console (including the
+ * logic in the [transform] block).
  *
  * If you do not care about converting the result to some arbitrary type, use the [tryPut] version that returns
  * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
@@ -426,8 +425,8 @@ suspend inline fun <reified B, T> ApiFetcher.tryPut(
 /**
  * Like [put] but returns null instead of throwing if the request fails.
  *
- * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
  *
  * If you plan to do additional operations on the response and would also like to have logging / exception
  * protection for them, consider using the other [tryPut] call which lets you pass in a `transform` callback.
@@ -471,8 +470,8 @@ suspend inline fun <reified B> ApiFetcher.tryPutBytes(
 /**
  * Like [put], but returns null if the request fails or the response can't be deserialized.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
@@ -643,8 +642,8 @@ suspend inline fun <reified R> ApiFetcher.patch(
  * You are generally encouraged to call `tryPatch(...) { convert() }` over `tryPatch(...)?.convert()` as the former will
  * ensure that exception handling is covered in that case.
  *
- * Additionally, if [logOnError] is set to true, any failure will be logged to the console (including the logic in
- * the [transform] block).
+ * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console (including the
+ * logic in the [transform] block).
  *
  * If you do not care about converting the result to some arbitrary type, use the [tryPatch] version that returns
  * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
@@ -663,8 +662,8 @@ suspend inline fun <reified B, T> ApiFetcher.tryPatch(
 /**
  * Like [patch] but returns null instead of throwing if the request fails.
  *
- * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
  *
  * If you plan to do additional operations on the response and would also like to have logging / exception
  * protection for them, consider using the other [tryPatch] call which lets you pass in a `transform` callback.
@@ -708,8 +707,8 @@ suspend inline fun <reified B> ApiFetcher.tryPatchBytes(
 /**
  * Like [patch], but returns null if the request fails or the response can't be deserialized.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */

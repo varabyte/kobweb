@@ -1,7 +1,5 @@
 package com.varabyte.kobweb.browser.http
 
-import com.varabyte.kobweb.browser.http.tryPost
-import com.varabyte.kobweb.browser.tryPost
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
@@ -191,8 +189,8 @@ suspend inline fun <reified R> HttpFetcher.post(
  * You are generally encouraged to call `tryPost(...) { convert() }` over `tryPost(...)?.convert()` as the former will
  * ensure that exception handling is covered in that case.
  *
- * Additionally, if [logOnError] is set to true, any failure will be logged to the console (including the logic in
- * the [transform] block).
+ * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console (including the
+ * logic in the [transform] block).
  *
  * If you do not care about converting the result to some arbitrary type, use the [tryPost] version that returns
  * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
@@ -211,8 +209,8 @@ suspend inline fun <reified B, T> HttpFetcher.tryPost(
 /**
  * Like [post] but returns null instead of throwing if the request fails.
  *
- * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
  *
  * If you plan to do additional operations on the response and would also like to have logging / exception
  * protection for them, consider using the other [tryPost] call which lets you pass in a `transform` callback.
@@ -252,8 +250,8 @@ suspend inline fun <reified B> HttpFetcher.tryPostBytes(
 /**
  * Like [post], but returns null if the request fails or the response can't be deserialized.
  *
- * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -411,8 +409,8 @@ suspend inline fun <reified R> HttpFetcher.put(
  * You are generally encouraged to call `tryPut(...) { convert() }` over `tryPut(...)?.convert()` as the former will
  * ensure that exception handling is covered in that case.
  *
- * Additionally, if [logOnError] is set to true, any failure will be logged to the console (including the logic in
- * the [transform] block).
+ * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console (including the
+ * logic in the [transform] block).
  *
  * If you do not care about converting the result to some arbitrary type, use the [tryPut] version that returns
  * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
@@ -431,8 +429,8 @@ suspend inline fun <reified B, T> HttpFetcher.tryPut(
 /**
  * Like [put] but returns null instead of throwing if the request fails.
  *
- * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
  *
  * If you plan to do additional operations on the response and would also like to have logging / exception
  * protection for them, consider using the other [tryPut] call which lets you pass in a `transform` callback.
@@ -474,8 +472,8 @@ suspend inline fun <reified B> HttpFetcher.tryPutBytes(
 /**
  * Like [put], but returns null if the request fails or the response can't be deserialized.
  *
- * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
@@ -633,8 +631,8 @@ suspend inline fun <reified R> HttpFetcher.patch(
  * You are generally encouraged to call `tryPatch(...) { convert() }` over `tryPatch(...)?.convert()` as the former will
  * ensure that exception handling is covered in that case.
  *
- * Additionally, if [logOnError] is set to true, any failure will be logged to the console (including the logic in
- * the [transform] block).
+ * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console (including the
+ * logic in the [transform] block).
  *
  * If you do not care about converting the result to some arbitrary type, use the [tryPatch] version that returns
  * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
@@ -653,8 +651,8 @@ suspend inline fun <reified B, T> HttpFetcher.tryPatch(
 /**
  * Like [patch] but returns null instead of throwing if the request fails.
  *
- * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
  *
  * If you plan to do additional operations on the response and would also like to have logging / exception
  * protection for them, consider using the other [tryPatch] call which lets you pass in a `transform` callback.
@@ -695,8 +693,8 @@ suspend inline fun <reified B> HttpFetcher.tryPatchBytes(
 /**
  * Like [patch], but returns null if the request fails or the response can't be deserialized.
  *
- * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this will
- * be true for debug builds and false for release builds.
+ * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
  */
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
