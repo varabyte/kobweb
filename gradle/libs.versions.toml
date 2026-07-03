@@ -18,7 +18,7 @@ ksp = "2.3.9"
 ktor = "3.5.0"
 logback = "1.5.15"
 playwright = "1.58.0"
-shadow = "9.1.0"
+shadow = "9.4.3"
 truthish = "1.0.4"
 vanniktech-publish = "0.34.0"
 
