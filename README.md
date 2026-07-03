@@ -3,7 +3,7 @@
 <br>
 [![kotlin: 2.4.0](https://img.shields.io/badge/kotlin-2.4.0-blue?logo=kotlin)](COMPATIBILITY.md)
 [![compose: 1.11.1](https://img.shields.io/badge/compose-1.10.2-blue?logo=jetpackcompose)](COMPATIBILITY.md)
-[![ktor: 3.4.0](https://img.shields.io/badge/ktor-3.4.0-blue)](https://ktor.io/)
+[![ktor: 3.5.0](https://img.shields.io/badge/ktor-3.5.0-blue)](https://ktor.io/)
 <br>
 <a href="https://kobweb.varabyte.com/docs">
 ![User Guide docs](https://img.shields.io/badge/User_Guide-royalblue?logo=readthedocs)

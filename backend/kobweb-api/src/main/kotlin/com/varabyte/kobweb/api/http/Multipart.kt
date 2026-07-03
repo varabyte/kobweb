@@ -1,7 +1,5 @@
 package com.varabyte.kobweb.api.http
 
-import java.io.Closeable
-
 /**
  * Represents all relevant information associated with a [multipart request](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/POST#multipart_form_submission).
  *
@@ -31,14 +29,18 @@ interface Multipart {
 
     /**
      * One section inside the parent [Multipart] request body.
+     *
+     * Be sure to [release] it when finished looking at it.
      */
-    interface Part : ContentSource, Closeable {
+    interface Part : ContentSource {
         override val contentLength: Long? get() = null
 
         val headers: Map<String, List<String>>
         val contentDisposition: ContentDisposition?
         val name: String?
         val extras: Extras?
+
+        suspend fun release()
     }
 
     /**
@@ -53,32 +55,33 @@ interface Multipart {
      *
      * You can either call this directly or use [forEachPart] which is provided as a convenience method.
      *
-     * If you call this yourself, be sure to [close][Part.close] each part when you're done with it.
+     * If you call this yourself, be sure to [close][Part.release] each part when you're done with it.
      */
     suspend fun readNextPart(): Part?
 }
 
 /**
- * @param autoClose Whether to automatically call [Part.close][Multipart.Part.close] after the callback this scope is
- *   associated with is finished.
+ * @param autoRelease Whether to automatically call [Part.close][Multipart.Part.release] after the callback this scope
+ * is associated with is finished.
  */
-class MultipartScope internal constructor(var autoClose: Boolean)
+class MultipartScope internal constructor(var autoRelease: Boolean)
 
 /**
  * A convenience method that wraps [Multipart.readNextPart] so you don't have to collect it yourself.
  *
- * @param autoClose If true, automatically call [Part.close][Multipart.Part.close] after each part is handled. You can
- *   override [MultipartScope.autoClose] as well per part, if you need to override this value on a case-by-case basis.
+ * @param autoRelease If true, automatically call [Part.release][Multipart.Part.release] after each part is handled. You
+ *   can set [MultipartScope.autoRelease] as well per part inside [block], if you need to override this value on a
+ *   case-by-case basis. (Changing the value for one part will not affect subsequent parts.)
  */
-suspend fun Multipart.forEachPart(autoClose: Boolean = true, block: suspend MultipartScope.(Multipart.Part) -> Unit) {
+suspend fun Multipart.forEachPart(autoRelease: Boolean = true, block: suspend MultipartScope.(Multipart.Part) -> Unit) {
     while (true) {
         val part = readNextPart() ?: break
-        val scope = MultipartScope(autoClose)
+        val scope = MultipartScope(autoRelease)
         try {
             scope.block(part)
         } finally {
-            if (scope.autoClose) {
-                part.close()
+            if (scope.autoRelease) {
+                part.release()
             }
         }
     }

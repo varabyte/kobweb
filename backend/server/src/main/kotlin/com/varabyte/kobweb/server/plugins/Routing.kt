@@ -205,8 +205,8 @@ private fun PartData.toKobwebPart(): Multipart.Part = object : Multipart.Part {
         else -> null
     }
 
-    override fun close() {
-        partData.dispose()
+    override suspend fun release() {
+        partData.release()
     }
 
     @Suppress("OPT_IN_OVERRIDE")
