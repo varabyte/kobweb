@@ -64,7 +64,7 @@ abstract class FetchIconsTask : DefaultTask() {
             .replace("\r", "\\r")
             .replace("\t", "\\t")
 
-        println("Fetching icons for version $lucideVersion...")
+        logger.lifecycle("Fetching icons for version $lucideVersion...")
 
         val iconSvgElements = mutableMapOf<String, List<Pair<String, Map<String, String>>>>()
         val deprecatedIcons = mutableMapOf<String, String>()
@@ -149,7 +149,7 @@ abstract class FetchIconsTask : DefaultTask() {
 
             writer.write("}\n")
         }
-        println("Written ${iconSvgElements.size} icons to ${iconsFile.name}")
+        logger.lifecycle("Written ${iconSvgElements.size} icons to ${iconsFile.name}")
     }
 }
 
@@ -460,7 +460,7 @@ abstract class GenerateIconsTask : DefaultTask() {
             file.writeText(fileContent)
         }
 
-        println("Generated ${activeIcons.size} icon files + ${deprecatedIcons.size} deprecated aliases")
+        logger.info("Generated ${activeIcons.size} icon files + ${deprecatedIcons.size} deprecated aliases")
     }
 }
 

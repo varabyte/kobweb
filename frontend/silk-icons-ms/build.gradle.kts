@@ -46,7 +46,7 @@ abstract class FetchIconsTask : DefaultTask() {
 
             for ((prefix, family) in families) {
                 val url = "$urlBase/$family$MS_AXIS_SUFFIX.codepoints"
-                println("Fetching $url")
+                logger.lifecycle("Fetching $url")
                 val connection = URI(url).toURL().openConnection()
                 connection.setRequestProperty("User-Agent", "kobweb-silk-icons-ms-generator")
                 val text = connection.getInputStream().use { it.readBytes().decodeToString() }
@@ -60,7 +60,7 @@ abstract class FetchIconsTask : DefaultTask() {
                 writer.appendLine("$prefix=${names.joinToString(",")}")
             }
         }
-        println("Wrote ${iconsFile.absolutePath}")
+        logger.lifecycle("Wrote ${iconsFile.absolutePath}")
     }
 }
 
@@ -226,6 +226,8 @@ abstract class GenerateIconsTask : DefaultTask() {
                 appendText(iconCode)
             }
         }
+
+        logger.info("Generated ${iconMethodEntries.size} icon files")
     }
 }
 val generateIconsTask = tasks.register<GenerateIconsTask>("generateIcons") {

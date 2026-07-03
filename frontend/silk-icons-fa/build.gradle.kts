@@ -194,6 +194,8 @@ abstract class GenerateIconsTask : DefaultTask() {
                 appendText(iconCode)
             }
         }
+
+        logger.info("Generated ${iconMethodEntries.size} icon files")
     }
 }
 val generateIconsTask = tasks.register<GenerateIconsTask>("generateIcons") {
