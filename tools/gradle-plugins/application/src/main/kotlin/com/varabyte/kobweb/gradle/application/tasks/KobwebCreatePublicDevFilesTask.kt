@@ -33,14 +33,15 @@ abstract class KobwebCreatePublicDevFilesTask @Inject constructor(
 
     @TaskAction
     fun execute() {
-        getDevFilesRoot().mkdirs()
+        val devFilesRoot = getDevFilesRoot()
+        devFilesRoot.mkdirs()
 
         // Create a list of known static routes, so dev servers running in static layout mode can reject requests to
         // dynamic routes.
         run {
             val routes = Json.decodeFromString<AppFrontendData>(appDataFile.get().asFile.readText())
                 .routes(excludeDynamicRoutes = true)
-            val routesFile = getDevFilesRoot().resolve("static-routes.txt")
+            val routesFile = devFilesRoot.resolve("static-routes.txt")
             routesFile.createNewFile()
             routesFile.writeText(routes.joinToString("\n"))
         }
