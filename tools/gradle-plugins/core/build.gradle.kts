@@ -42,9 +42,8 @@ gradlePlugin {
     }
 }
 
-// Make the version available to the plugin code, so that it can be used to determine the version of the ksp processor
-// dependency to add to the project
-val generateVersionProperties by tasks.registering {
+val generateVersionProperties = tasks.register("generateVersionProperties") {
+    description = "Makes the Kobweb version available to the plugin code, so that plugin tasks can use it."
     val projectVersion = version.toString() // store outside of task action for configuration cache compatibility
     val generatedVersionDir = layout.buildDirectory.dir("generated-version")
     inputs.property("projectVersion", projectVersion)

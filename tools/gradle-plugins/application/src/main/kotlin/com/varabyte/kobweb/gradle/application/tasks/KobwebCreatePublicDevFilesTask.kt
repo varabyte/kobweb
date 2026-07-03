@@ -9,7 +9,10 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import javax.inject.Inject
 
 /**
@@ -17,10 +20,12 @@ import javax.inject.Inject
  *
  * These files will be excluded during export, so they will never get exposed to a prod server.
  */
+@DisableCachingByDefault(because = "Trivial output, not worth caching.")
 abstract class KobwebCreatePublicDevFilesTask @Inject constructor(
     private val appBlock: AppBlock,
 ) : KobwebTask("Create dev-only files and put them in the `public` folder so a dev server can see them.") {
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val appDataFile: RegularFileProperty
 
     @get:Input

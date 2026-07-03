@@ -9,7 +9,10 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.UntrackedTask
 
 private fun List<PageEntry>.routes(excludeDynamicRoutes: Boolean): List<String> = this
     .asSequence()
@@ -33,8 +36,10 @@ fun AppFrontendData.routes(excludeDynamicRoutes: Boolean): List<String> =
  * }
  * ```
  */
+@UntrackedTask(because = "This task just generates logging output meant for a user to read in the terminal.")
 abstract class KobwebListRoutesTask : KobwebTask("Enumerate all routes for your site managed by Kobweb, printing them out to the console") {
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val appDataFile: RegularFileProperty
 
     @get:Input

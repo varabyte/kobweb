@@ -3,11 +3,12 @@ package com.varabyte.kobweb.gradle.worker.tasks
 import com.varabyte.kobweb.gradle.core.metadata.WorkerMetadata
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_WORKER
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 
+@DisableCachingByDefault(because = "Trivial output, not worth caching.")
 abstract class KobwebGenerateWorkerMetadataTask :
     KobwebTask("Generate a worker.json metadata file into this project's jar metadata, which identifies this artifact as a Kobweb worker.") {
 

@@ -5,15 +5,17 @@ import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
 import com.varabyte.kobweb.project.frontend.AppFrontendData
 import com.varabyte.kobweb.project.frontend.FrontendData
 import com.varabyte.kobweb.project.frontend.merge
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
 // NOTE: This task in meant as an internal API so it does not inherit from KobwebTask
@@ -32,6 +34,7 @@ import org.gradle.api.tasks.TaskAction
  *
  * // Inside the task
  * @get:InputFile
+ * @get:PathSensitive(PathSensitivity.NONE)
  * abstract val appDataFile: RegularFileProperty
  *
  * @TaskAction
@@ -41,6 +44,7 @@ import org.gradle.api.tasks.TaskAction
  * }
  * ```
  */
+@CacheableTask
 abstract class KobwebCacheAppFrontendDataTask : DefaultTask() {
     init {
         description =
@@ -48,9 +52,13 @@ abstract class KobwebCacheAppFrontendDataTask : DefaultTask() {
     }
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val appFrontendMetadataFile: RegularFileProperty
 
+    // We intentionally don't use @CompileClasspath, we just want to know if things have changed at all as a signal to
+    // search all jars.
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val compileClasspath: ConfigurableFileCollection
 
     @get:OutputFile

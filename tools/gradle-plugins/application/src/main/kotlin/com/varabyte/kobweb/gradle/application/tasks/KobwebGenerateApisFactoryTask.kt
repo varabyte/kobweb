@@ -7,13 +7,18 @@ import kotlinx.serialization.json.Json
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import javax.inject.Inject
 
+@DisableCachingByDefault(because = "Trivial output, not worth caching.")
 abstract class KobwebGenerateApisFactoryTask @Inject constructor(private val appBlock: AppBlock) :
     KobwebGenerateTask("Generate Kobweb code for the server") {
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val appDataFile: RegularFileProperty
 
     @OutputDirectory // needs to be dir to be registered as a kotlin srcDir

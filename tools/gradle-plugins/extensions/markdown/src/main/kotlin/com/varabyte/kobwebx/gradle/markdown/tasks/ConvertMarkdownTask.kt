@@ -15,6 +15,7 @@ import com.varabyte.kobwebx.gradle.markdown.util.visitFiles
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
@@ -28,6 +29,7 @@ import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.relativeTo
 
+@CacheableTask
 abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBlock) :
     MarkdownTask(
         markdownBlock,

@@ -6,13 +6,18 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.util.PatternSet
+import org.gradle.work.DisableCachingByDefault
 import javax.inject.Inject
 
+@DisableCachingByDefault(because = "This is just a copy task (and caching the files would not avoid the copy).")
 abstract class KobwebCopySupplementalResourcesTask @Inject constructor(
     private val appBlock: AppBlock,
-    @get:InputFile val indexFile: Provider<RegularFile>,
+    @get:InputFile @get:PathSensitive(PathSensitivity.NONE)
+    val indexFile: Provider<RegularFile>,
 ) : KobwebCopyTask("Copy and make available index.html & all public/ resources from any libraries to the final site") {
     @OutputDirectory
     fun getGenResDir() = appBlock.getGenJsResRoot("supplemental")

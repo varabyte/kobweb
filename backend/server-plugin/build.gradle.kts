@@ -6,7 +6,7 @@ plugins {
 group = "com.varabyte.kobweb"
 version = libs.versions.kobweb.get()
 
-val compileOnlyApi: Configuration by configurations.creating
+val compileOnlyApi: Configuration = configurations.create("compileOnlyApi")
 configurations["compileClasspath"].extendsFrom(compileOnlyApi)
 configurations["apiElements"].extendsFrom(compileOnlyApi)
 

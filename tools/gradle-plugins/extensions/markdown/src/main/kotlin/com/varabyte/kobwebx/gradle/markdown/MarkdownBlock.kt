@@ -13,6 +13,8 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.newInstance
@@ -30,6 +32,7 @@ abstract class MarkdownFolder {
      * A collection of one (or more) directories that should contain markdown files.
      */
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     val files = roots.asFileTree.matching { include("**/*.md") }
 
     /**
