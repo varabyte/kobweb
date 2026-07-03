@@ -1,5 +1,3 @@
-import kotlin.sequences.groupBy
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     id("kobweb-compose")
@@ -9,25 +7,25 @@ plugins {
 group = "com.varabyte.kobwebx"
 version = libs.versions.kobweb.get()
 
-private val GENERATED_SRC_ROOT = "build/generated/icons/src/jsMain/kotlin"
-
 enum class IconCategory {
     SOLID,
     REGULAR,
     BRAND,
 }
 
-val generateIconsTask = tasks.register("generateIcons") {
-    val srcFile = layout.projectDirectory.file("fa-icon-list.txt")
-    val dstDir =
-        layout.projectDirectory.dir("$GENERATED_SRC_ROOT/com/varabyte/kobweb/silk/components/icons/fa")
+@CacheableTask
+abstract class GenerateIconsTask : DefaultTask() {
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val srcFile: RegularFileProperty
 
-    inputs.files(srcFile)
-    outputs.dir(GENERATED_SRC_ROOT)
+    @get:OutputDirectory
+    abstract val genSrcRoot: DirectoryProperty
 
-    doLast {
+    @TaskAction
+    fun generate() {
         // {SOLID=[ad, address-book, address-card, ...], REGULAR=[address-book, address-card, angry, ...], ... }
-        val iconRawNames = srcFile.asFile
+        val iconRawNames = srcFile.get().asFile
             .readLines().asSequence()
             .filter { line -> !line.startsWith("#") }
             .associate { line ->
@@ -124,9 +122,10 @@ val generateIconsTask = tasks.register("generateIcons") {
             |
             """.trimMargin()
 
-        dstDir.asFile.mkdirs()
+        val dstDir = genSrcRoot.dir("com/varabyte/kobweb/silk/components/icons/fa").get().asFile
+        dstDir.mkdirs()
 
-        with(dstDir.file("_FaIcon.kt").asFile) {
+        with(dstDir.resolve("_FaIcon.kt")) {
             writeText(iconsHeader)
             appendText(
                 $$"""
@@ -189,13 +188,19 @@ val generateIconsTask = tasks.register("generateIcons") {
         }
 
         iconMethodEntries.forEach { (methodName, iconCode) ->
-            with(dstDir.file("$methodName.kt").asFile) {
+            with(dstDir.resolve("$methodName.kt")) {
                 writeText(iconsHeader)
                 appendText("\n")
                 appendText(iconCode)
             }
         }
     }
+}
+val generateIconsTask = tasks.register<GenerateIconsTask>("generateIcons") {
+    group = "Icon"
+    description = "Generate Kotlin bindings for Font Awesome icons."
+    srcFile.set(layout.projectDirectory.file("fa-icon-list.txt"))
+    genSrcRoot.set(layout.projectDirectory.dir("build/generated/icons/src/jsMain/kotlin"))
 }
 
 kotlin {
