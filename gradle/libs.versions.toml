@@ -1,7 +1,7 @@
 [versions]
 kobweb = "0.25.0-SNAPSHOT"
 #------------------------
-commonmark = "0.25.0"
+commonmark = "0.29.0"
 compose-runtime = "1.11.2"
 compose-html = "1.11.1"
 dokka = "2.1.0"
