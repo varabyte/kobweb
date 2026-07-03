@@ -27,12 +27,15 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.util.prefixIfNot
 import org.jsoup.Jsoup
@@ -54,6 +57,7 @@ class KobwebGenIndexConfInputs(
     )
 }
 
+@CacheableTask
 abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     private val appBlock: AppBlock,
     @get:Nested val confInputs: KobwebGenIndexConfInputs,
@@ -68,7 +72,10 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:Input
     abstract val publicPath: Property<String>
 
+    // Intentionally don't use @CompileClasspath, we just want to know if things have changed at all as a signal to
+    // search all jars.
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val compileClasspath: ConfigurableFileCollection
 
     @get:Internal

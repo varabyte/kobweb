@@ -43,12 +43,11 @@ gradlePlugin {
     }
 }
 
-val serverJar by configurations.registering {
+val serverJar = configurations.register("serverJar") {
     isCanBeConsumed = false
     isTransitive = false
 }
 dependencies {
-    @Suppress("UnstableApiUsage")
     serverJar(project(projects.backend.server.path, configuration = "shadow"))
 }
 
@@ -56,7 +55,8 @@ dependencies {
  * Embed a copy of the latest Kobweb server, naming it server.jar and putting it into the project's resources/ dir, so
  * we can run it from the plugin at runtime.
  */
-val copyServerJar by tasks.registering(Sync::class) {
+val copyServerJar = tasks.register<Sync>("copyServerJar") {
+    description = "Copy the built Kobweb server into a final location where it can be run from."
     from(serverJar)
     into(layout.buildDirectory.dir("generated/kobweb/server"))
     rename("server-${libs.versions.kobweb.get()}-all.jar", "server.jar")

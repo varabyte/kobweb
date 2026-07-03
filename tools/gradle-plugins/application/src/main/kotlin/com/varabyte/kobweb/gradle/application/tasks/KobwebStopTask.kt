@@ -6,6 +6,7 @@ import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
 import com.varabyte.kobweb.server.api.ServerStateFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.UntrackedTask
 import java.nio.file.Files
 import java.time.Duration
 
@@ -16,6 +17,7 @@ private val STOP_TIMEOUT_MS = Duration.ofSeconds(10).toMillis()
  *
  * This task will block until it can confirm the server is no longer running.
  */
+@UntrackedTask(because = "Task stops a server / does not create output meant to be consumed by Gradle.")
 abstract class KobwebStopTask : KobwebTask("Stop a Kobweb server if one is running") {
     @TaskAction
     fun execute() {

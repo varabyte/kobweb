@@ -6,6 +6,7 @@ import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * A task for generating an ID that can be used for naming a cache bucket on a CI.
@@ -14,6 +15,7 @@ import org.gradle.api.tasks.TaskAction
  *
  * You can use this value, for example, when [creating a cache key](https://github.com/actions/cache#creating-a-cache-key).
  */
+@DisableCachingByDefault(because = "Trivial output, not worth caching.")
 abstract class KobwebBrowserCacheIdTask : KobwebTask("Export the Kobweb project into a static site") {
     @get:Input
     abstract val browser: Property<Browser>

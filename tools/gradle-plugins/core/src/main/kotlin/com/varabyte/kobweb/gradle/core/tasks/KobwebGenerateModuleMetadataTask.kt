@@ -8,7 +8,9 @@ import kotlinx.serialization.json.Json
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 
+@DisableCachingByDefault(because = "Trivial output, not worth caching.")
 abstract class KobwebGenerateModuleMetadataTask :
     KobwebTask("Generate a module.json metadata file into this project's jar metadata, which identifies this artifact as one built by Kobweb.") {
     @Input

@@ -10,10 +10,12 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * A simple task for creating scripts which can be used to run the Kobweb server in production mode.
  */
+@DisableCachingByDefault(because = "Trivial output, not worth caching.")
 abstract class KobwebCreateServerScriptsTask :
     KobwebTask("Create scripts which can be used to start the Kobweb server in production mode") {
     @get:Input

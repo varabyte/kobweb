@@ -8,11 +8,13 @@ import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.util.PatternSet
+import org.gradle.work.DisableCachingByDefault
 import javax.inject.Inject
 
 /**
  * Copy JS output which is automatically packaged into metadata by the Kobweb worker plugin.
  */
+@DisableCachingByDefault(because = "This is just a copy task (and caching the files would not avoid the copy).")
 abstract class KobwebCopyWorkerJsOutputTask @Inject constructor(private val appBlock: AppBlock) : KobwebCopyTask(
     "Copy any JS output files from any Kobweb worker dependencies and copy them to the final site's resources"
 ) {

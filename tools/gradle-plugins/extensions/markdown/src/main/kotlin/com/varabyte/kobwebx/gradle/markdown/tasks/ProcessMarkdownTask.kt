@@ -12,6 +12,7 @@ import com.varabyte.kobwebx.gradle.markdown.util.visitFiles
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.CustomBlock
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
@@ -32,6 +33,7 @@ private class MarkdownVisitor : AbstractVisitor() {
     }
 }
 
+@CacheableTask
 abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBlock) :
     MarkdownTask(
         markdownBlock,

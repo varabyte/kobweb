@@ -16,7 +16,10 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.UntrackedTask
 import javax.inject.Inject
 
 /**
@@ -28,6 +31,7 @@ import javax.inject.Inject
  *
  * @param reuseServer If a server is already running, re-use it if possible.
  */
+@UntrackedTask(because = "Task runs a server / does not create output meant to be consumed by Gradle.")
 abstract class KobwebStartTask @Inject constructor(
     private val remoteDebuggingBlock: AppBlock.ServerBlock.RemoteDebuggingBlock,
     private val env: ServerEnvironment,
@@ -44,15 +48,18 @@ abstract class KobwebStartTask @Inject constructor(
      */
     @Suppress("unused") // Value is not used, but @InputFiles does affect Gradle behavior
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val watchFiles: ConfigurableFileCollection
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.ABSOLUTE) // serverJar.absolutePath is used in output
     abstract val serverJar: RegularFileProperty
 
     // This is not directly used by the task, but is used by the server which this task starts, so we configure the
     // directory as an input so that gradle handles task dependencies correctly.
     // Note: we don't use @InputDirectory as it doesn't support optional directories (https://github.com/gradle/gradle/issues/2016)
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val serverPluginsDir: DirectoryProperty
 
     @TaskAction

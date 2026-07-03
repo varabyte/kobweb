@@ -6,9 +6,12 @@ import com.varabyte.kobweb.project.frontend.AppFrontendData
 import kotlinx.serialization.json.Json
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
@@ -17,10 +20,14 @@ import javax.inject.Inject
  *
  * These files will be excluded during export, so they will never get exposed to a prod server.
  */
+// CacheableTask here is potentially overkill, but we avoid pulling routes out of appDataFile, and we may add more dev
+// files later. May later switch to: @DisableCachingByDefault(because = "Trivial output, not worth caching.")
+@CacheableTask
 abstract class KobwebCreatePublicDevFilesTask @Inject constructor(
     private val appBlock: AppBlock,
 ) : KobwebTask("Create dev-only files and put them in the `public` folder so a dev server can see them.") {
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val appDataFile: RegularFileProperty
 
     @get:Input

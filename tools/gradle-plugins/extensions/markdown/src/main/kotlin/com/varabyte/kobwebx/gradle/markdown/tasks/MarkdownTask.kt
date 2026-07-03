@@ -14,6 +14,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 import java.nio.file.Path
 import javax.inject.Inject
@@ -21,6 +22,7 @@ import kotlin.io.path.Path
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.relativeTo
 
+@DisableCachingByDefault(because = "Base task; up to children to decide caching strategy for themselves.")
 abstract class MarkdownTask @Inject constructor(
     @get:Internal protected val markdownBlock: MarkdownBlock,
     desc: String

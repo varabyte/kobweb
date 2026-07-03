@@ -5,6 +5,7 @@ import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.security.MessageDigest
 import java.util.*
 
@@ -19,6 +20,7 @@ import java.util.*
  * 2. This allows the .kobweb folder to be self-contained, which can be very useful for people who want to deploy their
  *    Kobweb site on some external hosting service.
  */
+@DisableCachingByDefault(because = "Trivial output, not worth caching.")
 abstract class KobwebUnpackServerJarTask :
     KobwebTask("Extract a server.jar resource from the Gradle plugin and move it into the .kobweb folder") {
     private val serverJarResource = javaClass.getResourceAsStream("/server.jar")!!.readAllBytes()

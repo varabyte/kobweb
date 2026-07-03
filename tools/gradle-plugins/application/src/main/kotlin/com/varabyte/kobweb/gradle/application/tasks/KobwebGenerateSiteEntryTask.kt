@@ -14,11 +14,14 @@ import org.gradle.api.artifacts.result.ResolvedDependencyResult
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
@@ -33,6 +36,7 @@ class KobwebGenSiteEntryConfInputs(
     constructor(kobwebConf: KobwebConf) : this(kobwebConf.server.redirects.map { Redirect(it.from, it.to) })
 }
 
+@CacheableTask
 abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     private val appBlock: AppBlock,
     @get:Input val basePath: String,
@@ -46,6 +50,7 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     val globals: Provider<Map<String, String>> = appBlock.globals
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val appDataFile: RegularFileProperty
 
     @get:Internal

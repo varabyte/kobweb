@@ -27,7 +27,10 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.UntrackedTask
 import org.jsoup.Jsoup
 import java.io.File
 import javax.inject.Inject
@@ -51,23 +54,27 @@ class KobwebExportConfInputs(
     )
 }
 
+@UntrackedTask(because = "Task runs a server / does not create output meant to be consumed by Gradle.")
 abstract class KobwebExportTask @Inject constructor(
     private val exportBlock: AppBlock.ExportBlock,
     @get:Nested val confInputs: KobwebExportConfInputs,
     @get:Input val siteLayout: Provider<SiteLayout>,
 ) : KobwebTask("Export the Kobweb project into a static site") {
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val appFrontendDataFile: RegularFileProperty
 
     // NOTE: Will be null if no JVM target is declared
     @get:Optional
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val appBackendDataFile: RegularFileProperty
 
     @get:Input
     abstract val publicPath: Property<String>
 
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val publicResources: ConfigurableFileCollection
 
     @OutputDirectory

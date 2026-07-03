@@ -7,11 +7,13 @@ import org.gradle.api.file.Directory
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Internal
+import org.gradle.work.DisableCachingByDefault
 import javax.inject.Inject
 
 /**
  * Minimal base class for ensuring that the current task is grouped consistently with other Kobweb tasks.
  */
+@DisableCachingByDefault(because = "Base task; up to children to decide caching strategy for themselves.")
 abstract class KobwebTask @Inject constructor(desc: String) : DefaultTask() {
     @get:Inject
     abstract val projectLayout: ProjectLayout
