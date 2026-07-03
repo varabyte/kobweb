@@ -11,9 +11,147 @@ plugins {
 group = "com.varabyte.kobwebx"
 version = libs.versions.kobweb.get()
 
-val GENERATED_JSON_FILE = "lucide-icons.json"
-val LUCIDE_REPO_BASE = "https://github.com/lucide-icons/lucide"
-val LUCIDE_VERSION = "1.22.0"
+val ICONS_JSON_FILE_NAME = "lucide-icons.json"
+
+@CacheableTask
+abstract class FetchIconsTask : DefaultTask() {
+    @get:Input
+    abstract val lucideRepoBase: Property<String>
+
+    @get:Input
+    abstract val lucideVersion: Property<String>
+
+    @get:OutputFile
+    abstract val iconsFile: RegularFileProperty
+
+    @TaskAction
+    fun generateLucideIcons() {
+        val lucideRepoBase = lucideRepoBase.get()
+        val lucideVersion = lucideVersion.get()
+        val iconsFile = iconsFile.get().asFile
+
+        fun parseSvgElements(svgContent: String): List<Pair<String, Map<String, String>>> {
+            val factory = DocumentBuilderFactory.newInstance()
+            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false)
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+            val builder = factory.newDocumentBuilder()
+            val doc = builder.parse(svgContent.byteInputStream())
+            val svgRoot = doc.documentElement
+
+            val elements = mutableListOf<Pair<String, Map<String, String>>>()
+            val children = svgRoot.childNodes
+            for (i in 0 until children.length) {
+                val node = children.item(i)
+                if (node is org.w3c.dom.Element) {
+                    val tag = node.tagName
+                    val attrs = mutableMapOf<String, String>()
+                    val attrNodes = node.attributes
+                    for (j in 0 until attrNodes.length) {
+                        val attr = attrNodes.item(j)
+                        attrs[attr.nodeName] = attr.nodeValue
+                    }
+                    elements.add(tag to attrs)
+                }
+            }
+            return elements
+        }
+
+        fun jsonEscape(s: String): String = s
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\n", "\\n")
+            .replace("\r", "\\r")
+            .replace("\t", "\\t")
+
+        println("Fetching icons for version $lucideVersion...")
+
+        val iconSvgElements = mutableMapOf<String, List<Pair<String, Map<String, String>>>>()
+        val deprecatedIcons = mutableMapOf<String, String>()
+
+        val zipUrl = "${lucideRepoBase}/archive/refs/tags/$lucideVersion.zip"
+        val connection = URI(zipUrl).toURL().openConnection()
+        connection.setRequestProperty("User-Agent", "kobweb-silk-icons-lucide-generator")
+
+        val svgContents = mutableMapOf<String, String>()
+        val jsonContents = mutableMapOf<String, String>()
+
+        ZipInputStream(connection.getInputStream()).use { zis ->
+            while (true) {
+                val entry = zis.nextEntry ?: break
+                if (entry.isDirectory) continue
+
+                if (entry.name.contains("/icons/") && entry.name.endsWith(".svg")) {
+                    val iconName = entry.name.substringAfterLast("/").removeSuffix(".svg")
+                    svgContents[iconName] = zis.readBytes().decodeToString()
+                } else if (entry.name.contains("/icons/") && entry.name.endsWith(".json")) {
+                    val iconName = entry.name.substringAfterLast("/").removeSuffix(".json")
+                    jsonContents[iconName] = zis.readBytes().decodeToString()
+                }
+            }
+        }
+
+        for ((iconName, svgContent) in svgContents) {
+            iconSvgElements[iconName] = parseSvgElements(svgContent)
+        }
+
+        for ((iconName, content) in jsonContents) {
+            val aliasesBlock = "\"aliases\"\\s*:\\s*\\[(.*?)\\]".toRegex(RegexOption.DOT_MATCHES_ALL)
+                .find(content)?.groupValues?.get(1)
+            if (aliasesBlock != null) {
+                val aliasObjects = "\\{(.*?)\\}".toRegex(RegexOption.DOT_MATCHES_ALL).findAll(aliasesBlock)
+                for (aliasObj in aliasObjects) {
+                    val objContent = aliasObj.groupValues[1]
+                    val nameMatch = "\"name\"\\s*:\\s*\"([^\"]+)\"".toRegex().find(objContent)
+                    val isDeprecated = "\"deprecated\"\\s*:\\s*true".toRegex().containsMatchIn(objContent)
+                    if (nameMatch != null && isDeprecated) {
+                        deprecatedIcons[nameMatch.groupValues[1]] = iconName
+                    }
+                }
+            }
+        }
+
+        iconsFile.bufferedWriter().use { writer ->
+            writer.write("{\n")
+            writer.write("  \"version\": \"$lucideVersion\",\n")
+
+            writer.write("  \"icons\": {\n")
+            val sortedIcons = iconSvgElements.keys.sorted()
+            sortedIcons.forEachIndexed { index, iconName ->
+                val elements = iconSvgElements[iconName]!!
+                writer.write("    \"${jsonEscape(iconName)}\": [")
+                elements.forEachIndexed { elemIndex, (tag, attributes) ->
+                    writer.write("{\"tag\":\"${jsonEscape(tag)}\"")
+                    if (attributes.isNotEmpty()) {
+                        writer.write(",\"attrs\":{")
+                        attributes.entries.forEachIndexed { attrIndex, (key, value) ->
+                            writer.write("\"${jsonEscape(key)}\":\"${jsonEscape(value)}\"")
+                            if (attrIndex < attributes.size - 1) writer.write(",")
+                        }
+                        writer.write("}")
+                    }
+                    writer.write("}")
+                    if (elemIndex < elements.size - 1) writer.write(",")
+                }
+                writer.write("]")
+                if (index < sortedIcons.size - 1) writer.write(",")
+                writer.write("\n")
+            }
+            writer.write("  },\n")
+
+            writer.write("  \"deprecated\": {")
+            val sortedDeprecated = deprecatedIcons.keys.sorted()
+            sortedDeprecated.forEachIndexed { index, deprecatedName ->
+                writer.write("\"${jsonEscape(deprecatedName)}\":\"${jsonEscape(deprecatedIcons[deprecatedName]!!)}\"")
+                if (index < sortedDeprecated.size - 1) writer.write(",")
+            }
+            writer.write("}\n")
+
+            writer.write("}\n")
+        }
+        println("Written ${iconSvgElements.size} icons to ${iconsFile.name}")
+    }
+}
 
 // Reads `lucide-icons.json` (generated by fetchLucideIcons) and produces one Kotlin file per icon.
 //
@@ -36,15 +174,14 @@ val LUCIDE_VERSION = "1.22.0"
 //           Path { d("m12 5 7 7-7 7") }
 //       }
 //   }
+@CacheableTask
 abstract class GenerateIconsTask : DefaultTask() {
     @get:InputFile
-    abstract val inputJsonFile: RegularFileProperty
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val iconsFile: RegularFileProperty
 
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
-
-    @get:Input
-    abstract val generatedJsonFileName: Property<String>
 
     // Represents parsed SVG element data, separating parsing from code generation
     sealed class ElementInfo(val tag: String) {
@@ -132,7 +269,7 @@ abstract class GenerateIconsTask : DefaultTask() {
             }
         }
 
-        val generatedJsonFile = generatedJsonFileName.get()
+        val generatedJsonFile = iconsFile.asFile.get().name
 
         // Clean up previously generated files to avoid stale output
         val outDir = outputDir.get().asFile
@@ -141,7 +278,7 @@ abstract class GenerateIconsTask : DefaultTask() {
             packageDir.deleteRecursively()
         }
 
-        val jsonText = inputJsonFile.get().asFile.readText()
+        val jsonText = iconsFile.get().asFile.readText()
 
         // All regex patterns are collected here for easier reasoning.
         // Note: we use simple regexes because lucide-icons.json is machine-generated by
@@ -327,139 +464,21 @@ abstract class GenerateIconsTask : DefaultTask() {
     }
 }
 
-val fetchLucideIconsTask = tasks.register("fetchLucideIcons") {
-    val outputFile = layout.projectDirectory.file(GENERATED_JSON_FILE)
-    val lucideVersion = LUCIDE_VERSION
-    val lucideRepoBase = LUCIDE_REPO_BASE
+val fetchLucideIconsTask = tasks.register<FetchIconsTask>("fetchIcons") {
+    group = "Icon"
+    description = "Download information that lets us create lucide-icons.json, which is used to generate icons."
 
-    doLast {
-        fun parseSvgElements(svgContent: String): List<Pair<String, Map<String, String>>> {
-            val factory = DocumentBuilderFactory.newInstance()
-            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false)
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
-            val builder = factory.newDocumentBuilder()
-            val doc = builder.parse(svgContent.byteInputStream())
-            val svgRoot = doc.documentElement
-
-            val elements = mutableListOf<Pair<String, Map<String, String>>>()
-            val children = svgRoot.childNodes
-            for (i in 0 until children.length) {
-                val node = children.item(i)
-                if (node is org.w3c.dom.Element) {
-                    val tag = node.tagName
-                    val attrs = mutableMapOf<String, String>()
-                    val attrNodes = node.attributes
-                    for (j in 0 until attrNodes.length) {
-                        val attr = attrNodes.item(j)
-                        attrs[attr.nodeName] = attr.nodeValue
-                    }
-                    elements.add(tag to attrs)
-                }
-            }
-            return elements
-        }
-
-        fun jsonEscape(s: String): String = s
-            .replace("\\", "\\\\")
-            .replace("\"", "\\\"")
-            .replace("\n", "\\n")
-            .replace("\r", "\\r")
-            .replace("\t", "\\t")
-
-        println("Fetching icons for version $lucideVersion...")
-
-        val iconSvgElements = mutableMapOf<String, List<Pair<String, Map<String, String>>>>()
-        val deprecatedIcons = mutableMapOf<String, String>()
-
-        val zipUrl = "${lucideRepoBase}/archive/refs/tags/$lucideVersion.zip"
-        val connection = URI(zipUrl).toURL().openConnection()
-        connection.setRequestProperty("User-Agent", "kobweb-silk-icons-lucide-generator")
-
-        val svgContents = mutableMapOf<String, String>()
-        val jsonContents = mutableMapOf<String, String>()
-
-        ZipInputStream(connection.getInputStream()).use { zis ->
-            while (true) {
-                val entry = zis.nextEntry ?: break
-                if (entry.isDirectory) continue
-
-                if (entry.name.contains("/icons/") && entry.name.endsWith(".svg")) {
-                    val iconName = entry.name.substringAfterLast("/").removeSuffix(".svg")
-                    svgContents[iconName] = zis.readBytes().decodeToString()
-                } else if (entry.name.contains("/icons/") && entry.name.endsWith(".json")) {
-                    val iconName = entry.name.substringAfterLast("/").removeSuffix(".json")
-                    jsonContents[iconName] = zis.readBytes().decodeToString()
-                }
-            }
-        }
-
-        for ((iconName, svgContent) in svgContents) {
-            iconSvgElements[iconName] = parseSvgElements(svgContent)
-        }
-
-        for ((iconName, content) in jsonContents) {
-            val aliasesBlock = "\"aliases\"\\s*:\\s*\\[(.*?)\\]".toRegex(RegexOption.DOT_MATCHES_ALL)
-                .find(content)?.groupValues?.get(1)
-            if (aliasesBlock != null) {
-                val aliasObjects = "\\{(.*?)\\}".toRegex(RegexOption.DOT_MATCHES_ALL).findAll(aliasesBlock)
-                for (aliasObj in aliasObjects) {
-                    val objContent = aliasObj.groupValues[1]
-                    val nameMatch = "\"name\"\\s*:\\s*\"([^\"]+)\"".toRegex().find(objContent)
-                    val isDeprecated = "\"deprecated\"\\s*:\\s*true".toRegex().containsMatchIn(objContent)
-                    if (nameMatch != null && isDeprecated) {
-                        deprecatedIcons[nameMatch.groupValues[1]] = iconName
-                    }
-                }
-            }
-        }
-
-        outputFile.asFile.bufferedWriter().use { writer ->
-            writer.write("{\n")
-            writer.write("  \"version\": \"$lucideVersion\",\n")
-
-            writer.write("  \"icons\": {\n")
-            val sortedIcons = iconSvgElements.keys.sorted()
-            sortedIcons.forEachIndexed { index, iconName ->
-                val elements = iconSvgElements[iconName]!!
-                writer.write("    \"${jsonEscape(iconName)}\": [")
-                elements.forEachIndexed { elemIndex, (tag, attributes) ->
-                    writer.write("{\"tag\":\"${jsonEscape(tag)}\"")
-                    if (attributes.isNotEmpty()) {
-                        writer.write(",\"attrs\":{")
-                        attributes.entries.forEachIndexed { attrIndex, (key, value) ->
-                            writer.write("\"${jsonEscape(key)}\":\"${jsonEscape(value)}\"")
-                            if (attrIndex < attributes.size - 1) writer.write(",")
-                        }
-                        writer.write("}")
-                    }
-                    writer.write("}")
-                    if (elemIndex < elements.size - 1) writer.write(",")
-                }
-                writer.write("]")
-                if (index < sortedIcons.size - 1) writer.write(",")
-                writer.write("\n")
-            }
-            writer.write("  },\n")
-
-            writer.write("  \"deprecated\": {")
-            val sortedDeprecated = deprecatedIcons.keys.sorted()
-            sortedDeprecated.forEachIndexed { index, deprecatedName ->
-                writer.write("\"${jsonEscape(deprecatedName)}\":\"${jsonEscape(deprecatedIcons[deprecatedName]!!)}\"")
-                if (index < sortedDeprecated.size - 1) writer.write(",")
-            }
-            writer.write("}\n")
-
-            writer.write("}\n")
-        }
-        println("Written ${iconSvgElements.size} icons to ${outputFile.asFile.name}")
-    }
+    lucideRepoBase.set("https://github.com/lucide-icons/lucide")
+    lucideVersion.set("1.22.0")
+    iconsFile.set(layout.projectDirectory.file(ICONS_JSON_FILE_NAME))
 }
 
 val generateIconsTask = tasks.register<GenerateIconsTask>("generateIcons") {
-    inputJsonFile.set(layout.projectDirectory.file(GENERATED_JSON_FILE))
+    group = "Icon"
+    description = "Generate Kotlin bindings for Lucide icons."
+
+    iconsFile.set(layout.projectDirectory.file(ICONS_JSON_FILE_NAME))
     outputDir.set(layout.buildDirectory.dir("generated/icons/src/jsMain/kotlin"))
-    generatedJsonFileName.set(GENERATED_JSON_FILE)
 }
 
 kotlin {

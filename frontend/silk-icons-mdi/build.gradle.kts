@@ -7,8 +7,6 @@ plugins {
 group = "com.varabyte.kobwebx"
 version = libs.versions.kobweb.get()
 
-private val GENERATED_SRC_ROOT = "build/generated/icons/src/jsMain/kotlin"
-
 enum class IconStyle {
     FILLED,
     OUTLINED,
@@ -17,16 +15,18 @@ enum class IconStyle {
     TWO_TONED;
 }
 
-val generateIconsTask = tasks.register("generateIcons") {
-    val srcFile = layout.projectDirectory.file("md-icon-list.txt")
-    val dstDir =
-        layout.projectDirectory.dir("$GENERATED_SRC_ROOT/com/varabyte/kobweb/silk/components/icons/mdi")
+@CacheableTask
+abstract class GenerateIconsTask : DefaultTask() {
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val srcFile: RegularFileProperty
 
-    inputs.files(srcFile)
-    outputs.dir(GENERATED_SRC_ROOT)
+    @get:OutputDirectory
+    abstract val genSrcRoot: DirectoryProperty
 
-    doLast {
-        val iconRawNames = srcFile.asFile
+    @TaskAction
+    fun generate() {
+        val iconRawNames = srcFile.get().asFile
             .readLines()
             .asSequence()
             .filter { line -> !line.startsWith("#") }
@@ -118,9 +118,10 @@ val generateIconsTask = tasks.register("generateIcons") {
             |
             """.trimMargin()
 
-        dstDir.asFile.mkdirs()
+        val dstDir = genSrcRoot.dir("com/varabyte/kobweb/silk/components/icons/mdi").get().asFile
+        dstDir.mkdirs()
 
-        with(dstDir.file("_MdIcon.kt").asFile) {
+        with(dstDir.resolve("_MdIcon.kt")) {
             writeText(iconsHeader)
             appendText(
                 $$"""
@@ -170,13 +171,19 @@ val generateIconsTask = tasks.register("generateIcons") {
         }
 
         iconMethodEntries.forEach { (methodName, iconCode) ->
-            with(dstDir.file("$methodName.kt").asFile) {
+            with(dstDir.resolve("$methodName.kt")) {
                 writeText(iconsHeader)
                 appendText("\n")
                 appendText(iconCode)
             }
         }
     }
+}
+val generateIconsTask = tasks.register<GenerateIconsTask>("generateIcons") {
+    group = "Icon"
+    description = "Generate Kotlin bindings for Material Design Icons."
+    srcFile.set(layout.projectDirectory.file("md-icon-list.txt"))
+    genSrcRoot.set(layout.projectDirectory.dir("build/generated/icons/src/jsMain/kotlin"))
 }
 
 kotlin {
