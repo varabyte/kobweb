@@ -44,6 +44,7 @@ kobweb {
 }
 
 val generateTestMarkdownTask = tasks.register("generateTestMarkdown") {
+    description = "Generates dummy markdown to make sure that the `addSource` method on a task works."
     // $name here to create a unique output directory just for this task
     val genOutputDir = layout.buildDirectory.dir("generated/$name/src/jsMain/resources/markdown")
 
