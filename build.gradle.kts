@@ -71,7 +71,7 @@ subprojects {
             compilerOptions {
                 // Pin to the oldest supported language level to ensure compatibility with older Gradle versions.
                 // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-                val target = @Suppress("DEPRECATION") KotlinVersion.KOTLIN_1_9
+                val target = @Suppress("DEPRECATION") KotlinVersion.KOTLIN_2_0
                 languageVersion = target
                 apiVersion = target
                 // Suppress warning about deprecated language version

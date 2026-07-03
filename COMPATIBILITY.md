@@ -7,6 +7,7 @@ in sync to avoid unexpected issues.
 
 | Kobweb      | Compose                                                      | Kotlin |
 |-------------|--------------------------------------------------------------|--------|
+| 0.25.0+     | [1.11.1 (HTML),<br/>1.11.2 (Runtime)](#compose-dependencies) | 2.4.0  |
 | 0.24.0+     | [1.10.0 (HTML),<br/>1.10.2 (Runtime)](#compose-dependencies) | 2.3.10 |
 | 0.23.3+     | 1.8.0                                                        | 2.2.20 |
 | 0.23.1+     | 1.8.0                                                        | 2.2.10 |
