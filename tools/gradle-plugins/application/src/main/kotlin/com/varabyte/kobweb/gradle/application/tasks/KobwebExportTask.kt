@@ -238,12 +238,17 @@ abstract class KobwebExportTask @Inject constructor(
             ).use { playwright ->
                 val browserType = when (browser) {
                     KobwebBrowser.Chromium -> playwright.chromium()
+                    KobwebBrowser.Edge -> playwright.chromium()
                     KobwebBrowser.Firefox -> playwright.firefox()
                     KobwebBrowser.WebKit -> playwright.webkit()
                 }
                 val launchOptions = BrowserType.LaunchOptions().apply {
                     exportBlock.browserPath.orNull?.let { path ->
                         setExecutablePath(Path(path))
+                    } ?: run {
+                        if (browser == KobwebBrowser.Edge) {
+                            setChannel("msedge")
+                        }
                     }
                 }
                 browserType.launch(launchOptions).use { browser ->
