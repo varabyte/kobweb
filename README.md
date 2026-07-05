@@ -5,7 +5,7 @@
 [![compose-html: 1.11.1](https://img.shields.io/badge/compose_html-1.11.1-blue?logo=jetpackcompose)](COMPATIBILITY.md)
 [![compose-runtime: 1.11.2](https://img.shields.io/badge/compose_runtime-1.11.2-blue?logo=jetpackcompose)](COMPATIBILITY.md)
 <br>
-[![ktor: 3.5.0](https://img.shields.io/badge/ktor-3.5.0-blue)](https://ktor.io/)
+[![ktor: 3.5.0](https://img.shields.io/badge/ktor-3.5.0-blue?logo=ktor)](https://ktor.io/)
 <br>
 <a href="https://kobweb.varabyte.com/docs">
 ![User Guide docs](https://img.shields.io/badge/User_Guide-royalblue?logo=readthedocs)
