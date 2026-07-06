@@ -841,3 +841,62 @@ suspend inline fun <reified R> HttpFetcher.tryOptions(
     responseDeserializer: DeserializationStrategy<R> = serializer(),
 ): R? = tryOptions(resource, headers, redirect, abortController) { bodyAs(responseDeserializer) }
 
+/**
+ * A version of [query] that accepts a serializable body.
+ *
+ * Use [bodyAs] on the returned [Response] if you want to deserialize returned bytes, e.g.
+ * `query<RequestClass>(/*...*/).bodyAs<ReplyClass>()`.
+ */
+suspend inline fun <reified B> HttpFetcher.query(
+    resource: String,
+    body: B,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
+    redirect: RequestRedirect? = FetchDefaults.Redirect,
+    abortController: AbortController? = null,
+    bodySerializer: SerializationStrategy<B> = serializer(),
+): Response = query(resource, body.toRequestBody(bodySerializer), headers, redirect, abortController)
+
+/**
+ * A serialize-friendly version of [tryQuery] that accepts a serializable body and logic to convert the response to some
+ * desired target object of type [T].
+ *
+ * A [transform] callback is provided allowing you to convert the response into a different type.
+ * You are generally encouraged to call `tryQuery(...) { convert() }` over `tryQuery(...)?.convert()` as the former will
+ * ensure that exception handling is covered in that case.
+ *
+ * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console (including the
+ * logic in the [transform] block).
+ *
+ * If you do not care about converting the result to some arbitrary type, use the [tryQuery] version that returns
+ * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
+ * this version. Instead, via the [Response] version, use `tryQuery<RequestClass>().bodyAs<ReplyClass>()`
+ */
+suspend inline fun <reified B, T> HttpFetcher.tryQuery(
+    resource: String,
+    body: B,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
+    redirect: RequestRedirect? = FetchDefaults.Redirect,
+    abortController: AbortController? = null,
+    bodySerializer: SerializationStrategy<B> = serializer(),
+    noinline transform: suspend Response.() -> T
+): T? = tryQuery(resource, body.toRequestBody(bodySerializer), headers, redirect, abortController, transform)
+
+/**
+ * Like [query] but returns null instead of throwing if the request fails.
+ *
+ * Additionally, if [HttpFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * will be true for debug builds and false for release builds.
+ *
+ * If you plan to do additional operations on the response and would also like to have logging / exception
+ * protection for them, consider using the other [tryQuery] call which lets you pass in a `transform` callback.
+ * You are generally encouraged to call `tryQuery(...) { convert() }` over `tryQuery(...)?.convert()`.
+ */
+suspend inline fun <reified B> HttpFetcher.tryQuery(
+    resource: String,
+    body: B,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
+    redirect: RequestRedirect? = FetchDefaults.Redirect,
+    abortController: AbortController? = null,
+    bodySerializer: SerializationStrategy<B> = serializer(),
+): Response? = tryQuery(resource, body, headers, redirect, abortController, bodySerializer) { this }
+

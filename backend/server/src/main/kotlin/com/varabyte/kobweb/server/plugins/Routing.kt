@@ -250,7 +250,7 @@ private suspend fun RoutingContext.handleApiCall(
 ) {
     call.parameters.getAll(KOBWEB_PARAMS)?.joinToString("/")?.let { pathStr ->
         val body: Body? = when (httpMethod) {
-            HttpMethod.PATCH, HttpMethod.POST, HttpMethod.PUT -> {
+            HttpMethod.PATCH, HttpMethod.POST, HttpMethod.PUT, HttpMethod.QUERY -> {
                 val contentType = call.request.contentType().toString()
                 if (Multipart.isMultipartContentType(contentType)) {
                     Body.multipart(
@@ -492,6 +492,7 @@ private fun Routing.configureApiRouting(
             HttpMethod.PATCH -> patch(path) { handleApiCall(env, apiJar, httpMethod, logger) }
             HttpMethod.POST -> post(path) { handleApiCall(env, apiJar, httpMethod, logger) }
             HttpMethod.PUT -> put(path) { handleApiCall(env, apiJar, httpMethod, logger) }
+            HttpMethod.QUERY -> query(path) { handleApiCall(env, apiJar, httpMethod, logger) }
         }
     }
 }

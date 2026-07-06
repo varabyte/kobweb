@@ -8,4 +8,5 @@ enum class HttpMethod {
     PATCH,
     POST,
     PUT,
+    QUERY,
 }

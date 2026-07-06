@@ -708,6 +708,65 @@ class ApiFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
     ): ByteArray? = tryPut(apiPath, body?.let { bodyOf(it) }, headers, redirect, abortController) { bodyAsBytes() }
+
+    /**
+     * Call QUERY on a target API path.
+     *
+     * See also [tryQuery], which will return null if the request fails.
+     *
+     * Note: you should NOT prepend your path with "api/", as that will be added automatically.
+     */
+    suspend fun query(
+        apiPath: String,
+        body: RequestBody? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
+        abortController: AbortController? = null,
+    ): Response = window.http.query(toResource(apiPath), body, headers, redirect, abortController)
+
+    /**
+     * Like [query], but returns null instead of throwing if the request fails.
+     *
+     * This method also provides a [transform] step which you can use to convert the response into a different type.
+     * You are generally encouraged to call `tryQuery(...) { convert() }` over `tryQuery(...)?.convert()` as the former
+     * ill ensure that exception handling is covered in that case.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console (including the logic in
+     * the [transform] block).
+     *
+     * If you do not care about converting the result, use the [tryQuery] version that returns [Response?][Response]
+     * instead.
+     *
+     * Note: you should NOT prepend your path with "api/", as that will be added automatically.
+     */
+    suspend fun <T> tryQuery(
+        apiPath: String,
+        body: RequestBody? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
+        abortController: AbortController? = null,
+        transform: suspend Response.() -> T
+    ): T? = window.http.tryQuery(toResource(apiPath), body, headers, redirect, abortController, transform)
+
+    /**
+     * Like [query], but returns null if the request fails.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
+     *
+     * If you plan to do additional operations on the response and would also like to have logging / exception
+     * protection for them, consider using the other [tryQuery] call which lets you pass in a `transform` callback.
+     * You are generally encouraged to call `tryQuery(...) { convert() }` over `tryQuery(...)?.convert()`.
+     *
+     * Note: you should NOT prepend your path with "api/", as that will be added automatically.
+     */
+    suspend fun tryQuery(
+        apiPath: String,
+        body: RequestBody? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
+        abortController: AbortController? = null,
+    ): Response? = tryQuery(apiPath, body, headers, redirect, abortController) { this }
 }
 
 val Window.api: ApiFetcher get() = with(this.asDynamic()) {

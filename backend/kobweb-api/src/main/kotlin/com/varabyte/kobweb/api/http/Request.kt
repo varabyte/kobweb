@@ -63,7 +63,8 @@ interface Request {
      * The body payload sent with the request.
      *
      * Will only potentially be set with appropriate methods that are allowed to send data, i.e. [HttpMethod.POST],
-     * [HttpMethod.PUT], and [HttpMethod.PATCH]. This value will be null if no body is set / applicable.
+     * [HttpMethod.PUT], [HttpMethod.PATCH], and [HttpMethod.QUERY]. This value will be null if no body is set /
+     * applicable.
      */
     val body: Body?
 
