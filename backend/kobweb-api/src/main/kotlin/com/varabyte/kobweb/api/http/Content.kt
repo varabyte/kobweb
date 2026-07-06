@@ -33,7 +33,7 @@ interface ContentSource {
      * or otherwise close it when you're done with it, which will release any resources associated with file or network
      * streams.
      *
-     * Note that [multipart bodies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/POST#multipart_form_submission) should not be consumed directly; instead, call [multipart].
+     * Note that [multipart bodies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/POST#multipart_form_submission) should not be consumed directly; instead, call [Body.multipart].
      */
     @DelicateApi("It is fine to call this method, but note that Kobweb had to create a custom I/O class that we are exposing here (ByteSource) because kotlinx-io doesn't have an async byte stream concept. If this ever changes in the future, we may decide migrating to it. If possible, consider using higher level helper methods instead, like `bytes()`, `text()`, or `stream()`, or file an issue with the team asking them to provide a more relevant adapter.")
     suspend fun consumeContent(): ByteSource
