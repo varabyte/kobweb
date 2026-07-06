@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.api.http
 
-import com.varabyte.kobweb.api.http.Body.Companion.invoke
 import com.varabyte.kobweb.api.http.io.parseCharsetFromContentType
 import com.varabyte.kobweb.framework.annotations.DelicateApi
 import com.varabyte.kobweb.io.ByteSource
@@ -101,9 +100,9 @@ fun Body.Companion.json(text: String) =
     bodyOf(text, contentType = "application/json")
 
 fun bodyOf(inputStream: InputStream, contentType: String = "application/octet-stream") =
-    invoke(contentType) { inputStream.toByteSource() }
+    Body(contentType) { inputStream.toByteSource() }
 fun bodyOf(bytes: ByteArray, contentType: String = "application/octet-stream") =
-    invoke(contentType) { RawByteSource(bytes) }
+    Body(contentType) { RawByteSource(bytes) }
 fun bodyOf(text: String, contentType: String = "text/plain") =
     bodyOf(text.toByteArray(contentType.parseCharsetFromContentType()), contentType)
 
