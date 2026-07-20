@@ -57,7 +57,7 @@ fun HomePage() {
 ```
 
 <p align="center">
-<img src="https://github.com/varabyte/media/raw/main/kobweb/screencasts/kobweb-welcome.gif" />
+<img src="https://github.com/varabyte/media/raw/main/kobweb/screencasts/welcome-to-kobweb.webp" />
 </p>
 
 ---
