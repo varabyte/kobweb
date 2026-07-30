@@ -541,11 +541,15 @@ abstract class AppBlock @Inject constructor(
          * If set to 1, parallelism will be disabled and snapshots will occur sequentially.
          *
          * Instead of setting this in your Gradle build script, you can also set the system property
-         * `kobweb.export.max.concurrency` or the environment variable `KOBWEB_EXPORT_MAX_CONCURRENCY` (which may be
+         * `kobweb.export.num.threads` or the environment variable `KOBWEB_EXPORT_NUM_THREADS` (which may be
          * convenient as it allows you to use a different value based on which environment you are exporting in, e.g.
-         * home machine vs CI)
+         * home machine vs CI).
+         *
+         * When setting via system property or env var, you can also use special-case string values. "max" means use as
+         * many threads as cores on the machine. "half" means use half. And "high" means use 75%. That way, you can
+         * specify a simple value even on a machine you don't know much about (like a CI).
          */
-        abstract val maxConcurrency: Property<Int>
+        abstract val numThreads: Property<Int>
 
         internal abstract val extraRoutes: SetProperty<RouteConfig>
 
@@ -623,8 +627,15 @@ abstract class AppBlock @Inject constructor(
                 return this.filter { it.isNotBlank() }
             }
 
-            fun Provider<String>.toIntOrNull(): Provider<Int> {
-                return this.map { it.toIntOrNull() }
+            fun Provider<String>.toConcurrencyCountOrNull(): Provider<Int> {
+                return this.map { str ->
+                    when (str.lowercase()) {
+                        "max" -> Runtime.getRuntime().availableProcessors()
+                        "high" -> (3 * Runtime.getRuntime().availableProcessors() / 4)
+                        "half" -> (Runtime.getRuntime().availableProcessors() / 2)
+                        else -> str.toIntOrNull()
+                    }?.coerceAtLeast(1)
+                }
             }
 
             browser.convention(
@@ -640,9 +651,9 @@ abstract class AppBlock @Inject constructor(
             includeSourceMap.convention(true)
             suppressLayoutWarning.convention(false)
             suppressNoRootWarning.convention(false)
-            maxConcurrency.convention(
-                providers.systemProperty("kobweb.export.max.concurrency").toIntOrNull()
-                    .orElse(providers.environmentVariable("KOBWEB_EXPORT_MAX_CONCURRENCY").toIntOrNull())
+            numThreads.convention(
+                providers.systemProperty("kobweb.export.num.threads").toConcurrencyCountOrNull()
+                    .orElse(providers.environmentVariable("KOBWEB_EXPORT_NUM_THREADS").toConcurrencyCountOrNull())
                     .orElse((Runtime.getRuntime().availableProcessors() / 2).coerceIn(1, 8))
             )
         }

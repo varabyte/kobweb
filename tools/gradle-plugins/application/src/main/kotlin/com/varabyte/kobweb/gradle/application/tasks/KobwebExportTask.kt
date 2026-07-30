@@ -299,19 +299,19 @@ abstract class KobwebExportTask @Inject constructor(
                 }
                 .takeIf { routes -> routes.isNotEmpty() }
                 ?.let { routes -> runBlocking {
-                    val maxConcurrency = exportBlock.maxConcurrency.get().coerceAtLeast(1)
+                    val numThreads = exportBlock.numThreads.get().coerceAtLeast(1)
                     logger.lifecycle("")
-                    if (maxConcurrency > 1) {
-                        logger.lifecycle("Exporting pages in parallel (limit: $maxConcurrency).")
-                        logger.lifecycle("You can change this using `kobweb.app.export.maxConcurrency` (and setting it to 1 will disable concurrency).")
+                    if (numThreads > 1) {
+                        logger.lifecycle("Exporting pages in parallel (limit: $numThreads)...")
+                        logger.lifecycle("You can change this using `kobweb.app.export.numThreads` (and setting it to 1 will disable concurrency).")
                     } else {
-                        logger.lifecycle("Exporting one page at a time, sequentially.")
-                        logger.lifecycle("You can set `kobweb.app.export.maxConcurrency` which may speed this step up considerably.")
+                        logger.lifecycle("Exporting one page at a time, sequentially...")
+                        logger.lifecycle("You can set `kobweb.app.export.numThreads` which may speed this step up considerably.")
                     }
                     logger.lifecycle("")
 
-                    val workerPool = Channel<PlaywrightWorker>(maxConcurrency)
-                    repeat(maxConcurrency) {
+                    val workerPool = Channel<PlaywrightWorker>(numThreads)
+                    repeat(numThreads) {
                         workerPool.send(
                             PlaywrightWorker(
                                 basePath,
@@ -353,7 +353,7 @@ abstract class KobwebExportTask @Inject constructor(
                                     }
 
                                 logger.lifecycle("Snapshot for \"${route}\" finished in ${elapsedMs}ms (saved to: \"${routeConfig.exportPath}\").")
-                                if (maxConcurrency == 1) {
+                                if (numThreads == 1) {
                                     // When we are running sequentially, it is much easier to read when we keep each
                                     // snapshot output separate. With concurrency, the extra newline ends up in random places.
                                     logger.lifecycle("")
@@ -372,7 +372,7 @@ abstract class KobwebExportTask @Inject constructor(
                         }
                     }.joinAll()
 
-                    repeat(maxConcurrency) { workerPool.receive().close() }
+                    repeat(numThreads) { workerPool.receive().close() }
 
                     if (!anyExported.get()) {
                         val noPagesExportedMessage = buildString {
