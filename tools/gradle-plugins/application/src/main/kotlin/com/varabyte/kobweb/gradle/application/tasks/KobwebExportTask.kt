@@ -15,10 +15,16 @@ import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.frontend.AppFrontendData
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.logging.Logger
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
@@ -33,11 +39,14 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.UntrackedTask
 import org.jsoup.Jsoup
 import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.io.path.Path
 import kotlin.io.path.writeText
 import kotlin.system.measureTimeMillis
+import kotlin.time.Duration
 import kotlin.time.DurationUnit
+import kotlin.time.TimeSource
 import com.varabyte.kobweb.gradle.application.Browser as KobwebBrowser
 
 class KobwebExportConfInputs(
@@ -54,32 +63,34 @@ class KobwebExportConfInputs(
     )
 }
 
-@UntrackedTask(because = "Task runs a server / does not create output meant to be consumed by Gradle.")
-abstract class KobwebExportTask @Inject constructor(
-    private val exportBlock: AppBlock.ExportBlock,
-    @get:Nested val confInputs: KobwebExportConfInputs,
-    @get:Input val siteLayout: Provider<SiteLayout>,
-) : KobwebTask("Export the Kobweb project into a static site") {
-    @get:InputFile
-    @get:PathSensitive(PathSensitivity.NONE)
-    abstract val appFrontendDataFile: RegularFileProperty
+private class PlaywrightWorker(private val basePath: BasePath, kobwebBrowser: KobwebBrowser, private val port: Int, private val timeout: Duration?, private val traceConfig: AppBlock.ExportBlock.TraceConfig?, browserPathOverride: String?, private val logger: Logger) : AutoCloseable {
+    private val playwright = Playwright.create(
+        Playwright.CreateOptions().setEnv(
+            mapOf(
+                // Class expects PlaywrightCache to be set up before the first worker is created
+                "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD" to "1"
+            )
+        )
+    )
+    val browser: Browser
 
-    // NOTE: Will be null if no JVM target is declared
-    @get:Optional
-    @get:InputFile
-    @get:PathSensitive(PathSensitivity.NONE)
-    abstract val appBackendDataFile: RegularFileProperty
-
-    @get:Input
-    abstract val publicPath: Property<String>
-
-    @get:InputFiles
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val publicResources: ConfigurableFileCollection
-
-    @OutputDirectory
-    fun getSiteDir(): File {
-        return projectLayout.projectDirectory.dir(confInputs.siteRoot).asFile
+    init {
+        val browserType = when (kobwebBrowser) {
+            KobwebBrowser.Chromium -> playwright.chromium()
+            KobwebBrowser.Edge -> playwright.chromium()
+            KobwebBrowser.Firefox -> playwright.firefox()
+            KobwebBrowser.WebKit -> playwright.webkit()
+        }
+        val launchOptions = BrowserType.LaunchOptions().apply {
+            browserPathOverride?.let { path ->
+                setExecutablePath(Path(path))
+            } ?: run {
+                if (kobwebBrowser == KobwebBrowser.Edge) {
+                    setChannel("msedge")
+                }
+            }
+        }
+        browser = browserType.launch(launchOptions)
     }
 
     private fun Page.takeSnapshot(url: String): String {
@@ -131,12 +142,10 @@ abstract class KobwebExportTask @Inject constructor(
         return Jsoup.parse(content()).toString()
     }
 
-    private fun Browser.takeSnapshot(route: String, url: String): String {
+    private fun Browser.takeSnapshot(route: String): String {
         newContext().use { context ->
-            exportBlock.timeout.orNull?.let { context.setDefaultTimeout(it.toDouble(DurationUnit.MILLISECONDS)) }
-            val traceConfig = exportBlock.traceConfig.orNull
-                ?.takeIf { it.filter(route) }
-            if (traceConfig != null) {
+            timeout?.let { context.setDefaultTimeout(it.toDouble(DurationUnit.MILLISECONDS)) }
+            traceConfig?.takeIf { it.filter(route) }?.let { traceConfig ->
                 val traceRoot = traceConfig.root
                 traceRoot.toFile().mkdirs()
                 traceRoot.resolve("README.md").writeText(
@@ -162,6 +171,7 @@ abstract class KobwebExportTask @Inject constructor(
             }
             context.newPage().use { page ->
                 try {
+                    val url = "http://localhost:$port${basePath.prependTo(route)}"
                     return page.takeSnapshot(url)
                 } finally {
                     traceConfig?.let { traceConfig ->
@@ -176,6 +186,44 @@ abstract class KobwebExportTask @Inject constructor(
                 }
             }
         }
+    }
+
+    fun takeSnapshot(route: String): String {
+        return browser.takeSnapshot(route)
+    }
+
+    override fun close() {
+        browser.close()
+        playwright.close()
+    }
+}
+
+@UntrackedTask(because = "Task runs a server / does not create output meant to be consumed by Gradle.")
+abstract class KobwebExportTask @Inject constructor(
+    private val exportBlock: AppBlock.ExportBlock,
+    @get:Nested val confInputs: KobwebExportConfInputs,
+    @get:Input val siteLayout: Provider<SiteLayout>,
+) : KobwebTask("Export the Kobweb project into a static site") {
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val appFrontendDataFile: RegularFileProperty
+
+    // NOTE: Will be null if no JVM target is declared
+    @get:Optional
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val appBackendDataFile: RegularFileProperty
+
+    @get:Input
+    abstract val publicPath: Property<String>
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val publicResources: ConfigurableFileCollection
+
+    @OutputDirectory
+    fun getSiteDir(): File {
+        return projectLayout.projectDirectory.dir(confInputs.siteRoot).asFile
     }
 
     private fun <T> T.toTriple() = Triple(this, this, this)
@@ -219,71 +267,77 @@ abstract class KobwebExportTask @Inject constructor(
         }
 
         frontendData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
-            val browser: KobwebBrowser = exportBlock.browser.get()
+            val kobwebBrowser: KobwebBrowser = exportBlock.browser.get()
 
             // Only install if a user doesn't specify a browser path (not setting a path is expected))
             if (!exportBlock.browserPath.isPresent) {
-                PlaywrightCache().install(browser)
+                PlaywrightCache().install(kobwebBrowser)
             } else {
-                logger.lifecycle("\nUser indicated a $browser browser is located at \"${exportBlock.browserPath.get()}\". We therefore skipped the download step.\nIf your export fails, check that the path exists and that it is a $browser browser at that location.\nIf you need to change the browser type, you can set the `kobweb.app.export.browser` property in your build script.\nIf you need to change the browser path, you can set the `kobweb.app.export.browserPath` property in your build script.\nClearing the browser path will go back to auto-downloading an appropriate browser.")
+                logger.lifecycle("\nUser indicated a $kobwebBrowser browser is located at \"${exportBlock.browserPath.get()}\". We therefore skipped the download step.\nIf your export fails, check that the path exists and that it is a $kobwebBrowser browser at that location.\nIf you need to change the browser type, you can set the `kobweb.app.export.browser` property in your build script.\nIf you need to change the browser path, you can set the `kobweb.app.export.browserPath` property in your build script.\nClearing the browser path will go back to auto-downloading an appropriate browser.")
             }
 
-            Playwright.create(
-                Playwright.CreateOptions().setEnv(
-                    mapOf(
-                        // Should have been downloaded above, by PlaywrightCache()
-                        "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD" to "1"
-                    )
-                )
-            ).use { playwright ->
-                val browserType = when (browser) {
-                    KobwebBrowser.Chromium -> playwright.chromium()
-                    KobwebBrowser.Edge -> playwright.chromium()
-                    KobwebBrowser.Firefox -> playwright.firefox()
-                    KobwebBrowser.WebKit -> playwright.webkit()
-                }
-                val launchOptions = BrowserType.LaunchOptions().apply {
-                    exportBlock.browserPath.orNull?.let { path ->
-                        setExecutablePath(Path(path))
-                    } ?: run {
-                        if (browser == KobwebBrowser.Edge) {
-                            setChannel("msedge")
+            val basePath = BasePath(confInputs.basePath)
+            pages
+                .asSequence()
+                .map { it.route }
+                // Skip export routes with dynamic parts, as they are dynamically generated based on their URL
+                // anyway
+                .filter { !it.contains('{') }
+                .filter { route ->
+                    val ctx = AppBlock.ExportBlock.ExportFilterContext(route)
+                    (exportBlock.filter.orNull?.invoke(ctx) ?: true)
+                        .also { shouldExport ->
+                            if (!shouldExport) {
+                                logger.lifecycle("\nSkipped export for \"$route\".")
+                            }
                         }
+                }
+                .map { route -> AppBlock.ExportBlock.RouteConfig(route) }
+                .toSet()
+                .let { pageRoutes ->
+                    pageRoutes + exportBlock.extraRoutes.orNull.orEmpty()
+                }
+                .takeIf { routes -> routes.isNotEmpty() }
+                ?.let { routes -> runBlocking {
+                    val maxConcurrency = exportBlock.maxConcurrency.get().coerceAtLeast(1)
+                    logger.lifecycle("")
+                    if (maxConcurrency > 1) {
+                        logger.lifecycle("Exporting pages in parallel (limit: $maxConcurrency).")
+                        logger.lifecycle("You can change this using `kobweb.app.export.maxConcurrency` (and setting it to 1 will disable concurrency).")
+                    } else {
+                        logger.lifecycle("Exporting one page at a time, sequentially.")
+                        logger.lifecycle("You can set `kobweb.app.export.maxConcurrency` which may speed this step up considerably.")
                     }
-                }
-                browserType.launch(launchOptions).use { browser ->
-                    val basePath = BasePath(confInputs.basePath)
-                    pages
-                        .asSequence()
-                        .map { it.route }
-                        // Skip export routes with dynamic parts, as they are dynamically generated based on their URL
-                        // anyway
-                        .filter { !it.contains('{') }
-                        .filter { route ->
-                            val ctx = AppBlock.ExportBlock.ExportFilterContext(route)
-                            (exportBlock.filter.orNull?.invoke(ctx) ?: true)
-                                .also { shouldExport ->
-                                    if (!shouldExport) {
-                                        logger.lifecycle("\nSkipped export for \"$route\".")
-                                    }
-                                }
-                        }
-                        .map { route -> AppBlock.ExportBlock.RouteConfig(route) }
-                        .toSet()
-                        .let { pageRoutes ->
-                            pageRoutes + exportBlock.extraRoutes.orNull.orEmpty()
-                        }
-                        .takeIf { routes -> routes.isNotEmpty() }
-                        ?.forEach { routeConfig ->
-                            val route = routeConfig.route
-                            logger.lifecycle("\nSnapshotting html for \"$route\"...")
+                    logger.lifecycle("")
 
-                            val fullPath = basePath.prependTo(route)
+                    val workerPool = Channel<PlaywrightWorker>(maxConcurrency)
+                    repeat(maxConcurrency) {
+                        workerPool.send(
+                            PlaywrightWorker(
+                                basePath,
+                                kobwebBrowser,
+                                port,
+                                exportBlock.timeout.orNull,
+                                exportBlock.traceConfig.orNull,
+                                exportBlock.browserPath.orNull,
+                                logger
+                            )
+                        )
+                    }
+
+                    val timeExportStarted = TimeSource.Monotonic.markNow()
+                    val anyExported = AtomicBoolean(false)
+
+                    routes.map { routeConfig ->
+                        launch(Dispatchers.IO) {
+                            val worker = workerPool.receive()
+                            val route = routeConfig.route
+                            logger.lifecycle("Snapshotting \"$route\"...")
 
                             try {
                                 val snapshot: String
                                 val elapsedMs = measureTimeMillis {
-                                    snapshot = browser.takeSnapshot(route, "http://localhost:$port$fullPath")
+                                    snapshot = worker.takeSnapshot(route)
                                 }
 
                                 pagesRoot
@@ -295,10 +349,17 @@ abstract class KobwebExportTask @Inject constructor(
 
                                         parentFile.mkdirs()
                                         writeText(snapshot)
+                                        anyExported.set(true)
                                     }
 
-                                logger.lifecycle("Snapshot finished in ${elapsedMs}ms (saved to: \"${routeConfig.exportPath}\").")
-                            } catch (ex: TimeoutError) {
+                                logger.lifecycle("Snapshot for \"${route}\" finished in ${elapsedMs}ms (saved to: \"${routeConfig.exportPath}\").")
+                                if (maxConcurrency == 1) {
+                                    // When we are running sequentially, it is much easier to read when we keep each
+                                    // snapshot output separate. With concurrency, the extra newline ends up in random places.
+                                    logger.lifecycle("")
+                                }
+
+                            } catch (_: TimeoutError) {
                                 logger.error(buildString {
                                     append("e: Export for \"${routeConfig.route}\" skipped due to timeout.")
                                     if (siteLayout.isFullstack) {
@@ -307,22 +368,30 @@ abstract class KobwebExportTask @Inject constructor(
                                     append(" In your build script, consider calling `kobweb.app.export.enableTraces(...)` to generate snapshots which can help understanding. Finally, you can try increasing the timeout by setting `kobweb.app.export.timeout`.")
                                 })
                             }
+                            workerPool.send(worker) // We're done with the worker, put it back into the pool
                         }
-                        ?: run {
-                            val noPagesExportedMessage = buildString {
-                                append("No pages were found to export.")
-                                if (exportBlock.filter.isPresent) {
-                                    append(" This may be because your build script's `kobweb.app.export.filter` is filtering out all pages.")
-                                }
-                            }
-                            // This case is an error in static layout mode, because with no pages, there's nothing for
-                            // the user to visit. For a fullstack layout, however, there is always at least a minimal
-                            // index.html file included.
-                            when {
-                                siteLayout.isFullstack -> logger.warn("w: $noPagesExportedMessage")
-                                else -> logger.error("e: $noPagesExportedMessage")
+                    }.joinAll()
+
+                    repeat(maxConcurrency) { workerPool.receive().close() }
+
+                    if (!anyExported.get()) {
+                        val noPagesExportedMessage = buildString {
+                            append("No pages were found to export.")
+                            if (exportBlock.filter.isPresent) {
+                                append(" This may be because your build script's `kobweb.app.export.filter` is filtering out all pages.")
                             }
                         }
+                        // This case is an error in static layout mode, because with no pages, there's nothing for
+                        // the user to visit. For a fullstack layout, however, there is always at least a minimal
+                        // index.html file included.
+                        when {
+                            siteLayout.isFullstack -> logger.warn("w: $noPagesExportedMessage")
+                            else -> logger.error("e: $noPagesExportedMessage")
+                        }
+                    }
+
+                    val timeExportFinished = TimeSource.Monotonic.markNow()
+                    logger.lifecycle("\nExport finished in ${(timeExportFinished - timeExportStarted).inWholeMilliseconds}ms.\n")
                 }
             }
         }

@@ -530,6 +530,21 @@ abstract class AppBlock @Inject constructor(
          */
         abstract val filter: Property<ExportFilterContext.() -> Boolean>
 
+        /**
+         * A value that controls the number of workers running snapshots at the same time.
+         *
+         * By default, it will try to use a sensible number based on the number of this machine's processors (see
+         * [Runtime.availableProcessors].
+         *
+         * If set to 1, parallelism will be disabled and snapshots will occur sequentially.
+         *
+         * Instead of setting this in your Gradle build script, you can also set the system property
+         * `kobweb.export.max.concurrency` or the environment variable `KOBWEB_EXPORT_MAX_CONCURRENCY` (which may be
+         * convenient as it allows you to use a different value based on which environment you are exporting in, e.g.
+         * home machine vs CI)
+         */
+        abstract val maxConcurrency: Property<Int>
+
         internal abstract val extraRoutes: SetProperty<RouteConfig>
 
         /**
@@ -606,6 +621,10 @@ abstract class AppBlock @Inject constructor(
                 return this.filter { it.isNotBlank() }
             }
 
+            fun Provider<String>.toIntOrNull(): Provider<Int> {
+                return this.map { it.toIntOrNull() }
+            }
+
             browser.convention(
                 providers.systemProperty("kobweb.export.browser.type").filterNotBlank()
                     .orElse(providers.environmentVariable("KOBWEB_EXPORT_BROWSER_TYPE").filterNotBlank())
@@ -619,6 +638,11 @@ abstract class AppBlock @Inject constructor(
             includeSourceMap.convention(true)
             suppressLayoutWarning.convention(false)
             suppressNoRootWarning.convention(false)
+            maxConcurrency.convention(
+                providers.systemProperty("kobweb.export.max.concurrency").toIntOrNull()
+                    .orElse(providers.environmentVariable("KOBWEB_EXPORT_MAX_CONCURRENCY").toIntOrNull())
+                    .orElse((Runtime.getRuntime().availableProcessors() / 2).coerceIn(1, 8))
+            )
         }
     }
 

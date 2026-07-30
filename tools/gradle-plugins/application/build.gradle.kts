@@ -13,6 +13,7 @@ dependencies {
     compileOnly(kotlin("gradle-plugin"))
 
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.coroutines.core)
 
     // Common Gradle plugin used by Library, Application, and Worker plugins
     api(projects.tools.gradlePlugins.core)
