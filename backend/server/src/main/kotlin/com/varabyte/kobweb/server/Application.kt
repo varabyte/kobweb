@@ -40,7 +40,7 @@ private fun isPortInUse(port: Int): Boolean {
         ServerSocket(port).use {
             return false
         }
-    } catch (ex: IOException) {
+    } catch (_: IOException) {
         return true
     }
 }
