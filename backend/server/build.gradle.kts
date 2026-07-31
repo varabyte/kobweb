@@ -13,7 +13,7 @@ version = libs.versions.kobweb.get()
 dependencies {
     implementation(libs.bundles.ktor)
     implementation(libs.kaml)
-    runtimeOnly(libs.bundles.logback)
+    runtimeOnly(libs.logback)
 
     implementation(projects.backend.kobwebApi)
     implementation(projects.backend.serverPlugin)

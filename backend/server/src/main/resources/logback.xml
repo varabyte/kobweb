@@ -1,47 +1,50 @@
 <configuration>
-    <if condition='property("LOG_CONSOLE_OUTPUT_ENABLED").equals("true")'>
+    <!-- No-op appender as a way to always have at least ONE appender should the others be disabled. -->
+    <appender name="NOP" class="ch.qos.logback.core.helpers.NOPAppender" />
+
+    <!-- Append logs to console -->
+    <condition class="ch.qos.logback.core.boolex.PropertyEqualityCondition">
+        <key>LOG_CONSOLE_OUTPUT_ENABLED</key>
+        <value>true</value>
+    </condition>
+    <if>
         <then>
             <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
                 <encoder>
-                    <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+                    <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
                 </encoder>
             </appender>
         </then>
     </if>
 
-    <if condition='property("LOG_FILE_OUTPUT_ENABLED").equals("true")'>
+    <!-- Append logs to (potentially rolling) log files -->
+    <condition class="ch.qos.logback.core.boolex.PropertyEqualityCondition">
+        <key>LOG_FILE_OUTPUT_ENABLED</key>
+        <value>true</value>
+    </condition>
+    <if>
         <then>
             <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
                 <file>${LOG_DEST}/${LOG_NAME}${LOG_SUFFIX}</file>
                 <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                    <!-- daily rollover -->
                     <fileNamePattern>${LOG_DEST}/${LOG_NAME}.%d{yyyy-MM-dd}${LOG_ROLLOVER_SUFFIX}</fileNamePattern>
                     <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
                     <totalSizeCap>${LOG_SIZE_CAP}</totalSizeCap>
                     <cleanHistoryOnStart>true</cleanHistoryOnStart>
                 </rollingPolicy>
                 <encoder>
-                    <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+                    <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
                 </encoder>
             </appender>
         </then>
     </if>
 
-    <if condition='property("LOG_CONSOLE_OUTPUT_ENABLED").equals("true")'>
-        <then>
-            <root level="${LOG_LEVEL}">
-                <appender-ref ref="STDOUT"/>
-            </root>
-        </then>
-    </if>
-
-    <if condition='property("LOG_FILE_OUTPUT_ENABLED").equals("true")'>
-        <then>
-            <root level="${LOG_LEVEL}">
-                <appender-ref ref="FILE"/>
-            </root>
-        </then>
-    </if>
+    <!-- Finally, register our appenders. If any are conditionally disabled above, that's fine! Logback ignores it. -->
+    <root level="${LOG_LEVEL}">
+        <appender-ref ref="NOP" />
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
 
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.netty" level="INFO"/>

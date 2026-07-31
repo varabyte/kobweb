@@ -6,7 +6,6 @@ compose-runtime = "1.11.2"
 compose-html = "1.11.1"
 dokka = "2.2.0"
 gradle-publish = "2.1.1"
-janino = "3.1.12"
 jsoup = "1.22.2"
 kaml = "0.104.0"
 kotlin = "2.4.0"
@@ -32,7 +31,6 @@ compose-compiler-plugin = { module = "org.jetbrains.kotlin:compose-compiler-grad
 compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose-runtime" }
 dokka-plugin = { module = "org.jetbrains.dokka:org.jetbrains.dokka.gradle.plugin", version.ref = "dokka" }
 gradle-publish-plugin = { module = "com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin", version.ref = "gradle-publish" }
-janino = { module = "org.codehaus.janino:janino", version.ref = "janino" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
@@ -79,10 +77,6 @@ ktor = [
     "ktor-server-netty",
     "ktor-server-sse",
     "ktor-server-websockets",
-]
-logback = [
-    "logback",
-    "janino", # for <if> conditions in logback.xml
 ]
 
 [plugins]
