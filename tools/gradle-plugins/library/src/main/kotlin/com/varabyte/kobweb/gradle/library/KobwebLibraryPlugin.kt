@@ -15,6 +15,7 @@ import com.varabyte.kobweb.gradle.core.util.generateModuleMetadataFor
 import com.varabyte.kobweb.gradle.library.extensions.createLibraryBlock
 import com.varabyte.kobweb.gradle.library.extensions.index
 import com.varabyte.kobweb.gradle.library.extensions.library
+import com.varabyte.kobweb.gradle.library.tasks.KobwebCopyWorkerJsOutputTask
 import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateLibraryMetadataTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -36,12 +37,21 @@ class KobwebLibraryPlugin : Plugin<Project> {
             .register<KobwebGenerateLibraryMetadataTask>("kobwebGenerateLibraryMetadata") {
                 indexHead = project.kobwebBlock.library.index.serializedHead
             }
+        val kobwebCopyWorkerJsOutputTask =
+            project.tasks.register<KobwebCopyWorkerJsOutputTask>("kobwebCopyWorkerJsOutput")
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
             project.setupKspJs(jsTarget, libraryBlock.cssPrefix)
             project.generateModuleMetadataFor(jsTarget)
+            kobwebGenerateLibraryMetadataTask.configure {
+                runtimeClasspath.from(project.configurations.named(jsTarget.runtimeClasspath))
+            }
+            kobwebCopyWorkerJsOutputTask.configure {
+                runtimeClasspath.from(project.configurations.named(jsTarget.runtimeClasspath))
+            }
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
                 resources.srcDir(kobwebGenerateLibraryMetadataTask)
+                resources.srcDir(kobwebCopyWorkerJsOutputTask)
             }
         }
 

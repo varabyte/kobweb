@@ -8,7 +8,10 @@ import kotlinx.serialization.Serializable
  * Its existence in a jar's metadata also identifies the jar as a Kobweb library.
  */
 @Serializable
-class LibraryMetadata(val index: Index) {
+class LibraryMetadata(
+    val index: Index,
+    val workers: List<String> = emptyList(),
+) {
     /**
      * Serialized data from the `kobweb { library { index { ... } } }` block.
      *

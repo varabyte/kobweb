@@ -83,7 +83,6 @@ kotlin {
             implementation("com.varabyte.kobwebx:kobwebx-markdown")
             implementation("com.varabyte.kobwebx:kobwebx-serialization-kotlinx")
             implementation(project(":sitelib"))
-            implementation(project(":worker"))
         }
         jvmMain.dependencies {
             implementation("com.varabyte.kobweb:kobweb-api")
