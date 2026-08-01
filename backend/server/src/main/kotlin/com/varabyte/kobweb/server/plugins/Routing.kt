@@ -611,23 +611,21 @@ private fun Routing.configureCatchAllRouting(
             { path -> serveScriptFiles(path, script, scriptMap) },
             { path -> handleRedirect(basePath, path, patternMappers) },
             { path ->
-                findResource(path).let { contentFile ->
-                    if (contentFile != null) {
-                        call.respondFile(contentFile)
-                        true
-                    } else false
-                }
+                val contentFile = findResource(path)
+                if (contentFile != null) {
+                    call.respondFile(contentFile)
+                    true
+                } else false
             },
             { _ -> abortIfNotHtml() },
             {
                 if (fallbackResource != null) {
-                    serveIndexFile(fallbackResource).also {
-                        application.log.debug(
-                            "Served fallback file \"{}\" in response to \"/{}\"",
-                            fallbackResource.fileName,
-                            pathSegments.joinToString("/")
-                        )
-                    }
+                    serveIndexFile(fallbackResource)
+                    application.log.debug(
+                        "Served fallback file \"{}\" in response to \"/{}\"",
+                        fallbackResource.fileName,
+                        pathSegments.joinToString("/")
+                    )
                     true
                 } else false
             },
