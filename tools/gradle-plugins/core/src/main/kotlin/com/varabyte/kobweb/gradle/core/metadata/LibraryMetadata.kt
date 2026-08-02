@@ -10,7 +10,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 class LibraryMetadata(
     val index: Index,
-    val workers: List<String> = emptyList(),
 ) {
     /**
      * Serialized data from the `kobweb { library { index { ... } } }` block.
