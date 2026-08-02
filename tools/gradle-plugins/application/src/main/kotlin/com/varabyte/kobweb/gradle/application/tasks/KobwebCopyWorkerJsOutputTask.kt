@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
-import com.varabyte.kobweb.gradle.core.util.toKobwebOutputByPattern
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_WORKER_SUBFOLDER
 import com.varabyte.kobweb.ksp.KOBWEB_PUBLIC_WORKER_ROOT
 import org.gradle.api.GradleException

@@ -1,71 +1,24 @@
 package com.varabyte.kobweb.gradle.core.util
 
-import com.varabyte.kobweb.common.path.invariantSeparatorsPath
 import com.varabyte.kobweb.gradle.core.kmp.TargetPlatform
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateModuleMetadataTask
-import com.varabyte.kobweb.ksp.KOBWEB_METADATA_MODULE
 import org.gradle.api.Project
-import org.gradle.api.file.ArchiveOperations
-import org.gradle.api.file.FileCollection
-import org.gradle.api.file.FileTree
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.util.PatternSet
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.jvm.tasks.ProcessResources
-import java.io.File
 import java.nio.file.Path
 import java.security.MessageDigest
 
 fun Project.getResourceSources(target: TargetPlatform<*>): Provider<SourceDirectorySet> =
     project.kotlin.sourceSets.named(target.mainSourceSet).map { it.resources }
-
-class RootAndFile(val root: File, val file: File) {
-    val relativeFile get() = file.relativeTo(root)
-}
-
-private val kobwebModulePattern = PatternSet().apply {
-    include(KOBWEB_METADATA_MODULE)
-}
-
-private fun FileTree.toKobwebOutputByPattern(patternSet: PatternSet, jar: File): List<Pair<File, RootAndFile>> {
-    val fileTree = this
-    if (fileTree.matching(kobwebModulePattern).isEmpty) return emptyList()
-
-    return buildList {
-        fileTree.matching(patternSet).visit {
-            if (this.isDirectory) return@visit
-            val root = File(file.absolutePath.invariantSeparatorsPath.removeSuffix(relativePath))
-            add(jar to RootAndFile(root, file))
-        }
-    }
-}
-
-fun FileCollection.toKobwebOutputByPattern(
-    objectFactory: ObjectFactory,
-    archiveOperations: ArchiveOperations,
-    patternSet: PatternSet,
-): List<Pair<File, RootAndFile>> {
-    return this.flatMap { jar ->
-        if (jar.isDirectory) {
-            objectFactory.fileTree().from(jar).toKobwebOutputByPattern(patternSet, jar)
-        } else {
-            try {
-                archiveOperations.zipTree(jar).toKobwebOutputByPattern(patternSet, jar)
-            } catch (_: Exception) {
-                emptyList()
-            }
-        }
-    }
-}
 
 private fun Project.getDependencyResultsFromConfiguration(configurationName: String): List<ResolvedDependencyResult> {
     return configurations[configurationName].incoming.resolutionResult.allDependencies
