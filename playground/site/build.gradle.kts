@@ -83,6 +83,7 @@ kotlin {
             implementation("com.varabyte.kobwebx:kobwebx-markdown")
             implementation("com.varabyte.kobwebx:kobwebx-serialization-kotlinx")
             implementation(project(":sitelib"))
+            implementation(project(":workers:countdown"))
             implementation(project(":workers:sum"))
         }
         jvmMain.dependencies {
