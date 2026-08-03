@@ -10,4 +10,4 @@ includeBuild("../")
 
 include(":site")
 include(":sitelib")
-include(":worker")
+include(":workers:sum")

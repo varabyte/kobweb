@@ -16,7 +16,7 @@ import playground.worker.SumWorker
 
 @InitRoute
 fun initWorkerPage(ctx: InitRouteContext) {
-    ctx.data.add(PageLayoutData("WORKER"))
+    ctx.data.add(PageLayoutData("SUM WORKER"))
 }
 
 @Page
