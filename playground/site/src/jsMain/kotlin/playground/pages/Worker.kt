@@ -31,7 +31,7 @@ fun WorkerPage() {
     var b by remember { mutableStateOf<Int?>(0) }
 
     LaunchedEffect(a, b) {
-        worker.postInput(SumInputs(a?:0, b?:0))
+        worker.postInput(SumInputs(a ?: 0, b ?: 0))
     }
 
     Input(InputType.Number, value = a, onValueChange = { a = it?.toInt() })
