@@ -19,6 +19,9 @@ fun initWorkerPage(ctx: InitRouteContext) {
     ctx.data.add(PageLayoutData("SUM WORKER"))
 }
 
+// DEV NOTE: We put this Worker here to ensure that applications can find workers referenced in Kobweb libraries and
+// copy their outputs to a location the site can find them.
+
 @Page
 @Composable
 fun WorkerPage() {
