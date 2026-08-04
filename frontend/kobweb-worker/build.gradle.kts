@@ -13,6 +13,7 @@ kotlin {
 
     sourceSets {
         jsMain.dependencies {
+            api(projects.frontend.kobwebCore) // For 'BasePath'
             api(projects.kobweb.common.kobwebSerialization)
             api(projects.kobweb.frontend.kobwebWorkerInterface)
         }

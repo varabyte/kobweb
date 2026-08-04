@@ -142,7 +142,8 @@ class WorkerProcessor(
             writer.write(
                 """
             ${workerPackage.takeIf { it.isNotEmpty() }?.let { "package $it" } ?: ""}
-
+            
+            import com.varabyte.kobweb.navigation.BasePath
             import com.varabyte.kobweb.worker.Attachments
             import com.varabyte.kobweb.worker.WorkerContext
             import org.w3c.dom.Worker
@@ -154,7 +155,7 @@ class WorkerProcessor(
 
                 private val ioSerializer = $workerFactoryType().createIOSerializer()
 
-                private val worker = Worker("/${KOBWEB_PUBLIC_WORKER_ROOT}/$outputPath").apply {
+                private val worker = Worker(BasePath.prependTo("/${KOBWEB_PUBLIC_WORKER_ROOT}/$outputPath")).apply {
                     onmessage = { e ->
                         val json = e.data.unsafeCast<Json>()
                         val outputDeserialized = try {
