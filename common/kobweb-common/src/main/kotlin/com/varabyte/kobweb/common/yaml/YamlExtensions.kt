@@ -10,6 +10,8 @@ private val NonStrictYamlInstance by lazy {
             // user tries to pull down a new Kobweb project with an older version the Kobweb binary, we will fail to
             // parse it EVEN IF the field we added didn't really matter that much.
             strictMode = false,
+            // Hide defaults as it makes for potentially cleaner, leaner saved files.
+            encodeDefaults = false,
         )
     )
 }
