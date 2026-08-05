@@ -1,12 +1,15 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.browser.dom.css.CssProperty
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
+private fun CssProperty.stretchKeyword() = firstSupportedValue("stretch", "-webkit-fill-available")
+
 internal sealed interface CssSizeValues<T: StylePropertyValue> {
     fun of(value: CSSLengthOrPercentageNumericValue) = "$value".unsafeCast<T>()
-    fun of(width: CSSAutoKeyword) = "$width".unsafeCast<T>()
+    fun of(auto: CSSAutoKeyword) = "$auto".unsafeCast<T>()
 
     // Keyword
     // Not widely supported: https://caniuse.com/mdn-css_properties_width_fit-content_function
@@ -31,7 +34,9 @@ internal sealed interface CssMaxSizeValues<T: StylePropertyValue> {
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/width
 sealed interface Width : StylePropertyValue {
-    companion object : CssSizeValues<Width>, CssGlobalValues<Width>
+    companion object : CssSizeValues<Width>, CssGlobalValues<Width> {
+        val Stretch get() = CssProperty("width").stretchKeyword().unsafeCast<Width>()
+    }
 }
 
 fun AttrsScope<*>.width(width: Int) {
@@ -53,7 +58,9 @@ fun StyleScope.minWidth(minWidth: MinWidth) {
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/height
 sealed interface Height : StylePropertyValue {
-    companion object : CssSizeValues<Height>, CssGlobalValues<Height>
+    companion object : CssSizeValues<Height>, CssGlobalValues<Height> {
+        val Stretch get() = CssProperty("height").stretchKeyword().unsafeCast<Height>()
+    }
 }
 
 fun AttrsScope<*>.height(height: Int) {

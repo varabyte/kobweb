@@ -1435,6 +1435,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { height(Height.FitContent) }).isEqualTo("height: fit-content")
         assertThat(styleToText { height(Height.MaxContent) }).isEqualTo("height: max-content")
         assertThat(styleToText { height(Height.MinContent) }).isEqualTo("height: min-content")
+        assertThat(styleToText { height(Height.Stretch) }).isEqualTo("height: stretch")
 
         assertThat(styleToText { height(Height.Inherit) }).isEqualTo("height: inherit")
         assertThat(styleToText { height(Height.Initial) }).isEqualTo("height: initial")
@@ -2713,6 +2714,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { width(Width.FitContent) }).isEqualTo("width: fit-content")
         assertThat(styleToText { width(Width.MaxContent) }).isEqualTo("width: max-content")
         assertThat(styleToText { width(Width.MinContent) }).isEqualTo("width: min-content")
+        assertThat(styleToText { width(Width.Stretch) }).isEqualTo("width: stretch")
 
         assertThat(styleToText { width(Width.Inherit) }).isEqualTo("width: inherit")
         assertThat(styleToText { width(Width.Initial) }).isEqualTo("width: initial")

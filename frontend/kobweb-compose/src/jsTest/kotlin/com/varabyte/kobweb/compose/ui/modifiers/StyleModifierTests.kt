@@ -594,6 +594,93 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifySize() {
+        assertThat(modifierToText {
+            Modifier.fillMaxWidth(80.percent)
+        }).isEqualTo("width: 80%")
+
+        assertThat(modifierToText {
+            Modifier.fillMaxHeight(90.percent)
+        }).isEqualTo("height: 90%")
+
+        assertThat(modifierToText {
+            Modifier.fillMaxSize()
+        }).isEqualTo("width: 100%; height: 100%")
+
+        assertThat(modifierToText {
+            Modifier.width(10.px)
+        }).isEqualTo("width: 10px")
+
+        assertThat(modifierToText {
+            Modifier.height(Height.Stretch)
+        }).isEqualTo("height: stretch")
+
+        assertThat(modifierToText {
+            Modifier.size(3.cssRem)
+        }).isEqualTo("width: 3rem; height: 3rem")
+
+        assertThat(modifierToText {
+            Modifier.minWidth(10.px)
+        }).isEqualTo("min-width: 10px")
+
+        assertThat(modifierToText {
+            Modifier.minWidth(MinWidth.MinContent)
+        }).isEqualTo("min-width: min-content")
+
+        assertThat(modifierToText {
+            Modifier.minHeight(MinHeight.MinContent)
+        }).isEqualTo("min-height: min-content")
+
+        assertThat(modifierToText {
+            Modifier.minHeight(10.px)
+        }).isEqualTo("min-height: 10px")
+
+        assertThat(modifierToText {
+            Modifier.maxWidth(MaxWidth.MaxContent)
+        }).isEqualTo("max-width: max-content")
+
+        assertThat(modifierToText {
+            Modifier.maxWidth(90.percent)
+        }).isEqualTo("max-width: 90%")
+
+        assertThat(modifierToText {
+            Modifier.maxHeight(MaxHeight.MaxContent)
+        }).isEqualTo("max-height: max-content")
+
+        assertThat(modifierToText {
+            Modifier.maxHeight(90.percent)
+        }).isEqualTo("max-height: 90%")
+
+        assertThat(modifierToText {
+            Modifier.minSize(1.cssRem)
+        }).isEqualTo("min-width: 1rem; min-height: 1rem")
+
+        assertThat(modifierToText {
+            Modifier.minSize(1.cssRem, 5.cssRem)
+        }).isEqualTo("min-width: 1rem; min-height: 5rem")
+
+        assertThat(modifierToText {
+            Modifier.maxSize(25.percent)
+        }).isEqualTo("max-width: 25%; max-height: 25%")
+
+        assertThat(modifierToText {
+            Modifier.maxSize(25.percent, 100.percent)
+        }).isEqualTo("max-width: 25%; max-height: 100%")
+
+        assertThat(modifierToText {
+            Modifier.widthIn(25.percent, 100.percent)
+        }).isEqualTo("min-width: 25%; max-width: 100%")
+
+        assertThat(modifierToText {
+            Modifier.heightIn(25.percent, 100.percent)
+        }).isEqualTo("min-height: 25%; max-height: 100%")
+
+        assertThat(modifierToText {
+            Modifier.sizeIn(25.percent, 50.percent, maxWidth = 90.percent, maxHeight = 100.percent)
+        }).isEqualTo("min-width: 25%; min-height: 50%; max-width: 90%; max-height: 100%")
+    }
+
+    @Test
     fun verifyText() {
         assertThat(modifierToText {
             Modifier.hyphenateCharacter(HyphenateCharacter.Auto)

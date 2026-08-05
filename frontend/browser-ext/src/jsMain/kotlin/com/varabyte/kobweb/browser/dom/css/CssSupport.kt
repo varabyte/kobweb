@@ -4,6 +4,7 @@ package com.varabyte.kobweb.browser.dom.css
 private abstract external class CSS {
     companion object {
         fun supports(exp: String): Boolean
+        fun supports(propertyName: String, value: String): Boolean
     }
 }
 
@@ -13,7 +14,7 @@ private abstract external class CSS {
  * By wrapping this concept in an outer class, we can add extension methods for it instead of `String`. We also perform
  * some checks in the constructor to ensure the passed in identifier is valid.
  */
-class CssIdent(val asStr: String): CharSequence by asStr {
+value class CssIdent(val asStr: String): CharSequence by asStr {
     companion object {
         fun isValid(identifier: String): Boolean {
             return tryCreate(identifier) != null
@@ -49,4 +50,40 @@ class CssIdent(val asStr: String): CharSequence by asStr {
      * ```
      */
     fun renamed(action: String.() -> String)= CssIdent(action(asStr))
+}
+
+/**
+ * A helping wrapper for CSS property names that let us define functionality on top of them.
+ */
+value class CssProperty(private val ident: CssIdent) {
+    constructor(name: String) : this(CssIdent(name))
+    val name get() = ident.asStr
+
+    /**
+     * Returns the first property value supported by this browser for this property name.
+     *
+     * Property values should be listed in priority order -- the earlier names in the list should ideally be matched
+     * before giving up and moving to the later names.
+     *
+     * If no property values are supported, the first item in the list will be returned, as even if the browser can't
+     * handle it, at least the user will be able to use dev tools to see it.
+     *
+     * The purpose of this method is to help with CSS properties that might require fallback values on different browser
+     * vendors.
+     *
+     * For example, `"width: stretch"` is not, at the time of writing this comment, supported by stable Safari yet;
+     * there, they still use `"width: -webkit-fill-available"`. So you would call:
+     * ```
+     * CssProperty("width").firstSupportedValue("stretch", "-webkit-fill-available")
+     * ```
+     * which would return `"stretch"` on, say, Chrome, and `"-webkit-fill-available"` on Safari.
+     *
+     * It is an error to call this method with one or fewer values. In that case, you shouldn't be using it!
+     */
+    fun firstSupportedValue(vararg values: String): String {
+        require(values.size >= 2)
+        return values.firstOrNull { value -> CSS.supports(ident.asStr, value) } ?: values.first()
+    }
+
+    override fun toString() = name
 }
