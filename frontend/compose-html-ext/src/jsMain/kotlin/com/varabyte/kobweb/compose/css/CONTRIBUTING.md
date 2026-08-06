@@ -108,12 +108,18 @@ sealed interface StyleExample /*...*/
 // interface for it.
 ❌ sealed interface MarginInlineEnd /* ... */
 
-// Instead, just handle this with a StyleScope extension method / methods
-// that accept relevant primitive values. We talk more about these methods
-// much later in the document.
-fun StyleScope.marginInlineEnd(value: CSSLengthOrPercentageNumericValue) {
-    property("margin-inline-end", value)
+// Instead, we handle properties like these at the modifier level.
+// See kobweb/compose/ui/modifiers/CONTRIBUTING.md for more details.
+class MarginScope internal constructor(private val styleScope: StyleScope) {
+  fun inlineEnd(value: CSSLengthOrPercentageNumericValue) = styleScope.property("margin-inline-end", value)
 }
+
+fun Modifier.margin(scope: MarginScope.() -> Unit) = styleModifier {
+  MarginScope(this).apply(scope)
+}
+
+// Calling it looks like:
+Modifier.margin { inlineEnd(10.px) }
 ```
 
 Even if the (non-longhand) property is a simple integer value 99% of the time (e.g. `column-count`), we still need to
@@ -228,7 +234,7 @@ By exposing enums as `StylePropertyValue`s, it allows us to use them inside styl
 
 #### Example
 
-Pay attention to the side enum below:
+Pay attention to the `Side` enum below:
 
 ```kotlin
 sealed interface TextEmphasisPosition : StylePropertyValue {
@@ -249,7 +255,7 @@ sealed interface TextEmphasisPosition : StylePropertyValue {
 }
 ```
 
-This allows the following code to be valid:
+The enum inheriting from `StylePropertyValue` allows the following code to be valid:
 
 ```kotlin
 val SideVar by StyleVariable(TextEmphasisPosition.Side.Right)
@@ -300,7 +306,9 @@ sealed interface Pixel : StylePropertyValue {
 }
 ```
 
-Here, we need to expose multiple interfaces for even more fine-grained control. `Mode` doesn't make sense here:
+Here, we need to expose multiple interfaces for even more fine-grained control. `Mode` as a generic name doesn't really
+work here:
+
 ```kotlin
 sealed interface Anchor : StylePropertyValue {
   sealed interface HorizOrCenter : Anchor
@@ -331,11 +339,11 @@ and one where it applies to a collection of other keywords.
 
 Both kinds occur in the `align-content` property so we'll use that to highlight them.
 
-* "first baseline" / "last baseline"
+* `"first baseline"` / `"last baseline"`
    * `first` and `last` are modifying keywords
    * they only ever affect `baseline`; they are not used with any other keyword
 
-* "safe start" / "unsafe end"
+* `"safe start"` / `"unsafe end"`
    * `safe` and `unsafe` are modifying keywords
    * they act on any of the positional keywords (e.g. `start`, `end`, `center`).
 
@@ -347,9 +355,9 @@ not.
 
 #### The modifying keyword only applies to a single target keyword
 
-This is the "first baseline" / "last baseline" case.
+This is the `"first baseline"` / `"last baseline"` case.
 
-As there is only one target keyword being modified (here, "baseline"), we can keep it simple and create direct
+As there is only one target keyword being modified (here, `"baseline"`), we can keep it simple and create direct
 properties to represent these additional cases.
 
 ```kotlin
@@ -364,7 +372,7 @@ sealed interface AlignSelf : StylePropertyValue {
 
 #### The modifying keyword applies to multiple target keywords
 
-This is the "safe $position" / "unsafe $position" case.
+This is the `"safe $position"` / `"unsafe $position"` case.
 
 We handle this by creating `Safe` and `Unsafe` methods (capitalized, so they feel like keywords) and have them accept a
 positional keyword instance as their argument.
@@ -388,7 +396,7 @@ sealed interface AlignSelf : StylePropertyValue {
 }
 ```
 
-#### No public `of` methods
+#### No public `of` methods for these cases
 
 Note that in the above classes, we don't provide public `of` methods. We could have added a
 `AlignSelf.of(Safety, Position)` method for example. 
