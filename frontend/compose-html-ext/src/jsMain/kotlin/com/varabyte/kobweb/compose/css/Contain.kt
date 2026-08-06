@@ -8,18 +8,18 @@ import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 /**
  * A class that wraps a target [CSSLengthNumericValue] with the auto keyword.
  *
- * This is generally uncommon but used by the `contain-intrinsic-*` line of CSS properties for sizing.
+ * This is generally uncommon but used by the `contain-intrinsic-*` line of CSS properties for sizing, which uniquely
+ * support pairing a length value with the auto keyword (as opposed to using the auto keyword in place of it).
  *
  * The constructor parameter [value] can be set to null to indicate this is a special `auto none` value, which is a
  * small number of cases is distinct from `auto 0px`.
  */
-class CSSAutoLengthNumericValue(private val value: CSSLengthNumericValue?) : StylePropertyValue {
-    override fun toString() = "auto ${value ?: "none"}"
+class CSSAutoLengthNumericValue(private val auto: CSSAutoKeyword, private val value: CSSLengthNumericValue?) : StylePropertyValue {
+    override fun toString() = "$auto ${value ?: "none"}"
 }
 
-operator fun CSSAutoKeyword.invoke(length: CSSLengthNumericValue) = CSSAutoLengthNumericValue(length)
-@Suppress("UnusedReceiverParameter") // Receiver required for "auto.none()" syntax.
-fun CSSAutoKeyword.none() = CSSAutoLengthNumericValue(null)
+operator fun CSSAutoKeyword.invoke(length: CSSLengthNumericValue) = CSSAutoLengthNumericValue(this, length)
+fun CSSAutoKeyword.none() = CSSAutoLengthNumericValue(this, null)
 
 internal sealed interface CssContainIntrinsicValues<T : StylePropertyValue> {
     fun of(value: CSSLengthNumericValue) = "$value".unsafeCast<T>()
