@@ -136,6 +136,32 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifyBorder() {
+        assertThat(modifierToText {
+            Modifier.borderRadius(10.px)
+        }).isEqualTo("border-radius: 10px")
+
+        assertThat(modifierToText {
+            Modifier.borderRadius {
+                topLeft(10.px)
+                bottomRight(20.px)
+            }
+        }).isEqualTo("border-top-left-radius: 10px; border-bottom-right-radius: 20px")
+
+        assertThat(modifierToText {
+            Modifier.borderSpacing(10.px)
+        }).isEqualTo("border-spacing: 10px")
+
+        assertThat(modifierToText {
+            Modifier.borderSpacing(10.px, 20.px)
+        }).isEqualTo("border-spacing: 10px 20px")
+
+        assertThat(modifierToText {
+            Modifier.borderSpacing(BorderSpacing.Inherit)
+        }).isEqualTo("border-spacing: inherit")
+    }
+
+    @Test
     fun verifyBox() {
         assertThat(modifierToText {
             Modifier.boxDecorationBreak(BoxDecorationBreak.Clone)

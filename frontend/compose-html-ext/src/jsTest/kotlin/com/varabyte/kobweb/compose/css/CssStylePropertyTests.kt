@@ -588,6 +588,18 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyBorderSpacing() {
+        assertThat(styleToText { borderSpacing(BorderSpacing.of(2.px)) }).isEqualTo("border-spacing: 2px")
+        assertThat(styleToText { borderSpacing(BorderSpacing.of(1.cm, 2.em)) }).isEqualTo("border-spacing: 1cm 2em")
+
+        assertThat(styleToText { borderSpacing(BorderSpacing.Inherit) }).isEqualTo("border-spacing: inherit")
+        assertThat(styleToText { borderSpacing(BorderSpacing.Initial) }).isEqualTo("border-spacing: initial")
+        assertThat(styleToText { borderSpacing(BorderSpacing.Revert) }).isEqualTo("border-spacing: revert")
+        assertThat(styleToText { borderSpacing(BorderSpacing.RevertLayer) }).isEqualTo("border-spacing: revert-layer")
+        assertThat(styleToText { borderSpacing(BorderSpacing.Unset) }).isEqualTo("border-spacing: unset")
+    }
+
+    @Test
     fun verifyBottom() {
         assertThat(styleToText { bottom(Bottom.of(10.px)) }).isEqualTo("bottom: 10px")
 

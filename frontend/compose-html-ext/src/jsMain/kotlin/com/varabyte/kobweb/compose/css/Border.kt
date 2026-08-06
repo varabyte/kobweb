@@ -366,3 +366,15 @@ sealed interface BorderImage : StylePropertyValue {
 fun StyleScope.borderImage(borderImage: BorderImage) {
     property("border-image", borderImage)
 }
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-spacing
+sealed interface BorderSpacing : StylePropertyValue {
+    companion object : CssGlobalValues<BorderSpacing> {
+        fun of(length: CSSLengthNumericValue) = "$length".unsafeCast<BorderSpacing>()
+        fun of(horiz: CSSLengthNumericValue, vert: CSSLengthNumericValue) = "$horiz $vert".unsafeCast<BorderSpacing>()
+    }
+}
+
+fun StyleScope.borderSpacing(borderSpacing: BorderSpacing) {
+    property("border-spacing", borderSpacing)
+}

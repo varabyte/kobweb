@@ -256,3 +256,15 @@ class BorderImageScope internal constructor(private val styleScope: StyleScope) 
 fun Modifier.borderImage(scope: BorderImageScope.() -> Unit) = styleModifier {
     BorderImageScope(this).apply(scope)
 }
+
+fun Modifier.borderSpacing(borderSpacing: BorderSpacing) = styleModifier {
+    borderSpacing(borderSpacing)
+}
+
+fun Modifier.borderSpacing(length: CSSLengthNumericValue) = styleModifier {
+    borderSpacing(BorderSpacing.of(length))
+}
+
+fun Modifier.borderSpacing(horiz: CSSLengthNumericValue, vert: CSSLengthNumericValue) = styleModifier {
+    borderSpacing(BorderSpacing.of(horiz, vert))
+}
