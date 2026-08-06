@@ -848,6 +848,10 @@ class StyleModifierTests {
         }).isEqualTo("text-overflow: ellipsis")
 
         assertThat(modifierToText {
+            Modifier.textRendering(TextRendering.OptimizeLegibility)
+        }).isEqualTo("text-rendering: optimizeLegibility")
+
+        assertThat(modifierToText {
             Modifier.textShadow(2.px, 2.px, 2.px, Colors.Gray)
         }).isEqualTo("text-shadow: 2px 2px 2px gray")
 

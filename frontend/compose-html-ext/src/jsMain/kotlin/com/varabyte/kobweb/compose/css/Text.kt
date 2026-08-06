@@ -204,6 +204,20 @@ fun StyleScope.textOverflow(textOverflow: TextOverflow) {
     property("text-overflow", textOverflow)
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-rendering
+sealed interface TextRendering : StylePropertyValue {
+    companion object : CssGlobalValues<TextRendering> {
+        // Keywords
+        val Auto get() = "auto".unsafeCast<TextRendering>()
+        val OptimizeSpeed get() = "optimizeSpeed".unsafeCast<TextRendering>()
+        val OptimizeLegibility get() = "optimizeLegibility".unsafeCast<TextRendering>()
+        val GeometricPrecision get() = "geometricPrecision".unsafeCast<TextRendering>()
+    }
+}
+
+fun StyleScope.textRendering(textRendering: TextRendering) {
+    property("text-rendering", textRendering)
+}
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow
 sealed interface TextShadow : StylePropertyValue {

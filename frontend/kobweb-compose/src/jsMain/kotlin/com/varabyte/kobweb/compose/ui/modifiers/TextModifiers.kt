@@ -98,6 +98,10 @@ fun Modifier.textOverflow(textOverflow: TextOverflow): Modifier = styleModifier 
     textOverflow(textOverflow)
 }
 
+fun Modifier.textRendering(textRendering: TextRendering): Modifier = styleModifier {
+    textRendering(textRendering)
+}
+
 fun Modifier.textShadow(
     offsetX: CSSLengthNumericValue,
     offsetY: CSSLengthNumericValue,

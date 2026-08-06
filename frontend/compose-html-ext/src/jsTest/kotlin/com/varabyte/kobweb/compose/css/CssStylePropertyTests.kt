@@ -2386,6 +2386,20 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyTextRendering() {
+        assertThat(styleToText { textRendering(TextRendering.Auto) }).isEqualTo("text-rendering: auto")
+        assertThat(styleToText { textRendering(TextRendering.OptimizeSpeed) }).isEqualTo("text-rendering: optimizeSpeed")
+        assertThat(styleToText { textRendering(TextRendering.OptimizeLegibility) }).isEqualTo("text-rendering: optimizeLegibility")
+        assertThat(styleToText { textRendering(TextRendering.GeometricPrecision) }).isEqualTo("text-rendering: geometricPrecision")
+
+        assertThat(styleToText { textRendering(TextRendering.Inherit) }).isEqualTo("text-rendering: inherit")
+        assertThat(styleToText { textRendering(TextRendering.Initial) }).isEqualTo("text-rendering: initial")
+        assertThat(styleToText { textRendering(TextRendering.Revert) }).isEqualTo("text-rendering: revert")
+        assertThat(styleToText { textRendering(TextRendering.RevertLayer) }).isEqualTo("text-rendering: revert-layer")
+        assertThat(styleToText { textRendering(TextRendering.Unset) }).isEqualTo("text-rendering: unset")
+    }
+
+    @Test
     fun verifyTextShadow() {
         assertThat(styleToText {
             textShadow(TextShadow.of(2.px, 3.px))
