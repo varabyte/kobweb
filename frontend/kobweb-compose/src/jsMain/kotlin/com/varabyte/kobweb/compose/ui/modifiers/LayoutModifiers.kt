@@ -4,6 +4,7 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
 fun Modifier.aspectRatio(ratio: Number) = styleModifier {
     aspectRatio(AspectRatio.of(ratio))
@@ -11,6 +12,14 @@ fun Modifier.aspectRatio(ratio: Number) = styleModifier {
 
 fun Modifier.aspectRatio(width: Number, height: Number) = styleModifier {
     aspectRatio(AspectRatio.of(width, height))
+}
+
+fun Modifier.aspectRatio(auto: CSSAutoKeyword, ratio: Number): Modifier = styleModifier {
+    aspectRatio(AspectRatio.of(auto, ratio))
+}
+
+fun Modifier.aspectRatio(auto: CSSAutoKeyword, width: Number, height: Number) = styleModifier {
+    aspectRatio(AspectRatio.of(auto, width, height))
 }
 
 fun Modifier.aspectRatio(ratio: AspectRatio): Modifier = styleModifier {

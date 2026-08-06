@@ -1,12 +1,15 @@
 package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio
 sealed interface AspectRatio : StylePropertyValue {
     companion object : CssGlobalValues<AspectRatio> {
         fun of(ratio: Number) = "$ratio".unsafeCast<AspectRatio>()
         fun of(width: Number, height: Number) = "$width / $height".unsafeCast<AspectRatio>()
+        fun of(auto: CSSAutoKeyword, ratio: Number) = "$auto $ratio".unsafeCast<AspectRatio>()
+        fun of(auto: CSSAutoKeyword, width: Number, height: Number) = "$auto $width / $height".unsafeCast<AspectRatio>()
 
         // Keywords
         val Auto get() = "auto".unsafeCast<AspectRatio>()
