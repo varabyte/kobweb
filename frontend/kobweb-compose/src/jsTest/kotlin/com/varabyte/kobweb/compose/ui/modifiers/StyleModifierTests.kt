@@ -9,6 +9,7 @@ import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.truthish.assertThat
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.keywords.auto
 import kotlin.test.Test
 
 class StyleModifierTests {
@@ -220,23 +221,77 @@ class StyleModifierTests {
         }).isEqualTo("contain-intrinsic-block-size: none")
         assertThat(modifierToText {
             Modifier.containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(100.px))
-        }).isEqualTo(
-            "contain-intrinsic-block-size: 100px"
-        )
+        }).isEqualTo("contain-intrinsic-block-size: 100px")
         assertThat(modifierToText {
-            Modifier.containIntrinsicBlockSize(100.px, auto = true)
+            Modifier.containIntrinsicBlockSize(100.px)
+        }).isEqualTo("contain-intrinsic-block-size: 100px")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicBlockSize(auto(100.px))
         }).isEqualTo("contain-intrinsic-block-size: auto 100px")
 
         assertThat(modifierToText {
             Modifier.containIntrinsicInlineSize(ContainIntrinsicInlineSize.None)
-        })
-            .isEqualTo("contain-intrinsic-inline-size: none")
+        }).isEqualTo("contain-intrinsic-inline-size: none")
         assertThat(modifierToText { Modifier.containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(100.px)) }).isEqualTo(
             "contain-intrinsic-inline-size: 100px"
         )
         assertThat(modifierToText {
-            Modifier.containIntrinsicInlineSize(100.px, auto = true)
+            Modifier.containIntrinsicInlineSize(auto(100.px))
         }).isEqualTo("contain-intrinsic-inline-size: auto 100px")
+
+        assertThat(modifierToText {
+            Modifier.containIntrinsicWidth(ContainIntrinsicWidth.None)
+        }).isEqualTo("contain-intrinsic-width: none")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicWidth(ContainIntrinsicWidth.of(100.px))
+        }).isEqualTo("contain-intrinsic-width: 100px")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicWidth(100.px)
+        }).isEqualTo("contain-intrinsic-width: 100px")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicWidth(auto(100.px))
+        }).isEqualTo("contain-intrinsic-width: auto 100px")
+
+        assertThat(modifierToText {
+            Modifier.containIntrinsicHeight(ContainIntrinsicHeight.None)
+        }).isEqualTo("contain-intrinsic-height: none")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicHeight(ContainIntrinsicHeight.of(100.px))
+        }).isEqualTo("contain-intrinsic-height: 100px")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicHeight(100.px)
+        }).isEqualTo("contain-intrinsic-height: 100px")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicHeight(auto(100.px))
+        }).isEqualTo("contain-intrinsic-height: auto 100px")
+
+        assertThat(modifierToText {
+            Modifier.containIntrinsicSize(ContainIntrinsicSize.None)
+        }).isEqualTo("contain-intrinsic-size: none")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicSize(ContainIntrinsicSize.of(100.px))
+        }).isEqualTo("contain-intrinsic-size: 100px")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicSize(ContainIntrinsicSize.of(100.px, 200.px))
+        }).isEqualTo("contain-intrinsic-size: 100px 200px")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicSize(100.px)
+        }).isEqualTo("contain-intrinsic-size: 100px")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicSize(auto(100.px))
+        }).isEqualTo("contain-intrinsic-size: auto 100px")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicSize(100.px, 200.px)
+        }).isEqualTo("contain-intrinsic-size: 100px 200px")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicSize(auto(100.px), 200.px)
+        }).isEqualTo("contain-intrinsic-size: auto 100px 200px")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicSize(100.px, auto(200.px))
+        }).isEqualTo("contain-intrinsic-size: 100px auto 200px")
+        assertThat(modifierToText {
+            Modifier.containIntrinsicSize(auto(100.px), auto(200.px))
+        }).isEqualTo("contain-intrinsic-size: auto 100px auto 200px")
     }
 
     @Test
