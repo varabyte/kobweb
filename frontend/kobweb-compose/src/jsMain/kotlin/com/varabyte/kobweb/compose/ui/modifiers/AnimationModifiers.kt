@@ -12,6 +12,8 @@ import org.jetbrains.compose.web.css.StyleScope
 import org.jetbrains.compose.web.events.SyntheticAnimationEvent
 
 class AnimationScope internal constructor(private val styleScope: StyleScope) {
+    fun composition(vararg compositions: AnimationComposition.Listable) = styleScope.animationComposition(AnimationComposition.list(*compositions))
+    fun composition(compositions: List<AnimationComposition.Listable>) = composition(*compositions.toTypedArray())
     fun delay(vararg delays: CSSTimeNumericValue) = styleScope.property("animation-delay", delays.joinToString())
     fun direction(vararg directions: AnimationDirection) = styleScope.property("animation-direction", directions.joinToString())
     fun duration(vararg durations: CSSTimeNumericValue) = styleScope.property("animation-duration", durations.joinToString())

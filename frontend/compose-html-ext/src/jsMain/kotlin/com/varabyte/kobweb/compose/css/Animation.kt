@@ -2,6 +2,25 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/animation-composition
+sealed interface AnimationComposition : StylePropertyValue {
+    sealed interface Listable : AnimationComposition
+
+    companion object : CssGlobalValues<AnimationComposition> {
+        fun list(vararg compositions: AnimationComposition.Listable): AnimationComposition =
+            compositions.joinToString().unsafeCast<AnimationComposition>()
+
+        // Keyword
+        val Accumulate get() = "accumulate".unsafeCast<Listable>()
+        val Add get() = "add".unsafeCast<Listable>()
+        val Replace get() = "replace".unsafeCast<Listable>()
+    }
+}
+
+fun StyleScope.animationComposition(value: AnimationComposition) {
+    property("animation-composition", value)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/animation-iteration-count
 sealed interface AnimationIterationCount : StylePropertyValue {
     companion object : CssGlobalValues<AnimationIterationCount> {

@@ -101,6 +101,20 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyAnimationComposition() {
+        assertThat(styleToText { animationComposition(AnimationComposition.Accumulate) }).isEqualTo("animation-composition: accumulate")
+        assertThat(styleToText { animationComposition(AnimationComposition.Add) }).isEqualTo("animation-composition: add")
+        assertThat(styleToText { animationComposition(AnimationComposition.Replace) }).isEqualTo("animation-composition: replace")
+        assertThat(styleToText { animationComposition(AnimationComposition.list(AnimationComposition.Accumulate, AnimationComposition.Replace)) }).isEqualTo("animation-composition: accumulate, replace")
+
+        assertThat(styleToText { animationComposition(AnimationComposition.Inherit) }).isEqualTo("animation-composition: inherit")
+        assertThat(styleToText { animationComposition(AnimationComposition.Initial) }).isEqualTo("animation-composition: initial")
+        assertThat(styleToText { animationComposition(AnimationComposition.Revert) }).isEqualTo("animation-composition: revert")
+        assertThat(styleToText { animationComposition(AnimationComposition.RevertLayer) }).isEqualTo("animation-composition: revert-layer")
+        assertThat(styleToText { animationComposition(AnimationComposition.Unset) }).isEqualTo("animation-composition: unset")
+    }
+
+    @Test
     fun verifyAlignContent() {
         assertThat(styleToText { alignContent(AlignContent.Normal) }).isEqualTo("align-content: normal")
 
