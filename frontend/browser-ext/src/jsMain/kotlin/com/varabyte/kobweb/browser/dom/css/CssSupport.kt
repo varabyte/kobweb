@@ -55,7 +55,7 @@ value class CssIdent(val asStr: String): CharSequence by asStr {
 /**
  * A helping wrapper for CSS property names that let us define functionality on top of them.
  */
-value class CssPropertyName(private val ident: CssIdent) {
+value class CssPropertyName private constructor(private val ident: CssIdent) {
     constructor(name: String) : this(CssIdent(name))
     val asStr get() = ident.asStr
 
@@ -74,7 +74,7 @@ value class CssPropertyName(private val ident: CssIdent) {
      * For example, `"width: stretch"` is not, at the time of writing this comment, supported by stable Safari yet;
      * there, they still use `"width: -webkit-fill-available"`. So you would call:
      * ```
-     * CssProperty("width").firstSupportedValue("stretch", "-webkit-fill-available")
+     * CssPropertyName("width").firstSupportedValue("stretch", "-webkit-fill-available")
      * ```
      * which would return `"stretch"` on, say, Chrome, and `"-webkit-fill-available"` on Safari.
      *
