@@ -43,6 +43,18 @@ fun Modifier.maxSize(width: CSSLengthOrPercentageNumericValue, height: CSSLength
         maxHeight(height)
     }
 
+fun Modifier.blockSize(size: CSSLengthOrPercentageNumericValue): Modifier = styleModifier {
+    blockSize(BlockSize.of(size))
+}
+
+fun Modifier.blockSize(auto: CSSAutoKeyword): Modifier = styleModifier {
+    blockSize(BlockSize.of(auto))
+}
+
+fun Modifier.blockSize(blockSize: BlockSize): Modifier = styleModifier {
+    blockSize(blockSize)
+}
+
 fun Modifier.width(size: CSSLengthOrPercentageNumericValue): Modifier = styleModifier {
     width(size)
 }

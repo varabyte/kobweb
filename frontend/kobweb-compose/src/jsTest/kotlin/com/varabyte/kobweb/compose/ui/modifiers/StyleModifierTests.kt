@@ -608,6 +608,18 @@ class StyleModifierTests {
         }).isEqualTo("width: 100%; height: 100%")
 
         assertThat(modifierToText {
+            Modifier
+                .blockSize(150.px)
+                .writingMode(WritingMode.HorizontalTb)
+        }).isEqualTo("block-size: 150px; writing-mode: horizontal-tb")
+
+        assertThat(modifierToText {
+            Modifier
+                .blockSize(BlockSize.MinContent)
+                .writingMode(WritingMode.VerticalRl)
+        }).isEqualTo("block-size: min-content; writing-mode: vertical-rl")
+
+        assertThat(modifierToText {
             Modifier.width(10.px)
         }).isEqualTo("width: 10px")
 

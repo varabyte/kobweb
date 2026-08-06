@@ -422,6 +422,23 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyBlockSize() {
+        assertThat(styleToText { blockSize(BlockSize.of(10.px)) }).isEqualTo("block-size: 10px")
+        assertThat(styleToText { blockSize(BlockSize.of(10.percent)) }).isEqualTo("block-size: 10%")
+        assertThat(styleToText { blockSize(BlockSize.of(auto)) }).isEqualTo("block-size: auto")
+
+        assertThat(styleToText { blockSize(BlockSize.FitContent) }).isEqualTo("block-size: fit-content")
+        assertThat(styleToText { blockSize(BlockSize.MaxContent) }).isEqualTo("block-size: max-content")
+        assertThat(styleToText { blockSize(BlockSize.MinContent) }).isEqualTo("block-size: min-content")
+
+        assertThat(styleToText { blockSize(BlockSize.Inherit) }).isEqualTo("block-size: inherit")
+        assertThat(styleToText { blockSize(BlockSize.Initial) }).isEqualTo("block-size: initial")
+        assertThat(styleToText { blockSize(BlockSize.Revert) }).isEqualTo("block-size: revert")
+        assertThat(styleToText { blockSize(BlockSize.RevertLayer) }).isEqualTo("block-size: revert-layer")
+        assertThat(styleToText { blockSize(BlockSize.Unset) }).isEqualTo("block-size: unset")
+    }
+
+    @Test
     fun verifyBorderCollapse() {
         assertThat(styleToText { borderCollapse(BorderCollapse.Separate) }).isEqualTo("border-collapse: separate")
         assertThat(styleToText { borderCollapse(BorderCollapse.Collapse) }).isEqualTo("border-collapse: collapse")

@@ -1,11 +1,11 @@
 package com.varabyte.kobweb.compose.css
 
-import com.varabyte.kobweb.browser.dom.css.CssProperty
+import com.varabyte.kobweb.browser.dom.css.CssPropertyName
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
-private fun CssProperty.stretchKeyword() = firstSupportedValue("stretch", "-webkit-fill-available")
+private fun CssPropertyName.stretchKeyword() = firstSupportedValue("stretch", "-webkit-fill-available")
 
 internal sealed interface CssSizeValues<T: StylePropertyValue> {
     fun of(value: CSSLengthOrPercentageNumericValue) = "$value".unsafeCast<T>()
@@ -32,10 +32,22 @@ internal sealed interface CssMaxSizeValues<T: StylePropertyValue> {
     val MinContent get() = "min-content".unsafeCast<T>()
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/block-size
+sealed interface BlockSize : StylePropertyValue {
+    companion object : CssSizeValues<BlockSize>, CssGlobalValues<BlockSize> {
+        // Stretch is not currently supported across all browsers
+        // https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/block-size#browser_compatibility
+    }
+}
+
+fun StyleScope.blockSize(blockSize: BlockSize) {
+    property("block-size", blockSize)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/width
 sealed interface Width : StylePropertyValue {
     companion object : CssSizeValues<Width>, CssGlobalValues<Width> {
-        val Stretch get() = CssProperty("width").stretchKeyword().unsafeCast<Width>()
+        val Stretch get() = CssPropertyName("width").stretchKeyword().unsafeCast<Width>()
     }
 }
 
@@ -59,7 +71,7 @@ fun StyleScope.minWidth(minWidth: MinWidth) {
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/height
 sealed interface Height : StylePropertyValue {
     companion object : CssSizeValues<Height>, CssGlobalValues<Height> {
-        val Stretch get() = CssProperty("height").stretchKeyword().unsafeCast<Height>()
+        val Stretch get() = CssPropertyName("height").stretchKeyword().unsafeCast<Height>()
     }
 }
 

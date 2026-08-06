@@ -55,9 +55,9 @@ value class CssIdent(val asStr: String): CharSequence by asStr {
 /**
  * A helping wrapper for CSS property names that let us define functionality on top of them.
  */
-value class CssProperty(private val ident: CssIdent) {
+value class CssPropertyName(private val ident: CssIdent) {
     constructor(name: String) : this(CssIdent(name))
-    val name get() = ident.asStr
+    val asStr get() = ident.asStr
 
     /**
      * Returns the first property value supported by this browser for this property name.
@@ -85,5 +85,5 @@ value class CssProperty(private val ident: CssIdent) {
         return values.firstOrNull { value -> CSS.supports(ident.asStr, value) } ?: values.first()
     }
 
-    override fun toString() = name
+    override fun toString() = asStr
 }
