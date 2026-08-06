@@ -2,6 +2,7 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/animation-iteration-count
 sealed interface AnimationIterationCount : StylePropertyValue {
     companion object : CssGlobalValues<AnimationIterationCount> {
         fun of(count: Number) = count.unsafeCast<AnimationIterationCount>()
