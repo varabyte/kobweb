@@ -86,15 +86,27 @@ private suspend inline fun <T> wrapUserCode(crossinline block: suspend () -> T):
     return withContext(Dispatchers.IO) { block() }
 }
 
-// A version of `stackTraceToString` that stops including traces once it hits a certain condition. This is a good way
-// to filter out traces that are not relevant to the user.
-private fun Throwable.stackTraceToString(includeUntil: (StackTraceElement) -> Boolean): String {
+/**
+ * A version of `stackTraceToString` that filters out traces after it hits a certain condition.
+ *
+ * This is a good way to hide traces that are not relevant to the user.
+ *
+ * This expects that the [includeUntil] parameter will be true at least once; otherwise, it is assumed that the user
+ * is trying to truncate an unrelated stacktrace by accident, at which point null will be returned.
+ *
+ * Unlike `stackTraceToString`, this methods strips the final newline from the returned string, since logging calls tend
+ * to automatically add an extra newline themselves anyway.
+ */
+private fun Throwable.truncateStackTraceToString(includeUntil: (StackTraceElement) -> Boolean): String? {
+    if (stackTrace.none { includeUntil(it) }) return null
+
     return buildString {
-        var currThrowable: Throwable? = this@stackTraceToString
+        var currThrowable: Throwable? = this@truncateStackTraceToString
         var lastThrowable: Throwable? = null
         while (currThrowable != null) {
-            if (lastThrowable != null) append("caused by: ")
-            appendLine(currThrowable.toString())
+            // Only show "caused by: ..." if we have *at least* one "at ..." line. Sometimes we might filter out every
+            // single "at" line due to our `includeUntil` filter, and an empty "caused by" section is just redundant.
+            var wasCausedByShown = false
 
             // If we're handling a "caused by" stack trace, make sure the first stack trace doesn't
             // get repeated in it.
@@ -103,11 +115,22 @@ private fun Throwable.stackTraceToString(includeUntil: (StackTraceElement) -> Bo
                 !includeUntil(it)
                     && (lastThrowableFirstStackTrace == null || it.toString() != lastThrowableFirstStackTrace)
             }.forEach {
+                if (!wasCausedByShown) {
+                    if (lastThrowable != null) append("caused by: ")
+                    appendLine(currThrowable.toString())
+                    wasCausedByShown = true
+                }
+
                 appendLine("\tat $it")
             }
 
             lastThrowable = currThrowable
             currThrowable = currThrowable.cause
+        }
+
+        // Strip final newline (if present) as log calls generally expect to add the newline themselves.
+        if (this.lastOrNull() == '\n') {
+            this.deleteAt(this.lastIndex)
         }
     }
 }
@@ -386,17 +409,26 @@ private suspend fun RoutingContext.handleApiCall(
                 content.use { it.transferTo(this) }
             }
         } catch (t: Throwable) {
-            val fullErrorString = t.stackTraceToString()
-            loggers.system.error(fullErrorString)
+            // Show the stack trace of the user's code but no need to share anything outside of that.
+            // The user can't do anything with the extra information anyway, and this keeps the message
+            // so much shorter.
+            // Note: We use "startsWith" and not "equals" below because the full classname is an
+            // anonymous inner class, something like "ApisFactoryImpl$create$2"
+            val userCodeStack =
+                t.truncateStackTraceToString(includeUntil = { it.className.startsWith("ApisFactoryImpl") })
+
+            if (userCodeStack != null) {
+                // User code exploded. No need to log extra scaffolding in that case, as it won't help.
+                loggers.system.error(userCodeStack)
+            } else {
+                // ktor exploded somehow. Best to report the whole thing to the logs since we're not sure what broke.
+                loggers.system.error(t.stackTraceToString().removeSuffix("\n"))
+            }
+
             when {
-                // Show the stack trace of the user's code but no need to share anything outside of that.
-                // The user can't do anything with the extra information anyway, and this keeps the message
-                // so much shorter.
-                // Note: We use "startsWith" and not "equals" below because the full classname is an
-                // anonymous inner class, something like "ApisFactoryImpl$create$2"
-                env == ServerEnvironment.DEV && t.stackTrace.any { it.className.startsWith("ApisFactoryImpl") } -> {
+                env == ServerEnvironment.DEV && userCodeStack != null -> {
                     call.respondText(
-                        t.stackTraceToString(includeUntil = { it.className.startsWith("ApisFactoryImpl") }),
+                        userCodeStack,
                         status = HttpStatusCode.InternalServerError,
                         contentType = ContentType.Text.Plain,
                     )
@@ -514,32 +546,32 @@ private fun Routing.setupStreaming(
                             }
                         }
                     } catch (t: Throwable) {
+                        // API streams can be created as objects or via `ApiStream` helper method. The
+                        // `includeUntil` block includes filtering logic for both cases.
+                        val userCodeStack = t.truncateStackTraceToString(includeUntil = {
+                            it.className == Apis::class.qualifiedName ||
+                                it.className.startsWith(ApiStream::class.qualifiedName!!)
+                        })
+
                         // Note: Route should always be set unless somehow we crash on the Connect event, which
                         // shouldn't happen.
                         val route = sessions.getValue(session).streamEntries[streamId]?.route ?: "?"
                         loggers.system.error(
-                            """
-                            |API stream ("$route", clientId=${clientId}) crashed
-                            |payload: "${Json.encodeToString(incomingMessage.payload)}"
-                            |${t.stackTraceToString()}
-                            """.trimMargin()
+                            buildString {
+                                appendLine("API stream crashed (\"$route\", clientId=${clientId})")
+                                append("payload: ${Json.encodeToString(incomingMessage.payload)}")
+                                if (userCodeStack != null) {
+                                    appendLine()
+                                    append(userCodeStack)
+                                }
+                            }
                         )
-
-                        // API streams can be created as objects or via `ApiStream` helper method. The
-                        // `includeUntil` block includes filtering logic for both cases.
-                        val callstack =
-                            if (env == ServerEnvironment.DEV) {
-                                t.stackTraceToString(includeUntil = {
-                                    it.className == Apis::class.qualifiedName ||
-                                        it.className.startsWith(ApiStream::class.qualifiedName!!)
-                                })
-                            } else null
 
                         session.send(
                             Json.encodeToString(
                                 StreamMessage.serverError(
                                     incomingMessage.localStreamId,
-                                    callstack
+                                    userCodeStack.takeIf { env == ServerEnvironment.DEV }
                                 )
                             )
                         )
