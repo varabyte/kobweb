@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.server.plugins
 
+import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.server.AppProperties
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -13,9 +14,7 @@ import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.forwardedheaders.*
 import kotlin.time.Duration.Companion.days
 
-fun Application.configureHTTP(appProperties: AppProperties, env: ServerEnvironment, conf: KobwebConf) {
-    val logger = log
-
+fun Application.configureHTTP(appProperties: AppProperties, env: ServerEnvironment, conf: KobwebConf, logger: Logger) {
     install(DefaultHeaders) {
         header("X-Engine", "Ktor")
 

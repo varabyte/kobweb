@@ -16,6 +16,7 @@ import com.varabyte.kobweb.server.plugin.KobwebServerPlugin
 import com.varabyte.kobweb.server.plugins.configureHTTP
 import com.varabyte.kobweb.server.plugins.configureRouting
 import com.varabyte.kobweb.server.plugins.configureSerialization
+import com.varabyte.kobweb.server.util.log.KobwebLoggers
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -124,11 +125,13 @@ suspend fun main(): Unit = withContext(Dispatchers.Default) {
     val siteLayout = SiteLayout.get()
     val events = EventDispatcher()
     val engine = embeddedServer(Netty, port) {
-        log.info("Initializing server engine for Kobweb project \"${conf.site.title}\"")
+        val loggers = KobwebLoggers()
 
-        configureRouting(appProperties, env, siteLayout, conf, globals, events)
+        loggers.system.info("Initializing server engine for Kobweb project \"${conf.site.title}\"")
+
+        configureRouting(appProperties, env, siteLayout, conf, globals, events, loggers)
         configureSerialization()
-        configureHTTP(appProperties, env, conf)
+        configureHTTP(appProperties, env, conf, loggers.system)
 
         val loader = ServiceLoader.load(KobwebServerPlugin::class.java, pluginClassloader)
         loader.forEach { kobwebServerPlugin -> kobwebServerPlugin.configure(this) }

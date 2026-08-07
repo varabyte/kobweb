@@ -6,9 +6,9 @@ import com.varabyte.kobweb.api.env.Environment
 import com.varabyte.kobweb.api.event.EventDispatcher
 import com.varabyte.kobweb.api.event.dispose.DisposeEvent
 import com.varabyte.kobweb.api.event.dispose.DisposeReason
-import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.project.io.LiveFile
 import com.varabyte.kobweb.server.api.ServerEnvironment
+import com.varabyte.kobweb.server.util.log.KobwebLoggers
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.IOException
@@ -63,7 +63,7 @@ class ApiJarFile(
     path: Path,
     private val environment: ServerEnvironment,
     private val events: EventDispatcher,
-    private val logger: Logger,
+    private val loggers: KobwebLoggers,
     private val nativeLibraryMappings: Map<String, String>
 ) {
     /**
@@ -81,7 +81,7 @@ class ApiJarFile(
      */
     private class IsolatedZipClassLoader(
         private val content: ByteArray,
-        private val logger: Logger,
+        private val loggers: KobwebLoggers,
         private val nativeLibraryMappings: Map<String, String>,
         private val serverClassLoader: ClassLoader = ApiJarFile::class.java.classLoader,
     ) : ClassLoader(serverClassLoader.parent) {
@@ -157,7 +157,7 @@ class ApiJarFile(
         override fun findLibrary(libname: String): String? {
             val sysLibName = System.mapLibraryName(libname)
 
-            logger.debug("Kobweb server got a request to load native library: \"$libname\" (system mapped to \"$sysLibName\")")
+            loggers.system.debug("Kobweb server got a request to load native library: \"$libname\" (system mapped to \"$sysLibName\")")
             val path =
                 (nativeLibraryMappings[libname]
                     ?: nativeLibraryMappings[sysLibName]
@@ -165,7 +165,7 @@ class ApiJarFile(
                         .takeIf { it.isNotEmpty() }
                         ?.let { paths ->
                             if (paths.size > 1) {
-                                logger.info(
+                                loggers.system.info(
                                     "... multiple copies of $sysLibName found in the jar: [${paths.joinToString(",") { path -> "\"$path\"" }}]. Using the first match. Consider registering \"$libname\" explicitly in your conf.yaml."
                                 )
                             }
@@ -176,9 +176,9 @@ class ApiJarFile(
             if (path != null) {
                 val stream = findFileInZipByPath(path)
                 if (stream != null) {
-                    logger.debug("... found it in the jar at: $path")
+                    loggers.system.debug("... found it in the jar at: $path")
                 } else {
-                    logger.debug("... could not find it in the jar at: $path")
+                    loggers.system.debug("... could not find it in the jar at: $path")
                 }
 
                 stream?.use {
@@ -191,14 +191,14 @@ class ApiJarFile(
                     val file =
                         File.createTempFile("${base}_", ext.takeIf { it.isNotEmpty() }).also { it.deleteOnExit() }
                     file.writeBytes(bytes)
-                    logger.debug("... created a copy at: ${file.absolutePath}")
+                    loggers.system.debug("... created a copy at: ${file.absolutePath}")
                     return file.absolutePath
                 }
             } else {
-                logger.debug("... could not find it in the jar.")
+                loggers.system.debug("... could not find it in the jar.")
             }
 
-            logger.debug("... falling back to system library searching logic.")
+            loggers.system.debug("... falling back to system library searching logic.")
             return super.findLibrary(sysLibName)
         }
 
@@ -236,7 +236,7 @@ class ApiJarFile(
         val content: ByteArray,
         environment: ServerEnvironment,
         events: EventDispatcher,
-        logger: Logger,
+        loggers: KobwebLoggers,
         nativeLibraryMappings: Map<String, String>
     ) {
         private fun ServerEnvironment.toApiEnvironment(): Environment {
@@ -247,14 +247,14 @@ class ApiJarFile(
         }
 
         val apis: Apis = run {
-            val classLoader = IsolatedZipClassLoader(content, logger, nativeLibraryMappings)
+            val classLoader = IsolatedZipClassLoader(content, loggers, nativeLibraryMappings)
             val (apis, elapsed) = measureTimedValue {
                 val factory =
                     classLoader.loadClass("ApisFactoryImpl").getDeclaredConstructor().newInstance() as ApisFactory
                 events.reset()
-                factory.create(environment.toApiEnvironment(), events, logger)
+                factory.create(environment.toApiEnvironment(), events, loggers.user)
             }
-            logger.info("Loaded and initialized server API jar in ${elapsed.inWholeMilliseconds}ms.")
+            loggers.system.info("Loaded and initialized server API jar in ${elapsed.inWholeMilliseconds}ms.")
             apis
         }
     }
@@ -269,7 +269,7 @@ class ApiJarFile(
             var cache = cache // Reassign temporarily so Kotlin knows it won't change underneath us
             if (cache == null || cache.content !== delegateFile.content) {
                 events.dispose(DisposeEvent(DisposeReason.DEV_API_RELOAD))
-                cache = Cache(currContent, environment, events, logger, nativeLibraryMappings)
+                cache = Cache(currContent, environment, events, loggers, nativeLibraryMappings)
                 this.cache = cache
             }
 

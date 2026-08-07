@@ -87,6 +87,8 @@ class Server(
      * @param enableFileLogging If true, logs will be written to a file (in addition to stdout/stderr). If false, logs
      *   will only be written to stdout/stderr. If false, the other file-related properties in this class will
      *   essentially be ignored.
+     * @param interceptSystemOutput If true, logging will track `println` / `System.out.println` and
+     *   `System.err.println` calls (rerouting them to _info_ and _warn_ streams, respectively).
      * @param logRoot The root directory where logs will be stored. If you change this to a directory that will contain
      *   other files besides just logs, consider setting [clearLogsOnStart] to false.
      * @param clearLogsOnStart If true, all existing files under the log root will be deleted when a server is
@@ -104,6 +106,7 @@ class Server(
         val level: Level = Level.DEBUG,
         val enableConsoleLogging: Boolean = true,
         val enableFileLogging: Boolean = true,
+        val interceptSystemOutput: Boolean = true,
         val logRoot: String = ".kobweb/server/logs",
         val clearLogsOnStart: Boolean = true,
         val logFileBaseName: String = "kobweb-server",

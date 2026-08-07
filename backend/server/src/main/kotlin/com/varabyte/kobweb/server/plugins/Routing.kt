@@ -9,7 +9,6 @@ import com.varabyte.kobweb.api.http.Multipart
 import com.varabyte.kobweb.api.http.MutableHeaders
 import com.varabyte.kobweb.api.http.MutableRequest
 import com.varabyte.kobweb.api.http.Request
-import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.api.stream.ApiStream
 import com.varabyte.kobweb.api.stream.Stream
 import com.varabyte.kobweb.api.stream.StreamEvent
@@ -27,6 +26,7 @@ import com.varabyte.kobweb.server.ServerGlobals
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.io.ApiJarFile
+import com.varabyte.kobweb.server.util.log.KobwebLoggers
 import com.varabyte.kobweb.streams.StreamMessage
 import com.varabyte.kobweb.streams.StreamMessage.Payload
 import com.varabyte.kobweb.util.text.PatternMapper
@@ -50,7 +50,10 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.OutputStream
+import java.io.PrintStream
 import java.nio.file.Path
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
@@ -109,34 +112,119 @@ private fun Throwable.stackTraceToString(includeUntil: (StackTraceElement) -> Bo
     }
 }
 
+/**
+ * Handles some original [PrintStream] output and redirects its output to a new location.
+ *
+ * This is meant to intercept raw `System.out` / `System.err` output from a user and redirect it into our own logger.
+ *
+ * @param shouldBypassFrame Logic to check if the current log call exists within a callstack that we should ignore.
+ *   See the header docs for [shouldRedirectOutput] for information about what this is for. An expected value would
+ *   be a callback like `{ frame.className.startsWith("ch.qos.logback.") }`, to skip any log call that originates from
+ *   a logback class.
+ */
+private class RedirectingOutputStream(
+    private val originalStream: PrintStream,
+    private val shouldBypassFrame: (StackWalker.StackFrame) -> Boolean,
+    private val logAction: (String) -> Unit
+) : OutputStream() {
+    private val buffers = ThreadLocal.withInitial { ByteArrayOutputStream() }
+
+    /**
+     * Check if the log message is coming from logback (e.g. ctx.logger.info) or from raw user system output.
+     *
+     * This helps us prevent duplicate logs in the following situation:
+     * * the end user calls `println` in their code
+     * * we intercept it and fed it into logback
+     * * logback outputs that back into console output (if `enableConsoleLogging` is configured true)
+     * * we then intercept the message again! But now, logback is on the callstack.
+     *
+     * In other words, if we know that the user is not the source of those logs, we can ignore them.
+     */
+    private fun shouldRedirectOutput(): Boolean {
+        return StackWalker.getInstance().walk { frames ->
+            frames.noneMatch { frame -> shouldBypassFrame(frame) }
+        }
+    }
+
+    private fun ByteArrayOutputStream.resetAndLog() {
+        val bytes = this.toByteArray()
+        this.reset()
+
+        if (shouldRedirectOutput()) {
+            val line = bytes.decodeToString().removeSuffix("\r") // Remove "\r" for Windows users
+            if (line.isNotEmpty()) {
+                logAction(line)
+            }
+        } else {
+            originalStream.write(bytes)
+            originalStream.write('\n'.code)
+            originalStream.flush()
+        }
+    }
+
+    override fun write(b: Int) {
+        val buffer = buffers.get()
+        if (b == '\n'.code) {
+            buffer.resetAndLog()
+        } else {
+            buffer.write(b)
+        }
+    }
+
+    override fun flush() {
+        val buffer = buffers.get()
+        if (buffer.size() > 0) {
+            buffer.resetAndLog()
+        }
+    }
+
+    fun toPrintStream(): PrintStream {
+        val autoFlush = true
+        // UTF_8 used by Kotlin for byte[] <-> String encoding / decoding
+        return PrintStream(this, autoFlush, Charsets.UTF_8)
+    }
+}
+
 fun Application.configureRouting(
     appProperties: AppProperties,
     env: ServerEnvironment,
     siteLayout: SiteLayout,
     conf: KobwebConf,
     globals: ServerGlobals,
-    events: EventDispatcher
+    events: EventDispatcher,
+    loggers: KobwebLoggers,
 ) {
-    val logger = object : Logger {
-        override fun trace(message: String) = log.trace(message)
-        override fun debug(message: String) = log.debug(message)
-        override fun info(message: String) = log.info(message)
-        override fun warn(message: String) = log.warn(message)
-        override fun error(message: String) = log.error(message)
+    if (conf.server.logging.interceptSystemOutput) {
+        val originalOut = System.out
+        val originalErr = System.err
+
+        val isLogbackFrame: (StackWalker.StackFrame) -> Boolean = { frame ->
+            frame.className.startsWith("ch.qos.logback.")
+        }
+
+        val logger = loggers.user
+        System.setOut(RedirectingOutputStream(originalOut, isLogbackFrame) { logger.info(it) }.toPrintStream())
+        System.setErr(RedirectingOutputStream(originalErr, isLogbackFrame) { logger.warn(it) }.toPrintStream())
+
+        // Restore original streams when Ktor shuts down or reloads
+        monitor.subscribe(ApplicationStopping) {
+            System.setOut(originalOut)
+            System.setErr(originalErr)
+        }
     }
 
     when {
         siteLayout.isFullstack -> {
             when (env) {
-                ServerEnvironment.DEV -> configureFullstackDevRouting(appProperties, conf, globals, events, logger)
-                ServerEnvironment.PROD -> configureFullstackProdRouting(conf, events, logger)
+                ServerEnvironment.DEV -> configureFullstackDevRouting(appProperties, conf, globals, events, loggers)
+                ServerEnvironment.PROD -> configureFullstackProdRouting(conf, events, loggers)
             }
         }
 
         else -> {
             check(siteLayout.isStatic)
             when (env) {
-                ServerEnvironment.DEV -> configureStaticDevRouting(appProperties, conf, globals, logger)
+                ServerEnvironment.DEV -> configureStaticDevRouting(appProperties, conf, globals, loggers)
                 ServerEnvironment.PROD -> configureStaticProdRouting(conf)
             }
         }
@@ -246,7 +334,7 @@ private suspend fun RoutingContext.handleApiCall(
     env: ServerEnvironment,
     apiJar: ApiJarFile,
     httpMethod: HttpMethod,
-    logger: Logger,
+    loggers: KobwebLoggers,
 ) {
     call.parameters.getAll(KOBWEB_PARAMS)?.joinToString("/")?.let { pathStr ->
         val body: Body? = when (httpMethod) {
@@ -299,7 +387,7 @@ private suspend fun RoutingContext.handleApiCall(
             }
         } catch (t: Throwable) {
             val fullErrorString = t.stackTraceToString()
-            logger.error(fullErrorString)
+            loggers.system.error(fullErrorString)
             when {
                 // Show the stack trace of the user's code but no need to share anything outside of that.
                 // The user can't do anything with the extra information anyway, and this keeps the message
@@ -377,9 +465,9 @@ private fun Routing.setupStreaming(
     application: Application,
     conf: KobwebConf,
     apiJar: ApiJarFile,
-    logger: Logger,
+    loggers: KobwebLoggers,
 ) {
-    logger.info("Initializing Kobweb streams.")
+    loggers.system.info("Initializing Kobweb streams.")
 
     application.install(WebSockets) {
         pingPeriod = conf.server.streaming.pingPeriod
@@ -429,7 +517,7 @@ private fun Routing.setupStreaming(
                         // Note: Route should always be set unless somehow we crash on the Connect event, which
                         // shouldn't happen.
                         val route = sessions.getValue(session).streamEntries[streamId]?.route ?: "?"
-                        logger.error(
+                        loggers.system.error(
                             """
                             |API stream ("$route", clientId=${clientId}) crashed
                             |payload: "${Json.encodeToString(incomingMessage.payload)}"
@@ -460,9 +548,9 @@ private fun Routing.setupStreaming(
                 }
             }
         } catch (e: ClosedReceiveChannelException) {
-            logger.trace("WebSocket connection (with clientId = $clientId) closed: ${closeReason.await()}\n$e")
+            loggers.system.trace("WebSocket connection (with clientId = $clientId) closed: ${closeReason.await()}\n$e")
         } catch (e: Throwable) {
-            logger.error("WebSocket connection (with clientId = $clientId) closed with an exception: ${closeReason.await()}\n$e")
+            loggers.system.error("WebSocket connection (with clientId = $clientId) closed with an exception: ${closeReason.await()}\n$e")
         } finally {
             sessions.remove(session)?.let { sessionData ->
                 sessionData.streamEntries.forEach { (streamId, streamData) ->
@@ -480,19 +568,19 @@ private fun Routing.configureApiRouting(
     env: ServerEnvironment,
     apiJar: ApiJarFile,
     basePath: String,
-    logger: Logger
+    loggers: KobwebLoggers
 ) {
     val path = "$basePath/api/{$KOBWEB_PARAMS...}"
     HttpMethod.entries.forEach { httpMethod ->
         when (httpMethod) {
-            HttpMethod.DELETE -> delete(path) { handleApiCall(env, apiJar, httpMethod, logger) }
-            HttpMethod.GET -> get(path) { handleApiCall(env, apiJar, httpMethod, logger) }
-            HttpMethod.HEAD -> head(path) { handleApiCall(env, apiJar, httpMethod, logger) }
-            HttpMethod.OPTIONS -> options(path) { handleApiCall(env, apiJar, httpMethod, logger) }
-            HttpMethod.PATCH -> patch(path) { handleApiCall(env, apiJar, httpMethod, logger) }
-            HttpMethod.POST -> post(path) { handleApiCall(env, apiJar, httpMethod, logger) }
-            HttpMethod.PUT -> put(path) { handleApiCall(env, apiJar, httpMethod, logger) }
-            HttpMethod.QUERY -> query(path) { handleApiCall(env, apiJar, httpMethod, logger) }
+            HttpMethod.DELETE -> delete(path) { handleApiCall(env, apiJar, httpMethod, loggers) }
+            HttpMethod.GET -> get(path) { handleApiCall(env, apiJar, httpMethod, loggers) }
+            HttpMethod.HEAD -> head(path) { handleApiCall(env, apiJar, httpMethod, loggers) }
+            HttpMethod.OPTIONS -> options(path) { handleApiCall(env, apiJar, httpMethod, loggers) }
+            HttpMethod.PATCH -> patch(path) { handleApiCall(env, apiJar, httpMethod, loggers) }
+            HttpMethod.POST -> post(path) { handleApiCall(env, apiJar, httpMethod, loggers) }
+            HttpMethod.PUT -> put(path) { handleApiCall(env, apiJar, httpMethod, loggers) }
+            HttpMethod.QUERY -> query(path) { handleApiCall(env, apiJar, httpMethod, loggers) }
         }
     }
 }
@@ -599,6 +687,7 @@ private fun Routing.configureCatchAllRouting(
     script: Path,
     fallbackResource: Path?,
     basePath: String,
+    loggers: KobwebLoggers,
     findResource: (String) -> File? = { null }
 ) {
     val scriptMap = Path("$script.map")
@@ -621,10 +710,8 @@ private fun Routing.configureCatchAllRouting(
             {
                 if (fallbackResource != null) {
                     serveIndexFile(fallbackResource)
-                    application.log.debug(
-                        "Served fallback file \"{}\" in response to \"/{}\"",
-                        fallbackResource.fileName,
-                        pathSegments.joinToString("/")
+                    loggers.system.debug(
+                        "Served fallback file \"${fallbackResource.fileName}\" in response to \"${pathSegments.joinToString("/")}\"",
                     )
                     true
                 } else false
@@ -644,16 +731,16 @@ private fun Routing.configureCatchAllRouting(
 
 private fun Path?.createApiJar(
     env: ServerEnvironment,
-    logger: Logger,
+    loggers: KobwebLoggers,
     events: EventDispatcher,
     nativeLibraryMappings: Map<String, String>
 ): ApiJarFile? {
     when {
-        this == null -> logger.info("No API jar file specified in conf.yaml. Server API routes will not be available.")
-        !this.exists() -> logger.warn("API jar specified but does not exist! Please fix conf.yaml, updating the path (or removing the value if you aren't declaring API endpoints). Invalid path: \"$this\"")
+        this == null -> loggers.system.info("No API jar file specified in conf.yaml. Server API routes will not be available.")
+        !this.exists() -> loggers.system.warn("API jar specified but does not exist! Please fix conf.yaml, updating the path (or removing the value if you aren't declaring API endpoints). Invalid path: \"$this\"")
         else -> {
-            logger.info("API jar found and will be loaded: \"$this\"")
-            return ApiJarFile(this, env, events, logger, nativeLibraryMappings)
+            loggers.system.info("API jar found and will be loaded: \"$this\"")
+            return ApiJarFile(this, env, events, loggers, nativeLibraryMappings)
         }
     }
     return null
@@ -670,7 +757,7 @@ private fun Application.configureDevRouting(
     conf: KobwebConf,
     strictRouting: Boolean,
     globals: ServerGlobals,
-    logger: Logger
+    loggers: KobwebLoggers
 ) {
     val script = Path(conf.server.files.dev.script)
     val contentRoot = Path(conf.server.files.dev.contentRoot)
@@ -679,7 +766,7 @@ private fun Application.configureDevRouting(
     routing {
         // Set up SSE (server-sent events) for the client to hear about the state of our server
         sse("/api/kobweb-status") {
-            logger.debug("Client connected and is requesting kobweb status events.")
+            loggers.system.debug("Client connected and is requesting kobweb status events.")
             heartbeat()
 
             try {
@@ -707,7 +794,7 @@ private fun Application.configureDevRouting(
                     }
                 }
             } catch (t: Throwable) {
-                logger.debug("Stopped sending kobweb status events, probably because client disconnected or server is shutting down. (${t::class.simpleName}: ${t.message})")
+                loggers.system.debug("Stopped sending kobweb status events, probably because client disconnected or server is shutting down. (${t::class.simpleName}: ${t.message})")
             }
         }
         val basePath = conf.site.basePathNormalized
@@ -717,8 +804,8 @@ private fun Application.configureDevRouting(
         }
 
         if (apiJar != null) {
-            configureApiRouting(ServerEnvironment.DEV, apiJar, basePath, logger)
-            setupStreaming(ServerEnvironment.DEV, this@configureDevRouting, conf, apiJar, logger)
+            configureApiRouting(ServerEnvironment.DEV, apiJar, basePath, loggers)
+            setupStreaming(ServerEnvironment.DEV, this@configureDevRouting, conf, apiJar, loggers)
         }
 
         val contentRootFile = contentRoot.toFile()
@@ -732,7 +819,7 @@ private fun Application.configureDevRouting(
                     ?.readLines().orEmpty().toSet()
             } else emptySet()
 
-        configureCatchAllRouting(conf, script, fallbackResource.takeIf { !strictRouting }, basePath) { path ->
+        configureCatchAllRouting(conf, script, fallbackResource.takeIf { !strictRouting }, basePath, loggers) { path ->
             // We fetch public resources dynamically in dev mode because things may get added, removed, or renamed while
             // the server is running, e.g. `cat.gif` renamed to `cat.mp4`
             var found = contentRootFile.resolve(path).takeIf { it.isFile && it.exists() }
@@ -757,23 +844,23 @@ private fun Application.configureFullstackDevRouting(
     conf: KobwebConf,
     globals: ServerGlobals,
     events: EventDispatcher,
-    logger: Logger
+    loggers: KobwebLoggers
 ) {
     val apiJar = conf.server.files.dev.api
         ?.let { Path(it) }
         .createApiJar(
             ServerEnvironment.DEV,
-            logger,
+            loggers,
             events,
             conf.server.nativeLibraries.associate { it.name to it.path })
 
-    configureDevRouting(appProperties, apiJar, conf, strictRouting = false, globals, logger)
+    configureDevRouting(appProperties, apiJar, conf, strictRouting = false, globals, loggers)
 }
 
 private fun Application.configureFullstackProdRouting(
     conf: KobwebConf,
     events: EventDispatcher,
-    logger: Logger
+    loggers: KobwebLoggers
 ) {
     val siteRoot = Path(conf.server.files.prod.siteRoot)
     if (!siteRoot.exists()) {
@@ -797,7 +884,7 @@ private fun Application.configureFullstackProdRouting(
         ?.let { systemRoot.resolve(it) }
         .createApiJar(
             ServerEnvironment.PROD,
-            logger,
+            loggers,
             events,
             conf.server.nativeLibraries.associate { it.name to it.path })
 
@@ -805,11 +892,11 @@ private fun Application.configureFullstackProdRouting(
         val basePath = conf.site.basePathNormalized
 
         if (apiJar != null) {
-            configureApiRouting(ServerEnvironment.PROD, apiJar, basePath, logger)
+            configureApiRouting(ServerEnvironment.PROD, apiJar, basePath, loggers)
             // Since prod doesn't have live reloading, we can avoid setting up streaming if there are no API streams
             // declared at this point.
             if (apiJar.apis.numApiStreams > 0) {
-                setupStreaming(ServerEnvironment.PROD, this@configureFullstackProdRouting, conf, apiJar, logger)
+                setupStreaming(ServerEnvironment.PROD, this@configureFullstackProdRouting, conf, apiJar, loggers)
             }
         }
 
@@ -836,7 +923,7 @@ private fun Application.configureFullstackProdRouting(
             }
         }
 
-        configureCatchAllRouting(conf, script, fallbackIndex, basePath)
+        configureCatchAllRouting(conf, script, fallbackIndex, basePath, loggers)
     }
 }
 
@@ -850,9 +937,9 @@ private fun Application.configureStaticDevRouting(
     appProperties: AppProperties,
     conf: KobwebConf,
     globals: ServerGlobals,
-    logger: Logger
+    loggers: KobwebLoggers
 ) {
-    configureDevRouting(appProperties, null, conf, strictRouting = true, globals, logger)
+    configureDevRouting(appProperties, null, conf, strictRouting = true, globals, loggers)
 }
 
 
