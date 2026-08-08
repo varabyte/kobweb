@@ -6,10 +6,3 @@ plugins {
     id("com.varabyte.kobweb.worker") apply false
     id("com.varabyte.kobwebx.markdown") apply false
 }
-
-subprojects {
-    repositories {
-        mavenCentral()
-        google()
-    }
-}
