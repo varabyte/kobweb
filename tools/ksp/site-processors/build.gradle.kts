@@ -1,4 +1,5 @@
 plugins {
+    id("kobweb-compilation-settings")
     alias(libs.plugins.kotlin.jvm)
     id("com.varabyte.kobweb.internal.publish")
 }

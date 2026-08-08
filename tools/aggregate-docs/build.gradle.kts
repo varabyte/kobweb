@@ -1,6 +1,7 @@
 import com.varabyte.kobweb.gradle.publish.configureDokka
 
 plugins {
+    id("kobweb-compilation-settings")
     alias(libs.plugins.dokka)
     id("com.varabyte.kobweb.internal.publish") apply false // to access the `configureDokka` function
 }
