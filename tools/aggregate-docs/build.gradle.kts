@@ -8,6 +8,10 @@ plugins {
 group = "com.varabyte.kobweb"
 version = libs.versions.kobweb.get()
 
+repositories {
+    mavenCentral()
+}
+
 configureDokka()
 
 dokka {

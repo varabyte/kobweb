@@ -1,4 +1,5 @@
 plugins {
+    id("kobweb-compilation-settings")
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlinx.serialization)
     id("com.varabyte.kobweb.internal.publish")

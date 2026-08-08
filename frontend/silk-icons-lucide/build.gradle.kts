@@ -3,6 +3,7 @@ import java.util.zip.ZipInputStream
 import javax.xml.parsers.DocumentBuilderFactory
 
 plugins {
+    id("kobweb-compilation-settings")
     alias(libs.plugins.kotlin.multiplatform)
     id("kobweb-compose")
     id("com.varabyte.kobweb.internal.publish")
