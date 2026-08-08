@@ -1,4 +1,6 @@
 import com.varabyte.kobweb.gradle.publish.configureDokka
+import org.gradle.kotlin.dsl.support.uppercaseFirstChar
+import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
 
 plugins {
     alias(libs.plugins.dokka)
@@ -50,7 +52,9 @@ val includedProjects = setOf(
 )
 
 val excludedProjects = setOf(
+    projects.backend.server,
     projects.common.clientServerInternal,
+    projects.frontend.test.composeTestUtils,
     projects.tools.ksp.siteProcessors,
     projects.tools.ksp.workerProcessor,
     projects.tools.ksp.kspExt,
@@ -62,19 +66,84 @@ dependencies {
     includedProjects.forEach { project -> dokka(project) }
 }
 
-// Warn if we ever add a new module and forget to add a dokka entry for it (which is too easy to do).
-// The Gradle team may decide to prevent this code from working in the future; if that happens, then I guess we'll just
-// have to remove it.
-gradle.projectsEvaluated {
-    val combinedProjects = (includedProjects + excludedProjects).toSet()
-    val referencedPaths = combinedProjects.map { it.path }.toSet()
-    val dokkaId = libs.plugins.dokka.get().pluginId
+// region Dokka setup validation
 
-    rootProject.subprojects {
-        if (referencedPaths.contains(project.path) && !project.pluginManager.hasPlugin(dokkaId)) {
-            logger.warn("w: Project ${project.path} doesn't apply the dokka plugin and doesn't have to be included in `aggregate-docs`")
-        } else if (!referencedPaths.contains(project.path) && project.pluginManager.hasPlugin(dokkaId)) {
-            logger.warn("w: Project ${project.path} has no dokka entry. Please make an explicit choice to include or exclude it in `aggregate-docs`")
+// Here, we report if someone adds a new module and does not explicitly register it in either the included or excluded
+// project lists. We do this in a way that is Gradle "isolated projects" compatible.
+
+val subprojectPathsProvider = provider {
+    val allPaths = rootProject.subprojects.map { it.path }.toSet()
+
+    // Remove empty "container" projects, like ":frontend"
+    allPaths.filter { path ->
+        allPaths.none { other -> other != path && other.startsWith("$path:") }
+    }.toSet()
+}
+
+@UntrackedTask(because = "Validation task with no output files")
+abstract class ValidateDokkaConfiguredProjectsTask : DefaultTask() {
+    @get:Input
+    abstract val allProjectPaths: SetProperty<String>
+
+    @get:Input
+    abstract val includedProjectPaths: SetProperty<String>
+
+    @get:Input
+    abstract val excludedProjectPaths: SetProperty<String>
+
+    @TaskAction
+    fun validate() {
+        fun String.kebabCaseToCamelCase(): String {
+            return this
+                .split("-")
+                .mapIndexed { i, part ->
+                    if (i == 0) part else part.uppercaseFirstChar()
+                }.joinToString("")
+        }
+
+        fun String.pathToProjectAccessor(): String {
+            val pathParts = this.split(":")
+            return "projects${pathParts.joinToString(".") { it.kebabCaseToCamelCase() }}"
+        }
+
+        val doubleEntered = includedProjectPaths.get().intersect(excludedProjectPaths.get())
+        if (doubleEntered.isNotEmpty()) {
+            throw GradleException(
+                """
+                |The following project(s) were entered in both the `includedProjects` and `excludedProjects` lists:
+                |${doubleEntered.joinToString("\n") { path -> " - ${path.pathToProjectAccessor()}" }}
+                |
+                |Please ensure each project only appears in one list or the other.
+                """.trimMargin()
+            )
+        }
+
+        val unconfigured = allProjectPaths.get() - includedProjectPaths.get() - excludedProjectPaths.get()
+        if (unconfigured.isNotEmpty()) {
+            throw GradleException(
+                """
+                |The following project(s) are missing an explicit Dokka entry in `tools/aggregate-docs`:
+                |${unconfigured.joinToString("\n") { path -> " - ${path.pathToProjectAccessor()}" }}
+                |
+                |Please make an explicit choice:
+                | - Add to `includedProjects` if public documentation should be generated.
+                | - Add to `excludedProjects` if this module is internal/private.
+                """.trimMargin()
+            )
         }
     }
 }
+
+val validateDokkaConfiguredProjectsTask = tasks.register<ValidateDokkaConfiguredProjectsTask>("validateDokkaConfiguredProjects") {
+    description = "Make sure that all modules are explicitly opted in or out from dokka docs generation"
+    group = "verification"
+    allProjectPaths.set(subprojectPathsProvider)
+    includedProjectPaths.set(includedProjects.map { it.path })
+    excludedProjectPaths.set(excludedProjects.map { it.path })
+}
+
+tasks.withType<DokkaGenerateTask>().configureEach {
+    dependsOn(validateDokkaConfiguredProjectsTask)
+}
+
+// endregion
