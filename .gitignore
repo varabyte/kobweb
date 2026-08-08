@@ -4,19 +4,20 @@
 .gradle
 /local.properties
 
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/gradle.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-/.idea/artifacts
-/.idea/compiler.xml
-/.idea/jarRepositories.xml
 /.idea/*.iml
-/.idea/modules
+/.idea/artifacts
+/.idea/assetWizardSettings.xml
+/.idea/caches
+/.idea/compiler.xml
+/.idea/gradle.xml
+/.idea/jarRepositories.xml
+/.idea/libraries
 /.idea/libraries-with-intellij-classes.xml
+/.idea/misc.xml
+/.idea/modules
+/.idea/modules.xml
+/.idea/navEditor.xml
+/.idea/workspace.xml
 
 .DS_Store
 kotlin-js-store/
