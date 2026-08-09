@@ -4,20 +4,10 @@
 .gradle
 /local.properties
 
-/.idea/*.iml
-/.idea/artifacts
-/.idea/assetWizardSettings.xml
-/.idea/caches
-/.idea/compiler.xml
-/.idea/gradle.xml
-/.idea/jarRepositories.xml
-/.idea/libraries
-/.idea/libraries-with-intellij-classes.xml
-/.idea/misc.xml
-/.idea/modules
-/.idea/modules.xml
-/.idea/navEditor.xml
-/.idea/workspace.xml
+# Gradle acts as the main source of truth for our projects so .idea
+# files are often just noise to our source control.
+/.idea/*
+!/.idea/codeStyles/
 
 .DS_Store
 kotlin-js-store/

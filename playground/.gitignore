@@ -7,6 +7,10 @@ out
 *.iml
 /*.ipr
 
+# Gradle is the source of truth; ignore IDEA noise
+/.idea/*
+!/.idea/codeStyles
+
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
