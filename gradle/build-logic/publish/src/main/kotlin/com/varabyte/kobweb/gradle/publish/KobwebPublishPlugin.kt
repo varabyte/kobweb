@@ -78,6 +78,7 @@ val TaskContainer.dokkaHtmlJar: Provider<Jar>
  * Additionally, this will attempt to sign your files only if you have "kobweb.sign" set to true. If this is false,
  * then files will not be published to the cloud.
  */
+@Suppress("unused") // Used by Gradle via reflection
 class KobwebPublishPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply {
