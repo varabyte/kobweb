@@ -7,18 +7,19 @@ import com.varabyte.kobweb.gradle.core.extensions.yarn
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateModuleMetadataTask
 import com.varabyte.kobweb.gradle.core.util.KOBWEB_CONFIGURE_COMPOSE_COMPILER
 import com.varabyte.kobweb.gradle.core.util.configureComposeCompiler
-import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.configuration.BuildFeatures
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
+import javax.inject.Inject
 
 @Suppress("unused") // KobwebApplicationPlugin is found by Gradle via reflection
-class KobwebCorePlugin : Plugin<Project> {
+class KobwebCorePlugin @Inject constructor(private val buildFeatures: BuildFeatures) : Plugin<Project> {
     override fun apply(project: Project) {
         val rootProject = project.rootProject
 
@@ -27,8 +28,18 @@ class KobwebCorePlugin : Plugin<Project> {
         val kobwebBlock = project.extensions.create<KobwebBlock>("kobweb")
         kobwebBlock.createYarnBlock()
 
-        rootProject.plugins.withType<YarnPlugin>().configureEach {
-            try {
+        // The official guidance for configuring the yarn plugin is "isolated projects" incompatible. Eventually, we
+        // will need to give users guidance on how to migrate their code. However, it doesn't look like that will be
+        // ready until the Kotlin 2.5.x releases start rolling out at the earliest, so it's hard to know what to suggest
+        // at this point. If push came to shove today, users should probably declare the kotlin multiplatform plugin
+        // (with `apply false`) in their root build script and configure the `YarnRootExtension` object there.
+        //
+        // For now, we'll ensure that Kobweb doesn't show up in "isolated project" error reports. (Users won't be using
+        // isolated projects at this point anyway because KGP is absolutely not "isolated project" compatible right now.
+        // However, if curious people are collecting error reports early, at least we can avoid showing up in them at
+        //  this point.)
+        if (!buildFeatures.isolatedProjects.active.get()) {
+            rootProject.plugins.withType<YarnPlugin>().configureEach {
                 rootProject.extensions.configure<YarnRootExtension> {
                     val yarnBlock = kobwebBlock.yarn
                     yarnLockMismatchReport = when (yarnBlock.lockChangedStrategy.get()) {
@@ -41,8 +52,6 @@ class KobwebCorePlugin : Plugin<Project> {
                         (yarnBlock.lockChangedStrategy.get() as? YarnLockChangedStrategy.Fail)?.rejectCreatingNewLock
                             ?: false
                 }
-            } catch (ex: NoSuchMethodError) {
-                throw GradleException("This version of Kobweb requires a newer Kotlin version than what this project is using. Please refer to https://github.com/varabyte/kobweb/blob/main/COMPATIBILITY.md")
             }
         }
 
