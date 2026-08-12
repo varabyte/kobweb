@@ -1,11 +1,8 @@
 package com.varabyte.kobweb.compose.css
 
-import com.varabyte.kobweb.browser.dom.css.CssPropertyName
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
-
-private fun CssPropertyName.stretchKeyword() = firstSupportedValue("stretch", "-webkit-fill-available")
 
 internal sealed interface CssSizeValues<T: StylePropertyValue> {
     fun of(value: CSSLengthOrPercentageNumericValue) = "$value".unsafeCast<T>()
@@ -17,6 +14,8 @@ internal sealed interface CssSizeValues<T: StylePropertyValue> {
     val FitContent get() = "fit-content".unsafeCast<T>()
     val MaxContent get() = "max-content".unsafeCast<T>()
     val MinContent get() = "min-content".unsafeCast<T>()
+    // Not supported across all browsers: https://caniuse.com/?search=width%3A+stretch
+    // val Stretch get() = "stretch".unsafeCast<T>()
 }
 
 internal sealed interface CssMaxSizeValues<T: StylePropertyValue> {
@@ -30,14 +29,13 @@ internal sealed interface CssMaxSizeValues<T: StylePropertyValue> {
     val FitContent get() = "fit-content".unsafeCast<T>()
     val MaxContent get() = "max-content".unsafeCast<T>()
     val MinContent get() = "min-content".unsafeCast<T>()
+    // Not supported across all browsers: https://caniuse.com/?search=max-width%3A+stretch
+    // val Stretch get() = "stretch".unsafeCast<T>()
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/block-size
 sealed interface BlockSize : StylePropertyValue {
-    companion object : CssSizeValues<BlockSize>, CssGlobalValues<BlockSize> {
-        // Stretch is not currently supported across all browsers
-        // https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/block-size#browser_compatibility
-    }
+    companion object : CssSizeValues<BlockSize>, CssGlobalValues<BlockSize>
 }
 
 fun StyleScope.blockSize(blockSize: BlockSize) {
@@ -46,9 +44,7 @@ fun StyleScope.blockSize(blockSize: BlockSize) {
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/width
 sealed interface Width : StylePropertyValue {
-    companion object : CssSizeValues<Width>, CssGlobalValues<Width> {
-        val Stretch get() = CssPropertyName("width").stretchKeyword().unsafeCast<Width>()
-    }
+    companion object : CssSizeValues<Width>, CssGlobalValues<Width>
 }
 
 fun AttrsScope<*>.width(width: Int) {
@@ -70,9 +66,7 @@ fun StyleScope.minWidth(minWidth: MinWidth) {
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/height
 sealed interface Height : StylePropertyValue {
-    companion object : CssSizeValues<Height>, CssGlobalValues<Height> {
-        val Stretch get() = CssPropertyName("height").stretchKeyword().unsafeCast<Height>()
-    }
+    companion object : CssSizeValues<Height>, CssGlobalValues<Height>
 }
 
 fun AttrsScope<*>.height(height: Int) {

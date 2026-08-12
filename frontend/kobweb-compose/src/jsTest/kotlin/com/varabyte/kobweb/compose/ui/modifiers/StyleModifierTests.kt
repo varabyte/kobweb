@@ -715,10 +715,6 @@ class StyleModifierTests {
         }).isEqualTo("width: 10px")
 
         assertThat(modifierToText {
-            Modifier.height(Height.Stretch)
-        }).isEqualTo("height: stretch")
-
-        assertThat(modifierToText {
             Modifier.size(3.cssRem)
         }).isEqualTo("width: 3rem; height: 3rem")
 
