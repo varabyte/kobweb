@@ -42,7 +42,6 @@ import com.varabyte.kobweb.gradle.core.ksp.setupKspJs
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode
-import com.varabyte.kobweb.gradle.core.util.getBuildScripts
 import com.varabyte.kobweb.gradle.core.util.getJvmDependencyResults
 import com.varabyte.kobweb.gradle.core.util.getResourceSources
 import com.varabyte.kobweb.gradle.core.util.getTransitiveJsDependencyResults
@@ -170,7 +169,13 @@ class KobwebApplicationPlugin @Inject constructor(
             // NOTE: To ensure build scripts from kobweb library modules are also watched for changes, we add
             // build scripts from all modules as inputs. Users with many non-kobweb modules may choose to override this
             // value to exclude build scripts from unrelated modules.
-            watchFiles.from(project.provider { project.rootProject.subprojects.map { it.layout.getBuildScripts() } })
+            watchFiles.from(
+                project.provider {
+                    project.rootProject.allprojects
+                        .map { it.buildFile }
+                        .filter { it.exists() } // Gradle returns phantom build files for intermediate folders
+                }
+            )
             serverJar = kobwebUnpackServerJarTask.map { RegularFile { it.getServerJar() } }
             serverPluginsDir = kobwebSyncServerPluginJarsTask.map {
                 project.objects.directoryProperty().apply { set(it.destinationDir) }.get()

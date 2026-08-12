@@ -114,18 +114,6 @@ fun Project.toUidString(): String {
 }
 
 /**
- * Return all Gradle build scripts within the given project layout.
- *
- * The method technically returns a collection of files, which could happen if the project has both a `build.gradle` and
- * a `build.gradle.kts` file. However, in practice, we always expect this to return a single entry, as most projects
- * would only ever have one or the other.
- */
-fun ProjectLayout.getBuildScripts(): List<Path> {
-    return listOf("build.gradle", "build.gradle.kts")
-        .mapNotNull { script -> this.projectDirectory.file(script).asFile.takeIf { it.exists() }?.toPath() }
-}
-
-/**
  * Return true if the Gradle "Isolated Projects" feature is enabled.
  *
  * The standard recommended way to do this is to inject the `BuildFeatures` API into your code and query it, but that
