@@ -7,18 +7,13 @@ import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateModuleMetadataTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
-import org.gradle.api.configuration.BuildFeatures
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.jvm.tasks.ProcessResources
-import org.gradle.util.GradleVersion
 import java.io.File
-import java.nio.file.Path
 import java.security.MessageDigest
 
 fun Project.getResourceSources(target: TargetPlatform<*>): Provider<SourceDirectorySet> =
@@ -111,24 +106,4 @@ fun Project.toUidString(): String {
     val hash = digest.digest(rawText.toByteArray(Charsets.UTF_8))
 
     return hash.joinToString("") { "%02x".format(it) }.uppercase()
-}
-
-/**
- * Return true if the Gradle "Isolated Projects" feature is enabled.
- *
- * The standard recommended way to do this is to inject the `BuildFeatures` API into your code and query it, but that
- * API was only added in Gradle 8.5, and I don't want the Kobweb plugin to crash people using older versions of Gradle.
- */
-fun Project.isIsolatedProjectsActive(): Boolean {
-    // Gradle 8.5+ introduced the BuildFeatures service starting in 8.5
-    // https://docs.gradle.org/current/javadoc/org/gradle/api/configuration/BuildFeatures.html
-    return if (GradleVersion.current() >= GradleVersion.version("8.5")) {
-        val buildFeatures = this.serviceOf<BuildFeatures>()
-        buildFeatures.isolatedProjects.active.getOrElse(false)
-    } else {
-        // Technically, experimental versions of isolated projects existed before 8.5, but I don't think we have
-        // to worry about checking for them. Anyone who cares enough to use isolated projects will be using a much more
-        // recent version of Gradle.
-        false
-    }
 }
