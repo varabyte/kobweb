@@ -867,6 +867,7 @@ class CssStylePropertyTests {
     fun verifyContainIntrinsicHeight() {
         assertThat(styleToText { containIntrinsicHeight(ContainIntrinsicHeight.of(300.px)) }).isEqualTo("contain-intrinsic-height: 300px")
         assertThat(styleToText { containIntrinsicHeight(ContainIntrinsicHeight.of(auto(200.px))) }).isEqualTo("contain-intrinsic-height: auto 200px")
+        assertThat(styleToText { containIntrinsicHeight(ContainIntrinsicHeight.of(auto.none())) }).isEqualTo("contain-intrinsic-height: auto none")
 
         assertThat(styleToText { containIntrinsicHeight(ContainIntrinsicHeight.None) }).isEqualTo("contain-intrinsic-height: none")
         assertThat(styleToText { containIntrinsicHeight(ContainIntrinsicHeight.Inherit) }).isEqualTo("contain-intrinsic-height: inherit")
@@ -880,6 +881,7 @@ class CssStylePropertyTests {
     fun verifyContainIntrinsicInlineSize() {
         assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(300.px)) }).isEqualTo("contain-intrinsic-inline-size: 300px")
         assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(auto(200.px))) }).isEqualTo("contain-intrinsic-inline-size: auto 200px")
+        assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(auto.none())) }).isEqualTo("contain-intrinsic-inline-size: auto none")
 
         assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.None) }).isEqualTo("contain-intrinsic-inline-size: none")
         assertThat(styleToText { containIntrinsicInlineSize(ContainIntrinsicInlineSize.Inherit) }).isEqualTo("contain-intrinsic-inline-size: inherit")
@@ -893,10 +895,12 @@ class CssStylePropertyTests {
     fun verifyContainIntrinsicSize() {
         assertThat(styleToText { containIntrinsicSize(ContainIntrinsicSize.of(300.px)) }).isEqualTo("contain-intrinsic-size: 300px")
         assertThat(styleToText { containIntrinsicSize(ContainIntrinsicSize.of(auto(200.px))) }).isEqualTo("contain-intrinsic-size: auto 200px")
+        assertThat(styleToText { containIntrinsicSize(ContainIntrinsicSize.of(auto.none())) }).isEqualTo("contain-intrinsic-size: auto none")
         assertThat(styleToText { containIntrinsicSize(ContainIntrinsicSize.of(1000.px, 1.5.em)) }).isEqualTo("contain-intrinsic-size: 1000px 1.5em")
         assertThat(styleToText { containIntrinsicSize(ContainIntrinsicSize.of(auto(300.px), 4.cssRem)) }).isEqualTo("contain-intrinsic-size: auto 300px 4rem")
         assertThat(styleToText { containIntrinsicSize(ContainIntrinsicSize.of(300.px, auto(4.cssRem))) }).isEqualTo("contain-intrinsic-size: 300px auto 4rem")
         assertThat(styleToText { containIntrinsicSize(ContainIntrinsicSize.of(auto(300.px), auto(4.cssRem))) }).isEqualTo("contain-intrinsic-size: auto 300px auto 4rem")
+        assertThat(styleToText { containIntrinsicSize(ContainIntrinsicSize.of(auto.none(), auto.none())) }).isEqualTo("contain-intrinsic-size: auto none auto none")
 
         assertThat(styleToText { containIntrinsicSize(ContainIntrinsicSize.None) }).isEqualTo("contain-intrinsic-size: none")
         assertThat(styleToText { containIntrinsicSize(ContainIntrinsicSize.Inherit) }).isEqualTo("contain-intrinsic-size: inherit")
