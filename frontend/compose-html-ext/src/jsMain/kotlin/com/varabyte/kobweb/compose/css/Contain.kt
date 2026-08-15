@@ -3,30 +3,21 @@
 package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
-
-/**
- * A class that wraps a target [CSSLengthNumericValue] with the auto keyword.
- *
- * This is generally uncommon but used by the `contain-intrinsic-*` line of CSS properties for sizing, which uniquely
- * support pairing a length value with the auto keyword (as opposed to using the auto keyword in place of it).
- *
- * The constructor parameter [value] can be set to null to indicate this is a special `auto none` value, which is a
- * small number of cases is distinct from `auto 0px`.
- */
-class CSSAutoLengthNumericValue(private val auto: CSSAutoKeyword, private val value: CSSLengthNumericValue?) : StylePropertyValue {
-    override fun toString() = "$auto ${value ?: "none"}"
-}
-
-operator fun CSSAutoKeyword.invoke(length: CSSLengthNumericValue) = CSSAutoLengthNumericValue(this, length)
-fun CSSAutoKeyword.none() = CSSAutoLengthNumericValue(this, null)
 
 internal sealed interface CssContainIntrinsicValues<T : StylePropertyValue> {
     fun of(value: CSSLengthNumericValue) = "$value".unsafeCast<T>()
-    fun of(value: CSSAutoLengthNumericValue) = "$value".unsafeCast<T>()
 
     // Keywords
     val None get() = "none".unsafeCast<T>()
+
+    fun Auto(value: CSSLengthNumericValue) = "auto $value".unsafeCast<T>()
+
+    /**
+     * A value that allows the "contain intrinsic" element to fall back to `"none"` if no remembered value exists.
+     *
+     * Official documentation recommends preferring `"auto none"` over `"auto 0px"`.
+     */
+    val AutoNone get() = "auto none".unsafeCast<T>()
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/contain
@@ -93,9 +84,9 @@ fun StyleScope.containIntrinsicHeight(containIntrinsicHeight: ContainIntrinsicHe
 sealed interface ContainIntrinsicSize : StylePropertyValue {
     companion object : CssContainIntrinsicValues<ContainIntrinsicSize>, CssGlobalValues<ContainIntrinsicSize> {
         fun of(width: CSSLengthNumericValue, height: CSSLengthNumericValue) = "$width $height".unsafeCast<ContainIntrinsicSize>()
-        fun of(width: CSSAutoLengthNumericValue, height: CSSLengthNumericValue) = "$width $height".unsafeCast<ContainIntrinsicSize>()
-        fun of(width: CSSLengthNumericValue, height: CSSAutoLengthNumericValue) = "$width $height".unsafeCast<ContainIntrinsicSize>()
-        fun of(width: CSSAutoLengthNumericValue, height: CSSAutoLengthNumericValue) = "$width $height".unsafeCast<ContainIntrinsicSize>()
+        fun of(width: ContainIntrinsicWidth, height: CSSLengthNumericValue) = "$width $height".unsafeCast<ContainIntrinsicSize>()
+        fun of(width: CSSLengthNumericValue, height: ContainIntrinsicHeight) = "$width $height".unsafeCast<ContainIntrinsicSize>()
+        fun of(width: ContainIntrinsicWidth, height: ContainIntrinsicHeight) = "$width $height".unsafeCast<ContainIntrinsicSize>()
     }
 }
 
