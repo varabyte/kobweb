@@ -1,7 +1,7 @@
 [versions]
-compose-runtime = "1.11.2"
+compose-runtime = "1.12.0"
 compose-html = "1.11.1"
-kotlin = "2.4.0"
+kotlin = "2.4.10"
 kotlinx-serialization = "1.11.0"
 
 [libraries]
