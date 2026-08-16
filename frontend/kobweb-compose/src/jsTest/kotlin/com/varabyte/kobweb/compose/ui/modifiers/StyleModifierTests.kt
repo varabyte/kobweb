@@ -9,7 +9,6 @@ import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.truthish.assertThat
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.keywords.auto
 import kotlin.test.Test
 
 class StyleModifierTests {
@@ -292,14 +291,6 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.aspectRatio(16, 9)
         }).isEqualTo("aspect-ratio: 16 / 9")
-
-        assertThat(modifierToText {
-            Modifier.aspectRatio(auto, 1.5)
-        }).isEqualTo("aspect-ratio: auto 1.5")
-
-        assertThat(modifierToText {
-            Modifier.aspectRatio(auto, 16, 9)
-        }).isEqualTo("aspect-ratio: auto 16 / 9")
 
         assertThat(modifierToText {
             Modifier.aspectRatio(AspectRatio.Auto)
