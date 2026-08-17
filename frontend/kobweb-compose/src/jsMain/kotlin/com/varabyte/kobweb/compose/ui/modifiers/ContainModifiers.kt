@@ -56,15 +56,15 @@ fun Modifier.containIntrinsicSize(width: CSSLengthNumericValue, height: CSSLengt
     containIntrinsicSize(ContainIntrinsicSize.of(width, height))
 }
 
-fun Modifier.containIntrinsicSize(width: ContainIntrinsicWidth, height: CSSLengthNumericValue) = styleModifier {
+fun Modifier.containIntrinsicSize(width: ContainIntrinsicWidth.Length, height: CSSLengthNumericValue) = styleModifier {
     containIntrinsicSize(ContainIntrinsicSize.of(width, height))
 }
 
-fun Modifier.containIntrinsicSize(width: CSSLengthNumericValue, height: ContainIntrinsicHeight) = styleModifier {
+fun Modifier.containIntrinsicSize(width: CSSLengthNumericValue, height: ContainIntrinsicHeight.Length) = styleModifier {
     containIntrinsicSize(ContainIntrinsicSize.of(width, height))
 }
 
-fun Modifier.containIntrinsicSize(width: ContainIntrinsicWidth, height: ContainIntrinsicHeight) = styleModifier {
+fun Modifier.containIntrinsicSize(width: ContainIntrinsicWidth.Length, height: ContainIntrinsicHeight.Length) = styleModifier {
     containIntrinsicSize(ContainIntrinsicSize.of(width, height))
 }
 

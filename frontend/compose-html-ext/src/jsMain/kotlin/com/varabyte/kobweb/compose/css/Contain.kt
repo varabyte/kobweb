@@ -4,7 +4,7 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-internal sealed interface CssContainIntrinsicValues<T : StylePropertyValue> {
+internal sealed interface CssContainIntrinsicLengthValues<T : StylePropertyValue> {
     fun of(value: CSSLengthNumericValue) = "$value".unsafeCast<T>()
 
     // Keywords
@@ -45,7 +45,8 @@ fun StyleScope.contain(contain: Contain) {
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/contain-intrinsic-block-size
 sealed interface ContainIntrinsicBlockSize : StylePropertyValue {
-    companion object : CssContainIntrinsicValues<ContainIntrinsicBlockSize>, CssGlobalValues<ContainIntrinsicBlockSize>
+    sealed interface Length : ContainIntrinsicBlockSize
+    companion object : CssContainIntrinsicLengthValues<Length>, CssGlobalValues<ContainIntrinsicBlockSize>
 }
 
 fun StyleScope.containIntrinsicBlockSize(containIntrinsicBlockSize: ContainIntrinsicBlockSize) {
@@ -54,8 +55,8 @@ fun StyleScope.containIntrinsicBlockSize(containIntrinsicBlockSize: ContainIntri
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/contain-intrinsic-inline-size
 sealed interface ContainIntrinsicInlineSize : StylePropertyValue {
-    companion object : CssContainIntrinsicValues<ContainIntrinsicInlineSize>,
-        CssGlobalValues<ContainIntrinsicInlineSize>
+    sealed interface Length : ContainIntrinsicInlineSize
+    companion object : CssContainIntrinsicLengthValues<Length>, CssGlobalValues<ContainIntrinsicInlineSize>
 }
 
 fun StyleScope.containIntrinsicInlineSize(containIntrinsicInlineSize: ContainIntrinsicInlineSize) {
@@ -64,7 +65,8 @@ fun StyleScope.containIntrinsicInlineSize(containIntrinsicInlineSize: ContainInt
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/contain-intrinsic-width
 sealed interface ContainIntrinsicWidth : StylePropertyValue {
-    companion object : CssContainIntrinsicValues<ContainIntrinsicWidth>, CssGlobalValues<ContainIntrinsicWidth>
+    sealed interface Length : ContainIntrinsicWidth
+    companion object : CssContainIntrinsicLengthValues<Length>, CssGlobalValues<ContainIntrinsicWidth>
 }
 
 fun StyleScope.containIntrinsicWidth(containIntrinsicWidth: ContainIntrinsicWidth) {
@@ -73,7 +75,8 @@ fun StyleScope.containIntrinsicWidth(containIntrinsicWidth: ContainIntrinsicWidt
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/contain-intrinsic-height
 sealed interface ContainIntrinsicHeight : StylePropertyValue {
-    companion object : CssContainIntrinsicValues<ContainIntrinsicHeight>, CssGlobalValues<ContainIntrinsicHeight>
+    sealed interface Length : ContainIntrinsicHeight
+    companion object : CssContainIntrinsicLengthValues<Length>, CssGlobalValues<ContainIntrinsicHeight>
 }
 
 fun StyleScope.containIntrinsicHeight(containIntrinsicHeight: ContainIntrinsicHeight) {
@@ -82,11 +85,12 @@ fun StyleScope.containIntrinsicHeight(containIntrinsicHeight: ContainIntrinsicHe
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/contain-intrinsic-size
 sealed interface ContainIntrinsicSize : StylePropertyValue {
-    companion object : CssContainIntrinsicValues<ContainIntrinsicSize>, CssGlobalValues<ContainIntrinsicSize> {
+    sealed interface Length : ContainIntrinsicSize
+    companion object : CssContainIntrinsicLengthValues<Length>, CssGlobalValues<ContainIntrinsicSize> {
         fun of(width: CSSLengthNumericValue, height: CSSLengthNumericValue) = "$width $height".unsafeCast<ContainIntrinsicSize>()
-        fun of(width: ContainIntrinsicWidth, height: CSSLengthNumericValue) = "$width $height".unsafeCast<ContainIntrinsicSize>()
-        fun of(width: CSSLengthNumericValue, height: ContainIntrinsicHeight) = "$width $height".unsafeCast<ContainIntrinsicSize>()
-        fun of(width: ContainIntrinsicWidth, height: ContainIntrinsicHeight) = "$width $height".unsafeCast<ContainIntrinsicSize>()
+        fun of(width: ContainIntrinsicWidth.Length, height: CSSLengthNumericValue) = "$width $height".unsafeCast<ContainIntrinsicSize>()
+        fun of(width: CSSLengthNumericValue, height: ContainIntrinsicHeight.Length) = "$width $height".unsafeCast<ContainIntrinsicSize>()
+        fun of(width: ContainIntrinsicWidth.Length, height: ContainIntrinsicHeight.Length) = "$width $height".unsafeCast<ContainIntrinsicSize>()
     }
 }
 
