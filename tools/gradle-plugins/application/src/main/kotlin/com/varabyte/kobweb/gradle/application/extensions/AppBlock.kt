@@ -337,11 +337,11 @@ abstract class AppBlock @Inject constructor(
              * Remote debugging will only work if the server is running in development mode.
              *
              * Instead of setting this via the build script, you can set it via the
-             * `kobweb.server.remote.debugging.enabled` property (since this is something you might want to be able to
-             * do from the command line or IDEA run configuration).
+             * `kobweb.server.remoteDebugging.enabled` Gradle property (since this is something you might want to be
+             * able to do from the command line or IDEA run configuration).
              *
              * So, for example, if you want to set this value from a `kobweb run` call in the terminal, you can use:
-             * `kobweb run --gradle-start -Dkobweb.server.remote.debugging.enabled=true`
+             * `kobweb run --gradle-start -Pkobweb.server.remoteDebugging.enabled=true`
              */
             abstract val enabled: Property<Boolean>
 
@@ -355,8 +355,12 @@ abstract class AppBlock @Inject constructor(
              * are running the application inside a Docker container or a remote VM).
              *
              * Instead of setting this via the build script, you can set it via the
-             * `kobweb.server.remote.debugging.host` property (since this is something you might want to be able to do
-             * from the command line or IDEA run configuration).
+             * `kobweb.server.remoteDebugging.host` Gradle property (since this is something you might want to be able
+             * to do from the command line or IDEA run configuration).
+             *
+             * So, for example, if you want to set this value from a `kobweb run` call in the terminal, you can use:
+             * `kobweb run --gradle-start -Pkobweb.server.remoteDebugging.host=*`
+             *
              */
             abstract val host: Property<String>
 
@@ -366,8 +370,11 @@ abstract class AppBlock @Inject constructor(
              * Defaults to `5005`, a common default for remote debugging.
              *
              * Instead of setting this via the build script, you can set it via the
-             * `kobweb.server.remote.debugging.port` property (since this is something you might want to be able to do
-             * from the command line or IDEA run configuration).
+             * `kobweb.server.remoteDebugging.port` Gradle property (since this is something you might want to be able
+             * to do from the command line or IDEA run configuration).
+             *
+             * So, for example, if you want to set this value from a `kobweb run` call in the terminal, you can use:
+             * `kobweb run --gradle-start -Pkobweb.server.remoteDebugging.port=5006`
              *
              * @see <a href="https://www.jetbrains.com/help/idea/attaching-to-local-process.html#attach-to-remote">Remote debugging documentation</a>
              */
@@ -376,18 +383,18 @@ abstract class AppBlock @Inject constructor(
             init {
                 enabled.convention(
                     providers
-                        .systemProperty("kobweb.server.remote.debugging.enabled")
+                        .gradleProperty("kobweb.server.remoteDebugging.enabled")
                         .map<Boolean> { it.toBooleanStrictOrNull() }
                         .orElse(false)
                 )
                 host.convention(
                     providers
-                        .systemProperty("kobweb.server.remote.debugging.host")
+                        .gradleProperty("kobweb.server.remoteDebugging.host")
                         .orElse("127.0.0.1")
                 )
                 port.convention(
                     providers
-                        .systemProperty("kobweb.server.remote.debugging.port")
+                        .gradleProperty("kobweb.server.remoteDebugging.port")
                         .map<Int> { it.toIntOrNull() }
                         .orElse(5005)
                 )
@@ -484,10 +491,13 @@ abstract class AppBlock @Inject constructor(
          * A corresponding browser will be downloaded for you the first time an export is run. If you would rather use
          * one installed on your system, setting [browserPath] will cause the download to be skipped.
          *
-         * Instead of setting this in your Gradle build sript, you can also set the system property
-         * `kobweb.export.browser.type` or the environment variable `KOBWEB_EXPORT_BROWSER_TYPE` (with values
+         * Instead of setting this in your Gradle build sript, you can also set the Gradle property
+         * `kobweb.export.browserType` or the environment variable `KOBWEB_EXPORT_BROWSER_TYPE` (with values
          * `Chromium`, `Firefox`, or `WebKit`). This can be useful if you also set the browser path via its associated
          * environment variable as well.
+         *
+         * So, for example, if you want to set this value from a `kobweb export` call in the terminal, you can use:
+         * `kobweb export --gradle-export -Pkobweb.export.browserType=Chromium`
          */
         abstract val browser: Property<Browser>
 
@@ -496,10 +506,14 @@ abstract class AppBlock @Inject constructor(
          *
          * If you set this, it _must_ match the type of [browser] (which defaults to Chromium).
          *
-         * Instead of setting this in your Gradle build script, you can also set the system property
-         * `kobweb.export.browser.path` or the environment variable `KOBWEB_EXPORT_BROWSER_PATH` (which may be
+         * Instead of setting this in your Gradle build script, you can also set the Gradle property
+         * `kobweb.export.browserPath` or the environment variable `KOBWEB_EXPORT_BROWSER_PATH` (which may be
          * convenient as it allows you to use a different value based on which environment you are exporting in,
          * e.g. home machine vs CI)
+         *
+         * So, for example, if you want to set this value from a `kobweb export` call in the terminal, you can use:
+         * `kobweb export --gradle-export -Pkobweb.export.browserPath=/Path/To/Locally/Installed/Chromium`
+         *
          */
         abstract val browserPath: Property<String>
 
@@ -540,8 +554,8 @@ abstract class AppBlock @Inject constructor(
          *
          * If set to 1, parallelism will be disabled and snapshots will occur sequentially.
          *
-         * Instead of setting this in your Gradle build script, you can also set the system property
-         * `kobweb.export.num.threads` or the environment variable `KOBWEB_EXPORT_NUM_THREADS` (which may be
+         * Instead of setting this in your Gradle build script, you can also set the Gradle property
+         * `kobweb.export.numThreads` or the environment variable `KOBWEB_EXPORT_NUM_THREADS` (which may be
          * convenient as it allows you to use a different value based on which environment you are exporting in, e.g.
          * home machine vs CI).
          *
@@ -639,20 +653,20 @@ abstract class AppBlock @Inject constructor(
             }
 
             browser.convention(
-                providers.systemProperty("kobweb.export.browser.type").filterNotBlank()
+                providers.gradleProperty("kobweb.export.browserType").filterNotBlank()
                     .orElse(providers.environmentVariable("KOBWEB_EXPORT_BROWSER_TYPE").filterNotBlank())
                     .map { Browser.valueOf(it) }
                     .orElse(Browser.Chromium)
             )
             browserPath.convention(
-                providers.systemProperty("kobweb.export.browser.path").filterNotBlank()
+                providers.gradleProperty("kobweb.export.browserPath").filterNotBlank()
                     .orElse(providers.environmentVariable("KOBWEB_EXPORT_BROWSER_PATH").filterNotBlank())
             )
             includeSourceMap.convention(true)
             suppressLayoutWarning.convention(false)
             suppressNoRootWarning.convention(false)
             numThreads.convention(
-                providers.systemProperty("kobweb.export.num.threads").toConcurrencyCountOrNull()
+                providers.gradleProperty("kobweb.export.numThreads").toConcurrencyCountOrNull()
                     .orElse(providers.environmentVariable("KOBWEB_EXPORT_NUM_THREADS").toConcurrencyCountOrNull())
                     .orElse((Runtime.getRuntime().availableProcessors() / 2).coerceIn(1, 8))
             )
