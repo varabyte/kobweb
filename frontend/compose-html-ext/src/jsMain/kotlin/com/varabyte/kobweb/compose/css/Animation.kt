@@ -7,7 +7,7 @@ sealed interface AnimationComposition : StylePropertyValue {
     sealed interface Listable : AnimationComposition
 
     companion object : CssGlobalValues<AnimationComposition> {
-        fun list(vararg compositions: AnimationComposition.Listable): AnimationComposition =
+        fun list(vararg compositions: Listable): AnimationComposition =
             compositions.joinToString().unsafeCast<AnimationComposition>()
 
         // Keyword
@@ -34,7 +34,7 @@ sealed interface Animation : StylePropertyValue {
     sealed interface Listable : Animation
 
     companion object : CssGlobalValues<Animation> {
-        // A replacement for org.jetbrains.compose.web.css.CSSAnimation which is currently implemented incorrectly
+        // A replacement for org.jetbrains.compose.web.css.CSSAnimation -- theirs is currently implemented incorrectly
         // (it exposes a 1:many relationship between an animation's name and its properties, but
         // it should be 1:1).
         fun of(

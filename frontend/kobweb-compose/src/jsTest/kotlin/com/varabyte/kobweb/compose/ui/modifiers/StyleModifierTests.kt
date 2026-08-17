@@ -39,7 +39,6 @@ class StyleModifierTests {
 
         assertThat(modifierToText {
             Modifier.animation {
-                composition(AnimationComposition.Accumulate)
                 name("test")
                 delay(2.s)
                 duration(3.s)
@@ -49,15 +48,26 @@ class StyleModifierTests {
                 playState(AnimationPlayState.Running)
                 timingFunction(AnimationTimingFunction.EaseIn)
             }
-        }).isEqualTo("animation-composition: accumulate; animation-name: test; animation-delay: 2s; animation-duration: 3s; animation-direction: alternate; animation-fill-mode: both; animation-iteration-count: 2; animation-play-state: running; animation-timing-function: ease-in")
+        }).isEqualTo("animation-name: test; animation-delay: 2s; animation-duration: 3s; animation-direction: alternate; animation-fill-mode: both; animation-iteration-count: 2; animation-play-state: running; animation-timing-function: ease-in")
 
         assertThat(modifierToText {
             Modifier.animation {
-                composition(AnimationComposition.Replace, AnimationComposition.Add)
                 delay(0.s, 2.s)
                 duration(5.s, 3.s)
             }
-        }).isEqualTo("animation-composition: replace, add; animation-delay: 0s, 2s; animation-duration: 5s, 3s")
+        }).isEqualTo("animation-delay: 0s, 2s; animation-duration: 5s, 3s")
+
+        assertThat(modifierToText {
+            Modifier.animationComposition(AnimationComposition.Accumulate)
+        }).isEqualTo("animation-composition: accumulate")
+
+        assertThat(modifierToText {
+            Modifier.animationComposition(AnimationComposition.Replace, AnimationComposition.Add)
+        }).isEqualTo("animation-composition: replace, add")
+
+        assertThat(modifierToText {
+            Modifier.animationComposition(listOf(AnimationComposition.Replace, AnimationComposition.Add))
+        }).isEqualTo("animation-composition: replace, add")
     }
 
     @Test
