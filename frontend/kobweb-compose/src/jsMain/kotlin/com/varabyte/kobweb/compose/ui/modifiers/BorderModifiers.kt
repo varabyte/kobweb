@@ -265,6 +265,6 @@ fun Modifier.borderSpacing(length: CSSLengthNumericValue) = styleModifier {
     borderSpacing(BorderSpacing.of(length))
 }
 
-fun Modifier.borderSpacing(horiz: CSSLengthNumericValue, vert: CSSLengthNumericValue) = styleModifier {
-    borderSpacing(BorderSpacing.of(horiz, vert))
+fun Modifier.borderSpacing(horizontal: CSSLengthNumericValue, vertical: CSSLengthNumericValue) = styleModifier {
+    borderSpacing(BorderSpacing.of(horizontal, vertical))
 }

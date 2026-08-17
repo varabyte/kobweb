@@ -30,10 +30,10 @@ sealed interface TouchAction : StylePropertyValue {
             (touchAction.toList() + if (pinchZoom) listOf("pinch-zoom") else emptyList())
                 .joinToString(" ").unsafeCast<TouchAction>()
 
-        fun of(horiz: PanHorizontal, vert: PanVertical, pinchZoom: Boolean = false) =
-            _of(horiz, vert, pinchZoom = pinchZoom)
-        fun of(horiz: PanHorizontal, pinchZoom: Boolean = false) = _of(horiz, pinchZoom = pinchZoom)
-        fun of(vert: PanVertical, pinchZoom: Boolean = false) = _of(vert, pinchZoom = pinchZoom)
+        fun of(horizontal: PanHorizontal, vertical: PanVertical, pinchZoom: Boolean = false) =
+            _of(horizontal, vertical, pinchZoom = pinchZoom)
+        fun of(horizontal: PanHorizontal, pinchZoom: Boolean = false) = _of(horizontal, pinchZoom = pinchZoom)
+        fun of(vertical: PanVertical, pinchZoom: Boolean = false) = _of(vertical, pinchZoom = pinchZoom)
 
         // Keyword
         val Auto get() = "auto".unsafeCast<TouchAction>()

@@ -371,7 +371,7 @@ fun StyleScope.borderImage(borderImage: BorderImage) {
 sealed interface BorderSpacing : StylePropertyValue {
     companion object : CssGlobalValues<BorderSpacing> {
         fun of(length: CSSLengthNumericValue) = "$length".unsafeCast<BorderSpacing>()
-        fun of(horiz: CSSLengthNumericValue, vert: CSSLengthNumericValue) = "$horiz $vert".unsafeCast<BorderSpacing>()
+        fun of(horizontal: CSSLengthNumericValue, vertical: CSSLengthNumericValue) = "$horizontal $vertical".unsafeCast<BorderSpacing>()
     }
 }
 
