@@ -3,8 +3,18 @@
 package com.varabyte.kobweb.gradle.core.extensions
 
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
+import javax.inject.Inject
+
+/**
+ * A Gradle property that controls the default value of [YarnBlock.active].
+ *
+ * This is provided as a simple way to disable multiple Kobweb projects with one setting, which can be useful for
+ * codebases that would prefer handling yarn configuration for themselves.
+ */
+internal const val KOBWEB_HANDLE_YARN_PLUGIN_CONFIGURATION = "kobweb.handleYarnPluginConfiguration"
 
 /**
  * An enumeration of strategies to take when Kotlin informs us that a project's `yarn.lock` file has changed.
@@ -67,7 +77,19 @@ sealed class YarnLockChangedStrategy {
     object Regenerate : YarnLockChangedStrategy()
 }
 
-abstract class YarnBlock {
+abstract class YarnBlock @Inject constructor(providers: ProviderFactory) {
+    /**
+     * If set to true, the Kobweb core plugin will handle configuring the yarn plugin using values from this block for
+     * this project.
+     *
+     * If set to false, the core plugin will skip configuring the yarn plugin entirely. This is provided as an option
+     * for people who may want to handle configuring yarn themselves.
+     *
+     * This value defaults to true or to the value of the Gradle property `kobweb.handleYarnPluginConfiguration` if it
+     * is set.
+     */
+    abstract val active: Property<Boolean>
+
     /**
      * The strategy to use when Kotlin notifies us that the project's `yarn.lock` file has changed.
      *
@@ -76,6 +98,13 @@ abstract class YarnBlock {
     abstract val lockChangedStrategy: Property<YarnLockChangedStrategy>
 
     init {
+        active.convention(
+            providers
+                .gradleProperty(KOBWEB_HANDLE_YARN_PLUGIN_CONFIGURATION)
+                .map<Boolean> { it.toBooleanStrictOrNull() }
+                .orElse(true)
+        )
+
         lockChangedStrategy.convention(YarnLockChangedStrategy.Regenerate)
     }
 }
@@ -83,6 +112,6 @@ abstract class YarnBlock {
 val KobwebBlock.yarn: YarnBlock
     get() = extensions.getByType<YarnBlock>()
 
-internal fun KobwebBlock.createYarnBlock() {
-    extensions.create<YarnBlock>("yarn")
+internal fun KobwebBlock.createYarnBlock(providers: ProviderFactory): YarnBlock {
+    return extensions.create<YarnBlock>("yarn", providers)
 }
