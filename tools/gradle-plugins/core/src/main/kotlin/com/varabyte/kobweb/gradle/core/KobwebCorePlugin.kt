@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 import javax.inject.Inject
 
-@Suppress("unused") // KobwebApplicationPlugin is found by Gradle via reflection
+@Suppress("unused") // KobwebCorePlugin is found by Gradle via reflection
 class KobwebCorePlugin @Inject constructor(private val buildFeatures: BuildFeatures) : Plugin<Project> {
     override fun apply(project: Project) {
         val rootProject = project.rootProject
