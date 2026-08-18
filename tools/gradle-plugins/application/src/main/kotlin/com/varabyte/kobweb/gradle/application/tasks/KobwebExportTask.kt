@@ -289,7 +289,7 @@ abstract class KobwebExportTask @Inject constructor(
                     (exportBlock.filter.orNull?.invoke(ctx) ?: true)
                         .also { shouldExport ->
                             if (!shouldExport) {
-                                logger.lifecycle("\nSkipped export for \"$route\".")
+                                logger.lifecycle("Skipped export for \"$route\".")
                             }
                         }
                 }
