@@ -34,10 +34,11 @@ fun Application.configureHTTP(appProperties: AppProperties, env: ServerEnvironme
     // Plugin to do so.
 
     install(CORS) {
-        allowMethod(HttpMethod.Options)
-        allowMethod(HttpMethod.Put)
         allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Patch)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Query)
         allowHeader(HttpHeaders.Authorization)
         allowCredentials = true
         allowNonSimpleContentTypes = true // Kobweb uses octet-streams
