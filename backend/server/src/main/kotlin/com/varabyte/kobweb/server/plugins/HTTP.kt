@@ -34,6 +34,10 @@ fun Application.configureHTTP(appProperties: AppProperties, env: ServerEnvironme
     // Plugin to do so.
 
     install(CORS) {
+        // The following three methods are not explicitly registered as they are enabled by default
+        // allowMethod(HttpMethod.Get)
+        // allowMethod(HttpMethod.Head)
+        // allowMethod(HttpMethod.Post)
         allowMethod(HttpMethod.Delete)
         allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Patch)
