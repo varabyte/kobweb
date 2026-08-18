@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.gradle.core
 
+import com.varabyte.kobweb.gradle.core.extensions.KOBWEB_CONFIGURE_YARN_PLUGIN
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.extensions.YarnLockChangedStrategy
 import com.varabyte.kobweb.gradle.core.extensions.createYarnBlock
@@ -25,7 +26,9 @@ class KobwebCorePlugin @Inject constructor(private val buildFeatures: BuildFeatu
         // A `kobweb` block is not used directly here in the core plugin but is provided as a foundational building
         // block for both library and application plugins.
         val kobwebBlock = project.extensions.create<KobwebBlock>("kobweb")
-        val yarnBlock = kobwebBlock.createYarnBlock(project.providers)
+        val yarnBlock = kobwebBlock.createYarnBlock()
+
+        val shouldConfigureYarnPlugin = project.providers.gradleProperty(KOBWEB_CONFIGURE_YARN_PLUGIN).getOrElse("true").toBoolean()
 
         // The official guidance for configuring the yarn plugin is "isolated projects" incompatible. Eventually, we
         // will need to give users guidance on how to migrate their code. However, it doesn't look like that will be
@@ -37,7 +40,7 @@ class KobwebCorePlugin @Inject constructor(private val buildFeatures: BuildFeatu
         // isolated projects at this point anyway because KGP is absolutely not "isolated project" compatible right now.
         // However, if curious people are collecting error reports early, at least we can avoid showing up in them at
         //  this point.)
-        if (yarnBlock.active.get() && !buildFeatures.isolatedProjects.active.get()) {
+        if (shouldConfigureYarnPlugin && !buildFeatures.isolatedProjects.active.get()) {
             rootProject.plugins.withType<YarnPlugin>().configureEach {
                 rootProject.extensions.configure<YarnRootExtension> {
                     yarnLockMismatchReport = when (yarnBlock.lockChangedStrategy.get()) {
