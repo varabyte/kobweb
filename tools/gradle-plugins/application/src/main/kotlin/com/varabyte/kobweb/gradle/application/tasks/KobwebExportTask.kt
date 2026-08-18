@@ -311,8 +311,9 @@ abstract class KobwebExportTask @Inject constructor(
                     }
                     logger.lifecycle("")
 
-                    val workerPool = Channel<PlaywrightWorker>(numThreads)
-                    repeat(numThreads) {
+                    val workerCount = minOf(numThreads, routes.size)
+                    val workerPool = Channel<PlaywrightWorker>(workerCount)
+                    repeat(workerCount) {
                         workerPool.send(
                             PlaywrightWorker(
                                 basePath,
@@ -373,7 +374,7 @@ abstract class KobwebExportTask @Inject constructor(
                         }
                     }.joinAll()
 
-                    repeat(numThreads) { workerPool.receive().close() }
+                    repeat(workerCount) { workerPool.receive().close() }
 
                     if (!anyExported.get()) {
                         val noPagesExportedMessage = buildString {
