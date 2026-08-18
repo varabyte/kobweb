@@ -145,7 +145,8 @@ private class PlaywrightWorker(private val basePath: BasePath, kobwebBrowser: Ko
     private fun Browser.takeSnapshot(route: String): String {
         newContext().use { context ->
             timeout?.let { context.setDefaultTimeout(it.toDouble(DurationUnit.MILLISECONDS)) }
-            traceConfig?.takeIf { it.filter(route) }?.let { traceConfig ->
+            val activeTraceConfig = traceConfig?.takeIf { it.filter(route) }
+            activeTraceConfig?.let { traceConfig ->
                 val traceRoot = traceConfig.root
                 traceRoot.toFile().mkdirs()
                 traceRoot.resolve("README.md").writeText(
@@ -174,7 +175,7 @@ private class PlaywrightWorker(private val basePath: BasePath, kobwebBrowser: Ko
                     val url = "http://localhost:$port${basePath.prependTo(route)}"
                     return page.takeSnapshot(url)
                 } finally {
-                    traceConfig?.let { traceConfig ->
+                    activeTraceConfig?.let { traceConfig ->
                         val traceRelativePath = traceConfig.root.resolve(
                             (if (route.endsWith('/')) route + "index" else route).removePrefix(
                                 "/"
