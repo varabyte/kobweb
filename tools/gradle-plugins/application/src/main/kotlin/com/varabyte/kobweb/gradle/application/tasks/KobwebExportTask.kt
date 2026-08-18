@@ -369,8 +369,9 @@ abstract class KobwebExportTask @Inject constructor(
                                     }
                                     append(" In your build script, consider calling `kobweb.app.export.enableTraces(...)` to generate snapshots which can help understanding. Finally, you can try increasing the timeout by setting `kobweb.app.export.timeout`.")
                                 })
+                            } finally {
+                                workerPool.send(worker) // We're done with the worker, put it back into the pool
                             }
-                            workerPool.send(worker) // We're done with the worker, put it back into the pool
                         }
                     }.joinAll()
 
