@@ -278,6 +278,10 @@ abstract class KobwebExportTask @Inject constructor(
             }
 
             val basePath = BasePath(confInputs.basePath)
+
+            val anyExported = AtomicBoolean(false)
+            val timeExportStarted = TimeSource.Monotonic.markNow()
+
             pages
                 .asSequence()
                 .map { it.route }
@@ -327,9 +331,6 @@ abstract class KobwebExportTask @Inject constructor(
                         )
                     }
 
-                    val timeExportStarted = TimeSource.Monotonic.markNow()
-                    val anyExported = AtomicBoolean(false)
-
                     routes.map { routeConfig ->
                         launch(Dispatchers.IO) {
                             val worker = workerPool.receive()
@@ -376,25 +377,25 @@ abstract class KobwebExportTask @Inject constructor(
                     }.joinAll()
 
                     repeat(workerCount) { workerPool.receive().close() }
+                }
+            }
 
-                    if (!anyExported.get()) {
-                        val noPagesExportedMessage = buildString {
-                            append("No pages were found to export.")
-                            if (exportBlock.filter.isPresent) {
-                                append(" This may be because your build script's `kobweb.app.export.filter` is filtering out all pages.")
-                            }
-                        }
-                        // This case is an error in static layout mode, because with no pages, there's nothing for
-                        // the user to visit. For a fullstack layout, however, there is always at least a minimal
-                        // index.html file included.
-                        when {
-                            siteLayout.isFullstack -> logger.warn("w: $noPagesExportedMessage")
-                            else -> logger.error("e: $noPagesExportedMessage")
-                        }
+            val timeExportFinished = TimeSource.Monotonic.markNow()
+            logger.lifecycle("\nExport finished in ${(timeExportFinished - timeExportStarted).inWholeMilliseconds}ms.\n")
+
+            if (!anyExported.get()) {
+                val noPagesExportedMessage = buildString {
+                    append("No pages were found to export.")
+                    if (exportBlock.filter.isPresent) {
+                        append(" This may be because your build script's `kobweb.app.export.filter` is filtering out all pages.")
                     }
-
-                    val timeExportFinished = TimeSource.Monotonic.markNow()
-                    logger.lifecycle("\nExport finished in ${(timeExportFinished - timeExportStarted).inWholeMilliseconds}ms.\n")
+                }
+                // This case is an error in static layout mode, because with no pages, there's nothing for
+                // the user to visit. For a fullstack layout, however, there is always at least a minimal
+                // index.html file included. Maybe the site is just a collection of dynamic pages, for example.
+                when {
+                    siteLayout.isFullstack -> logger.warn("w: $noPagesExportedMessage")
+                    else -> logger.error("e: $noPagesExportedMessage")
                 }
             }
         }
