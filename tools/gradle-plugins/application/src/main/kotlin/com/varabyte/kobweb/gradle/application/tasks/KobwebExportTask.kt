@@ -395,7 +395,7 @@ abstract class KobwebExportTask @Inject constructor(
                 // index.html file included. Maybe the site is just a collection of dynamic pages, for example.
                 when {
                     siteLayout.isFullstack -> logger.warn("w: $noPagesExportedMessage")
-                    else -> logger.error("e: $noPagesExportedMessage")
+                    else -> throw GradleException("e: $noPagesExportedMessage")
                 }
             }
         }
