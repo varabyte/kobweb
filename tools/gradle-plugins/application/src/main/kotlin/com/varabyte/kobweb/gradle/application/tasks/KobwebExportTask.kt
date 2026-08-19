@@ -385,7 +385,7 @@ abstract class KobwebExportTask @Inject constructor(
 
             if (!anyExported.get()) {
                 val noPagesExportedMessage = buildString {
-                    append("No pages were found to export.")
+                    append("No pages were exported.")
                     if (exportBlock.filter.isPresent) {
                         append(" This may be because your build script's `kobweb.app.export.filter` is filtering out all pages.")
                     }
