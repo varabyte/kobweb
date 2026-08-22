@@ -352,7 +352,7 @@ abstract class GenerateIconsTask : DefaultTask() {
         val activeMethodNames = activeIcons.keys.map { rawNameToMethodName(it) }.toSet()
         val activeMethodNamesLowerCase = activeMethodNames.map { it.lowercase() }.toSet()
 
-        val iconParams = "modifier: Modifier = Modifier, size: CSSLengthValue = 1.em, strokeWidth: Number = 2, color: CSSColorValue? = null"
+        val iconParams = "modifier: Modifier = Modifier, strokeWidth: Number = 2"
 
         val supportedTags = setOf("circle", "ellipse", "line", "path", "polygon", "polyline", "rect")
 
@@ -404,14 +404,10 @@ abstract class GenerateIconsTask : DefaultTask() {
                 appendLine(") {")
                 appendLine("${indent}createIcon(")
                 appendLine("$indent${indent}viewBox = ViewBox.sized(24),")
-                appendLine("$indent${indent}width = size,")
                 appendLine("$indent${indent}renderStyle = IconRenderStyle.Stroke(strokeWidth),")
                 appendLine("$indent${indent}attrs = modifier.toAttrs {")
                 appendLine("$indent$indent${indent}strokeLineCap(SVGStrokeLineCap.Round)")
                 appendLine("$indent$indent${indent}strokeLineJoin(SVGStrokeLineJoin.Round)")
-                appendLine("$indent$indent${indent}if (color != null) {")
-                appendLine("$indent$indent$indent${indent}stroke(color)")
-                appendLine("$indent$indent${indent}}")
                 appendLine("$indent${indent}}")
                 appendLine("${indent}) {")
                 for (element in elements) {
@@ -441,11 +437,11 @@ abstract class GenerateIconsTask : DefaultTask() {
                 appendLine("import com.varabyte.kobweb.compose.ui.Modifier")
                 appendLine("import org.jetbrains.compose.web.css.*")
                 appendLine()
-                appendLine("@Deprecated(\"Use $canonicalMethodName instead.\", ReplaceWith(\"$canonicalMethodName(modifier = modifier, size = size, strokeWidth = strokeWidth, color = color)\"))")
+                appendLine("@Deprecated(\"Use $canonicalMethodName instead.\", ReplaceWith(\"$canonicalMethodName(modifier = modifier, strokeWidth = strokeWidth)\"))")
                 appendLine("@Composable")
                 appendLine("fun $deprecatedMethodName(")
                 appendLine("${indent}$iconParams,")
-                appendLine(") = $canonicalMethodName(modifier = modifier, size = size, strokeWidth = strokeWidth, color = color)")
+                appendLine(") = $canonicalMethodName(modifier = modifier, strokeWidth = strokeWidth)")
             }
 
             val file = packageDir.resolve("deprecated").resolve("$deprecatedMethodName.kt")

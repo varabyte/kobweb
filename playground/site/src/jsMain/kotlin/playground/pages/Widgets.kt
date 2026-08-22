@@ -385,12 +385,18 @@ fun WidgetsPage() {
                                 Tooltip(ElementTarget.PreviousSibling, iconName)
                             }
                         }
-                        Row(Modifier.gap(0.5.cssRem), verticalAlignment = Alignment.CenterVertically) {
-                            LucideStar(size = 16.px)
-                            LucideStar(size = 24.px)
-                            LucideStar(size = 32.px, color = Colors.Gold)
-                            LucideStar(size = 32.px, strokeWidth = 1)
-                            LucideStar(size = 32.px, strokeWidth = 1)
+                        Row(Modifier.gap(0.5.cssRem), verticalAlignment = Alignment.Bottom) {
+                            val renderIcons = listOf<@Composable () -> Unit>(
+                                { LucideStar(Modifier.size(16.px)) },
+                                { LucideStar(Modifier.size(24.px)) },
+                                { LucideStar(Modifier.size(32.px).color(Colors.Gold)) },
+                                { LucideStar(Modifier.size(32.px), strokeWidth = 1) },
+                                { LucideStar(Modifier.size(32.px), strokeWidth = 1) },
+                            )
+                            renderIcons.forEach { renderIcon ->
+                                Box(IconContainerStyle.toModifier()) { renderIcon() }
+                                Tooltip(ElementTarget.PreviousSibling, "Star")
+                            }
                         }
                     }
                 }
