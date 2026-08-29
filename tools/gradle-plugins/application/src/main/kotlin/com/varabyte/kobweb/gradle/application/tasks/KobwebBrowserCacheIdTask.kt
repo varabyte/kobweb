@@ -16,7 +16,7 @@ import org.gradle.work.DisableCachingByDefault
  * You can use this value, for example, when [creating a cache key](https://github.com/actions/cache#creating-a-cache-key).
  */
 @DisableCachingByDefault(because = "Trivial output, not worth caching.")
-abstract class KobwebBrowserCacheIdTask : KobwebTask("Export the Kobweb project into a static site") {
+abstract class KobwebBrowserCacheIdTask : KobwebTask("Generates a consistent ID that can be used by a CI for creating a reliable cache bucket for the browser used during the export step.") {
     @get:Input
     abstract val browser: Property<Browser>
 
