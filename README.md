@@ -65,7 +65,6 @@ fun HomePage() {
 While Kobweb is still pre-1.0, it has been usable for a while now. It provides escape hatches to lower-level APIs, so
 you can accomplish anything even if Kobweb doesn't support it yet. Please consider starring the project to indicate
 interest, so we know we're creating something the community wants.
-[How ready is it?▼](#can-we-kobweb-yet)
 
 Our goal is to provide:
 
@@ -768,63 +767,6 @@ Ultimately, I believe there is room for both Compose Multiplatform *and* Kobweb.
 that feels the same on Android, iOS, Desktop, and Web, then Compose Multiplatform could be the right choice for you.
 However, if you just want to make a traditional website but want to use Kotlin instead of TypeScript, Kobweb can provide
 an excellent development experience for that case.
-
-### Can We Kobweb Yet
-
-Current state: **Foundations are in place! You may encounter API gaps.**
-
-You may wish to refer to our [Kobweb 1.0 roadmap document](https://docs.google.com/document/d/1n2Jd02yzuxaatpT7gOhEuijzfaSu9UIaQTV2t4EPcPk/preview).
-
-Kobweb is becoming quite functional. We are already using it to build https://kobweb.varabyte.com and
-https://bitspittle.dev. Several users have created working portfolio sites already, and I'm aware of at least two cases
-where Kobweb was used in a project for a client.
-
-At this point:
-
-* It is easy to set up a new project and get things running quickly.
-* The live reloading flow is pretty nice, and you'll miss it when you switch to projects that don't have it.
-* It supports generating pages from Markdown that can reference your Composable code.
-* While it's not quite a server-side rendering, you can export static pages which will get hydrated on load.
-* A huge range of CSS properties are supported, along with support for style variables and animations.
-* You can use the `Modifier` builder for a significant number of CSS properties.
-* Silk components are color-mode aware and support responsive behavior.
-* There are quite a few widgets available, and it's easy to create your own.
-
-However, there's always more to do.
-
-* I'm trying to add support for every stabilized CSS property, but some are still missing, especially less
-  common ones. (You can use a fallback for such cases in the meantime).
-* There are still a handful of widgets planned to be added.
-* A lot of detailed documentation is planned to go into the Kobweb site (linked just above) but it isn't done yet.
-
-I think there's enough here now to let you do almost anything you'd want to do, as either Kobweb supports it or you can
-escape hatch to underlying Compose HTML / Kotlin/JS approaches, but there might be some areas where it's still a bit
-DIY. It would be great to get real-world experience to hear what issues users are actually running into.
-
-In general, please understand that we are still pre-1.0, and as such, there is an expectation that you'll be a little
-more tolerant to occasional API migrations, unlike if you were using a more stable library.
-
-We strive hard to ensure that any code we deprecate is kept around for *at least* 6 months, but after that, we are
-likely to remove it. This allows our very lean team to stay nimble as we focus on getting to a 1.0 release.
-
-So, should you use Kobweb at this point? If you are...
-
-* playing around with Compose HTML for the first time and want to get up and running quickly on a toy project:
-  * **YES!!!** Please see the [connecting with us▼](#connecting-with-us) section
-    below, we'd definitely love to hear from you. It's still a good time if you want to have a voice in the
-    direction of this project.
-* a Kotlin developer who wants to write a small web app or create a new blog from scratch:
-  * **Probably!** I hope if you evaluate Kobweb at this point, you'll find a lot to like. You can get in touch
-    with us at our Discord if you try it and have questions or run into missing features.
-* someone who already has an existing project in progress and wants to integrate Kobweb into it:
-  * **Maybe not?** Depending on how much work you've done, it may not be a trivial refactor. You can review
-    [this guide on adding Kobweb to an existing project](https://kobweb.varabyte.com/docs/guides/existing-project) if
-    you want to try anyway.
-* a company:
-  * **Probably not?** I'm assuming most companies are so risk-averse they would not even use Compose HTML, which Kobweb
-    is built on top of. If you *were* considering Compose HTML, however, Kobweb is worth a look.
-
-On the fence but not sure? Connect with us, and I'd be happy to help you assess your situation.
 
 ## Community
 
