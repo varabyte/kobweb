@@ -84,10 +84,10 @@ Our goal is to provide:
 📚 You can find a detailed guide at https://kobweb.varabyte.com/docs
 
 You can
-also [check out my talk at Droidcon SF 24](https://www.droidcon.com/2024/07/17/kobwebcreating-websites-in-kotlin-leveraging-compose-html/)
-for a high level overview of Kobweb. The talk showcases what Kobweb can do, introduces Compose HTML (which it builds
-on top of), and covers a wide range of frontend and backend functionality. It is light on code but heavy on
-understanding the structure and capabilities of the framework.
+also [check out my talk at KotlinConf '25](https://kotlinconf.com/talks/774286/)
+for a high-level overview of Kobweb. The talk showcases what Kobweb can do, introduces Compose HTML (which it builds
+on top of), and touches on a range of frontend and backend functionality. It is light on code but heavy on understanding
+the structure and capabilities of the framework.
 
 ---
 
