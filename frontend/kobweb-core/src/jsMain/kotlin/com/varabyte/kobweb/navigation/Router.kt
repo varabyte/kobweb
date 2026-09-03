@@ -490,29 +490,34 @@ class Router {
 
             // Update URL to match page we navigated to
             "${window.location.origin}$pathQueryAndFragment".let { url ->
-                // It's possible only the search params or hash changed, in which case we don't want to reset the
-                // current page scroll. (pathname is the part of the URL that is just the path, no origin or search
-                // params or hash).
-                val onNewPage = window.location.pathname != Route.fromUrl(URL(url)).path
+                var onNewPage = false
 
                 if (window.location.href != url) {
+                    // It's possible only the search params or hash changed, in which case we don't want to reset the
+                    // current page scroll. (pathname is the part of the URL that is just the path, no origin or search
+                    // params or hash).
+                    if (window.location.pathname != Route.fromUrl(URL(url)).path) {
+                        onNewPage = true
+                    }
+
                     when (updateHistoryMode) {
                         UpdateHistoryMode.PUSH -> window.history.pushState(window.history.state, "", url)
                         UpdateHistoryMode.REPLACE -> window.history.replaceState(window.history.state, "", url)
-                    }
-
-                    if (onNewPage) {
-                        scrollRequest = {
-                            window.scroll(ScrollToOptions(0.0, 0.0, ScrollBehavior.INSTANT))
-                        }
                     }
                 }
 
                 // Even if the URL hasn't changed, still scroll to the target element if you can. Sometimes a user might
                 // scroll the page and then re-enter the same URL to go back.
-                if (url.contains('#')) {
-                    scrollRequest = {
-                        document.getElementById(url.substringAfter('#'))?.scrollIntoView()
+                scrollRequest = {
+                    if (onNewPage) {
+                        window.scroll(ScrollToOptions(0.0, 0.0, ScrollBehavior.INSTANT))
+                    }
+
+                    val fragment = url.substringAfter('#', "").takeIf { it.isNotEmpty() }
+                    if (fragment != null) {
+                        document.getElementById(fragment)?.scrollIntoView()
+                    } else if (!onNewPage) {
+                        window.scrollTo(0.0, 0.0)
                     }
                 }
             }
