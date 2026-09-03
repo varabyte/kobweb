@@ -230,7 +230,8 @@ class Server(
 }
 
 /**
- * Data values exposed to users that are used to define values globally useful to a Kobweb project.
+ * Data values that users can configure which control the behavior of a Kobweb application, especially its server
+ * behavior.
  */
 @Serializable
 class KobwebConf(
