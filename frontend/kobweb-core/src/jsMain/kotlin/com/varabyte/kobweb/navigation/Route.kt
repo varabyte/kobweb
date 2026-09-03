@@ -135,7 +135,7 @@ class Route(pathQueryAndFragment: String) {
     val path: String
     /** The query parameters of the original URL (decoded, in case originally URL encoded) */
     val queryParams: Map<String, String>
-    /** The fragment of the original URL (decoded, in case originally URL encoded) */
+    /** The fragment of the original URL (decoded, in case originally URL encoded); will not include the leading # */
     val fragment: String?
 
     init {
