@@ -23,7 +23,7 @@ fun Window.open(href: String, strategy: OpenLinkStrategy) {
  */
 fun SyntheticMouseEvent.toOpenLinkStrategy(default: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE): OpenLinkStrategy {
     return when {
-        ctrlKey || shiftKey -> OpenLinkStrategy.IN_NEW_TAB
+        ctrlKey || shiftKey || metaKey -> OpenLinkStrategy.IN_NEW_TAB
         else -> default
     }
 }
