@@ -12,7 +12,7 @@ import kotlinx.serialization.serializer
  * or valid JSON that cannot be converted into the requested type).
  *
  * See also the ApiFetcher extension methods provided by this library for examples of how to send requests with a
- * serialized body, e.g. `window.api.post<ExampleRequest, ExampleResponse>(body = ...)`.
+ * serialized body, e.g. `window.api.post<ExampleRequest>(body = ...)`.
  */
 suspend inline fun <reified T> ContentSource.decode(bodyDeserializer: DeserializationStrategy<T> = serializer()): T? {
     return text().let { bodyText ->
