@@ -1,5 +1,5 @@
-[![version: 0.25.2](https://img.shields.io/badge/kobweb-0.25.2-blue)](COMPATIBILITY.md)
-[![version: 0.9.23](https://img.shields.io/badge/kobweb_cli-0.9.23-blue)](https://github.com/varabyte/kobweb-cli)
+[![kobweb: 0.25.2](https://img.shields.io/badge/kobweb-0.25.2-blue)](COMPATIBILITY.md)
+[![kobweb-cli: 0.9.23](https://img.shields.io/badge/kobweb_cli-0.9.23-blue)](https://github.com/varabyte/kobweb-cli)
 <br>
 [![kotlin: 2.4.10](https://img.shields.io/badge/kotlin-2.4.10-blue?logo=kotlin)](COMPATIBILITY.md)
 [![compose-html: 1.11.1](https://img.shields.io/badge/compose_html-1.11.1-blue?logo=jetpackcompose)](COMPATIBILITY.md)
