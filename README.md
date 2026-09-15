@@ -120,6 +120,8 @@ $ brew install varabyte/tap/kobweb
 
 *OS: Mac and Linux*
 
+*Thanks a ton to [Lilian Maulny (e_ψ_lon)](https://github.com/e-psi-lon) for adding support for this target!*
+
 First, enable flakes. Create `~/.config/nix/nix.conf`:
 ```properties
 experimental-features = nix-command flakes
