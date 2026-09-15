@@ -116,6 +116,22 @@ need to do this in your own project!*
 $ brew install varabyte/tap/kobweb
 ```
 
+#### [Nix](https://nix.dev/)
+
+*OS: Mac and Linux*
+
+First, enable flakes. Create `~/.config/nix/nix.conf`:
+```properties
+experimental-features = nix-command flakes
+```
+Then:
+```bash
+$ nix profile add github:varabyte/kobweb-cli-nix
+```
+
+> [!TIP]
+> For more options, as well as NixOS instructions, see the README at https://github.com/varabyte/kobweb-cli-nix.
+
 #### [Scoop](https://scoop.sh/)
 
 *OS: Windows*
@@ -251,6 +267,7 @@ you installed it.
 | Method                    | Instructions                                                                                                                         |
 |---------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | Homebrew                  | `brew update`<br/>`brew upgrade kobweb`                                                                                              |
+| Nix                       | `nix profile upgrade kobweb-cli-nix`<br/>(or review the [varabyte/kobweb-cli-nix README](https://github.com/varabyte/kobweb-cli-nix#updating-kobweb) for more options).                                                                                                |
 | Scoop                     | `scoop update kobweb`                                                                                                                |
 | SDKMAN!                   | `sdk upgrade kobweb`                                                                                                                 |
 | Arch Linux                | Rerunning [install steps](#arch-linux) should work. If using an AUR helper, you may need to review its manual.                       |
