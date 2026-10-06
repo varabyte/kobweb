@@ -228,14 +228,13 @@ abstract class GenerateIconsTask : DefaultTask() {
             }
 
             if (tag == "polyline" || tag == "polygon") {
-                val pairs = attributes["points"]?.trim()?.split("\\s+".toRegex())?.mapNotNull { point ->
-                    val coords = point.split(",")
+                val pairs = attributes["points"]?.trim()?.split("\\s+|,".toRegex())?.chunked(2)?.mapNotNull { coords ->
                     if (coords.size == 2) {
                         val x = coords[0].toDoubleOrNull()
                         val y = coords[1].toDoubleOrNull()
                         if (x != null && y != null) "$x to $y" else null
                     } else null
-                } ?: emptyList()
+                } ?: throw GradleException("Failed to parse `points` attribute: tag=$tag, attrs=$attributes")
                 return ElementInfo.Points(tag, pairs)
             }
 

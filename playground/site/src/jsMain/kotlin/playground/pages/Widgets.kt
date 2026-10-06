@@ -49,40 +49,40 @@ import com.varabyte.kobweb.silk.components.icons.ArrowDownIcon
 import com.varabyte.kobweb.silk.components.icons.ArrowForwardIcon
 import com.varabyte.kobweb.silk.components.icons.ArrowUpIcon
 import com.varabyte.kobweb.silk.components.icons.AttachmentIcon
+import com.varabyte.kobweb.silk.components.icons.CalendarIcon
+import com.varabyte.kobweb.silk.components.icons.CheckCircleIcon
 import com.varabyte.kobweb.silk.components.icons.CheckIcon
-import com.varabyte.kobweb.silk.components.icons.UploadIcon
-import com.varabyte.kobweb.silk.components.icons.CodeIcon
-import com.varabyte.kobweb.silk.components.icons.ClipboardIcon
-import com.varabyte.kobweb.silk.components.icons.UserIcon
 import com.varabyte.kobweb.silk.components.icons.ChevronDownIcon
 import com.varabyte.kobweb.silk.components.icons.ChevronLeftIcon
-import com.varabyte.kobweb.silk.components.icons.SettingsIcon
 import com.varabyte.kobweb.silk.components.icons.ChevronRightIcon
 import com.varabyte.kobweb.silk.components.icons.ChevronUpIcon
 import com.varabyte.kobweb.silk.components.icons.CircleIcon
+import com.varabyte.kobweb.silk.components.icons.ClipboardIcon
 import com.varabyte.kobweb.silk.components.icons.CloseIcon
-import com.varabyte.kobweb.silk.components.icons.EditIcon
-import com.varabyte.kobweb.silk.components.icons.TrashIcon
+import com.varabyte.kobweb.silk.components.icons.CodeIcon
 import com.varabyte.kobweb.silk.components.icons.DownloadIcon
+import com.varabyte.kobweb.silk.components.icons.EditIcon
 import com.varabyte.kobweb.silk.components.icons.ExclaimIcon
+import com.varabyte.kobweb.silk.components.icons.EyeIcon
+import com.varabyte.kobweb.silk.components.icons.EyeOffIcon
 import com.varabyte.kobweb.silk.components.icons.HamburgerIcon
 import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
 import com.varabyte.kobweb.silk.components.icons.InfoIcon
 import com.varabyte.kobweb.silk.components.icons.LightbulbIcon
-import com.varabyte.kobweb.silk.components.icons.MinusIcon
 import com.varabyte.kobweb.silk.components.icons.LockIcon
+import com.varabyte.kobweb.silk.components.icons.MinusIcon
 import com.varabyte.kobweb.silk.components.icons.MoonIcon
-import com.varabyte.kobweb.silk.components.icons.EyeIcon
-import com.varabyte.kobweb.silk.components.icons.EyeOffIcon
 import com.varabyte.kobweb.silk.components.icons.PlusIcon
-import com.varabyte.kobweb.silk.components.icons.CalendarIcon
-import com.varabyte.kobweb.silk.components.icons.SearchIcon
-import com.varabyte.kobweb.silk.components.icons.CheckCircleIcon
 import com.varabyte.kobweb.silk.components.icons.QuestionIcon
 import com.varabyte.kobweb.silk.components.icons.QuoteIcon
+import com.varabyte.kobweb.silk.components.icons.SearchIcon
+import com.varabyte.kobweb.silk.components.icons.SettingsIcon
 import com.varabyte.kobweb.silk.components.icons.SquareIcon
 import com.varabyte.kobweb.silk.components.icons.StopIcon
 import com.varabyte.kobweb.silk.components.icons.SunIcon
+import com.varabyte.kobweb.silk.components.icons.TrashIcon
+import com.varabyte.kobweb.silk.components.icons.UploadIcon
+import com.varabyte.kobweb.silk.components.icons.UserIcon
 import com.varabyte.kobweb.silk.components.icons.WarningIcon
 import com.varabyte.kobweb.silk.components.icons.fa.FaBolt
 import com.varabyte.kobweb.silk.components.icons.fa.FaCheck
@@ -92,15 +92,13 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaGithub
 import com.varabyte.kobweb.silk.components.icons.fa.FaHouse
 import com.varabyte.kobweb.silk.components.icons.fa.FaStar
 import com.varabyte.kobweb.silk.components.icons.fa.FaUser
-import com.varabyte.kobweb.silk.components.icons.lucide.LucideBell
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideCloud
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideHeart
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideHouse
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideSearch
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideSettings
 import com.varabyte.kobweb.silk.components.icons.lucide.LucideStar
-import com.varabyte.kobweb.silk.components.icons.lucide.LucideTrash
-import com.varabyte.kobweb.silk.components.icons.lucide.LucideUser
+import com.varabyte.kobweb.silk.components.icons.lucide.LucideSwords
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiClose
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiHome
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiMenu
@@ -373,6 +371,7 @@ fun WidgetsPage() {
                         "Search" to { LucideSearch() },
                         "Settings" to { LucideSettings() },
                         "Star" to { LucideStar() },
+                        "Swords" to { LucideSwords() },
                     )
 
                     Column(Modifier.gap(0.5.cssRem)) {
