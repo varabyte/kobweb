@@ -110,3 +110,45 @@ Both tasks share the `MarkdownTask` base class, which receives the page package,
 
 - `KobwebCopyTask`, `KobwebGenerateTask`, `MarkdownTask`, and `KobwebTask` are abstract base classes and are never
   registered directly. (`KobwebTask` is registered directly only for `kobwebCleanSite` and `kobwebCleanFolder`.)
+
+## Gradle plugins relied upon
+
+This covers third-party/JetBrains Gradle plugins used by the plugin projects, either at runtime (the plugin code
+interacts with them in a user's build) or at build time (the build logic that compiles and publishes the plugins).
+
+### Runtime dependencies (used by the Kobweb plugins in a user's build)
+
+- **Kotlin Gradle Plugin / Kotlin Multiplatform (`org.jetbrains.kotlin.multiplatform`)**: Every Kobweb plugin
+  is `compileOnly` against `kotlin("gradle-plugin")` and expects the user to have applied it. The plugins use it to
+  find the JS and JVM targets, their source sets, compilations, classpaths, and tasks (`processResources`,
+  `jar`, webpack, browser run/distribution), and to add generated source and resource dirs.
+- **KSP (`com.google.devtools.ksp`)**: The core plugin depends on it (`implementation(libs.ksp.plugin)`)
+  and applies it itself (`applyKspPlugin`). It runs the Kobweb processors that discover pages, APIs, workers, and
+  so on, and produces the metadata that the `kobwebCache…` tasks merge.
+- **Compose Compiler Gradle plugin (`org.jetbrains.kotlin.plugin.compose`)**: Not applied by Kobweb; the core
+  plugin reacts to it via `pluginManager.withPlugin` and, unless disabled with `kobweb.configureComposeCompiler=false`,
+  configures its extension for smaller and faster sites. It is `compileOnly`, and failure to configure it only
+  produces a warning.
+- **Kotlin Serialization compiler plugin (`org.jetbrains.kotlin.plugin.serialization`)**: Applied to the plugin projects
+  themselves, so that they can serialize their JSON metadata. It is not applied to user projects.
+- **Gradle Kotlin DSL (`gradleKotlinDsl()`)**: Not a plugin but an API that the core plugin exposes
+  (`compileOnlyApi`) for its configuration blocks.
+
+### Build-time dependencies (building and publishing the plugins)
+
+- **Kotlin JVM (`org.jetbrains.kotlin.jvm`)**: Compiles each plugin project.
+- **Gradle Plugin Publish (`com.gradle.plugin-publish`)**: Applied through the `kobweb-gradle-portal` convention
+  plugin. It publishes to the Gradle Plugin Portal and sets website, VCS, and tags. `publishPlugins` is disabled for
+  `-SNAPSHOT` versions.
+- **`java-gradle-plugin`**: Provides the `gradlePlugin { plugins { … } }` blocks that declare `kobwebCore`,
+  `kobwebApplication`, `kobwebLibrary`, `kobwebWorker`, and `kobwebxMarkdown`. It is brought in automatically by
+  the plugin-publish plugin.
+- **Kotlin SAM-with-receiver and Assignment compiler plugins**: Applied in the `kobweb-compilation-settings`
+  convention so that Gradle Kotlin DSL idioms (e.g. `=` for properties) work in the plugin code.
+- **`com.varabyte.kobweb.internal.publish` (`KobwebPublishPlugin`)**: The repo's own publishing convention. It applies
+  the two plugins below and is used by every plugin project.
+  - **Dokka (`org.jetbrains.dokka`)**: Generates the Javadoc/HTML docs jars that Maven Central requires.
+  - **Vanniktech Maven Publish (`com.vanniktech.maven.publish`)**: Handles Maven publishing, POM metadata, and signing.
+- **Shadow (`com.gradleup.shadow`)**: Not used by the plugin projects directly. It is applied in
+  `backend/server` to build the fat server jar that the `application` project's `copyServerJar` task embeds as
+  `server.jar` (the `shadow` configuration is consumed via the `serverJar` configuration).
