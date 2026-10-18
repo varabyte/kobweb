@@ -100,7 +100,7 @@ class WorkerProcessor(
             error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's output type must be public so the Kobweb application can use it. Please make `${workerFactory.outputTypeDeclaration.qualifiedName!!.asString()}` public.")
         }
 
-        if (classNameOverride == null && !workerFactory.classDeclaration.qualifiedName!!.asString()
+        if (classNameOverride == null && !workerFactory.classDeclaration.simpleName.asString()
                 .let { it.endsWith(WORKER_FACTORY_SIMPLE_NAME) && it != WORKER_FACTORY_SIMPLE_NAME }
         ) {
             error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's name should end with the suffix \"$WORKER_FACTORY_SIMPLE_NAME\", so we can automatically generate an associated \"Worker\" class from it. Please change the name of `${workerFactory.classDeclaration.qualifiedName!!.asString()}` to meet this requirement. Alternately, call `kobweb { worker { fqcn.set(...) }` to explicitly set the generated class name.")
