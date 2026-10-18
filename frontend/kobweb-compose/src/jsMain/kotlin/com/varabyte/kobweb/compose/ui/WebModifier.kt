@@ -7,7 +7,7 @@ import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
 
 // Just a marker interface to express intention
-interface WebModifier : Modifier.Element
+sealed interface WebModifier : Modifier.Element
 
 /**
  * A modifier element which works by setting CSS styles and/or attributes when it is applied.
