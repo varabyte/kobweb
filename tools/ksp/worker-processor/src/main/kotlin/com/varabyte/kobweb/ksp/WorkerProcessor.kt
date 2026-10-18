@@ -42,9 +42,14 @@ class WorkerProcessor(
     private var workerFactoryInfo: WorkerFactoryInfo? = null
 
     // See WorkerBlock.fqcn property documentation for explicit examples for converting the fqcn value to final
-    // values for class generation.
-    private val classNameOverride = workerFqcnOverride?.substringAfterLast('.')?.takeIf { it.isNotBlank() }
-    private val classPackageOverride = workerFqcnOverride?.substringBeforeLast('.')?.takeIf { it.isNotBlank() }
+    // values for class generation. A blank fqcn is treated the same as not setting it.
+    private val workerFqcnOverride = workerFqcnOverride?.takeIf { it.isNotBlank() }
+    private val classNameOverride = this.workerFqcnOverride?.substringAfterLast('.')?.takeIf { it.isNotBlank() }
+    private val classPackageOverride = this.workerFqcnOverride?.let { fqcn ->
+        // Distinguish between "PiWorker" (no package) and ".PiWorker" (use inferred package)
+        val pkg = fqcn.substringBeforeLast('.', missingDelimiterValue = "")
+        if (fqcn.startsWith('.')) pkg.takeIf { it.isNotEmpty() } else pkg
+    }
 
     @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
@@ -118,13 +123,13 @@ class WorkerProcessor(
             ).toTypedArray()
         )
 
-        val workerPackage = classPackageOverride?.let {
-            if (it.startsWith('.')) {
-                workerFactoryInfo.classDeclaration.packageName.asString() + it
-            } else {
-                it
-            }
-        } ?: workerFactoryInfo.classDeclaration.packageName.asString()
+        val factoryPackage = workerFactoryInfo.classDeclaration.packageName.asString()
+        val workerPackage = when {
+            classPackageOverride == null -> factoryPackage
+            !classPackageOverride.startsWith('.') -> classPackageOverride
+            factoryPackage.isEmpty() -> classPackageOverride.removePrefix(".")
+            else -> factoryPackage + classPackageOverride
+        }
         val workerClassName = classNameOverride
             ?: workerFactoryInfo.classDeclaration.simpleName.asString().removeSuffix("Factory")
 
