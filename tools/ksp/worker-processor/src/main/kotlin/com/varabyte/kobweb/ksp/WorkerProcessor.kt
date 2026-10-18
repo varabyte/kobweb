@@ -16,7 +16,9 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSFile
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSVisitorVoid
+import com.squareup.kotlinpoet.ksp.toTypeName
 import com.varabyte.kobweb.ksp.symbol.suppresses
 
 /**
@@ -35,8 +37,8 @@ class WorkerProcessor(
 ) : SymbolProcessor {
     class WorkerFactoryInfo(
         val classDeclaration: KSClassDeclaration,
-        val inputTypeDeclaration: KSDeclaration,
-        val outputTypeDeclaration: KSDeclaration,
+        val inputType: KSType,
+        val outputType: KSType,
     )
 
     private var workerFactoryInfo: WorkerFactoryInfo? = null
@@ -92,12 +94,12 @@ class WorkerProcessor(
             }
         }
 
-        if (!workerFactory.inputTypeDeclaration.isPublic()) {
-            error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's input type must be public so the Kobweb application can use it. Please make `${workerFactory.inputTypeDeclaration.qualifiedName!!.asString()}` public.")
+        workerFactory.inputType.allDeclarations().firstOrNull { !it.isPublic() }?.let { nonPublicDeclaration ->
+            error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's input type (`${workerFactory.inputType.toFqString()}`) must be public so the Kobweb application can use it. Please make `${nonPublicDeclaration.qualifiedName!!.asString()}` public.")
         }
 
-        if (!workerFactory.outputTypeDeclaration.isPublic()) {
-            error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's output type must be public so the Kobweb application can use it. Please make `${workerFactory.outputTypeDeclaration.qualifiedName!!.asString()}` public.")
+        workerFactory.outputType.allDeclarations().firstOrNull { !it.isPublic() }?.let { nonPublicDeclaration ->
+            error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's output type (`${workerFactory.outputType.toFqString()}`) must be public so the Kobweb application can use it. Please make `${nonPublicDeclaration.qualifiedName!!.asString()}` public.")
         }
 
         if (classNameOverride == null && !workerFactory.classDeclaration.simpleName.asString()
@@ -116,11 +118,13 @@ class WorkerProcessor(
 
         val deps = Dependencies(
             aggregating = true,
-            *listOfNotNull(
-                workerFactoryInfo.classDeclaration.containingFile,
-                workerFactoryInfo.inputTypeDeclaration.containingFile,
-                workerFactoryInfo.outputTypeDeclaration.containingFile
-            ).toTypedArray()
+            *(sequenceOf(workerFactoryInfo.classDeclaration) +
+                workerFactoryInfo.inputType.allDeclarations() +
+                workerFactoryInfo.outputType.allDeclarations())
+                .mapNotNull { it.containingFile }
+                .distinct()
+                .toList()
+                .toTypedArray()
         )
 
         val factoryPackage = workerFactoryInfo.classDeclaration.packageName.asString()
@@ -133,8 +137,8 @@ class WorkerProcessor(
         val workerClassName = classNameOverride
             ?: workerFactoryInfo.classDeclaration.simpleName.asString().removeSuffix("Factory")
 
-        val inputType = workerFactoryInfo.inputTypeDeclaration.qualifiedName!!.asString()
-        val outputType = workerFactoryInfo.outputTypeDeclaration.qualifiedName!!.asString()
+        val inputType = workerFactoryInfo.inputType.toFqString()
+        val outputType = workerFactoryInfo.outputType.toFqString()
 
         codeGenerator.createNewFile(
             deps,
@@ -307,10 +311,23 @@ class WorkerProcessor(
             _workerStrategies.add(
                 WorkerFactoryInfo(
                     classDeclaration,
-                    inputTypeDeclaration = resolvedTypes[0].declaration,
-                    outputTypeDeclaration = resolvedTypes[1].declaration,
+                    inputType = resolvedTypes[0],
+                    outputType = resolvedTypes[1],
                 )
             )
         }
     }
+}
+
+/**
+ * Render this type as fully qualified Kotlin source, including any type arguments and nullability.
+ *
+ * For example, `List<MyInput?>` will be rendered as `kotlin.collections.List<com.example.MyInput?>`.
+ */
+private fun KSType.toFqString(): String = toTypeName().toString()
+
+/** All declarations referenced by this type, e.g. `Map<String, MyOutput>` → `Map`, `String`, `MyOutput`. */
+private fun KSType.allDeclarations(): Sequence<KSDeclaration> = sequence {
+    yield(declaration)
+    arguments.forEach { arg -> arg.type?.resolve()?.let { yieldAll(it.allDeclarations()) } }
 }

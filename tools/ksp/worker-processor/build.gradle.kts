@@ -9,6 +9,7 @@ version = libs.versions.kobweb.get()
 
 dependencies {
     implementation(libs.ksp.processing)
+    implementation(libs.kotlinpoet.ksp)
     implementation(projects.tools.processorCommon)
     implementation(projects.tools.ksp.kspExt)
 }
