@@ -114,7 +114,7 @@ class WorkerProcessor(
             *listOfNotNull(
                 workerFactoryInfo.classDeclaration.containingFile,
                 workerFactoryInfo.inputTypeDeclaration.containingFile,
-                workerFactoryInfo.inputTypeDeclaration.containingFile
+                workerFactoryInfo.outputTypeDeclaration.containingFile
             ).toTypedArray()
         )
 
