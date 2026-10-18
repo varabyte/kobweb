@@ -38,6 +38,7 @@ abstract class WorkerBlock @Inject constructor(project: Project) {
      * `com.example.PiCalculatorWorkerFactory`, then...
      *
      * * fqcn = _not set_ → "com.example.PiCalculatorWorker"
+     * * fqcn = "PiWorker" → "PiWorker"
      * * fqcn = "com.mysite.PiWorker" → "com.mysite.PiWorker"
      * * fqcn = ".PiWorker" → "com.example.PiWorker"
      * * fqcn = "com.mysite." → "com.mysite.PiCalculatorWorker"
