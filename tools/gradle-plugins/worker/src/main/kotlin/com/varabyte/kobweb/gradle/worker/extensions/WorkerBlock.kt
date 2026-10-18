@@ -17,6 +17,8 @@ abstract class WorkerBlock @Inject constructor(project: Project) {
     /**
      * The development name you'd like to use to represent this project.
      *
+     * Consider a name like "xyz-worker" (where "xyz" is replaced with your specific worker name).
+     *
      * It won't be visible to the end user, but it will be used to generate a script name for this worker. If left
      * unset, it will be given the generic name "worker".
      */
