@@ -1,3 +1,5 @@
+@file:Suppress("UnusedReceiverParameter") // Receiver acts as scope for methods to autocomplete in
+
 package com.varabyte.kobweb.silk.style.selectors
 
 import com.varabyte.kobweb.silk.style.CssRule
