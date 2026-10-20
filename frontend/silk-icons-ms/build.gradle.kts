@@ -80,7 +80,7 @@ val fetchMsIconsTask = tasks.register<FetchIconsTask>("fetchIcons") {
     group = "Icon"
     description = "Download information that lets us create $ICON_LIST_FILE_NAME, which is used to generate icons."
 
-    sourceCommit.set("229d4d6de51043272fdbb0137652f18f5ff4034b")
+    sourceCommit.set("49d4db35df873165d6bd6ba09b063c7dafbac2f4")
     iconsFile.set(layout.projectDirectory.file(ICON_LIST_FILE_NAME))
 }
 
