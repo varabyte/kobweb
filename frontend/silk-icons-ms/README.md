@@ -23,12 +23,12 @@ style, which matches Google's documented default.
 
 This directory contains a file called `ms-icon-list.txt`, which is parsed and used to generate code for this project.
 
-To update it, run the `fetchMsIcons` Gradle task, which downloads the codepoint files from
+To update it, run the `fetchIcons` Gradle task, which downloads the codepoint file from
 [`google/material-design-icons`](https://github.com/google/material-design-icons) at the commit pinned in
 `build.gradle.kts`:
 
 ```bash
-./gradlew :frontend:silk-icons-ms:fetchMsIcons
+./gradlew :frontend:silk-icons-ms:fetchIcons
 ```
 
 Once updated, regenerate the Kotlin source:
