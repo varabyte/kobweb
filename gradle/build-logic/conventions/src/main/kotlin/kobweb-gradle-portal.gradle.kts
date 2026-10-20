@@ -1,3 +1,5 @@
+import org.gradle.plugin.compatibility.compatibility
+
 plugins {
     id("com.gradle.plugin-publish")
 }
@@ -7,8 +9,14 @@ extensions.configure<GradlePluginDevelopmentExtension> {
     vcsUrl.convention("https://github.com/varabyte/kobweb.git")
 
     plugins.configureEach {
-        @Suppress("UnstableApiUsage")
         tags.addAll("kotlin", "kobweb", "web")
+
+        // See also: https://plugins.gradle.org/docs/publish-plugin#compatibility
+        compatibility {
+            features {
+                configurationCache = true
+            }
+        }
     }
 }
 
