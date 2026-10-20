@@ -11,7 +11,7 @@ template:
 which adds to the size of your page, something you should be mindful of if you don't plan to use any of these icons.
 
 Material Symbols ship in three styles: `OUTLINED`, `ROUNDED`, and `SHARP`. You can select a style per-icon via the
-`style` parameter, e.g. `MsHome(style = MsIconStyle.ROUNDED)`. If you don't pass one, icons render in the `OUTLINED`
+`style` parameter, e.g. `MsHome(style = IconStyle.ROUNDED)`. If you don't pass one, icons render in the `OUTLINED`
 style, which matches Google's documented default.
 
 > [!NOTE]

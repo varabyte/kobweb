@@ -105,7 +105,6 @@ import com.varabyte.kobweb.silk.components.icons.mdi.MdiMenu
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiSearch
 import com.varabyte.kobweb.silk.components.icons.ms.MsClose
 import com.varabyte.kobweb.silk.components.icons.ms.MsHome
-import com.varabyte.kobweb.silk.components.icons.ms.MsIconStyle
 import com.varabyte.kobweb.silk.components.icons.ms.MsMenu
 import com.varabyte.kobweb.silk.components.icons.ms.MsSearch
 import com.varabyte.kobweb.silk.components.layout.SimpleGrid
@@ -134,6 +133,7 @@ import playground.components.layouts.PageLayoutData
 import playground.components.widgets.GoHomeLink
 import com.varabyte.kobweb.silk.components.icons.fa.IconStyle as FaIconStyle
 import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle as MdiIconStyle
+import com.varabyte.kobweb.silk.components.icons.ms.IconStyle as MsIconStyle
 
 val WidgetSectionStyle = CssStyle.base {
     Modifier

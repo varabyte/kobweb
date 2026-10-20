@@ -112,7 +112,7 @@ abstract class GenerateIconsTask : DefaultTask() {
             @Suppress("DEPRECATION") // capitalize is way more readable than a direct replacement
             val methodName = "Ms" + rawName.split("_").joinToString("") { it.capitalize() }
 
-            methodName to "@Composable fun $methodName(modifier: Modifier = Modifier, style: MsIconStyle = OUTLINED) = MsIcon(\"$rawName\", modifier, style)"
+            methodName to "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = OUTLINED) = MsIcon(\"$rawName\", modifier, style)"
         }
 
         val iconsHeader =
@@ -131,7 +131,7 @@ abstract class GenerateIconsTask : DefaultTask() {
             |
             |import androidx.compose.runtime.*
             |import com.varabyte.kobweb.compose.ui.Modifier
-            |import com.varabyte.kobweb.silk.components.icons.ms.MsIconStyle.*
+            |import com.varabyte.kobweb.silk.components.icons.ms.IconStyle.*
             |
             """.trimMargin()
 
@@ -146,13 +146,16 @@ abstract class GenerateIconsTask : DefaultTask() {
                 |import org.jetbrains.compose.web.dom.Span
                 |import org.jetbrains.compose.web.dom.Text
                 |
-                |enum class MsIconStyle {
+                |enum class IconStyle {
                 |    OUTLINED,
                 |    ROUNDED,
                 |    SHARP;
                 |}
                 |
-                |private fun MsIconStyle.toClassNameSuffix(): String {
+                |@Deprecated("Use IconStyle instead", ReplaceWith("IconStyle"))
+                |typealias MsIconStyle = IconStyle
+                |
+                |private fun IconStyle.toClassNameSuffix(): String {
                 |    return when (this) {
                 |        OUTLINED -> "-outlined"
                 |        ROUNDED -> "-rounded"
@@ -164,7 +167,7 @@ abstract class GenerateIconsTask : DefaultTask() {
                 |fun MsIcon(
                 |    name: String,
                 |    modifier: Modifier,
-                |    style: MsIconStyle = OUTLINED,
+                |    style: IconStyle = OUTLINED,
                 |) {
                 |    Span(
                 |        attrs = modifier.toAttrs { classes("material-symbols${style.toClassNameSuffix()}") }
