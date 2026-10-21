@@ -301,7 +301,7 @@ class FrontendProcessor(
                 pages
                     .filter { page -> page.hasLayoutAnnotation() }
                     .map { page -> page to page.getAnnotationsByName(LAYOUT_FQN).first() }
-                    .filter { (_, layout) -> layout.getArgumentValue().orEmpty().isEmpty() }
+                    .filter { (_, layout) -> layout.getArgumentValue().orEmpty().isBlank() }
                     .forEach { (page, layout) ->
                         logger.error(
                             "@Page method \"${page.qualifiedName!!.asString()}\" cannot apply a `@Layout` annotation without specifying a target path. Please add a valid layout path to the layout annotation or remove it.",
