@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.navigation
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.core.RoutePath
 import com.varabyte.kobweb.core.init.KobwebConfig
 import com.varabyte.kobweb.core.rememberPageContext
 import org.jetbrains.compose.web.dom.A
@@ -29,7 +30,7 @@ import org.w3c.dom.HTMLAnchorElement
  */
 @Composable
 fun Anchor(
-    href: String,
+    @RoutePath href: String,
     attrs: AttrBuilderContext<HTMLAnchorElement>? = null,
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,

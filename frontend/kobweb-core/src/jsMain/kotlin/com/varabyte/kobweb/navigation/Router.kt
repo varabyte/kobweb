@@ -7,6 +7,8 @@ import com.varabyte.kobweb.compose.css.JustifyContent
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.core.PageContext
 import com.varabyte.kobweb.core.PageContextLocal
+import com.varabyte.kobweb.core.RoutePath
+import com.varabyte.kobweb.core.RoutePathType
 import com.varabyte.kobweb.core.data.MutableData
 import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.core.layout.NO_LAYOUT_FQN
@@ -70,6 +72,8 @@ class RouteInterceptorScope(pathQueryAndFragment: String) {
      * This path should always be absolute; if you set it without a leading slash, one will
      * be added for you.
      */
+    @get:RoutePath(RoutePathType.PATH_ONLY, mustExist = false)
+    @set:RoutePath(RoutePathType.PATH_ONLY, mustExist = true)
     var path = route.path
         set(value) {
             field = if (value.startsWith('/')) value else "/$value"
@@ -94,6 +98,7 @@ class RouteInterceptorScope(pathQueryAndFragment: String) {
      *
      * This value is read-only. To affect it, set the various parts.
      */
+    @RoutePath(RoutePathType.PATH_QUERY_AND_FRAGMENT, mustExist = false)
     val pathQueryAndFragment get() = Route(path, queryParams, fragment).toString()
 }
 
@@ -311,7 +316,14 @@ class Router {
      * `user = 123456` and `post = 321` passed down in the `PageContext`.
      */
     @Suppress("unused") // Called by generated code
-    fun register(route: String, layoutId: String? = null, initRouteMethod: InitRouteMethod? = null, pageMethod: PageMethod) {
+    // `route` NOT marked with @RoutePath because it can contain custom formatting for dynamic routes; it's more a
+    // special route definition rather than a path.
+    fun register(
+        route: String,
+        layoutId: String? = null,
+        initRouteMethod: InitRouteMethod? = null,
+        pageMethod: PageMethod
+    ) {
         require(Route.isRoute(route) && route.startsWith('/')) { "Registration only allowed for internal, rooted routes, e.g. /example/path. Got: $route" }
         require(
             routeTree.register(BasePath.prependTo(route), pageMethod)
@@ -322,6 +334,8 @@ class Router {
     }
 
     @Suppress("unused") // Called by generated code
+    // Params NOT marked with @RoutePath because fromRoute is a regex and toRoute can contain replacement variables,
+    // e.g. "to-route/$1"
     fun registerRedirect(fromRoute: String, toRoute: String) {
         listOf(fromRoute, toRoute).forEach {
             require(Route.isRoute(it) && it.startsWith('/')) { "Registration only allowed for rooted routes, e.g. `/example/path`. Got: $it" }
@@ -431,7 +445,7 @@ class Router {
      */
     @IgnorableReturnValue
     fun tryRoutingTo(
-        pathQueryAndFragment: String,
+        @RoutePath(RoutePathType.PATH_QUERY_AND_FRAGMENT) pathQueryAndFragment: String,
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE,
         routeToErrorPageOnFail: Boolean = true,
@@ -545,7 +559,7 @@ class Router {
      *   ctx.router.navigateTo(...)
      * ```
      *
-     * Note that if [pathQueryAndFragment] is a domain-less, absolute route (that is, it starts with a slash), then this
+     * Note that if [url] is a domain-less, absolute route (that is, it starts with a slash), then this
      * method will automatically prepend this site's [BasePath] if it is configured.
      *
      * Finally, if you pass in a path that starts with the current site's domain, then this method will treat it as an
@@ -559,26 +573,26 @@ class Router {
      *
      * @param updateHistoryMode This parameter is only used for internal site routing. See [tryRoutingTo] for more
      *   information.
-     * @param openInternalLinksStrategy The tab opening strategy to use when [pathQueryAndFragment] is a link that
+     * @param openInternalLinksStrategy The tab opening strategy to use when [url] is a link that
      *   would result in the user staying inside the same domain.
-     * @param openExternalLinksStrategy The tab opening strategy to use when [pathQueryAndFragment] is a link that
+     * @param openExternalLinksStrategy The tab opening strategy to use when [url] is a link that
      *   would result in the user leaving the current domain.
      */
     fun navigateTo(
-        pathQueryAndFragment: String,
+        @RoutePath url: String,
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openInternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE,
         openExternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_NEW_TAB,
     ) {
         if (!tryRoutingTo(
-                pathQueryAndFragment,
+                url,
                 updateHistoryMode,
                 openInternalLinksStrategy,
                 routeToErrorPageOnFail = false,
             )
         ) {
-            window.open(Route.normalizeSlashes(pathQueryAndFragment),
-                if (pathQueryAndFragment.resolvesToSameOrigin()) {
+            window.open(Route.normalizeSlashes(url),
+                if (url.resolvesToSameOrigin()) {
                     openInternalLinksStrategy
                 } else {
                     openExternalLinksStrategy

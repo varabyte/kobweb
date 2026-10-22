@@ -7,6 +7,7 @@ import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.core.RoutePath
 import com.varabyte.kobweb.navigation.Anchor
 import com.varabyte.kobweb.navigation.OpenLinkStrategy
 import com.varabyte.kobweb.navigation.UpdateHistoryMode
@@ -89,7 +90,7 @@ val AlwaysUnderlinedLinkVariant = LinkStyle.addVariant {
  */
 @Composable
 fun Link(
-    path: String,
+    @RoutePath path: String,
     text: String? = null,
     modifier: Modifier = Modifier,
     variant: CssStyleVariant<LinkKind>? = null,
@@ -118,7 +119,7 @@ fun Link(
  */
 @Composable
 fun Link(
-    path: String,
+    @RoutePath path: String,
     modifier: Modifier = Modifier,
     variant: CssStyleVariant<LinkKind>? = null,
     openInternalLinksStrategy: OpenLinkStrategy? = null,

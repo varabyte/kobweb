@@ -56,6 +56,7 @@ class RouteInfo internal constructor(
      *
      * This property is equivalent to `window.location.pathname` but provided here as a convenience property.
      */
+    @RoutePath(RoutePathType.PATH_ONLY, mustExist = false)
     val path: String = route.path
 
     /**
@@ -112,6 +113,7 @@ class RouteInfo internal constructor(
      *In the URL: "https://example.com/a/b/c/slug?x=1&y=2#id", this will return
      * "/a/b/c/slug?x=1&y=2#id"
      */
+    @RoutePath(RoutePathType.PATH_QUERY_AND_FRAGMENT, mustExist = false)
     val pathQueryAndFragment get() = route.toString()
 
     override fun toString() = pathQueryAndFragment
@@ -132,7 +134,7 @@ class RouteInfo internal constructor(
     }
 
     fun copy(
-        path: String = route.path,
+        @RoutePath(RoutePathType.PATH_ONLY, mustExist = false) path: String = route.path,
         queryParams: Map<String, String> = route.queryParams,
         fragment: String? = route.fragment,
         dynamicParams: Map<String, String> = this.dynamicParams

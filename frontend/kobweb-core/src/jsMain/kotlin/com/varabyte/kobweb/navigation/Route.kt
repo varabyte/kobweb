@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.navigation
 
 import com.varabyte.kobweb.browser.uri.decodeURIComponent
+import com.varabyte.kobweb.core.RoutePath
+import com.varabyte.kobweb.core.RoutePathType
 import org.w3c.dom.url.URL
 
 class RouteException(value: String) :
@@ -12,7 +14,7 @@ class RouteException(value: String) :
  * If this route is constructed with a leading domain, e.g. "http://whatever.com" or the protocol-relative
  * version "//whatever.com", or some other protocol, e.g. "mailto:account@site.com", it will throw an exception
  */
-class Route(pathQueryAndFragment: String) {
+class Route(@RoutePath(RoutePathType.PATH_QUERY_AND_FRAGMENT, mustExist = false) pathQueryAndFragment: String) {
     init {
         // Ideally, we either have an absolute route (like "/a/b/c") or a relative route (like "a/b/c"), but we might
         // have also been fed a full URL, e.g. "https://site.com/a/b/c" or even "mailto:x@site.com", or a
@@ -47,7 +49,7 @@ class Route(pathQueryAndFragment: String) {
      * @param fragment The value "xyz" in route "/a/b/c?p=q&s=t#xyz". If null, the final route will be fragment-less.
      *   Note that the empty-string fragment is a valid case which tells the browser to navigate to the top of the page.
      */
-    constructor(path: String, queryParams: Map<String, String>, fragment: String?) :
+    constructor(@RoutePath(RoutePathType.PATH_ONLY, mustExist = false) path: String, queryParams: Map<String, String>, fragment: String?) :
         this(buildString {
             append(path)
             if (queryParams.isNotEmpty()) {
@@ -80,7 +82,7 @@ class Route(pathQueryAndFragment: String) {
          * "path#frag?key=value" -> "path" to "#frag?key=value"
          * ```
          */
-        fun partition(pathQueryAndFragment: String): Pair<String, String> {
+        fun partition(@RoutePath(RoutePathType.PATH_QUERY_AND_FRAGMENT, mustExist = false) pathQueryAndFragment: String): Pair<String, String> {
             val pathPart = pathQueryAndFragment.substringBefore('?').substringBefore('#')
             return pathPart to pathQueryAndFragment.removePrefix(pathPart)
         }
@@ -113,8 +115,8 @@ class Route(pathQueryAndFragment: String) {
         }
 
         /** Returns true if a route, i.e. a path without an origin */
-        fun isRoute(path: String) = tryCreate(path) != null
-        fun tryCreate(path: String) = try {
+        fun isRoute(@RoutePath(mustExist = false) path: String) = tryCreate(path) != null
+        fun tryCreate(@RoutePath(mustExist = false) path: String) = try {
             Route(path)
         } catch (_: RouteException) {
             null
@@ -132,6 +134,7 @@ class Route(pathQueryAndFragment: String) {
     private val url = URL(this.pathQueryAndFragment, "http://unused.com")
 
     /** The path part of the original URL (i.e. the part without query parameters or a fragment) */
+    @RoutePath(RoutePathType.PATH_ONLY, mustExist = false)
     val path: String
     /** The query parameters of the original URL (decoded, in case originally URL encoded) */
     val queryParams: Map<String, String>
@@ -169,7 +172,7 @@ class Route(pathQueryAndFragment: String) {
      * and fragments as before, if any were present.
      */
     fun copy(
-        path: String = this.path,
+        @RoutePath(RoutePathType.PATH_ONLY, mustExist = false) path: String = this.path,
         queryParams: Map<String, String> = this.queryParams,
         fragment: String? = this.fragment,
     ): Route {
