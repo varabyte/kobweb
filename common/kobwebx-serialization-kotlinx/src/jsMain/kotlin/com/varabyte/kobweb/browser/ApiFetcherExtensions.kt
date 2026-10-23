@@ -1,5 +1,10 @@
+// Everything in this file is deprecated and only kept around for migration. And also, replaceWith doesn't work great
+// for extension functions.
+@file:Suppress("DEPRECATION", "DeprecatedCallableAddReplaceWith")
+
 package com.varabyte.kobweb.browser
 
+import com.varabyte.kobweb.api.ApiPath
 import com.varabyte.kobweb.browser.http.AbortController
 import com.varabyte.kobweb.browser.http.FetchDefaults
 import com.varabyte.kobweb.browser.http.bodyAsBytes
@@ -21,14 +26,13 @@ import org.w3c.fetch.Response
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "get(apiPath, headers, redirect, abortController).bodyAs(responseDeserializer)",
-        "com.varabyte.kobweb.browser.get",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified R> ApiFetcher.get(
-    apiPath: String,
+    @ApiPath apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -38,7 +42,7 @@ suspend inline fun <reified R> ApiFetcher.get(
 /**
  * Like [get], but returns null if the request fails or the response can't be deserialized.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * Additionally, if `ApiFetcher.logOnError` is set to true, any failure will be logged to the console. By default, this
  * will be true for debug builds and false for release builds.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
@@ -46,14 +50,13 @@ suspend inline fun <reified R> ApiFetcher.get(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "tryGet(apiPath, headers, redirect, abortController) { bodyAs(responseDeserializer) }",
-        "com.varabyte.kobweb.browser.tryGet",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified R> ApiFetcher.tryGet(
-    apiPath: String,
+    @ApiPath apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -68,8 +71,9 @@ suspend inline fun <reified R> ApiFetcher.tryGet(
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
+@Deprecated("Serialization-aware `ApiFetcher` extensions have moved to the `com.varabyte.kobweb.api` package. Replace `import com.varabyte.kobweb.browser.post` with `import com.varabyte.kobweb.api.post`.")
 suspend inline fun <reified B> ApiFetcher.post(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -86,14 +90,14 @@ suspend inline fun <reified B> ApiFetcher.post(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(
         "post(apiPath, body, headers, redirect, abortController, bodySerializer).bodyAsBytes()",
-        "com.varabyte.kobweb.browser.post",
+        "com.varabyte.kobweb.api.post",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAsBytes",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified B> ApiFetcher.postBytes(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -116,14 +120,14 @@ suspend inline fun <reified B> ApiFetcher.postBytes(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "post(apiPath, body, headers, redirect, abortController, bodySerializer).bodyAs(responseDeserializer)",
-        "com.varabyte.kobweb.browser.post",
+        "com.varabyte.kobweb.api.post",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified B, reified R> ApiFetcher.post(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -147,14 +151,14 @@ suspend inline fun <reified B, reified R> ApiFetcher.post(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "post(apiPath, body = null, headers, redirect, abortController).bodyAs(responseDeserializer)",
-        "com.varabyte.kobweb.browser.post",
+        "com.varabyte.kobweb.api.post",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified R> ApiFetcher.post(
-    apiPath: String,
+    @ApiPath apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -169,15 +173,16 @@ suspend inline fun <reified R> ApiFetcher.post(
  * You are generally encouraged to call `tryPost(...) { convert() }` over `tryPost(...)?.convert()` as the former will
  * ensure that exception handling is covered in that case.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console (including the
+ * Additionally, if `ApiFetcher.logOnError` is set to true, any failure will be logged to the console (including the
  * logic in the [transform] block).
  *
  * If you do not care about converting the result to some arbitrary type, use the [tryPost] version that returns
  * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
  * this version. Instead, via the [Response] version, use `tryPost<RequestClass>().bodyAs<ReplyClass>()`
  */
+@Deprecated("Serialization-aware `ApiFetcher` extensions have moved to the `com.varabyte.kobweb.api` package. Replace `import com.varabyte.kobweb.browser.tryPost` with `import com.varabyte.kobweb.api.tryPost`.")
 suspend inline fun <reified B, T> ApiFetcher.tryPost(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -189,7 +194,7 @@ suspend inline fun <reified B, T> ApiFetcher.tryPost(
 /**
  * Like [post] but returns null instead of throwing if the request fails.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * Additionally, if `ApiFetcher.logOnError` is set to true, any failure will be logged to the console. By default, this
  * will be true for debug builds and false for release builds.
  *
  * If you plan to do additional operations on the response and would also like to have logging / exception
@@ -198,8 +203,9 @@ suspend inline fun <reified B, T> ApiFetcher.tryPost(
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
+@Deprecated("Serialization-aware `ApiFetcher` extensions have moved to the `com.varabyte.kobweb.api` package. Replace `import com.varabyte.kobweb.browser.tryPost` with `import com.varabyte.kobweb.api.tryPost`.")
 suspend inline fun <reified B> ApiFetcher.tryPost(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -216,14 +222,14 @@ suspend inline fun <reified B> ApiFetcher.tryPost(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(
         "tryPost(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }",
-        "com.varabyte.kobweb.browser.tryPost",
+        "com.varabyte.kobweb.api.tryPost",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAsBytes",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified B> ApiFetcher.tryPostBytes(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -234,7 +240,7 @@ suspend inline fun <reified B> ApiFetcher.tryPostBytes(
 /**
  * Like [post], but returns null if the request fails or the response can't be deserialized.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * Additionally, if `ApiFetcher.logOnError` is set to true, any failure will be logged to the console. By default, this
  * will be true for debug builds and false for release builds.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
@@ -242,14 +248,14 @@ suspend inline fun <reified B> ApiFetcher.tryPostBytes(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "tryPost(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAs(responseDeserializer) }",
-        "com.varabyte.kobweb.browser.tryPost",
+        "com.varabyte.kobweb.api.tryPost",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified B, reified R> ApiFetcher.tryPost(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -273,14 +279,14 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPost(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "tryPost(apiPath, body = null, headers, redirect, abortController) { bodyAs(responseDeserializer) }",
-        "com.varabyte.kobweb.browser.tryPost",
+        "com.varabyte.kobweb.api.tryPost",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified R> ApiFetcher.tryPost(
-    apiPath: String,
+    @ApiPath apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -301,8 +307,9 @@ suspend inline fun <reified R> ApiFetcher.tryPost(
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
+@Deprecated("Serialization-aware `ApiFetcher` extensions have moved to the `com.varabyte.kobweb.api` package. Replace `import com.varabyte.kobweb.browser.put` with `import com.varabyte.kobweb.api.put`.")
 suspend inline fun <reified B> ApiFetcher.put(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -319,14 +326,14 @@ suspend inline fun <reified B> ApiFetcher.put(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(
         "put(apiPath, body, headers, redirect, abortController, bodySerializer).bodyAsBytes()",
-        "com.varabyte.kobweb.browser.put",
+        "com.varabyte.kobweb.api.put",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAsBytes",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified B> ApiFetcher.putBytes(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -346,14 +353,14 @@ suspend inline fun <reified B> ApiFetcher.putBytes(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "put(apiPath, body, headers, redirect, abortController, bodySerializer).bodyAs(responseDeserializer)",
-        "com.varabyte.kobweb.browser.put",
+        "com.varabyte.kobweb.api.put",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified B, reified R> ApiFetcher.put(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -377,14 +384,14 @@ suspend inline fun <reified B, reified R> ApiFetcher.put(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "put(apiPath, body = null, headers, redirect, abortController).bodyAs(responseDeserializer)",
-        "com.varabyte.kobweb.browser.put",
+        "com.varabyte.kobweb.api.put",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified R> ApiFetcher.put(
-    apiPath: String,
+    @ApiPath apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -405,15 +412,16 @@ suspend inline fun <reified R> ApiFetcher.put(
  * You are generally encouraged to call `tryPut(...) { convert() }` over `tryPut(...)?.convert()` as the former will
  * ensure that exception handling is covered in that case.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console (including the
+ * Additionally, if `ApiFetcher.logOnError` is set to true, any failure will be logged to the console (including the
  * logic in the [transform] block).
  *
  * If you do not care about converting the result to some arbitrary type, use the [tryPut] version that returns
  * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
  * this version. Instead, via the [Response] version, use `tryPut<RequestClass>().bodyAs<ReplyClass>()`
  */
+@Deprecated("Serialization-aware `ApiFetcher` extensions have moved to the `com.varabyte.kobweb.api` package. Replace `import com.varabyte.kobweb.browser.tryPut` with `import com.varabyte.kobweb.api.tryPut`.")
 suspend inline fun <reified B, T> ApiFetcher.tryPut(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -425,7 +433,7 @@ suspend inline fun <reified B, T> ApiFetcher.tryPut(
 /**
  * Like [put] but returns null instead of throwing if the request fails.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * Additionally, if `ApiFetcher.logOnError` is set to true, any failure will be logged to the console. By default, this
  * will be true for debug builds and false for release builds.
  *
  * If you plan to do additional operations on the response and would also like to have logging / exception
@@ -434,8 +442,9 @@ suspend inline fun <reified B, T> ApiFetcher.tryPut(
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
+@Deprecated("Serialization-aware `ApiFetcher` extensions have moved to the `com.varabyte.kobweb.api` package. Replace `import com.varabyte.kobweb.browser.tryPut` with `import com.varabyte.kobweb.api.tryPut`.")
 suspend inline fun <reified B> ApiFetcher.tryPut(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -452,14 +461,14 @@ suspend inline fun <reified B> ApiFetcher.tryPut(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(
         "tryPut(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }",
-        "com.varabyte.kobweb.browser.tryPut",
+        "com.varabyte.kobweb.api.tryPut",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAsBytes",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified B> ApiFetcher.tryPutBytes(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -470,7 +479,7 @@ suspend inline fun <reified B> ApiFetcher.tryPutBytes(
 /**
  * Like [put], but returns null if the request fails or the response can't be deserialized.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * Additionally, if `ApiFetcher.logOnError` is set to true, any failure will be logged to the console. By default, this
  * will be true for debug builds and false for release builds.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
@@ -478,14 +487,14 @@ suspend inline fun <reified B> ApiFetcher.tryPutBytes(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "tryPut(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAs(responseDeserializer) }",
-        "com.varabyte.kobweb.browser.tryPut",
+        "com.varabyte.kobweb.api.tryPut",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified B, reified R> ApiFetcher.tryPut(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -509,14 +518,14 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPut(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "tryPut(apiPath, body = null, headers, redirect, abortController) { bodyAs(responseDeserializer) }",
-        "com.varabyte.kobweb.browser.tryPut",
+        "com.varabyte.kobweb.api.tryPut",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified R> ApiFetcher.tryPut(
-    apiPath: String,
+    @ApiPath apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -538,8 +547,9 @@ suspend inline fun <reified R> ApiFetcher.tryPut(
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
+@Deprecated("Serialization-aware `ApiFetcher` extensions have moved to the `com.varabyte.kobweb.api` package. Replace `import com.varabyte.kobweb.browser.patch` with `import com.varabyte.kobweb.api.patch`.")
 suspend inline fun <reified B> ApiFetcher.patch(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -556,14 +566,14 @@ suspend inline fun <reified B> ApiFetcher.patch(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(
         "patch(apiPath, body, headers, redirect, abortController, bodySerializer).bodyAsBytes()",
-        "com.varabyte.kobweb.browser.patch",
+        "com.varabyte.kobweb.api.patch",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAsBytes",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified B> ApiFetcher.patchBytes(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -583,14 +593,14 @@ suspend inline fun <reified B> ApiFetcher.patchBytes(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "patch(apiPath, body, headers, redirect, abortController, bodySerializer).bodyAs(responseDeserializer)",
-        "com.varabyte.kobweb.browser.patch",
+        "com.varabyte.kobweb.api.patch",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified B, reified R> ApiFetcher.patch(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -614,14 +624,14 @@ suspend inline fun <reified B, reified R> ApiFetcher.patch(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "patch(apiPath, body = null, headers, redirect, abortController).bodyAs(responseDeserializer)",
-        "com.varabyte.kobweb.browser.patch",
+        "com.varabyte.kobweb.api.patch",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified R> ApiFetcher.patch(
-    apiPath: String,
+    @ApiPath apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -642,15 +652,16 @@ suspend inline fun <reified R> ApiFetcher.patch(
  * You are generally encouraged to call `tryPatch(...) { convert() }` over `tryPatch(...)?.convert()` as the former will
  * ensure that exception handling is covered in that case.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console (including the
+ * Additionally, if `ApiFetcher.logOnError` is set to true, any failure will be logged to the console (including the
  * logic in the [transform] block).
  *
  * If you do not care about converting the result to some arbitrary type, use the [tryPatch] version that returns
  * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
  * this version. Instead, via the [Response] version, use `tryPatch<RequestClass>().bodyAs<ReplyClass>()`
  */
+@Deprecated("Serialization-aware `ApiFetcher` extensions have moved to the `com.varabyte.kobweb.api` package. Replace `import com.varabyte.kobweb.browser.tryPatch` with `import com.varabyte.kobweb.api.tryPatch`.")
 suspend inline fun <reified B, T> ApiFetcher.tryPatch(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -662,7 +673,7 @@ suspend inline fun <reified B, T> ApiFetcher.tryPatch(
 /**
  * Like [patch] but returns null instead of throwing if the request fails.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * Additionally, if `ApiFetcher.logOnError` is set to true, any failure will be logged to the console. By default, this
  * will be true for debug builds and false for release builds.
  *
  * If you plan to do additional operations on the response and would also like to have logging / exception
@@ -671,8 +682,9 @@ suspend inline fun <reified B, T> ApiFetcher.tryPatch(
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
+@Deprecated("Serialization-aware `ApiFetcher` extensions have moved to the `com.varabyte.kobweb.api` package. Replace `import com.varabyte.kobweb.browser.tryPatch` with `import com.varabyte.kobweb.api.tryPatch`.")
 suspend inline fun <reified B> ApiFetcher.tryPatch(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -689,14 +701,14 @@ suspend inline fun <reified B> ApiFetcher.tryPatch(
     "We are phasing out the *Bytes version of network requests, now that we have new versions that return `Response` objects directly.",
     ReplaceWith(
         "tryPatch(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAsBytes() }",
-        "com.varabyte.kobweb.browser.tryPatch",
+        "com.varabyte.kobweb.api.tryPatch",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAsBytes",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified B> ApiFetcher.tryPatchBytes(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -707,7 +719,7 @@ suspend inline fun <reified B> ApiFetcher.tryPatchBytes(
 /**
  * Like [patch], but returns null if the request fails or the response can't be deserialized.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * Additionally, if `ApiFetcher.logOnError` is set to true, any failure will be logged to the console. By default, this
  * will be true for debug builds and false for release builds.
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
@@ -715,14 +727,14 @@ suspend inline fun <reified B> ApiFetcher.tryPatchBytes(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "tryPatch(apiPath, body, headers, redirect, abortController, bodySerializer) { bodyAs(responseDeserializer) }",
-        "com.varabyte.kobweb.browser.tryPatch",
+        "com.varabyte.kobweb.api.tryPatch",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified B, reified R> ApiFetcher.tryPatch(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -746,14 +758,14 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPatch(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "tryPatch(apiPath, body = null, headers, redirect, abortController) { bodyAs(responseDeserializer) }",
-        "com.varabyte.kobweb.browser.tryPatch",
+        "com.varabyte.kobweb.api.tryPatch",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified R> ApiFetcher.tryPatch(
-    apiPath: String,
+    @ApiPath apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -778,14 +790,13 @@ suspend inline fun <reified R> ApiFetcher.tryPatch(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "delete(apiPath, headers, redirect, abortController).bodyAs(responseDeserializer)",
-        "com.varabyte.kobweb.browser.delete",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified R> ApiFetcher.delete(
-    apiPath: String,
+    @ApiPath apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -800,14 +811,13 @@ suspend inline fun <reified R> ApiFetcher.delete(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "tryDelete(apiPath, headers, redirect, abortController) { bodyAs(responseDeserializer) }",
-        "com.varabyte.kobweb.browser.tryDelete",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified R> ApiFetcher.tryDelete(
-    apiPath: String,
+    @ApiPath apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -826,14 +836,13 @@ suspend inline fun <reified R> ApiFetcher.tryDelete(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "options(apiPath, headers, redirect, abortController).bodyAs(responseDeserializer)",
-        "com.varabyte.kobweb.browser.options",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified R> ApiFetcher.options(
-    apiPath: String,
+    @ApiPath apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -848,14 +857,13 @@ suspend inline fun <reified R> ApiFetcher.options(
 @Deprecated("With these serialization-aware network methods, we are moving response deserialization handling to a separate `bodyAs` call. This lets us accomplish the same amount of functionality with fewer methods.",
     ReplaceWith(
         "tryOptions(apiPath, headers, redirect, abortController) { bodyAs(responseDeserializer) }",
-        "com.varabyte.kobweb.browser.tryOptions",
         "com.varabyte.kobweb.browser.http.FetchDefaults",
         "com.varabyte.kobweb.browser.http.bodyAs",
         "kotlinx.serialization.serializer",
     )
 )
 suspend inline fun <reified R> ApiFetcher.tryOptions(
-    apiPath: String,
+    @ApiPath apiPath: String,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -870,8 +878,9 @@ suspend inline fun <reified R> ApiFetcher.tryOptions(
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
+@Deprecated("Serialization-aware `ApiFetcher` extensions have moved to the `com.varabyte.kobweb.api` package. Replace `import com.varabyte.kobweb.browser.query` with `import com.varabyte.kobweb.api.query`.")
 suspend inline fun <reified B> ApiFetcher.query(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -887,15 +896,16 @@ suspend inline fun <reified B> ApiFetcher.query(
  * You are generally encouraged to call `tryQuery(...) { convert() }` over `tryQuery(...)?.convert()` as the former will
  * ensure that exception handling is covered in that case.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console (including the
+ * Additionally, if `ApiFetcher.logOnError` is set to true, any failure will be logged to the console (including the
  * logic in the [transform] block).
  *
  * If you do not care about converting the result to some arbitrary type, use the [tryQuery] version that returns
  * [Response?][Response] instead. For serialization-aware methods, it is expected that users will rarely, if ever, need
  * this version. Instead, via the [Response] version, use `tryQuery<RequestClass>().bodyAs<ReplyClass>()`
  */
+@Deprecated("Serialization-aware `ApiFetcher` extensions have moved to the `com.varabyte.kobweb.api` package. Replace `import com.varabyte.kobweb.browser.tryQuery` with `import com.varabyte.kobweb.api.tryQuery`.")
 suspend inline fun <reified B, T> ApiFetcher.tryQuery(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
@@ -907,7 +917,7 @@ suspend inline fun <reified B, T> ApiFetcher.tryQuery(
 /**
  * Like [query] but returns null instead of throwing if the request fails.
  *
- * Additionally, if [ApiFetcher.logOnError] is set to true, any failure will be logged to the console. By default, this
+ * Additionally, if `ApiFetcher.logOnError` is set to true, any failure will be logged to the console. By default, this
  * will be true for debug builds and false for release builds.
  *
  * If you plan to do additional operations on the response and would also like to have logging / exception
@@ -916,8 +926,9 @@ suspend inline fun <reified B, T> ApiFetcher.tryQuery(
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  */
+@Deprecated("Serialization-aware `ApiFetcher` extensions have moved to the `com.varabyte.kobweb.api` package. Replace `import com.varabyte.kobweb.browser.tryQuery` with `import com.varabyte.kobweb.api.tryQuery`.")
 suspend inline fun <reified B> ApiFetcher.tryQuery(
-    apiPath: String,
+    @ApiPath apiPath: String,
     body: B,
     headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,

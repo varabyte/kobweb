@@ -1,14 +1,15 @@
 package com.varabyte.kobweb.streams
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.api.ApiStreamPath
 import com.varabyte.kobweb.streams.StreamMessage.Payload
 import kotlinx.browser.window
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.w3c.dom.WebSocket
 
 interface ImmutableApiStream {
+    @ApiStreamPath
     val route: String
     val isConnected: Boolean
 }
@@ -51,7 +52,7 @@ interface ApiStreamListener {
  * If you call [send] BEFORE a stream finished connecting, what happens to the message (whether it gets enqueued or
  * dropped) is configurable. See its header docs for more details.
  */
-class ApiStream(override val route: String) : ImmutableApiStream {
+class ApiStream(@param:ApiStreamPath @property:ApiStreamPath override val route: String) : ImmutableApiStream {
     internal class WebSocketChannel {
         internal interface Listener {
             fun onOpen()
@@ -271,7 +272,7 @@ suspend fun ApiStream.connect(handleTextEvent: (ApiStreamListener.TextReceivedCo
 }
 
 @Composable
-fun rememberApiStream(route: String, streamListener: ApiStreamListener): ApiStream {
+fun rememberApiStream(@ApiStreamPath route: String, streamListener: ApiStreamListener): ApiStream {
     val stream = remember(route) { ApiStream(route) }
     LaunchedEffect(Unit) {
         stream.connect(streamListener)
@@ -280,7 +281,7 @@ fun rememberApiStream(route: String, streamListener: ApiStreamListener): ApiStre
 }
 
 @Composable
-fun rememberApiStream(route: String, handleTextEvent: (ApiStreamListener.TextReceivedContext) -> Unit): ApiStream {
+fun rememberApiStream(@ApiStreamPath route: String, handleTextEvent: (ApiStreamListener.TextReceivedContext) -> Unit): ApiStream {
     return rememberApiStream(route, object : ApiStreamListener {
         override fun onTextReceived(ctx: ApiStreamListener.TextReceivedContext) = handleTextEvent(ctx)
     })
