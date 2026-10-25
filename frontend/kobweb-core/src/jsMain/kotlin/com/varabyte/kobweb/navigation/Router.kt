@@ -336,9 +336,11 @@ class Router {
     @Suppress("unused") // Called by generated code
     // Params NOT marked with @RoutePath because fromRoute is a regex and toRoute can contain replacement variables,
     // e.g. "to-route/$1"
+    // Also, neither param is required to start with a slash, as e.g. "(/a/b)/c" and "$1/d" still represent rooted
+    // routes. However, the route tree will treat the final result of a redirect as rooted.
     fun registerRedirect(fromRoute: String, toRoute: String) {
         listOf(fromRoute, toRoute).forEach {
-            require(Route.isRoute(it) && it.startsWith('/')) { "Registration only allowed for rooted routes, e.g. `/example/path`. Got: $it" }
+            require(Route.isRoute(it)) { "Registration only allowed for internal routes, e.g. `/example/path`. Got: $it" }
         }
 
         // Don't use BasePath.prepend here because `fromRoute` and `toRoute` are not strictly routes (the first is a

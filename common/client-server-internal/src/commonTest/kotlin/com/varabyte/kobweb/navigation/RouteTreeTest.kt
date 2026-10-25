@@ -403,4 +403,31 @@ class RouteTreeTest {
         routeTree.registerRedirect("/d/([^/]+)/([^/]+)/([^/]+)", "/$1/$2/$3/d")
         assertThat(routeTree.resolveRouteData("/d/a/b/c")).isSameAs(dataABCD)
     }
+
+    @Test
+    fun redirectChainingExampleFromDocsWorks() {
+        val routeTree = RouteTree<DummyData>()
+        val dataAbout = DummyData()
+        routeTree.register("/socials/meta/about-meta", dataAbout)
+
+        routeTree.registerRedirect("/socials/facebook/([^/]+)", "/socials/meta/$1")
+        routeTree.registerRedirect("(/socials/meta)/about-facebook", "$1/about-meta")
+
+        assertThat(routeTree.resolveRouteData("/socials/facebook/about-facebook")).isSameAs(dataAbout)
+    }
+
+    @Test
+    fun redirectResultsAreTreatedAsRooted() {
+        val routeTree = RouteTree<DummyData>()
+        val dataNew = DummyData()
+        val dataCD = DummyData()
+        routeTree.register("/new", dataNew)
+        routeTree.register("/c/d", dataCD)
+
+        routeTree.registerRedirect("/old", "new")
+        routeTree.registerRedirect("/([^/]+)/b", "$1/d")
+
+        assertThat(routeTree.resolveRouteData("/old")).isSameAs(dataNew)
+        assertThat(routeTree.resolveRouteData("/c/b")).isSameAs(dataCD)
+    }
 }

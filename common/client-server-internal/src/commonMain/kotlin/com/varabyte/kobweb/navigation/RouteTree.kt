@@ -305,7 +305,7 @@ class RouteTree<T : Any> {
     private fun resolveAllowingRedirects(route: String): List<ResolvedEntry<T>>? {
         val redirectedRoute = redirects.fold(route) { route, redirect ->
             redirect.map(route) ?: route
-        }
+        }.let { if (it.startsWith('/')) it else "/$it" } // Redirect results are always treated as rooted
         return resolveWithoutRedirects(redirectedRoute)
     }
 
@@ -376,6 +376,10 @@ class RouteTree<T : Any> {
      * someone would actually move to page to the new location (so content would now be hosted at "/team/new-name") and
      * then add a redirect: `registerRedirect("/team/old-name/", "/team/new-name/")`. Now, when someone tries to visit
      * "/team/old-name/", they will be immediately redirected to "/team/new-name/".
+     *
+     * @param redirectRoute A regex which must match the entire route being visited, e.g. "/socials/facebook/(.+)".
+     * @param actualRoute The route to redirect to, which can reference groups captured by [redirectRoute], e.g.
+     *   "/socials/meta/$1". The final result is always treated as rooted, so "a/b" is the same as "/a/b".
      */
     fun registerRedirect(redirectRoute: String, actualRoute: String) {
         redirects.add(PatternMapper("^$redirectRoute\$", actualRoute))

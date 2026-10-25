@@ -366,7 +366,7 @@ fun createMainFunction(
                     }
 
                     redirects.forEach { entry ->
-                        addStatement("""ctx.router.registerRedirect("${entry.from}", "${entry.to}")""")
+                        addStatement("ctx.router.registerRedirect(%S, %S)", entry.from, entry.to)
                     }
                     addStatement("")
 
