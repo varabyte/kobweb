@@ -365,7 +365,7 @@ fun createMainFunction(
                         addStatement("}")
                     }
 
-                    redirects.sortedBy { it.to }.forEach { entry ->
+                    redirects.forEach { entry ->
                         addStatement("""ctx.router.registerRedirect("${entry.from}", "${entry.to}")""")
                     }
                     addStatement("")
