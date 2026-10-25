@@ -4,6 +4,7 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFile
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.util.getArgumentValue
+import com.varabyte.kobweb.project.common.PackageName
 import com.varabyte.kobweb.project.common.PackageUtils
 
 // pair corresponds to (current package, override)
@@ -43,7 +44,7 @@ fun getDefaultLayout(
             )
             null
         }
-        else if (currPackage.startsWith(qualifiedPagesPackage)) {
+        else if (PackageName(currPackage).isSameOrSubpackageOf(PackageName(qualifiedPagesPackage))) {
             val layoutMethodFqn = PackageUtils.resolvePackageShortcut(projectGroup, layoutTarget)
             currPackage to layoutMethodFqn
         } else {

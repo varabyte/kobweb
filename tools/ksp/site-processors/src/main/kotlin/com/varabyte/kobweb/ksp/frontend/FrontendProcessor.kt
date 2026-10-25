@@ -46,6 +46,7 @@ import com.varabyte.kobweb.ksp.symbol.suppresses
 import com.varabyte.kobweb.ksp.util.getAnnotationArgumentValue
 import com.varabyte.kobweb.ksp.util.getArgumentValue
 import com.varabyte.kobweb.ksp.util.receiverClass
+import com.varabyte.kobweb.project.common.PackageName
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobweb.project.frontend.CssStyleEntry
 import com.varabyte.kobweb.project.frontend.CssStyleVariantEntry
@@ -843,7 +844,7 @@ class FrontendProcessor(
                 if (layoutData != null && !assertReceiverCompatibleWithLayout(annotatedFun, layoutData)) return@mapNotNull null
                 (layoutData?.method?.qualifiedName?.asString()
                     ?: defaultLayouts.asSequence().mapNotNull { (pkg, layoutMethod) ->
-                        layoutMethod.takeIf { annotatedFun.packageName.asString().startsWith(pkg) }
+                        layoutMethod.takeIf { PackageName(annotatedFun.packageName.asString()).isSameOrSubpackageOf(PackageName(pkg)) }
                     }.firstOrNull()?.qualifiedName?.asString())
             }
 

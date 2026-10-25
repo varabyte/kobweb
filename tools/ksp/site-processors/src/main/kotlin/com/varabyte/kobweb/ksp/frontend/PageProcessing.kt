@@ -8,6 +8,7 @@ import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.util.getArgumentValue
 import com.varabyte.kobweb.ksp.util.receiverClass
 import com.varabyte.kobweb.project.common.DynamicRouteSegment
+import com.varabyte.kobweb.project.common.PackageName
 import com.varabyte.kobweb.project.frontend.PageEntry
 
 /**
@@ -33,7 +34,7 @@ fun processPagesFun(
     val currPackage = annotatedFun.packageName.asString()
     val routeOverride = pageAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }
 
-    if (routeOverride?.startsWith("/") == true || currPackage.startsWith(qualifiedPagesPackage)) {
+    if (routeOverride?.startsWith("/") == true || PackageName(currPackage).isSameOrSubpackageOf(PackageName(qualifiedPagesPackage))) {
         // To maintain the general association between the file name and the slug, we reject route overrides which use
         // the "{}" inferred dynamic segment syntax in any part except for the last.
         // e.g. "/dynamic/{example}/route/{}" is OK but "/dynamic/{}/route/{example}" is not.

@@ -31,6 +31,7 @@ import com.varabyte.kobweb.project.backend.ApiStreamEntry
 import com.varabyte.kobweb.project.backend.BackendData
 import com.varabyte.kobweb.project.backend.InitApiEntry
 import com.varabyte.kobweb.project.backend.assertValid
+import com.varabyte.kobweb.project.common.PackageName
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobweb.project.frontend.FrontendData
 import kotlinx.serialization.json.Json
@@ -205,7 +206,7 @@ private fun processApiFun(
     val file = annotatedFun.containingFile ?: error("Symbol does not come from a source file")
     val routeOverride = apiAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }
 
-    return if (routeOverride?.startsWith("/") == true || currPackage.startsWith(qualifiedApiPackage)) {
+    return if (routeOverride?.startsWith("/") == true || PackageName(currPackage).isSameOrSubpackageOf(PackageName(qualifiedApiPackage))) {
         val resolvedRoute = processRoute(
             packageRoot = qualifiedApiPackage,
             pkg = annotatedFun.packageName.asString(),
