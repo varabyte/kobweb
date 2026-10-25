@@ -98,7 +98,7 @@ class RouteTree<T : Any> {
             check(findChild(routeSegment) == null) { "Node.createChild called unexpectedly. Please report this issue." }
 
             check(!isRouteTerminator) {
-                error("User attempted to register an invalid route. \"$sourceRouteSegment\" must be the last segment of the route, but it was followed by \"$routeSegment\".")
+                "User attempted to register an invalid route. \"$sourceRouteSegment\" must be the last segment of the route, but it was followed by \"$routeSegment\"."
             }
 
             return if (routeSegment.isDynamicSegment()) {
