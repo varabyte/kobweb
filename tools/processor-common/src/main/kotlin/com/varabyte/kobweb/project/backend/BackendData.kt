@@ -41,6 +41,7 @@ fun Iterable<BackendData>.merge(throwError: (String) -> Unit): BackendData {
 
 fun BackendData.assertValid(throwError: (String) -> Unit) {
     apiMethods.assertValidApis(throwError)
+    apiStreamMethods.assertValidApiStreams(throwError)
 }
 
 private fun Iterable<ApiEntry>.assertValidApis(throwError: (String) -> Unit) {
@@ -48,6 +49,16 @@ private fun Iterable<ApiEntry>.assertValidApis(throwError: (String) -> Unit) {
     entriesByRoute.forEach { (route, apis) ->
         if (apis.size > 1) {
             throwError("The API route \"$route\" was defined more than once. Used by:\n${apis.joinToString("\n") { entry -> " - ${entry.fqn}" }}")
+        }
+    }
+}
+
+private fun Iterable<ApiStreamEntry>.assertValidApiStreams(throwError: (String) -> Unit) {
+    // The server registers streams with any leading slash removed, so "/echo" and "echo" collide
+    val entriesByRoute = this.groupBy { it.route.removePrefix("/") }
+    entriesByRoute.forEach { (route, streams) ->
+        if (streams.size > 1) {
+            throwError("The API stream route \"/$route\" was defined more than once. Used by:\n${streams.joinToString("\n") { entry -> " - ${entry.fqn}" }}")
         }
     }
 }
