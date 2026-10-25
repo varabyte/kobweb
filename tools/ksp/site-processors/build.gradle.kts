@@ -13,6 +13,9 @@ dependencies {
     implementation(projects.common.kobwebCommon)
     implementation(projects.tools.processorCommon)
     implementation(projects.tools.ksp.kspExt)
+
+    testImplementation(kotlin("test"))
+    testImplementation(libs.truthish)
 }
 
 kobwebPublication {
