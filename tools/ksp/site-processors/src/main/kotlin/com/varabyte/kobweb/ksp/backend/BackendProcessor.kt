@@ -36,6 +36,7 @@ import com.varabyte.kobweb.project.backend.ApiStreamEntry
 import com.varabyte.kobweb.project.backend.BackendData
 import com.varabyte.kobweb.project.backend.InitApiEntry
 import com.varabyte.kobweb.project.backend.assertValid
+import com.varabyte.kobweb.project.common.DynamicRouteSegment
 import com.varabyte.kobweb.project.common.PackageName
 import com.varabyte.kobweb.project.frontend.FrontendData
 import kotlinx.serialization.json.Json
@@ -156,7 +157,7 @@ internal class BackendProcessor(
             annotatedFun.toApiEntry(apiPackage, packageMappings, logger)
                 ?.also { fileDependencies.add(annotatedFun.containingFile!!) }
         }
-        val apiStreams = apiStreamsDeclarations.map { property ->
+        val apiStreams = apiStreamsDeclarations.mapNotNull { property ->
             val apiAnnotation = property.getAnnotationsByName(API_FQN).firstOrNull()
             val routeOverride = apiAnnotation?.getArgumentValue()?.takeIf { it.isNotBlank() }
                 ?.let { RouteOverride(it) }
@@ -166,8 +167,16 @@ internal class BackendProcessor(
                 packageRoot = apiPackage,
                 packageMappings = packageMappings,
                 routeOverride = routeOverride,
-                supportEmptyDynamicSegments = false,
             )
+
+            // Unlike API routes, streams are looked up by exact path, so there's no way to capture a dynamic value
+            if (resolvedRoute.split('/').any { DynamicRouteSegment.tryCreate(it) != null }) {
+                logger.error(
+                    "`val ${property.simpleName.asString()}` resolves to the route \"$resolvedRoute\", but API streams don't support dynamic route segments.",
+                    property
+                )
+                return@mapNotNull null
+            }
 
             ApiStreamEntry(property.qualifiedName!!.asString(), resolvedRoute)
         }
@@ -215,7 +224,6 @@ private fun KSFunctionDeclaration.toApiEntry(
             packageRoot = qualifiedApiPackage,
             packageMappings = packageMappings,
             routeOverride = routeOverride,
-            supportEmptyDynamicSegments = false,
         )
         ApiEntry(qualifiedName!!.asString(), resolvedRoute)
     } else {

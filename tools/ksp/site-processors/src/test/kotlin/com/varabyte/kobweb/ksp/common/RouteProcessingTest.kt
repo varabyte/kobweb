@@ -13,8 +13,7 @@ class RouteProcessingTest {
     private fun KSFile.toRoute(
         routeOverride: String?,
         packageMappings: Map<PackageName, String> = emptyMap(),
-        supportEmptyDynamicSegments: Boolean = true,
-    ) = toRoute(pagesPackage, packageMappings, routeOverride?.let { RouteOverride(it) }, supportEmptyDynamicSegments)
+    ) = toRoute(pagesPackage, packageMappings, routeOverride?.let { RouteOverride(it) })
 
     @Test
     fun routeOverrideExamplesFromPageDocs() {
@@ -39,13 +38,6 @@ class RouteProcessingTest {
     fun indexIsLeftForPageProcessingToHandle() {
         // The docs say `@Page("index")` gives "/a/b/c/", but that's done by the page processing, not here
         assertThat(file.toRoute("index")).isEqualTo("/a/b/c/index")
-    }
-
-    @Test
-    fun inferredDynamicSegmentsCanBeDisabled() {
-        // e.g. for API routes
-        assertThat(file.toRoute("{}", supportEmptyDynamicSegments = false)).isEqualTo("/a/b/c/{}")
-        assertThat(file.toRoute("/d/{}", supportEmptyDynamicSegments = false)).isEqualTo("/d/{}")
     }
 
     @Test

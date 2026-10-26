@@ -56,7 +56,6 @@ fun KSFunctionDeclaration.toPageEntry(
                 packageRoot = qualifiedPagesPackage,
                 packageMappings = packageMappings,
                 routeOverride = routeOverride,
-                supportEmptyDynamicSegments = true,
             ).let { if (it.endsWith("/index")) it.removeSuffix("index") else it }
 
             return PageEntry(
