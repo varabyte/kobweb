@@ -49,16 +49,28 @@ fun PackageName.toMappedRouteSegment(value: String, logger: KSPLogger, symbol: K
         return null
     }
 
-    val dynamicRouteSegment = DynamicRouteSegment.tryCreate(value) ?: return value
-    if (dynamicRouteSegment.isCatchAll || dynamicRouteSegment.isOptional) {
-        logger.error("Package mapping for \"$this\" cannot be a catch-all or optional dynamic segment, as a package is never the last part of a route. Got: \"$value\"", symbol)
-        return null
-    }
+    // In practice, a package mapping will rarely (or never) contain a slash, but it technically can, so we review each
+    // segment separately. One thing we can guarantee is that no segment here will be the last part of the route -- the
+    // route will always be appended to with more.
+    val segments = value.split('/')
+    return segments.mapIndexed { i, segment ->
+        val dynamicRouteSegment = DynamicRouteSegment.tryCreate(segment) ?: return@mapIndexed segment
+        if (dynamicRouteSegment.isCatchAll || dynamicRouteSegment.isOptional) {
+            logger.error("Package mapping for \"$this\" cannot contain a catch-all or optional dynamic segment, as a package is never the last part of a route. Got: \"$value\"", symbol)
+            return null
+        }
 
-    return if (dynamicRouteSegment.isInferred) {
-        // e.g. "{}" under a.b.pkg resolves to "{pkg}"
-        dynamicRouteSegment.withReplacedName(this.value.substringAfterLast('.').toRouteSegment()).rawValue
-    } else value
+        if (dynamicRouteSegment.isInferred) {
+            // As with route overrides, only the last segment can be inferred, as otherwise multiple segments would end
+            // up with the same name, e.g. "{}/{}" -> "{pkg}/{pkg}"
+            if (i < segments.lastIndex) {
+                logger.error("Package mapping `$value` for \"$this\" is invalid, as only its last segment can be an inferred dynamic segment (`{}`). Please name the others explicitly.", symbol)
+                return null
+            }
+            // e.g. "{}" under a.b.pkg resolves to "{pkg}"
+            dynamicRouteSegment.withReplacedName(this.value.substringAfterLast('.').toRouteSegment()).rawValue
+        } else segment
+    }.joinToString("/")
 }
 
 /**

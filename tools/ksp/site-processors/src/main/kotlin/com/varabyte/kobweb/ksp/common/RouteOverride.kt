@@ -37,6 +37,11 @@ value class RouteOverride(val value: String) {
                 return@forEach
             }
 
+            // Browsers remove these from the path (resolving them like relative directories) before Kobweb ever sees
+            // it, e.g. "/a/../b" becomes "/b", so a route containing one can never match
+            if (segment.replace("%2e", ".", ignoreCase = true) in listOf(".", "..")) {
+                add("`$segment` is a relative path segment, which browsers remove from URLs, so the route can never match.")
+            }
             if (segment.any { it == '{' || it == '}' }) {
                 add("`$segment` has curly braces but is not a valid dynamic segment. $DYNAMIC_SEGMENT_FORMS To use curly braces literally, percent-encode them as `%7B` and `%7D`.")
             }
@@ -65,11 +70,12 @@ value class RouteOverride(val value: String) {
         /**
          * Return false if the browser won't keep this character (a single code point) as is in a URL path.
          *
-         * `?` and `#` start the query string and fragment, and the rest are percent-encoded by the browser (see
+         * `?` and `#` start the query string and fragment, `\` is treated as a `/` (for http and https URLs), and the
+         * rest are percent-encoded by the browser (see
          * [the path percent-encode set](https://url.spec.whatwg.org/#path-percent-encode-set)), including all
          * non-ASCII characters.
          */
-        fun String.isValidInUrlPath() = length == 1 && single() in '\u0021'..'\u007E' && single() !in "\"#<>?`{}"
+        fun String.isValidInUrlPath() = length == 1 && single() in '\u0021'..'\u007E' && single() !in "\"#<>?`{}\\"
 
         fun String.describe() = when {
             this == " " -> "a space"

@@ -24,7 +24,13 @@ class PackageMappingProcessingTest {
     @Test
     fun invalidMappings() {
         val pkg = PackageName("site.pages.users.user")
-        listOf("", " ", "{...}", "{...rest}", "{?}", "{id?}", "{...rest?}", "a?b", "a#b", "a b", "{user", "{a.b}", "a//b").forEach { value ->
+        listOf(
+            "", " ", "{...}", "{...rest}", "{?}", "{id?}", "{...rest?}", "a?b", "a#b", "a b", "{user", "{a.b}", "a//b", "..", "%2e",
+            // Every segment of a mapping with a slash is checked, not just the whole value
+            "a/{...rest}", "a/{id?}", "{a}/{b?}", "{...a}/b",
+            // Only the last segment can be inferred
+            "{}/{}", "{}/b", "{}/{b}",
+        ).forEach { value ->
             val logger = RecordingLogger()
             assertThat(pkg.toMappedRouteSegment(value, logger)).isNull()
             assertThat(logger.errors).hasSize(1)
@@ -37,6 +43,10 @@ class PackageMappingProcessingTest {
         listOf(
             "a/b" to "a/b",
             "a/{b}" to "a/{b}",
+            // An inferred last segment is named after the package
+            "a/{}" to "a/{user}",
+            "{a}/{}" to "{a}/{user}",
+            "{a}/{b}" to "{a}/{b}",
         ).forEach { (value, expected) ->
             val logger = RecordingLogger()
             // Warnings only, so the mapping is still applied

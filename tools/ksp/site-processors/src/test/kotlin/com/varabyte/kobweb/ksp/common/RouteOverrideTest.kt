@@ -74,6 +74,20 @@ class RouteOverrideTest {
     }
 
     @Test
+    fun dotSegmentsAreReported() {
+        listOf(".", "..", "a/./b", "a/../b", "./b", "a/..", "a/../", "%2e", "%2E%2e", ".%2E", "%2e.").forEach { value ->
+            assertThat(RouteOverride(value).findProblems()).hasSize(1)
+        }
+    }
+
+    @Test
+    fun segmentsWithDotsThatArentDotSegmentsAreAllowed() {
+        listOf("...", ".a", "a.", "a.b", "%2e%2e%2e", ".well-known").forEach { value ->
+            assertThat(RouteOverride(value).findProblems()).isEmpty()
+        }
+    }
+
+    @Test
     fun nonPathCharactersAreReported() {
         listOf(
             "posts?draft",
@@ -84,6 +98,8 @@ class RouteOverrideTest {
             "a<b>",
             "a\"b",
             "a`b",
+            // Browsers treat a backslash as a slash in http and https URLs
+            "a\\b",
             "café",
             "😀",
         ).forEach { value ->
@@ -106,6 +122,7 @@ class RouteOverrideTest {
         assertThat(problem).contains("(`%F0%9F%98%80`)")
 
         assertThat(RouteOverride("a\tb").findProblems().single()).contains("U+0009 (`%09`)")
+        assertThat(RouteOverride("a\\b").findProblems().single()).contains("`\\` (`%5C`)")
     }
 
     @Test
