@@ -56,4 +56,27 @@ class PackageNameTest {
         assertThat(PackageName("a").toPath()).isEqualTo(Path("a"))
         assertThat(PackageName("").toPath()).isEqualTo(Path(""))
     }
+
+    @Test
+    fun findProblems() {
+        fun problems(value: String) = PackageName(value).findProblems()
+
+        assertThat(problems("")).isEmpty()
+        assertThat(problems("com.example.pages")).isEmpty()
+        // Legal with backticks, which KSP strips, e.g. com.example.`my-site`
+        assertThat(problems("com.example.my-site")).isEmpty()
+        assertThat(problems("com.example.my site")).isEmpty()
+
+        assertThat(problems("com..example").single()).contains("empty segment")
+        assertThat(problems(".pages").single()).contains("empty segment")
+        assertThat(problems("com.example.").single()).contains("empty segment")
+        assertThat(problems("com.example.pages ").single()).contains("`pages ` starts or ends with whitespace")
+        assertThat(problems("com. example").single()).contains("` example` starts or ends with whitespace")
+        assertThat(problems("com/example").single()).contains("`com/example` contains `/`")
+        assertThat(problems("com.ex:am:ple").single()).contains("`ex:am:ple` contains `:`")
+        assertThat(problems("com.`example`").single()).contains("contains `")
+
+        // Each problem is reported
+        assertThat(problems("com..example/a ")).hasSize(3)
+    }
 }

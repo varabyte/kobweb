@@ -11,11 +11,34 @@ import kotlin.io.path.Path
  * Note that this class does not validate its value. Packages from user code are reported by KSP, which has already
  * validated them, but without any backticks (e.g. package com.example.`my-site` is reported as
  * "com.example.my-site"), so we can't hold them to Kotlin's syntax rules ourselves. Values that come from elsewhere,
- * e.g. a package configured in a Gradle block, should be checked by whatever code reads them.
+ * e.g. a package configured in a Gradle block, should be checked with [findProblems] by whatever code reads them.
  */
 @JvmInline
 value class PackageName(val value: String) {
     val isRoot get() = value.isEmpty()
+
+    /**
+     * Return a description of each problem found in this package, e.g. an empty segment in "com..example".
+     *
+     * This is lenient on purpose, only catching values that can't be a package even with backticks, since packages
+     * like "com.example.my-site" are legal (see the header docs).
+     */
+    fun findProblems(): List<String> = buildList {
+        if (isRoot) return@buildList
+
+        val segments = value.split('.')
+        if (segments.any { it.isEmpty() }) {
+            add("It contains an empty segment.")
+        }
+        segments.filter { it.isNotEmpty() }.forEach { segment ->
+            if (segment.first().isWhitespace() || segment.last().isWhitespace()) {
+                add("`$segment` starts or ends with whitespace.")
+            }
+            segment.filter { it in INVALID_CHARS }.toSet().forEach { c ->
+                add("`$segment` contains `$c`, which is not allowed in a package name.")
+            }
+        }
+    }
 
     /**
      * Return true if this package is the same as [other] or lives somewhere underneath it.
@@ -59,6 +82,14 @@ value class PackageName(val value: String) {
     }
 
     override fun toString() = value
+
+    private companion object {
+        /**
+         * Characters which can't appear in a package segment even when it's wrapped in backticks (where the backtick
+         * itself is also disallowed).
+         */
+        const val INVALID_CHARS = "`;[]/<>:\\\r\n"
+    }
 }
 
 /**
