@@ -59,6 +59,13 @@ import androidx.compose.runtime.*
  *
  * See also [PackageMapping] which can be used to change any intermediate part of a route.
  *
+ * ## Reserved routes
+ *
+ * Routes whose first segment is `api` (e.g. "/api" or "/api/users") are reserved for the Kobweb server, which serves
+ * API endpoints there as well as internal endpoints (such as the one that powers live reloading during development).
+ * This applies to static sites too, since they are served by the same server when you run them locally. Using such a
+ * route for a page results in a build error.
+ *
  * @param routeOverride If specified, override the logic for generating a route for this page as documented in this
  *   header doc.
  */
