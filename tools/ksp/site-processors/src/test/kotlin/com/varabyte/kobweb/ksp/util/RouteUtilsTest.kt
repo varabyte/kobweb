@@ -1,45 +1,45 @@
 package com.varabyte.kobweb.ksp.util
 
+import com.varabyte.kobweb.project.common.PackageName
 import com.varabyte.truthish.assertThat
 import com.varabyte.truthish.assertThrows
 import org.junit.Test
 
 class RouteUtilsTest {
     @Test
-    fun packageSegmentToRouteSegment() {
-        assertThat(RouteUtils.packageSegmentToRouteSegment("blog")).isEqualTo("blog")
-        assertThat(RouteUtils.packageSegmentToRouteSegment("ourTeam")).isEqualTo("our-team")
-        assertThat(RouteUtils.packageSegmentToRouteSegment("_2021")).isEqualTo("2021")
-        assertThat(RouteUtils.packageSegmentToRouteSegment("fun_")).isEqualTo("fun")
-        assertThat(RouteUtils.packageSegmentToRouteSegment("our_team")).isEqualTo("our-team")
-        assertThat(RouteUtils.packageSegmentToRouteSegment("our__team")).isEqualTo("our-team")
+    fun toRouteSegment() {
+        assertThat("blog".toRouteSegment()).isEqualTo("blog")
+        assertThat("ourTeam".toRouteSegment()).isEqualTo("our-team")
+        assertThat("_2021".toRouteSegment()).isEqualTo("2021")
+        assertThat("fun_".toRouteSegment()).isEqualTo("fun")
+        assertThat("our_team".toRouteSegment()).isEqualTo("our-team")
+        assertThat("our__team".toRouteSegment()).isEqualTo("our-team")
 
-        assertThrows<IllegalArgumentException> { RouteUtils.packageSegmentToRouteSegment("a.b") }
+        assertThrows<IllegalArgumentException> { "a.b".toRouteSegment() }
     }
 
     @Test
-    fun convertPackageToRouteWithoutMappings() {
-        assertThat(RouteUtils.convertPackageToRoute("site.pages", emptyMap(), "site.pages")).isEqualTo("/")
-        assertThat(RouteUtils.convertPackageToRoute("site.pages", emptyMap(), "site.pages.blog")).isEqualTo("/blog/")
-        assertThat(RouteUtils.convertPackageToRoute("site.pages", emptyMap(), "site.pages.corp.ourTeam"))
-            .isEqualTo("/corp/our-team/")
-        assertThat(RouteUtils.convertPackageToRoute("site.pages", emptyMap(), "site.pages.blogs._2021"))
-            .isEqualTo("/blogs/2021/")
+    fun toRouteWithoutMappings() {
+        val root = PackageName("site.pages")
+        assertThat(PackageName("site.pages").toRoute(root, emptyMap())).isEqualTo("/")
+        assertThat(PackageName("site.pages.blog").toRoute(root, emptyMap())).isEqualTo("/blog/")
+        assertThat(PackageName("site.pages.corp.ourTeam").toRoute(root, emptyMap())).isEqualTo("/corp/our-team/")
+        assertThat(PackageName("site.pages.blogs._2021").toRoute(root, emptyMap())).isEqualTo("/blogs/2021/")
     }
 
     @Test
-    fun convertPackageToRouteWithMappings() {
+    fun toRouteWithMappings() {
+        val root = PackageName("site.pages")
         val mappings = mapOf(
-            "site.pages.blogs._2021" to "twenty-twenty-one",
-            "site.pages.blogs._2021._12" to "{month}",
+            PackageName("site.pages.blogs._2021") to "twenty-twenty-one",
+            PackageName("site.pages.blogs._2021._12") to "{month}",
         )
 
-        assertThat(RouteUtils.convertPackageToRoute("site.pages", mappings, "site.pages.blogs._2021"))
+        assertThat(PackageName("site.pages.blogs._2021").toRoute(root, mappings))
             .isEqualTo("/blogs/twenty-twenty-one/")
-        assertThat(RouteUtils.convertPackageToRoute("site.pages", mappings, "site.pages.blogs._2021._12.tutorials"))
+        assertThat(PackageName("site.pages.blogs._2021._12.tutorials").toRoute(root, mappings))
             .isEqualTo("/blogs/twenty-twenty-one/{month}/tutorials/")
         // Mappings only apply to their exact package
-        assertThat(RouteUtils.convertPackageToRoute("site.pages", mappings, "site.pages.blogs._2022"))
-            .isEqualTo("/blogs/2022/")
+        assertThat(PackageName("site.pages.blogs._2022").toRoute(root, mappings)).isEqualTo("/blogs/2022/")
     }
 }

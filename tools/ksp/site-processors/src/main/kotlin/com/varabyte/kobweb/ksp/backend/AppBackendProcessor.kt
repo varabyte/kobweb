@@ -12,14 +12,14 @@ import com.varabyte.kobweb.ksp.common.API_INTERCEPTOR_FQN
 import com.varabyte.kobweb.ksp.common.RESPONSE_FQN
 import com.varabyte.kobweb.project.backend.ApiInterceptorEntry
 import com.varabyte.kobweb.project.backend.AppBackendData
+import com.varabyte.kobweb.project.common.PackageName
 import kotlinx.serialization.json.Json
 
-class AppBackendProcessor(
+internal class AppBackendProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
     private val genFile: String,
-    projectGroup: String,
-    apiPackage: String,
+    apiPackage: PackageName,
 ) : SymbolProcessor {
     private val fileDependencies = mutableSetOf<KSFile>()
 
@@ -31,7 +31,6 @@ class AppBackendProcessor(
         codeGenerator = codeGenerator,
         logger = logger,
         genFile = "",
-        projectGroup = projectGroup,
         apiPackage = apiPackage,
     )
 

@@ -1,10 +1,11 @@
 package com.varabyte.kobwebx.gradle.markdown.tasks
 
-import com.varabyte.kobweb.common.lang.packageConcat
 import com.varabyte.kobweb.common.path.invariantSeparatorsPath
 import com.varabyte.kobweb.common.text.suffixIfNot
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
-import com.varabyte.kobweb.project.common.PackageUtils
+import com.varabyte.kobweb.project.common.PackageName
+import com.varabyte.kobweb.project.common.PackageShortcut
+import com.varabyte.kobweb.project.common.toPath
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFolder
 import org.gradle.api.file.FileTreeElement
@@ -39,18 +40,15 @@ abstract class MarkdownTask @Inject constructor(
     // Should only be called during the `execute` phase
     @get:Internal
     protected val pagesPath: Path get() {
-        return Path(PackageUtils.packageToPath(projectGroup.get().toString().packageConcat(pagesPackage.get())))
+        return PackageName(projectGroup.get().toString()).resolve(PackageShortcut(pagesPackage.get())).toPath()
     }
 
     /**
      * [MarkdownFolder.targetPackage] but resolved against [projectGroup] to ensure it is an absolute package.
      */
-    protected val MarkdownFolder.resolvedTargetPackage: String
+    protected val MarkdownFolder.resolvedTargetPackage: PackageName
         get() {
-            return PackageUtils.resolvePackageShortcut(
-                projectGroup.get().toString(),
-                targetPackage.get()
-            )
+            return PackageName(projectGroup.get().toString()).resolve(PackageShortcut(targetPackage.get()))
         }
 
     protected fun Path.toRelativePagePath(): Path? {

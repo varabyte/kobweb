@@ -1,7 +1,7 @@
 package com.varabyte.kobwebx.gradle.markdown.tasks
 
 import com.varabyte.kobweb.common.lang.packageFromFile
-import com.varabyte.kobweb.project.common.PackageUtils
+import com.varabyte.kobweb.project.common.toPath
 import com.varabyte.kobwebx.frontmatter.FrontMatterElement
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownEntry
@@ -21,7 +21,6 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import javax.inject.Inject
-import kotlin.io.path.Path
 import kotlin.io.path.invariantSeparatorsPathString
 
 private class MarkdownVisitor : AbstractVisitor() {
@@ -71,7 +70,7 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
             markdownFolders.get().forEach { markdownFolder ->
                 markdownFolder.files.visitFiles {
                     val pkgBase = markdownFolder.resolvedTargetPackage
-                    val srcPath = Path(PackageUtils.packageToPath(pkgBase), relativePath.toString())
+                    val srcPath = pkgBase.toPath().resolve(relativePath.toString())
                     srcPath.toRelativePagePath()?.let { relativePagePath ->
                         val mdFile = file
                         val visitor = MarkdownVisitor()

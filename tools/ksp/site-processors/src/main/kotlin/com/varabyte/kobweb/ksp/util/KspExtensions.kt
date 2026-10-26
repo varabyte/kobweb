@@ -4,7 +4,9 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.KSName
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
+import com.varabyte.kobweb.project.common.PackageName
 
 /**
  * Get the value associated with a named argument on an annotation, or the first argument if no name is specified.
@@ -37,3 +39,8 @@ fun KSAnnotated.getAnnotationArgumentValue(fqn: String, name: String? = null): S
  */
 val KSFunctionDeclaration.receiverClass: KSClassDeclaration?
     get() = extensionReceiver?.resolve()?.declaration as? KSClassDeclaration
+
+/**
+ * Convert a KSP name representing a package (e.g. `KSDeclaration.packageName`) into a [PackageName].
+ */
+fun KSName.toPackageName() = PackageName(asString())

@@ -1,6 +1,7 @@
 package com.varabyte.kobwebx.gradle.markdown.handlers
 
-import com.varabyte.kobweb.project.common.PackageUtils
+import com.varabyte.kobweb.project.common.FqNameShortcut
+import com.varabyte.kobweb.project.common.PackageName
 import org.commonmark.node.BlockQuote
 import org.commonmark.node.Text
 
@@ -90,7 +91,7 @@ fun SilkCalloutBlockquoteHandler(
             @Suppress("NAME_SHADOWING")
             val variant = parameters["variant"] ?: variant ?: "$SILK.display.CalloutDefaults.Variant"
             val calloutTypeFqn = types[typeId]?.let {
-                PackageUtils.resolvePackageShortcut(data.getValue(MarkdownHandlers.DataKeys.ProjectGroup), it)
+                PackageName(data.getValue(MarkdownHandlers.DataKeys.ProjectGroup)).resolve(FqNameShortcut(it))
             }
 
             if (calloutTypeFqn != null) {

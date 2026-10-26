@@ -19,34 +19,31 @@ import com.varabyte.kobweb.ksp.common.API_STREAM_FQN
 import com.varabyte.kobweb.ksp.common.API_STREAM_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.INIT_API_FQN
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_API_FQN
-import com.varabyte.kobweb.ksp.common.getPackageMappings
-import com.varabyte.kobweb.ksp.common.processRoute
+import com.varabyte.kobweb.ksp.common.getPackageRouteMapping
+import com.varabyte.kobweb.ksp.common.toRoute
 import com.varabyte.kobweb.ksp.frontend.FrontendProcessor
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.resolveQualifiedName
 import com.varabyte.kobweb.ksp.symbol.suppresses
 import com.varabyte.kobweb.ksp.util.getArgumentValue
+import com.varabyte.kobweb.ksp.util.toPackageName
 import com.varabyte.kobweb.project.backend.ApiEntry
 import com.varabyte.kobweb.project.backend.ApiStreamEntry
 import com.varabyte.kobweb.project.backend.BackendData
 import com.varabyte.kobweb.project.backend.InitApiEntry
 import com.varabyte.kobweb.project.backend.assertValid
 import com.varabyte.kobweb.project.common.PackageName
-import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobweb.project.frontend.FrontendData
 import kotlinx.serialization.json.Json
 
-class BackendProcessor(
+internal class BackendProcessor(
     private val isLibrary: Boolean,
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
     private val genFile: String,
-    projectGroup: String,
-    apiPackage: String,
+    private val apiPackage: PackageName,
 ) : SymbolProcessor {
     private val apiVisitor = ApiVisitor()
-
-    private val qualifiedApiPackage = PackageUtils.resolvePackageShortcut(projectGroup, apiPackage)
 
     private val initMethods = mutableListOf<InitApiEntry>()
 
@@ -54,7 +51,7 @@ class BackendProcessor(
     private val apiStreamsDeclarations = mutableListOf<KSPropertyDeclaration>()
 
     // fqPkg to subdir, e.g. "api.id._as._int" to "int"
-    private val packageMappings = mutableMapOf<String, String>()
+    private val packageMappings = mutableMapOf<PackageName, String>()
 
     // We track all files we depend on so that ksp can perform smart recompilation
     // Even though our output is aggregating so generally requires full reprocessing, this at minimum means processing
@@ -80,9 +77,11 @@ class BackendProcessor(
         val newFiles = resolver.getNewFiles()
 
         // package mapping must be processed before api methods & streams
-        packageMappings += newFiles.flatMap { file ->
-            getPackageMappings(file, qualifiedApiPackage, PACKAGE_MAPPING_API_FQN, logger).toList()
-                .also { if (it.isNotEmpty()) fileDependencies.add(file) }
+        newFiles.forEach { file ->
+            file.getPackageRouteMapping(apiPackage, PACKAGE_MAPPING_API_FQN, logger)?.let { mapping ->
+                packageMappings[mapping.pkg] = mapping.routeSegment
+                fileDependencies.add(file)
+            }
         }
 
         apiMethodsDeclarations += resolver.getSymbolsWithAnnotation(API_FQN)
@@ -149,19 +148,17 @@ class BackendProcessor(
         // api declarations must be processed at the end, as they rely on package mappings,
         // which may be populated over several rounds
         val apiMethods = apiMethodsDeclarations.mapNotNull { annotatedFun ->
-            processApiFun(annotatedFun, qualifiedApiPackage, packageMappings, logger)
+            annotatedFun.toApiEntry(apiPackage, packageMappings, logger)
                 ?.also { fileDependencies.add(annotatedFun.containingFile!!) }
         }
         val apiStreams = apiStreamsDeclarations.map { property ->
             val routeOverride = property.getAnnotationsByName(API_FQN).firstOrNull()?.getArgumentValue()
                 ?.takeIf { it.isNotBlank() }
 
-            val resolvedRoute = processRoute(
-                packageRoot = qualifiedApiPackage,
-                pkg = property.packageName.asString(),
-                file = property.containingFile!!,
-                routeOverride = routeOverride,
+            val resolvedRoute = property.containingFile!!.toRoute(
+                packageRoot = apiPackage,
                 packageMappings = packageMappings,
+                routeOverride = routeOverride,
                 supportEmptyDynamicSegments = false,
             )
 
@@ -195,33 +192,30 @@ class BackendProcessor(
     data class Result(val data: BackendData, val fileDependencies: Set<KSFile>)
 }
 
-private fun processApiFun(
-    annotatedFun: KSFunctionDeclaration,
-    qualifiedApiPackage: String,
-    packageMappings: Map<String, String>,
+private fun KSFunctionDeclaration.toApiEntry(
+    qualifiedApiPackage: PackageName,
+    packageMappings: Map<PackageName, String>,
     logger: KSPLogger,
 ): ApiEntry? {
-    val apiAnnotation = annotatedFun.getAnnotationsByName(API_FQN).first()
-    val currPackage = annotatedFun.packageName.asString()
-    val file = annotatedFun.containingFile ?: error("Symbol does not come from a source file")
+    val apiAnnotation = getAnnotationsByName(API_FQN).first()
+    val currPackage = packageName.toPackageName()
+    val file = containingFile ?: error("Symbol does not come from a source file")
     val routeOverride = apiAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }
 
-    return if (routeOverride?.startsWith("/") == true || PackageName(currPackage).isSameOrSubpackageOf(PackageName(qualifiedApiPackage))) {
-        val resolvedRoute = processRoute(
+    return if (routeOverride?.startsWith("/") == true || currPackage.isSameOrSubpackageOf(qualifiedApiPackage)) {
+        val resolvedRoute = file.toRoute(
             packageRoot = qualifiedApiPackage,
-            pkg = annotatedFun.packageName.asString(),
-            file = file,
-            routeOverride = routeOverride,
             packageMappings = packageMappings,
+            routeOverride = routeOverride,
             supportEmptyDynamicSegments = false,
         )
-        ApiEntry(annotatedFun.qualifiedName!!.asString(), resolvedRoute)
+        ApiEntry(qualifiedName!!.asString(), resolvedRoute)
     } else {
-        val funName = annotatedFun.simpleName.asString()
+        val funName = simpleName.asString()
         val annotationName = apiAnnotation.shortName.asString()
         logger.warn(
             "Skipped over `@$annotationName fun ${funName}`. It is defined under package `$currPackage` but must exist under `$qualifiedApiPackage`.",
-            annotatedFun
+            this
         )
         null
     }

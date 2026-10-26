@@ -14,19 +14,21 @@ import com.varabyte.kobweb.ksp.backend.BackendProcessor
 import com.varabyte.kobweb.ksp.backend.AppBackendProcessor
 import com.varabyte.kobweb.ksp.frontend.AppFrontendProcessor
 import com.varabyte.kobweb.ksp.frontend.FrontendProcessor
+import com.varabyte.kobweb.project.common.PackageName
+import com.varabyte.kobweb.project.common.PackageShortcut
 
 class KobwebProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
         val processorMode = environment.options[KSP_PROCESSOR_MODE_KEY]?.let { ProcessorMode.valueOf(it) }
             ?: error("KobwebProcessorProvider: Missing processor mode ($KSP_PROCESSOR_MODE_KEY)")
 
-        val projectGroup = environment.options[KSP_PROJECT_GROUP_KEY]
+        val projectGroup = environment.options[KSP_PROJECT_GROUP_KEY]?.let { PackageName(it) }
             ?: error("KobwebProcessorProvider: Missing project group ($KSP_PROJECT_GROUP_KEY)")
 
         return when (val platform = environment.platforms.singleOrNull()) {
             is JsPlatformInfo -> {
 
-                val pagesPackage = environment.options[KSP_PAGES_PACKAGE_KEY]
+                val pagesPackage = environment.options[KSP_PAGES_PACKAGE_KEY]?.let { projectGroup.resolve(PackageShortcut(it)) }
                     ?: error("KobwebProcessorProvider: Missing pages package ($KSP_PAGES_PACKAGE_KEY)")
 
                 val genFile = processorMode.frontendFile
@@ -58,7 +60,7 @@ class KobwebProcessorProvider : SymbolProcessorProvider {
             }
 
             is JvmPlatformInfo -> {
-                val apiPackage = environment.options[KSP_API_PACKAGE_KEY]
+                val apiPackage = environment.options[KSP_API_PACKAGE_KEY]?.let { projectGroup.resolve(PackageShortcut(it)) }
                     ?: error("KobwebProcessorProvider: Missing api package ($KSP_API_PACKAGE_KEY)")
 
                 when (processorMode) {
@@ -67,7 +69,6 @@ class KobwebProcessorProvider : SymbolProcessorProvider {
                             codeGenerator = environment.codeGenerator,
                             logger = environment.logger,
                             genFile = processorMode.backendFile,
-                            projectGroup = projectGroup,
                             apiPackage = apiPackage,
                         )
                     }
@@ -78,7 +79,6 @@ class KobwebProcessorProvider : SymbolProcessorProvider {
                             codeGenerator = environment.codeGenerator,
                             logger = environment.logger,
                             genFile = processorMode.backendFile,
-                            projectGroup = projectGroup,
                             apiPackage = apiPackage,
                         )
                     }

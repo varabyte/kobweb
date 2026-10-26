@@ -3,7 +3,9 @@ package com.varabyte.kobwebx.gradle.markdown
 import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.common.navigation.Route
 import com.varabyte.kobweb.gradle.core.util.Reporter
-import com.varabyte.kobweb.project.common.PackageUtils
+import com.varabyte.kobweb.project.common.FqNameShortcut
+import com.varabyte.kobweb.project.common.PackageName
+import com.varabyte.kobweb.project.common.PackageShortcut
 import com.varabyte.kobwebx.frontmatter.FrontMatterElement
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
@@ -106,7 +108,7 @@ class KotlinRenderer internal constructor(
                     appendLine("import com.varabyte.kobwebx.markdown.*")
                 }
                 (imports + frontMatterData?.imports.orEmpty()).forEach { importPath ->
-                    appendLine("import ${PackageUtils.resolvePackageShortcut(projectGroup, importPath)}")
+                    appendLine("import ${PackageName(projectGroup).resolveImport(importPath)}")
                 }
 
                 appendLine()
@@ -512,4 +514,22 @@ class KotlinRenderer internal constructor(
             }
         }
     }
+}
+
+/**
+ * Resolve an import path (which may use a package shortcut) relative to this package.
+ *
+ * An import path is either a fully qualified name (e.g. ".components.widgets.Button") or a package followed by a
+ * wildcard (e.g. ".components.widgets.*"), and either can be followed by an alias (e.g. "... as MyButton").
+ */
+private fun PackageName.resolveImport(importPath: String): String {
+    val path = importPath.substringBefore(" as ")
+    val alias = importPath.removePrefix(path)
+    val resolvedPath = if (path.endsWith("*")) {
+        val pkg = path.removeSuffix("*").removeSuffix(".").ifEmpty { "." }
+        "${resolve(PackageShortcut(pkg))}.*"
+    } else {
+        resolve(FqNameShortcut(path)).value
+    }
+    return resolvedPath + alias
 }

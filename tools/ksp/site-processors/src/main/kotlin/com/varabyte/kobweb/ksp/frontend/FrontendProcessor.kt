@@ -40,14 +40,15 @@ import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_PAGE_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_CONTEXT_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.getDefaultLayout
-import com.varabyte.kobweb.ksp.common.getPackageMappings
+import com.varabyte.kobweb.ksp.common.getPackageRouteMapping
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.suppresses
 import com.varabyte.kobweb.ksp.util.getAnnotationArgumentValue
 import com.varabyte.kobweb.ksp.util.getArgumentValue
 import com.varabyte.kobweb.ksp.util.receiverClass
+import com.varabyte.kobweb.ksp.util.toPackageName
+import com.varabyte.kobweb.project.common.FqNameShortcut
 import com.varabyte.kobweb.project.common.PackageName
-import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobweb.project.frontend.CssStyleEntry
 import com.varabyte.kobweb.project.frontend.CssStyleVariantEntry
 import com.varabyte.kobweb.project.frontend.FrontendData
@@ -59,13 +60,13 @@ import com.varabyte.kobweb.project.frontend.assertValid
 import kotlinx.serialization.json.Json
 
 @OptIn(KspExperimental::class)
-class FrontendProcessor(
+internal class FrontendProcessor(
     private val isLibrary: Boolean,
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
     private val genFile: String,
-    private val projectGroup: String,
-    pagesPackage: String,
+    private val projectGroup: PackageName,
+    private val pagesPackage: PackageName,
     private val defaultCssPrefix: String? = null,
 ) : SymbolProcessor {
 
@@ -93,21 +94,19 @@ class FrontendProcessor(
     private val pageDeclarations = mutableListOf<KSFunctionDeclaration>()
     private val initRouteDeclarations = mutableListOf<KSFunctionDeclaration>()
 
-    private val qualifiedPagesPackage = PackageUtils.resolvePackageShortcut(projectGroup, pagesPackage)
-
     private val layoutMethods = mutableSetOf<LayoutMethodData>()
     private val noLayoutsFor = mutableSetOf<KSFunctionDeclaration>()
     private val layoutsFor = mutableMapOf<KSFunctionDeclaration, LayoutMethodData>()
     // fqPkg to layout fqn, e.g. "pages.blog" to "com.example.components.layouts.BlogLayout"
     // sorted by length (descending), so more specific packages will be checked before less specific ones
-    private val defaultLayouts = mutableMapOf<String, KSFunctionDeclaration>().toSortedMap(compareBy({ -it.length }, { it }))
+    private val defaultLayouts = mutableMapOf<PackageName, KSFunctionDeclaration>().toSortedMap(compareBy({ -it.value.length }, { it.value }))
     private val kobwebInits = mutableListOf<InitKobwebEntry>()
     private val silkInits = mutableListOf<InitSilkEntry>()
     private val cssStyles = mutableListOf<CssStyleEntry>()
     private val cssStyleVariants = mutableListOf<CssStyleVariantEntry>()
     private val keyframesList = mutableListOf<KeyframesEntry>()
     // fqPkg to subdir, e.g. "blog._2022._01" to "01"
-    private val packageMappings = mutableMapOf<String, String>()
+    private val packageMappings = mutableMapOf<PackageName, String>()
 
     // We track all files we depend on so that ksp can perform smart recompilation
     // Even though our output is aggregating so generally requires full reprocessing, this at minimum means processing
@@ -218,8 +217,8 @@ class FrontendProcessor(
                         if (layoutFqn.isBlank() || layoutFqn == NO_LAYOUT_FQN) {
                             noLayoutsFor.add(annotatedFun)
                         } else {
-                            val resolvedFqn = PackageUtils.resolvePackageShortcut(projectGroup, layoutFqn)
-                            val layoutParent = resolver.getKSNameFromString(resolvedFqn)
+                            val resolvedFqn = projectGroup.resolve(FqNameShortcut(layoutFqn))
+                            val layoutParent = resolver.getKSNameFromString(resolvedFqn.value)
                             resolver.checkLayoutMethod(annotatedFun, layoutParent)?.let { layoutMethod ->
                                 layoutsFor[annotatedFun] = layoutMethod
                             }
@@ -269,26 +268,22 @@ class FrontendProcessor(
         resolver.getNewFiles().forEach { file ->
             silkVisitor?.let { file.accept(it, Unit) }
 
-            getDefaultLayout(
-                file,
+            file.getDefaultLayout(
                 projectGroup,
-                qualifiedPagesPackage,
+                pagesPackage,
                 LAYOUT_FQN,
                 logger
-            )?.let { (pkg, layoutFqn) ->
-                resolver.checkLayoutMethod(file, resolver.getKSNameFromString(layoutFqn))?.let { layoutData ->
-                    defaultLayouts[pkg] = layoutData.method
+            )?.let { defaultLayout ->
+                resolver.checkLayoutMethod(file, resolver.getKSNameFromString(defaultLayout.layoutFqn.value))?.let { layoutData ->
+                    defaultLayouts[defaultLayout.pkg] = layoutData.method
                     fileDependencies.add(file)
                 }
             }
 
-            packageMappings += getPackageMappings(
-                file,
-                qualifiedPagesPackage,
-                PACKAGE_MAPPING_PAGE_FQN,
-                logger
-            ).toMap()
-                .also { if (it.isNotEmpty()) fileDependencies.add(file) }
+            file.getPackageRouteMapping(pagesPackage, PACKAGE_MAPPING_PAGE_FQN, logger)?.let { mapping ->
+                packageMappings[mapping.pkg] = mapping.routeSegment
+                fileDependencies.add(file)
+            }
         }
 
         pageDeclarations += resolver.getSymbolsWithAnnotation(PAGE_FQN).map { it as KSFunctionDeclaration }
@@ -843,16 +838,16 @@ class FrontendProcessor(
                 val layoutData = layoutsFor[annotatedFun]
                 if (layoutData != null && !assertReceiverCompatibleWithLayout(annotatedFun, layoutData)) return@mapNotNull null
                 (layoutData?.method?.qualifiedName?.asString()
-                    ?: defaultLayouts.asSequence().mapNotNull { (pkg, layoutMethod) ->
-                        layoutMethod.takeIf { PackageName(annotatedFun.packageName.asString()).isSameOrSubpackageOf(PackageName(pkg)) }
-                    }.firstOrNull()?.qualifiedName?.asString())
+                    ?: defaultLayouts.asSequence()
+                        .firstNotNullOfOrNull { (pkg, layoutMethod) ->
+                            layoutMethod.takeIf { annotatedFun.packageName.toPackageName().isSameOrSubpackageOf(pkg) }
+                        }?.qualifiedName?.asString())
             }
 
-            processPagesFun(
-                annotatedFun = annotatedFun,
+            annotatedFun.toPageEntry(
                 layoutFqn = layoutFqn,
                 initRoutes = initRoutesMap,
-                qualifiedPagesPackage = qualifiedPagesPackage,
+                qualifiedPagesPackage = pagesPackage,
                 packageMappings = packageMappings,
                 logger = logger,
             )?.also { fileDependencies.add(annotatedFun.containingFile!!) }

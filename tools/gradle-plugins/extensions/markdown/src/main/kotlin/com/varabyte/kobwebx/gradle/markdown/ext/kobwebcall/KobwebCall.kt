@@ -1,6 +1,7 @@
 package com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall
 
-import com.varabyte.kobweb.project.common.PackageUtils
+import com.varabyte.kobweb.project.common.FqNameShortcut
+import com.varabyte.kobweb.project.common.PackageName
 import org.commonmark.node.CustomNode
 
 /**
@@ -24,8 +25,12 @@ class KobwebCall(val partiallyQualifiedName: String, var appendBrace: Boolean = 
      * * `test()` -> `test()`
      */
     fun toFqn(projectGroup: String): String {
+        // Split a call like ".widgets.VideoPlayer(src = "...")" into its name and everything after it, as only the name
+        // part can be a shortcut
+        val name = partiallyQualifiedName.takeWhile { it != '(' && it != '{' && it != '<' && !it.isWhitespace() }
         return buildString {
-            append(PackageUtils.resolvePackageShortcut(projectGroup, partiallyQualifiedName))
+            append(PackageName(projectGroup).resolve(FqNameShortcut(name)))
+            append(partiallyQualifiedName.removePrefix(name))
             if (partiallyQualifiedName.last().isLetterOrDigit() && !appendBrace) {
                 append("()")
             }

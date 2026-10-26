@@ -10,17 +10,17 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.varabyte.kobweb.ksp.common.APP_FQN
+import com.varabyte.kobweb.project.common.PackageName
 import com.varabyte.kobweb.project.frontend.AppFrontendData
 import com.varabyte.kobweb.project.frontend.AppEntry
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class AppFrontendProcessor(
+internal class AppFrontendProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
     private val genFile: String,
-    projectGroup: String,
-    pagesPackage: String,
+    projectGroup: PackageName,
+    pagesPackage: PackageName,
     defaultCssPrefix: String? = null,
 ) : SymbolProcessor {
     private val fileDependencies = mutableListOf<KSFile>()

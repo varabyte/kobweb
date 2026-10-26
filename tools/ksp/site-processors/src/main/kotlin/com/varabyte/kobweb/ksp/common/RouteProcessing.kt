@@ -1,14 +1,14 @@
 package com.varabyte.kobweb.ksp.common
 
 import com.google.devtools.ksp.symbol.KSFile
-import com.varabyte.kobweb.ksp.util.RouteUtils
+import com.varabyte.kobweb.ksp.util.toPackageName
+import com.varabyte.kobweb.ksp.util.toRoute
 import com.varabyte.kobweb.ksp.util.toSlug
 import com.varabyte.kobweb.project.common.DynamicRouteSegment
+import com.varabyte.kobweb.project.common.PackageName
 
 /**
- * Process all incoming information to produce a final route.
- *
- * This is useful, for example, to determine the route for a method annotated with `@Page`
+ * Produce the final route for a declaration (e.g. a method annotated with `@Page`) inside this file.
  *
  * For example, a method annotated with `@Page` in a file named `Example.kt`
  * and in the package `pages.a.b.c` will generate a route `/a/b/c/example`.
@@ -18,29 +18,24 @@ import com.varabyte.kobweb.project.common.DynamicRouteSegment
  * @param packageRoot The package to the folder that's considered the parent of all files that we're converting. For
  *   example, `mysite.pages` as a route would mean `mysite.pages.user.settings` would correspond to the route
  *   `/user/settings`
- * @param pkg The package of the file we're planning to convert into a route. This will be used unless a route override
- *   is specified.
- * @param file The file containing the target method we're converting into a route.
+ * @param packageMappings A map of package to route mappings. See [PackageName.toRoute] for more information.
  * @param routeOverride If specified, this will influence the final route. Depending on whether it starts with and/or
  *   ends with a slash, it will either replace the entire route or affect parts of it.
- * @param packageMappings A map of package to route mappings. See [RouteUtils.convertPackageToRoute] for more information.
  * @param supportEmptyDynamicSegments Whether to support the special "{}" route segment. This is allowed on the frontend
  *   (where it captures values from the user's URL) but not on the backend.
  */
-fun processRoute(
-    packageRoot: String,
-    pkg: String,
-    file: KSFile,
+fun KSFile.toRoute(
+    packageRoot: PackageName,
+    packageMappings: Map<PackageName, String>,
     routeOverride: String?,
-    packageMappings: Map<String, String>,
     supportEmptyDynamicSegments: Boolean,
 ): String {
-    val slugFromFile = file.toSlug()
+    val slugFromFile = toSlug()
     val routeWithoutSlug = if (routeOverride != null && routeOverride.startsWith("/")) {
         // If route override starts with "/" it means the user set the full route explicitly
         routeOverride.substringBeforeLast('/') + '/'
     } else {
-        RouteUtils.convertPackageToRoute(packageRoot, packageMappings, pkg)
+        packageName.toPackageName().toRoute(packageRoot, packageMappings)
     }
 
     val routeExtra =

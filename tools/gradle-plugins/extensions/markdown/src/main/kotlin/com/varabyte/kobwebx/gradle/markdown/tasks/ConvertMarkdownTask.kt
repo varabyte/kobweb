@@ -4,7 +4,8 @@ import com.varabyte.kobweb.common.lang.packageConcat
 import com.varabyte.kobweb.common.lang.packageFromFile
 import com.varabyte.kobweb.common.text.ensureSurrounded
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
-import com.varabyte.kobweb.project.common.PackageUtils
+import com.varabyte.kobweb.project.common.PackageName
+import com.varabyte.kobweb.project.common.toPath
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
@@ -83,8 +84,8 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                 val pkgBase = markdownFolder.resolvedTargetPackage
 
                 val sourcePath = relativePath.toPath()
-                val absolutePackage = pkgBase.packageConcat(sourcePath.packageFromFile())
-                val outputRootPath = Path(PackageUtils.packageToPath(absolutePackage))
+                val absolutePackage = pkgBase.value.packageConcat(sourcePath.packageFromFile())
+                val outputRootPath = PackageName(absolutePackage).toPath()
 
                 nodeCache.metadata[nodeCache[file]] = NodeCache.Metadata.Entry(
                     projectRoot.get(),
@@ -94,7 +95,7 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                     absolutePackage,
                     // Route should only be set for pages
                     if (outputRootPath.startsWith(pagesPath)) {
-                        Path(PackageUtils.packageToPath(pkgBase)).resolve(sourcePath.parent ?: Path(""))
+                        pkgBase.toPath().resolve(sourcePath.parent ?: Path(""))
                             .relativeTo(pagesPath)
                             .invariantSeparatorsPathString
                             .ensureSurrounded("/") +
