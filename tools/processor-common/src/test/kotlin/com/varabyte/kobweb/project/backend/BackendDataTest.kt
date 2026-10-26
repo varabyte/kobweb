@@ -14,7 +14,7 @@ class BackendDataTest {
     fun validDataReportsNoErrors() {
         val data = BackendData(
             apiMethods = listOf(ApiEntry("a.api.users", "/users"), ApiEntry("a.api.posts", "/posts")),
-            apiStreamMethods = listOf(ApiStreamEntry("a.api.echo", "/echo"), ApiStreamEntry("a.api.chat", "/chat")),
+            apiStreamProperties = listOf(ApiStreamEntry("a.api.echo", "/echo"), ApiStreamEntry("a.api.chat", "/chat")),
         )
         assertThat(data.collectErrors()).isEmpty()
     }
@@ -38,7 +38,7 @@ class BackendDataTest {
     @Test
     fun duplicateApiStreamRoutesAreReported() {
         val data = BackendData(
-            apiStreamMethods = listOf(
+            apiStreamProperties = listOf(
                 ApiStreamEntry("a.api.echo", "/echo"),
                 ApiStreamEntry("b.api.echo", "/echo"),
                 ApiStreamEntry("a.api.chat", "/chat"),
@@ -55,7 +55,7 @@ class BackendDataTest {
     fun apiStreamRoutesIgnoreLeadingSlash() {
         // The server strips a leading slash when registering streams, so these would collide at runtime
         val data = BackendData(
-            apiStreamMethods = listOf(ApiStreamEntry("a.api.echo", "/echo"), ApiStreamEntry("b.api.echo", "echo")),
+            apiStreamProperties = listOf(ApiStreamEntry("a.api.echo", "/echo"), ApiStreamEntry("b.api.echo", "echo")),
         )
         assertThat(data.collectErrors().size).isEqualTo(1)
     }
@@ -64,7 +64,7 @@ class BackendDataTest {
     fun apiAndStreamRoutesDoNotConflictWithEachOther() {
         val data = BackendData(
             apiMethods = listOf(ApiEntry("a.api.echo", "/echo")),
-            apiStreamMethods = listOf(ApiStreamEntry("a.api.echoStream", "/echo")),
+            apiStreamProperties = listOf(ApiStreamEntry("a.api.echoStream", "/echo")),
         )
         assertThat(data.collectErrors()).isEmpty()
     }
@@ -73,11 +73,11 @@ class BackendDataTest {
     fun mergeReportsDuplicatesAcrossModules() {
         val errors = mutableListOf<String>()
         val merged = listOf(
-            BackendData(apiStreamMethods = listOf(ApiStreamEntry("lib.api.echo", "/echo"))),
-            BackendData(apiStreamMethods = listOf(ApiStreamEntry("app.api.echo", "/echo"))),
+            BackendData(apiStreamProperties = listOf(ApiStreamEntry("lib.api.echo", "/echo"))),
+            BackendData(apiStreamProperties = listOf(ApiStreamEntry("app.api.echo", "/echo"))),
         ).merge { errors.add(it) }
 
-        assertThat(merged.apiStreamMethods.size).isEqualTo(2)
+        assertThat(merged.apiStreamProperties.size).isEqualTo(2)
         assertThat(errors.size).isEqualTo(1)
     }
 }

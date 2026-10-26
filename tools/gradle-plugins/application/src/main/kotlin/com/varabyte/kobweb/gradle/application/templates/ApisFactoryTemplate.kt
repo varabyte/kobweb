@@ -63,7 +63,7 @@ fun createApisFactoryImpl(appBackendData: AppBackendData): String {
                         backendData.apiMethods.sortedBy { entry -> entry.route }.forEach { entry ->
                             addStatement("apis.register(%S) { ctx -> ${entry.fqn}(ctx) }", entry.route)
                         }
-                        backendData.apiStreamMethods.sortedBy { entry -> entry.route }.forEach { entry ->
+                        backendData.apiStreamProperties.sortedBy { entry -> entry.route }.forEach { entry ->
                             addStatement("apis.registerStream(%S, ${entry.fqn})", entry.route)
                         }
                         if (backendData.initMethods.isNotEmpty()) {

@@ -7,15 +7,15 @@ import kotlinx.serialization.Serializable
  *
  * @param initMethods A collection of methods annotated with `@InitApi` and relevant metadata.
  * @param apiMethods A collection of methods annotated with `@Api` and relevant metadata.
- * @param apiStreamMethods A collection of ApiStream properties and relevant metadata.
+ * @param apiStreamProperties A collection of ApiStream properties and relevant metadata.
  */
 @Serializable
 class BackendData(
     val initMethods: List<InitApiEntry> = emptyList(),
     val apiMethods: List<ApiEntry> = emptyList(),
-    val apiStreamMethods: List<ApiStreamEntry> = emptyList(),
+    val apiStreamProperties: List<ApiStreamEntry> = emptyList(),
 ) {
-    fun isEmpty() = initMethods.isEmpty() && apiMethods.isEmpty() && apiStreamMethods.isEmpty()
+    fun isEmpty() = initMethods.isEmpty() && apiMethods.isEmpty() && apiStreamProperties.isEmpty()
 }
 
 @Serializable
@@ -35,13 +35,13 @@ fun Iterable<BackendData>.merge(handleError: (String) -> Unit): BackendData {
     return BackendData(
         this.flatMap { it.initMethods },
         this.flatMap { it.apiMethods },
-        this.flatMap { it.apiStreamMethods },
+        this.flatMap { it.apiStreamProperties },
     ).also { it.assertValid(handleError) }
 }
 
 fun BackendData.assertValid(handleError: (String) -> Unit) {
     apiMethods.assertValidApis(handleError)
-    apiStreamMethods.assertValidApiStreams(handleError)
+    apiStreamProperties.assertValidApiStreams(handleError)
 }
 
 private fun Iterable<ApiEntry>.assertValidApis(handleError: (String) -> Unit) {
