@@ -20,6 +20,15 @@ class BackendDataTest {
     }
 
     @Test
+    fun repeatedDynamicSegmentNamesInApiRoutesAreReported() {
+        val errors = BackendData(apiMethods = listOf(ApiEntry("a.api.users.user", "/users/{user}/{user}"))).collectErrors()
+        assertThat(errors.size).isEqualTo(1)
+        assertThat(errors[0]).contains("\"user\"")
+
+        assertThat(BackendData(apiMethods = listOf(ApiEntry("a.api.a", "/a/{a}/a"))).collectErrors()).isEmpty()
+    }
+
+    @Test
     fun duplicateApiRoutesAreReported() {
         val data = BackendData(
             apiMethods = listOf(

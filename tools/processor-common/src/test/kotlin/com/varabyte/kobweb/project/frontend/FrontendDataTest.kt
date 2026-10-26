@@ -47,6 +47,20 @@ class FrontendDataTest {
     }
 
     @Test
+    fun repeatedDynamicSegmentNamesAreReported() {
+        val errors = pagesErrors("site.pages.users.user" to "/users/{user}/{user}")
+        assertThat(errors.size).isEqualTo(1)
+        assertThat(errors[0]).contains("\"user\"")
+
+        // Catch-all and optional segments are read by name too
+        assertThat(pagesErrors("a" to "/{id}/x/{...id}").size).isEqualTo(1)
+        assertThat(pagesErrors("a" to "/{id}/x/{id?}").size).isEqualTo(1)
+
+        // Static segments can repeat
+        assertThat(pagesErrors("a" to "/a/{a}/a")).isEmpty()
+    }
+
+    @Test
     fun trailingOptionalSegmentConflictsWithParentRoute() {
         val errors = pagesErrors("site.pages.users.index" to "/users/", "site.pages.users.id" to "/users/{id?}")
         assertThat(errors.size).isEqualTo(1)

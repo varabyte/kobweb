@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.project.backend
 
+import com.varabyte.kobweb.project.common.DynamicRouteSegment
 import kotlinx.serialization.Serializable
 
 /**
@@ -49,6 +50,13 @@ private fun Iterable<ApiEntry>.assertValidApis(handleError: (String) -> Unit) {
     entriesByRoute.forEach { (route, apis) ->
         if (apis.size > 1) {
             handleError("The API route \"$route\" was defined more than once. Used by:\n${apis.joinToString("\n") { entry -> " - ${entry.fqn}" }}")
+        }
+    }
+
+    this.forEach { entry ->
+        val repeatedNames = DynamicRouteSegment.findRepeatedNames(entry.route)
+        if (repeatedNames.isNotEmpty()) {
+            handleError("The API route \"${entry.route}\" (${entry.fqn}) uses the dynamic segment name(s) ${repeatedNames.joinToString { "\"$it\"" }} more than once, so only one of the values can be read. Please rename one of them.")
         }
     }
 }

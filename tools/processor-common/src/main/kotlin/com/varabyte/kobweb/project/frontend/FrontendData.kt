@@ -78,6 +78,15 @@ private fun Iterable<PageEntry>.assertValidPages(handleError: (String) -> Unit) 
         }
     }
 
+    // This is easiest to hit by accident when names are inferred from different places, e.g. a package mapped to "{}"
+    // under "users.user" plus a page with `@Page("{}")` in "User.kt" results in "/users/{user}/{user}"
+    this.forEach { entry ->
+        val repeatedNames = DynamicRouteSegment.findRepeatedNames(entry.route)
+        if (repeatedNames.isNotEmpty()) {
+            handleError("The route \"${entry.route}\" (${entry.fqn}) uses the dynamic segment name(s) ${repeatedNames.joinToString { "\"$it\"" }} more than once, so only one of the values can be read. Please rename one of them.")
+        }
+    }
+
     // Collect all entries that end with an optional segment, e.g. "/a/b/c/{d?}", as we'll check if their parent dir is
     // already registered separately, e.g. "/a/b/c/". If so, that means the former route can probably drop the ?, e.g.
     // "/a/b/c/{d}", as the empty case will always be handled by the static route.

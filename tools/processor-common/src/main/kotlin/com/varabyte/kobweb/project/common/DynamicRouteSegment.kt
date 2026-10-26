@@ -44,6 +44,18 @@ class DynamicRouteSegment(val rawValue: String) {
                 null
             }
         }
+
+        /**
+         * Return any dynamic segment names used more than once in this route, e.g. "id" in "/a/{id}/b/{...id}".
+         *
+         * Dynamic values are read by name, so if two segments share a name, only one of their values can be read.
+         */
+        fun findRepeatedNames(route: String): Set<String> {
+            return route.split('/')
+                .mapNotNull { tryCreate(it)?.name }
+                .groupingBy { it }.eachCount()
+                .filterValues { it > 1 }.keys
+        }
     }
 
 }
