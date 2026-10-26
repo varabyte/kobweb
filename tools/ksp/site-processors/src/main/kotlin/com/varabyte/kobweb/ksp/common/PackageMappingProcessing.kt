@@ -25,7 +25,8 @@ class PackageRouteMapping(val pkg: PackageName, val routeSegment: String, val fi
  * Convert the value of a `@PackageMapping` annotation declared in this package into the route segment it represents.
  *
  * An inferred dynamic segment, e.g. "{}", is named after this package. Blank values, catch-all segments, and optional
- * segments are rejected, as a package is never the last part of a route.
+ * segments are rejected, as a package is never the last part of a route. Other suspicious values, e.g. a malformed
+ * dynamic segment like "{user", are accepted but logged as warnings.
  *
  * @param symbol The node to attach any errors to, e.g. the annotation the value came from.
  *
@@ -35,6 +36,14 @@ fun PackageName.toMappedRouteSegment(value: String, logger: KSPLogger, symbol: K
     if (value.isBlank()) {
         logger.error("Package mapping for \"$this\" is blank, which is not supported. If you want to remove this package from your routes, move its files into the parent package instead.", symbol)
         return null
+    }
+
+    if (value.contains('/')) {
+        logger.warn("Package mapping `$value` for \"$this\" contains a slash, so it will add multiple segments to routes. Package mappings are expected to be a single route segment.", symbol)
+    }
+    // A package mapping is essentially a route override for a single segment, so the same problems apply
+    RouteOverride(value).findProblems().forEach { problem ->
+        logger.warn("Package mapping `$value` for \"$this\" may not work as expected. $problem", symbol)
     }
 
     val dynamicRouteSegment = DynamicRouteSegment.tryCreate(value) ?: return value

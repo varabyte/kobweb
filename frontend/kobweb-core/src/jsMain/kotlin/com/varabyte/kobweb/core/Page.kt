@@ -19,9 +19,11 @@ import androidx.compose.runtime.*
  * general, you should NOT set it, as this will make it harder for people to navigate your project and find where a
  * URL is coming from.
  *
- * However, if you do set it, in most cases, it is expected to just be a single, lowercase word, which changes the slug
- * used for this page (instead of the file name). You can use the name "index" here which will be treated specially as
- * mentioned above.
+ * However, if you do set it, in most cases, it should just be a single word, which changes the slug used for this page
+ * (instead of the file name). Lowercase is recommended, but the value is used exactly as written, since URL paths are
+ * case-sensitive (e.g. `@Page("AboutUs")` generates ".../AboutUs", which can be useful for preserving legacy URLs).
+ * You can use the name "index" here which will be treated specially as mentioned above. (This check is also
+ * case-sensitive, so "Index" is treated like any other name.)
  *
  * But wait, there's more!
  *

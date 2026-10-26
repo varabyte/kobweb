@@ -3,7 +3,9 @@ package com.varabyte.kobweb.ksp.frontend
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
+import com.varabyte.kobweb.ksp.common.RouteOverride
 import com.varabyte.kobweb.ksp.common.toRoute
+import com.varabyte.kobweb.ksp.common.warnAboutProblems
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.util.getArgumentValue
 import com.varabyte.kobweb.ksp.util.receiverClass
@@ -34,16 +36,17 @@ fun KSFunctionDeclaration.toPageEntry(
     }
 
     val currPackage = packageName.toPackageName()
-    val routeOverride = pageAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }
+    val routeOverride = pageAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }?.let { RouteOverride(it) }
+    routeOverride?.warnAboutProblems(pageAnnotation, logger)
 
-    if (routeOverride?.startsWith("/") == true || currPackage.isSameOrSubpackageOf(qualifiedPagesPackage)) {
+    if (routeOverride?.value?.startsWith("/") == true || currPackage.isSameOrSubpackageOf(qualifiedPagesPackage)) {
         // To maintain the general association between the file name and the slug, we reject route overrides which use
         // the "{}" inferred dynamic segment syntax in any part except for the last.
         // e.g. "/dynamic/{example}/route/{}" is OK but "/dynamic/{}/route/{example}" is not.
         // (While we're here, catch all segments, e.g. "{...rest}", and optional segments, e.g. "{example?}" are also
         // only allowed in the final position.)
         if (routeOverride == null ||
-            routeOverride.substringBeforeLast("/", missingDelimiterValue = "").split("/")
+            routeOverride.value.substringBeforeLast("/", missingDelimiterValue = "").split("/")
                 .none { segment ->
                     val dynamicSegment = DynamicRouteSegment.tryCreate(segment)
                     dynamicSegment != null && (dynamicSegment.isInferred || dynamicSegment.isCatchAll || dynamicSegment.isOptional)

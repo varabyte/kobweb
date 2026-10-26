@@ -8,6 +8,27 @@ import com.varabyte.kobweb.project.common.DynamicRouteSegment
 import com.varabyte.kobweb.project.common.PackageName
 
 /**
+ * The full route to use (minus the slug), if this override starts with a slash, as that means the user set the full
+ * route explicitly, e.g. "/d/e/f/" for "/d/e/f/other".
+ */
+private val RouteOverride.routeWithoutSlug: String?
+    get() = value.takeIf { it.startsWith('/') }?.let { it.substringBeforeLast('/') + '/' }
+
+/**
+ * Subdirectories to append to the package's route, if this override does NOT start with a slash but contains at least
+ * one, e.g. "d/e/f/" for "d/e/f/other".
+ */
+private val RouteOverride.routeExtra: String?
+    get() = value.takeIf { !it.startsWith('/') && it.contains('/') }?.let { it.substringBeforeLast('/') + '/' }
+
+/**
+ * The slug to use instead of the file's, unless this override ends with a slash (which means "keep the file's slug"),
+ * e.g. "other" for "d/e/f/other".
+ */
+private val RouteOverride.slug: String?
+    get() = value.takeIf { !it.endsWith('/') }?.substringAfterLast('/')
+
+/**
  * Produce the final route for a declaration (e.g. a method annotated with `@Page`) inside this file.
  *
  * For example, a method annotated with `@Page` in a file named `Example.kt`
@@ -27,36 +48,18 @@ import com.varabyte.kobweb.project.common.PackageName
 fun KSFile.toRoute(
     packageRoot: PackageName,
     packageMappings: Map<PackageName, String>,
-    routeOverride: String?,
+    routeOverride: RouteOverride?,
     supportEmptyDynamicSegments: Boolean,
 ): String {
     val slugFromFile = toSlug()
-    val routeWithoutSlug = if (routeOverride != null && routeOverride.startsWith("/")) {
-        // If route override starts with "/" it means the user set the full route explicitly
-        routeOverride.substringBeforeLast('/') + '/'
-    } else {
-        packageName.toPackageName().toRoute(packageRoot, packageMappings)
-    }
-
-    val routeExtra =
-        if (routeOverride != null && !routeOverride.startsWith("/") && routeOverride.contains("/")) {
-            // If route override did NOT begin with slash, but contains at least one subdir, it means append
-            // subdir to base route
-            routeOverride.substringBeforeLast("/") + "/"
-        } else {
-            ""
-        }
-
-    val slug = if (routeOverride != null && routeOverride.last() != '/') {
-        routeOverride.substringAfterLast("/").let { value ->
-            val dynamicRouteSegment = DynamicRouteSegment.tryCreate(value)
-            if (supportEmptyDynamicSegments && dynamicRouteSegment != null && dynamicRouteSegment.isInferred) {
-                dynamicRouteSegment.withReplacedName(slugFromFile).rawValue
-            } else value
-        }
-    } else {
-        slugFromFile
-    }
+    val routeWithoutSlug = routeOverride?.routeWithoutSlug ?: packageName.toPackageName().toRoute(packageRoot, packageMappings)
+    val routeExtra = routeOverride?.routeExtra.orEmpty()
+    val slug = routeOverride?.slug?.let { value ->
+        val dynamicRouteSegment = DynamicRouteSegment.tryCreate(value)
+        if (supportEmptyDynamicSegments && dynamicRouteSegment != null && dynamicRouteSegment.isInferred) {
+            dynamicRouteSegment.withReplacedName(slugFromFile).rawValue
+        } else value
+    } ?: slugFromFile
 
     return "$routeWithoutSlug$routeExtra$slug"
 }

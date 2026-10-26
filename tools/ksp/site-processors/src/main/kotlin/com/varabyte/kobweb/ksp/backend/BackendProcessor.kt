@@ -20,9 +20,11 @@ import com.varabyte.kobweb.ksp.common.API_STREAM_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.INIT_API_FQN
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_API_FQN
 import com.varabyte.kobweb.ksp.common.PackageRouteMapping
+import com.varabyte.kobweb.ksp.common.RouteOverride
 import com.varabyte.kobweb.ksp.common.getPackageRouteMapping
 import com.varabyte.kobweb.ksp.common.toRoute
 import com.varabyte.kobweb.ksp.common.toRouteSegmentsByPackage
+import com.varabyte.kobweb.ksp.common.warnAboutProblems
 import com.varabyte.kobweb.ksp.frontend.FrontendProcessor
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.resolveQualifiedName
@@ -155,8 +157,10 @@ internal class BackendProcessor(
                 ?.also { fileDependencies.add(annotatedFun.containingFile!!) }
         }
         val apiStreams = apiStreamsDeclarations.map { property ->
-            val routeOverride = property.getAnnotationsByName(API_FQN).firstOrNull()?.getArgumentValue()
-                ?.takeIf { it.isNotBlank() }
+            val apiAnnotation = property.getAnnotationsByName(API_FQN).firstOrNull()
+            val routeOverride = apiAnnotation?.getArgumentValue()?.takeIf { it.isNotBlank() }
+                ?.let { RouteOverride(it) }
+                ?.also { it.warnAboutProblems(apiAnnotation, logger) }
 
             val resolvedRoute = property.containingFile!!.toRoute(
                 packageRoot = apiPackage,
@@ -203,9 +207,10 @@ private fun KSFunctionDeclaration.toApiEntry(
     val apiAnnotation = getAnnotationsByName(API_FQN).first()
     val currPackage = packageName.toPackageName()
     val file = containingFile ?: error("Symbol does not come from a source file")
-    val routeOverride = apiAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }
+    val routeOverride = apiAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }?.let { RouteOverride(it) }
+    routeOverride?.warnAboutProblems(apiAnnotation, logger)
 
-    return if (routeOverride?.startsWith("/") == true || currPackage.isSameOrSubpackageOf(qualifiedApiPackage)) {
+    return if (routeOverride?.value?.startsWith("/") == true || currPackage.isSameOrSubpackageOf(qualifiedApiPackage)) {
         val resolvedRoute = file.toRoute(
             packageRoot = qualifiedApiPackage,
             packageMappings = packageMappings,

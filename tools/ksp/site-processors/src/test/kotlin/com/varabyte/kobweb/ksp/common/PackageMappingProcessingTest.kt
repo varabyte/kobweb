@@ -16,6 +16,7 @@ class PackageMappingProcessingTest {
         ).forEach { (value, expected) ->
             val logger = RecordingLogger()
             assertThat(pkg.toMappedRouteSegment(value, logger)).isEqualTo(expected)
+            assertThat(logger.warnings).isEmpty()
             assertThat(logger.errors).isEmpty()
         }
     }
@@ -27,6 +28,22 @@ class PackageMappingProcessingTest {
             val logger = RecordingLogger()
             assertThat(pkg.toMappedRouteSegment(value, logger)).isNull()
             assertThat(logger.errors).hasSize(1)
+        }
+    }
+
+    @Test
+    fun suspiciousMappingsAreWarnedAbout() {
+        val pkg = PackageName("site.pages.users.user")
+        listOf(
+            "a/b" to "a/b",
+            "{user" to "{user",
+            "a?b" to "a?b",
+        ).forEach { (value, expected) ->
+            val logger = RecordingLogger()
+            // Warnings only, so the mapping is still applied
+            assertThat(pkg.toMappedRouteSegment(value, logger)).isEqualTo(expected)
+            assertThat(logger.warnings).hasSize(1)
+            assertThat(logger.errors).isEmpty()
         }
     }
 
