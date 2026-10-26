@@ -39,8 +39,10 @@ import com.varabyte.kobweb.ksp.common.NO_LAYOUT_FQN
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_PAGE_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_CONTEXT_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
+import com.varabyte.kobweb.ksp.common.PackageRouteMapping
 import com.varabyte.kobweb.ksp.common.getDefaultLayout
 import com.varabyte.kobweb.ksp.common.getPackageRouteMapping
+import com.varabyte.kobweb.ksp.common.toRouteSegmentsByPackage
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.suppresses
 import com.varabyte.kobweb.ksp.util.getAnnotationArgumentValue
@@ -105,8 +107,7 @@ internal class FrontendProcessor(
     private val cssStyles = mutableListOf<CssStyleEntry>()
     private val cssStyleVariants = mutableListOf<CssStyleVariantEntry>()
     private val keyframesList = mutableListOf<KeyframesEntry>()
-    // fqPkg to subdir, e.g. "blog._2022._01" to "01"
-    private val packageMappings = mutableMapOf<PackageName, String>()
+    private val packageRouteMappings = mutableListOf<PackageRouteMapping>()
 
     // We track all files we depend on so that ksp can perform smart recompilation
     // Even though our output is aggregating so generally requires full reprocessing, this at minimum means processing
@@ -281,7 +282,7 @@ internal class FrontendProcessor(
             }
 
             file.getPackageRouteMapping(pagesPackage, PACKAGE_MAPPING_PAGE_FQN, logger)?.let { mapping ->
-                packageMappings[mapping.pkg] = mapping.routeSegment
+                packageRouteMappings.add(mapping)
                 fileDependencies.add(file)
             }
         }
@@ -832,6 +833,8 @@ internal class FrontendProcessor(
                 )
             }
         }
+
+        val packageMappings = packageRouteMappings.toRouteSegmentsByPackage(logger)
 
         val pages = pageDeclarations.mapNotNull { annotatedFun ->
             val layoutFqn = if (noLayoutsFor.contains(annotatedFun)) NO_LAYOUT_FQN else {

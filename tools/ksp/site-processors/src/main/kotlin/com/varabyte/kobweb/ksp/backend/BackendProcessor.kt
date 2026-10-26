@@ -19,8 +19,10 @@ import com.varabyte.kobweb.ksp.common.API_STREAM_FQN
 import com.varabyte.kobweb.ksp.common.API_STREAM_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.INIT_API_FQN
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_API_FQN
+import com.varabyte.kobweb.ksp.common.PackageRouteMapping
 import com.varabyte.kobweb.ksp.common.getPackageRouteMapping
 import com.varabyte.kobweb.ksp.common.toRoute
+import com.varabyte.kobweb.ksp.common.toRouteSegmentsByPackage
 import com.varabyte.kobweb.ksp.frontend.FrontendProcessor
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.resolveQualifiedName
@@ -50,8 +52,7 @@ internal class BackendProcessor(
     private val apiMethodsDeclarations = mutableListOf<KSFunctionDeclaration>()
     private val apiStreamsDeclarations = mutableListOf<KSPropertyDeclaration>()
 
-    // fqPkg to subdir, e.g. "api.id._as._int" to "int"
-    private val packageMappings = mutableMapOf<PackageName, String>()
+    private val packageRouteMappings = mutableListOf<PackageRouteMapping>()
 
     // We track all files we depend on so that ksp can perform smart recompilation
     // Even though our output is aggregating so generally requires full reprocessing, this at minimum means processing
@@ -79,7 +80,7 @@ internal class BackendProcessor(
         // package mapping must be processed before api methods & streams
         newFiles.forEach { file ->
             file.getPackageRouteMapping(apiPackage, PACKAGE_MAPPING_API_FQN, logger)?.let { mapping ->
-                packageMappings[mapping.pkg] = mapping.routeSegment
+                packageRouteMappings.add(mapping)
                 fileDependencies.add(file)
             }
         }
@@ -145,6 +146,8 @@ internal class BackendProcessor(
      * passed in when using KSP's [CodeGenerator] to store the data.
      */
     fun getProcessorResult(): Result {
+        val packageMappings = packageRouteMappings.toRouteSegmentsByPackage(logger)
+
         // api declarations must be processed at the end, as they rely on package mappings,
         // which may be populated over several rounds
         val apiMethods = apiMethodsDeclarations.mapNotNull { annotatedFun ->
