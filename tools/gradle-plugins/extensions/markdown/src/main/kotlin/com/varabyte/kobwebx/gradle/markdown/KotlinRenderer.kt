@@ -390,16 +390,18 @@ class KotlinRenderer internal constructor(
                 val destinationPath = metadataEntry.sourceFilePath.resolveSibling(link.destination).normalize().toString()
                 val destinationNode = nodeCache.getRelative(destinationPath.removePrefix("/"))
                 if (destinationNode != null) {
+                    // Only Markdown files under the pages package get a route. Others (e.g. a component written in
+                    // Markdown) are only usable from code, so there's nothing for a link to point at.
+                    val destinationRouteWithSlug = nodeCache.metadata.getValue(destinationNode).routeWithSlug
+                        ?: error("Markdown file link '${link.destination}' in '${metadataEntry.sourceFilePath}' links to a Markdown file which is not a page (its package is not under the pages package), so it has no route to link to.")
+
                     // Retrieve the destination's route override, if present
                     val frontMatterData = with(FrontMatterVisitor()) {
                         destinationNode.accept(this)
                         this.data
                     }
 
-                    val route = Route(
-                        frontMatterData?.routeOverride
-                        ?: nodeCache.metadata.getValue(destinationNode).routeWithSlug!! // Guaranteed set for a page
-                    )
+                    val route = Route(frontMatterData?.routeOverride ?: destinationRouteWithSlug)
                     if (route.isDynamic) {
                         error("Markdown file link '${link.destination}' links to file with dynamic route override. This is not supported!")
                     }
