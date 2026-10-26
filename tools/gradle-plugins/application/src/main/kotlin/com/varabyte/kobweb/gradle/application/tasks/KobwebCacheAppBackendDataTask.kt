@@ -80,7 +80,7 @@ abstract class KobwebCacheAppBackendDataTask : DefaultTask() {
                 }
             }
         }
-            .merge(throwError = { msg -> throw GradleException("e: $msg") })
+            .merge(handleError = { msg -> throw GradleException("e: $msg") })
 
         appDataFile.get().asFile.writeText(Json.encodeToString(AppBackendData(appBackendData.apiInterceptorMethod, mergedBackendData)))
     }

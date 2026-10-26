@@ -873,7 +873,7 @@ internal class FrontendProcessor(
             cssStyles,
             cssStyleVariants,
         ).also {
-            it.assertValid(throwError = { msg -> logger.error(msg) })
+            it.assertValid(handleError = { msg -> logger.error(msg) })
         }
 
         return Result(frontendData, fileDependencies)

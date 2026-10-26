@@ -31,34 +31,34 @@ class AppBackendData(
  *
  * An error will be thrown if the merged result generates any invalid conditions, e.g. duplicate routes.
  */
-fun Iterable<BackendData>.merge(throwError: (String) -> Unit): BackendData {
+fun Iterable<BackendData>.merge(handleError: (String) -> Unit): BackendData {
     return BackendData(
         this.flatMap { it.initMethods },
         this.flatMap { it.apiMethods },
         this.flatMap { it.apiStreamMethods },
-    ).also { it.assertValid(throwError) }
+    ).also { it.assertValid(handleError) }
 }
 
-fun BackendData.assertValid(throwError: (String) -> Unit) {
-    apiMethods.assertValidApis(throwError)
-    apiStreamMethods.assertValidApiStreams(throwError)
+fun BackendData.assertValid(handleError: (String) -> Unit) {
+    apiMethods.assertValidApis(handleError)
+    apiStreamMethods.assertValidApiStreams(handleError)
 }
 
-private fun Iterable<ApiEntry>.assertValidApis(throwError: (String) -> Unit) {
+private fun Iterable<ApiEntry>.assertValidApis(handleError: (String) -> Unit) {
     val entriesByRoute = this.groupBy { it.route }
     entriesByRoute.forEach { (route, apis) ->
         if (apis.size > 1) {
-            throwError("The API route \"$route\" was defined more than once. Used by:\n${apis.joinToString("\n") { entry -> " - ${entry.fqn}" }}")
+            handleError("The API route \"$route\" was defined more than once. Used by:\n${apis.joinToString("\n") { entry -> " - ${entry.fqn}" }}")
         }
     }
 }
 
-private fun Iterable<ApiStreamEntry>.assertValidApiStreams(throwError: (String) -> Unit) {
+private fun Iterable<ApiStreamEntry>.assertValidApiStreams(handleError: (String) -> Unit) {
     // The server registers streams with any leading slash removed, so "/echo" and "echo" collide
     val entriesByRoute = this.groupBy { it.route.removePrefix("/") }
     entriesByRoute.forEach { (route, streams) ->
         if (streams.size > 1) {
-            throwError("The API stream route \"/$route\" was defined more than once. Used by:\n${streams.joinToString("\n") { entry -> " - ${entry.fqn}" }}")
+            handleError("The API stream route \"/$route\" was defined more than once. Used by:\n${streams.joinToString("\n") { entry -> " - ${entry.fqn}" }}")
         }
     }
 }

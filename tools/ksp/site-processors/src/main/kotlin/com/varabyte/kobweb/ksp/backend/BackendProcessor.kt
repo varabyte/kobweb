@@ -166,7 +166,7 @@ internal class BackendProcessor(
         }
 
         val backendData = BackendData(initMethods, apiMethods, apiStreams).also {
-            it.assertValid(throwError = { msg -> logger.error(msg) })
+            it.assertValid(handleError = { msg -> logger.error(msg) })
         }
 
         return Result(backendData, fileDependencies)

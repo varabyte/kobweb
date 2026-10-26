@@ -41,7 +41,7 @@ class FrontendData(
  *
  * An error will be thrown if the merged result generates any invalid conditions, e.g. duplicate routes.
  */
-fun Iterable<FrontendData>.merge(throwError: (String) -> Unit): FrontendData {
+fun Iterable<FrontendData>.merge(handleError: (String) -> Unit): FrontendData {
     return FrontendData(
         this.flatMap { it.layouts },
         this.flatMap { it.pages },
@@ -50,14 +50,14 @@ fun Iterable<FrontendData>.merge(throwError: (String) -> Unit): FrontendData {
         this.flatMap { it.keyframesList },
         this.flatMap { it.cssStyles },
         this.flatMap { it.cssStyleVariants },
-    ).also { it.assertValid(throwError) }
+    ).also { it.assertValid(handleError) }
 }
 
-fun FrontendData.assertValid(throwError: (String) -> Unit) {
-    pages.assertValidPages(throwError)
+fun FrontendData.assertValid(handleError: (String) -> Unit) {
+    pages.assertValidPages(handleError)
 }
 
-private fun Iterable<PageEntry>.assertValidPages(throwError: (String) -> Unit) {
+private fun Iterable<PageEntry>.assertValidPages(handleError: (String) -> Unit) {
     // Remove contents of dynamic segments to ensure we don't have two routes that resolve to the same dynamic path,
     // e.g. a/{b}/c/{d} should conflict with "a/{x}/c/{y}"
     fun String.anonymizeDynamicSegments(): String {
@@ -70,11 +70,11 @@ private fun Iterable<PageEntry>.assertValidPages(throwError: (String) -> Unit) {
     val entriesByRoute = this.groupBy { it.route.anonymizeDynamicSegments() }
     entriesByRoute.forEach { (route, pages) ->
         if (pages.size > 1) {
-            throwError("The route \"$route\" was defined more than once. Used by: ${pages.joinToString(", ") { page -> page.fqn }}")
+            handleError("The route \"$route\" was defined more than once. Used by: ${pages.joinToString(", ") { page -> page.fqn }}")
         }
 
         if (route.removePrefix("/").split('/', limit = 2).first() == "api") {
-            throwError("The route \"$route\" starts with \"api\", which is currently a reserved route path, so please choose another name. Used by ${pages.first().fqn}.")
+            handleError("The route \"$route\" starts with \"api\", which is currently a reserved route path, so please choose another name. Used by ${pages.first().fqn}.")
         }
     }
 
@@ -89,7 +89,7 @@ private fun Iterable<PageEntry>.assertValidPages(throwError: (String) -> Unit) {
         val finalSegment = entry.route.substringAfterLast('/')
         val matchingPageEntry = entriesByRoute[parentDir]?.first()
         if (matchingPageEntry != null) {
-            throwError(
+            handleError(
                 buildString {
                     append("The route \"${parentDir}$finalSegment\" (${entry.fqn}) ends with a trailing optional segment, ")
                     append("but \"$parentDir\" (${matchingPageEntry.fqn}) is also registered and will always take precedence in that case. ")
