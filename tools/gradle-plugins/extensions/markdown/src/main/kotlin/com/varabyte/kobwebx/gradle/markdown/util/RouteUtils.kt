@@ -1,6 +1,6 @@
 package com.varabyte.kobwebx.gradle.markdown.util
 
-import com.varabyte.kobweb.common.text.camelCaseToKebabCase
+import com.varabyte.kobweb.project.common.toRouteSegment
 import com.varabyte.kobwebx.frontmatter.FrontMatterElement
 import java.io.File
 
@@ -22,14 +22,7 @@ internal object RouteUtils {
             )
         }
 
-    // e.g. `___forced__--example_--_` -> `forced-example`
-    private fun String.replaceUnderscoresAndMultipleHyphensWithSingleHyphenSeparators() =
-        replace(Regex("_+"), "-").replace(Regex("-+"), "-").removeSurrounding("-")
-
-    private fun File.toSlug(): String = this.nameWithoutExtensionIfNotIndex
-        ?.camelCaseToKebabCase()
-        ?.replaceUnderscoresAndMultipleHyphensWithSingleHyphenSeparators()
-        .orEmpty()
+    private fun File.toSlug(): String = this.nameWithoutExtensionIfNotIndex?.toRouteSegment().orEmpty()
 
     fun getSlug(file: File) = file.toSlug()
 

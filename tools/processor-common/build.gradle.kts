@@ -10,6 +10,7 @@ version = libs.versions.kobweb.get()
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
+    implementation(projects.common.kobwebCommon)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.truthish)

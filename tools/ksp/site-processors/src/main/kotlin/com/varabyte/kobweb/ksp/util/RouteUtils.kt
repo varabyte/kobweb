@@ -1,25 +1,10 @@
 package com.varabyte.kobweb.ksp.util
 
 import com.google.devtools.ksp.symbol.KSFile
-import com.varabyte.kobweb.common.text.camelCaseToKebabCase
 import com.varabyte.kobweb.common.text.prefixIfNot
 import com.varabyte.kobweb.ksp.symbol.nameWithoutExtension
 import com.varabyte.kobweb.project.common.PackageName
-
-/**
- * Perform a default transformation of any package segment to a final route segment.
- *
- * Note that this should only be used when a specific package mapping wasn't provided by the user (which is expected
- * in a vast majority of cases).
- *
- * The receiver should be a single package segment, e.g. "b" in "a.b.c"
- */
-fun String.toRouteSegment(): String {
-    require('.' !in this) { "Invalid package part: $this" }
-    return this
-        .camelCaseToKebabCase()
-        .replaceUnderscoresAndMultipleHyphensWithSingleHyphenSeparators()
-}
+import com.varabyte.kobweb.project.common.toRouteSegment
 
 /**
  * Convert this package into a final, absolute URL route.
@@ -30,7 +15,8 @@ fun String.toRouteSegment(): String {
  *
  * The final route will begin with a slash and end with a slash.
  *
- * We also perform some additional processing on any remaining package segments that don't have mappings:
+ * We also perform some additional processing on any remaining package segments that don't have mappings (see
+ * [toRouteSegment] for more details):
  * - convert camelCase to kebab-case
  * - remove leading underscores (because these are usually used as a workaround for numbers, e.g. _123)
  * - remove trailing underscores (because these are usually used as a workaround for reserved words, e.g. `fun_`)
@@ -83,13 +69,7 @@ fun PackageName.toRoute(packageRoot: PackageName, packageMappings: Map<PackageNa
     return (transformedSegments.joinToString("/") + "/").prefixIfNot("/")
 }
 
-// e.g. `___forced__--example_--_` -> `forced-example`
-private fun String.replaceUnderscoresAndMultipleHyphensWithSingleHyphenSeparators() =
-    trim('_').replace(Regex("_+"), "-").replace(Regex("-+"), "-")
-
 /**
  * Given some file (which likely represents an annotation's containing file), return the slug for the file.
  */
-fun KSFile.toSlug() = nameWithoutExtension
-    .camelCaseToKebabCase()
-    .replaceUnderscoresAndMultipleHyphensWithSingleHyphenSeparators()
+fun KSFile.toSlug() = nameWithoutExtension.toRouteSegment()

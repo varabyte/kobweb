@@ -2,22 +2,9 @@ package com.varabyte.kobweb.ksp.util
 
 import com.varabyte.kobweb.project.common.PackageName
 import com.varabyte.truthish.assertThat
-import com.varabyte.truthish.assertThrows
 import org.junit.Test
 
 class RouteUtilsTest {
-    @Test
-    fun toRouteSegment() {
-        assertThat("blog".toRouteSegment()).isEqualTo("blog")
-        assertThat("ourTeam".toRouteSegment()).isEqualTo("our-team")
-        assertThat("_2021".toRouteSegment()).isEqualTo("2021")
-        assertThat("fun_".toRouteSegment()).isEqualTo("fun")
-        assertThat("our_team".toRouteSegment()).isEqualTo("our-team")
-        assertThat("our__team".toRouteSegment()).isEqualTo("our-team")
-
-        assertThrows<IllegalArgumentException> { "a.b".toRouteSegment() }
-    }
-
     @Test
     fun toRouteWithoutMappings() {
         val root = PackageName("site.pages")

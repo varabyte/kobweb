@@ -5,9 +5,9 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.util.getArgumentValue
 import com.varabyte.kobweb.ksp.util.toPackageName
-import com.varabyte.kobweb.ksp.util.toRouteSegment
 import com.varabyte.kobweb.project.common.DynamicRouteSegment
 import com.varabyte.kobweb.project.common.PackageName
+import com.varabyte.kobweb.project.common.toRouteSegment
 
 /**
  * A route segment to use in place of a package's name when generating routes, as declared by a
