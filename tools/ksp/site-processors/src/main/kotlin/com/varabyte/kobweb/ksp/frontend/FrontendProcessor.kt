@@ -30,6 +30,7 @@ import com.varabyte.kobweb.ksp.common.CSS_NAME_FQN
 import com.varabyte.kobweb.ksp.common.CSS_PREFIX_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_VARIANT_FQN
+import com.varabyte.kobweb.ksp.common.DefaultLayout
 import com.varabyte.kobweb.ksp.common.INIT_KOBWEB_FQN
 import com.varabyte.kobweb.ksp.common.INIT_ROUTE_FQN
 import com.varabyte.kobweb.ksp.common.INIT_SILK_FQN
@@ -42,6 +43,7 @@ import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.PackageRouteMapping
 import com.varabyte.kobweb.ksp.common.getDefaultLayout
 import com.varabyte.kobweb.ksp.common.getPackageRouteMapping
+import com.varabyte.kobweb.ksp.common.reportPackagesWithMultipleLayouts
 import com.varabyte.kobweb.ksp.common.toRouteSegmentsByPackage
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.suppresses
@@ -102,6 +104,8 @@ internal class FrontendProcessor(
     // fqPkg to layout fqn, e.g. "pages.blog" to "com.example.components.layouts.BlogLayout"
     // sorted by length (descending), so more specific packages will be checked before less specific ones
     private val defaultLayouts = mutableMapOf<PackageName, KSFunctionDeclaration>().toSortedMap(compareBy({ -it.value.length }, { it.value }))
+    // All default layouts declared so far, tracked separately so we can report packages that declare more than one
+    private val defaultLayoutDeclarations = mutableListOf<DefaultLayout>()
     private val kobwebInits = mutableListOf<InitKobwebEntry>()
     private val silkInits = mutableListOf<InitSilkEntry>()
     private val cssStyles = mutableListOf<CssStyleEntry>()
@@ -275,6 +279,7 @@ internal class FrontendProcessor(
                 LAYOUT_FQN,
                 logger
             )?.let { defaultLayout ->
+                defaultLayoutDeclarations.add(defaultLayout)
                 resolver.checkLayoutMethod(file, resolver.getKSNameFromString(defaultLayout.layoutFqn.value))?.let { layoutData ->
                     defaultLayouts[defaultLayout.pkg] = layoutData.method
                     fileDependencies.add(file)
@@ -834,6 +839,7 @@ internal class FrontendProcessor(
             }
         }
 
+        defaultLayoutDeclarations.reportPackagesWithMultipleLayouts(logger)
         val packageMappings = packageRouteMappings.toRouteSegmentsByPackage(logger)
 
         val pages = pageDeclarations.mapNotNull { annotatedFun ->

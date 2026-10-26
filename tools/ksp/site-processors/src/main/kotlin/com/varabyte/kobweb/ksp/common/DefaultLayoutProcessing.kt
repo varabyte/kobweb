@@ -12,8 +12,10 @@ import com.varabyte.kobweb.project.common.PackageName
 /**
  * A layout that should be applied to all pages under a package (and its subpackages), as declared by a
  * `@file:Layout` annotation.
+ *
+ * @property filePath The path of the file that declared this layout, useful for reporting conflicts.
  */
-class DefaultLayout(val pkg: PackageName, val layoutFqn: FqName)
+class DefaultLayout(val pkg: PackageName, val layoutFqn: FqName, val filePath: String)
 
 /**
  * Return any default layout defined against this file's package.
@@ -50,7 +52,7 @@ fun KSFile.getDefaultLayout(
             null
         }
         else if (currPackage.isSameOrSubpackageOf(qualifiedPagesPackage)) {
-            DefaultLayout(currPackage, projectGroup.resolve(FqNameShortcut(layoutTarget)))
+            DefaultLayout(currPackage, projectGroup.resolve(FqNameShortcut(layoutTarget)), filePath)
         } else {
             logger.warn(
                 "Skipped over `@file:${layoutAnnotation.shortName.asString()}`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`.",
@@ -59,4 +61,20 @@ fun KSFile.getDefaultLayout(
             null
         }
     }
+}
+
+/**
+ * Report an error for any package that is given a default layout by more than one file.
+ *
+ * Otherwise, which layout a page ends up with would depend on processing order.
+ */
+fun Iterable<DefaultLayout>.reportPackagesWithMultipleLayouts(logger: KSPLogger) {
+    groupBy { it.pkg }
+        .filterValues { it.size > 1 }
+        .forEach { (pkg, layouts) ->
+            logger.error(buildString {
+                appendLine("Package \"$pkg\" is given a default layout by multiple files. Please remove all but one:")
+                layouts.map { it.filePath }.sorted().forEach { filePath -> appendLine(" - $filePath") }
+            }.trimEnd())
+        }
 }
