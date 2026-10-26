@@ -34,12 +34,13 @@ abstract class KobwebCopyWorkerJsOutputTask @Inject constructor(private val appB
         // will have to be the same across different projects. But it could happen if a user duplicates a
         // worker project and forgets to update either the group name or worker name.
         val copiedFiles = mutableMapOf<String, String>()
-        val workerOutputData = runtimeClasspath.toKobwebOutputByPattern(workerOutputsFilesPattern)
+        val workerOutputData = runtimeClasspath.toKobwebOutputByPattern { workerOutputsFilesPattern }
 
         fileSystemOperations.sync {
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             into(getGenPublicRoot())
-            workerOutputData.forEach { (jar, rootAndFile) ->
+            workerOutputData.forEach { moduleFile ->
+                val rootAndFile = moduleFile.rootAndFile
                 from(rootAndFile.file) {
                     val targetFile = getGenPublicRoot()
                         .resolve(KOBWEB_PUBLIC_WORKER_ROOT)
@@ -47,8 +48,8 @@ abstract class KobwebCopyWorkerJsOutputTask @Inject constructor(private val appB
                             rootAndFile.relativeFile.invariantSeparatorsPath.removePrefix("$KOBWEB_METADATA_WORKER_SUBFOLDER/")
                         )
 
-                    copiedFiles.putIfAbsent(targetFile.absolutePath, jar.name)?.let { sourceJar ->
-                        throw GradleException("You are attempting to use two different worker dependencies that both have the same group and worker name: $sourceJar and ${jar.name}. They are incompatible and you cannot use both. If you own the project for either, consider changing the Gradle group or the worker name (via `configAsKobwebWorker(...)`) on one or the other to avoid this naming collision.")
+                    copiedFiles.putIfAbsent(targetFile.absolutePath, moduleFile.jar.name)?.let { sourceJar ->
+                        throw GradleException("You are attempting to use two different worker dependencies that both have the same group and worker name: $sourceJar and ${moduleFile.jar.name}. They are incompatible and you cannot use both. If you own the project for either, consider changing the Gradle group or the worker name (via `configAsKobwebWorker(...)`) on one or the other to avoid this naming collision.")
                     }
 
                     into(targetFile.relativeTo(getGenPublicRoot()).parentFile) // relative to top-level "into" dir

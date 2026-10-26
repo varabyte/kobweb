@@ -1,9 +1,11 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.path.invariantSeparatorsPath
+import com.varabyte.kobweb.gradle.core.metadata.ModuleMetadata
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.RootAndFile
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_MODULE
+import kotlinx.serialization.json.Json
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
@@ -47,28 +49,47 @@ abstract class KobwebCopyTask(desc: String) : KobwebTask(desc) {
         include(KOBWEB_METADATA_MODULE)
     }
 
-    private fun FileTree.toKobwebOutputByPattern(patternSet: PatternSet, jar: File): List<Pair<File, RootAndFile>> {
+    // Modules built with newer versions of Kobweb may add fields we don't know about
+    private val moduleMetadataJson = Json { ignoreUnknownKeys = true }
+
+    /**
+     * A file found inside a Kobweb module (i.e. a jar or directory containing a Kobweb module.json file).
+     */
+    protected class KobwebModuleFile(val jar: File, val metadata: ModuleMetadata, val rootAndFile: RootAndFile)
+
+    private fun FileTree.toKobwebOutputByPattern(
+        jar: File,
+        createPatternSet: (ModuleMetadata) -> PatternSet,
+    ): List<KobwebModuleFile> {
         val fileTree = this
-        if (fileTree.matching(kobwebModulePattern).isEmpty) return emptyList()
+        val moduleFile = fileTree.matching(kobwebModulePattern).files.firstOrNull() ?: return emptyList()
+        val metadata = moduleMetadataJson.decodeFromString(ModuleMetadata.serializer(), moduleFile.readText())
 
         return buildList {
-            fileTree.matching(patternSet).visit {
+            fileTree.matching(createPatternSet(metadata)).visit {
                 if (this.isDirectory) return@visit
                 val root =
                     File(file.absolutePath.invariantSeparatorsPath.removeSuffix(relativePath))
-                add(jar to RootAndFile(root, file))
+                add(KobwebModuleFile(jar, metadata, RootAndFile(root, file)))
             }
         }
     }
 
-    protected fun FileCollection.toKobwebOutputByPattern(patternSet: PatternSet): List<Pair<File, RootAndFile>> {
+    /**
+     * Find all files inside the Kobweb modules in this collection that match the pattern created for each module.
+     *
+     * The pattern is created per module since it may depend on the module's metadata, e.g. on its public path.
+     */
+    protected fun FileCollection.toKobwebOutputByPattern(
+        createPatternSet: (ModuleMetadata) -> PatternSet,
+    ): List<KobwebModuleFile> {
         return this.flatMap { jar ->
             if (jar.isDirectory) {
-                objectFactory.fileTree().from(jar).toKobwebOutputByPattern(patternSet, jar)
+                objectFactory.fileTree().from(jar).toKobwebOutputByPattern(jar, createPatternSet)
             } else {
                 try {
-                    archiveOperations.zipTree(jar).toKobwebOutputByPattern(patternSet, jar)
-                } catch (ex: Exception) {
+                    archiveOperations.zipTree(jar).toKobwebOutputByPattern(jar, createPatternSet)
+                } catch (_: Exception) {
                     // NOTE: I used to catch ZipException here, but it became GradleException at some point?? So
                     // let's just be safe and block all exceptions here. It sucks if this task crashes here because
                     // not being able to unzip a non-zip file is not really a big deal.

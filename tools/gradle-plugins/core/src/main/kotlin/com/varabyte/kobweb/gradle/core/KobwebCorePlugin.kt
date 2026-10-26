@@ -59,6 +59,7 @@ class KobwebCorePlugin @Inject constructor(private val buildFeatures: BuildFeatu
         project.tasks.register("kobwebGenerateModuleMetadata", KobwebGenerateModuleMetadataTask::class.java) {
             // Evaluated lazily, since users usually set `group` in their build script after applying plugins
             projectGroup.set(project.provider { project.group.toString() })
+            publicPath.set(kobwebBlock.publicPath)
         }
 
         if (project.providers.gradleProperty(KOBWEB_CONFIGURE_COMPOSE_COMPILER).getOrElse("true").toBoolean()) {

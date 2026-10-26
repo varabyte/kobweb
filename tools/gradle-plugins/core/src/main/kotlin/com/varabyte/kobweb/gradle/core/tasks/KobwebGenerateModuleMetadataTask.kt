@@ -22,6 +22,12 @@ abstract class KobwebGenerateModuleMetadataTask :
     @get:Input
     abstract val projectGroup: Property<String>
 
+    /**
+     * The path of public resources inside this project's resources folder, which apps need to know to find them.
+     */
+    @get:Input
+    abstract val publicPath: Property<String>
+
     @OutputDirectory
     fun getGenResDir() = projectLayout.buildDirectory.dir("generated/kobweb/module")
 
@@ -31,7 +37,7 @@ abstract class KobwebGenerateModuleMetadataTask :
         moduleMetadataFile.asFile.apply {
             parentFile.mkdirs()
             writeText(Json.encodeToString(
-                ModuleMetadata(getKobwebVersion(), projectGroup.get())
+                ModuleMetadata(getKobwebVersion(), projectGroup.get(), publicPath.get())
             ))
         }
     }
