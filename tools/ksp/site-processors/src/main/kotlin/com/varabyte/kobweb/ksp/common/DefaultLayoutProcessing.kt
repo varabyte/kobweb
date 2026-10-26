@@ -32,7 +32,7 @@ class DefaultLayout(val pkg: PackageName, val layoutFqn: FqName, val filePath: S
  *
  * NOTE: We visit the annotation per-file instead of directly as visiting directly doesn't let us read the package
  *
- * @return null if this file has no layout annotation defined, or if it's invalid (in which case a warning will have
+ * @return null if this file has no layout annotation defined, or if it's invalid (in which case an error will have
  *   been logged).
  */
 fun KSFile.getDefaultLayout(
@@ -45,8 +45,8 @@ fun KSFile.getDefaultLayout(
         val layoutTarget = layoutAnnotation.getArgumentValue()?.takeIf { it.isNotEmpty() }
         val currPackage = packageName.toPackageName()
         if (layoutTarget == null) {
-            logger.warn(
-                "Skipped over `@file:${layoutAnnotation.shortName.asString()}` as it doesn't specify a target.",
+            logger.error(
+                "`@file:${layoutAnnotation.shortName.asString()}` doesn't specify a target layout.",
                 layoutAnnotation
             )
             null
@@ -54,8 +54,8 @@ fun KSFile.getDefaultLayout(
         else if (currPackage.isSameOrSubpackageOf(qualifiedPagesPackage)) {
             DefaultLayout(currPackage, projectGroup.resolve(FqNameShortcut(layoutTarget)), filePath)
         } else {
-            logger.warn(
-                "Skipped over `@file:${layoutAnnotation.shortName.asString()}`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`.",
+            logger.error(
+                "`@file:${layoutAnnotation.shortName.asString()}` is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`.",
                 layoutAnnotation
             )
             null

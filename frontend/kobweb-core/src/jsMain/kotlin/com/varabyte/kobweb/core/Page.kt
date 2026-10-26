@@ -59,6 +59,13 @@ import androidx.compose.runtime.*
  *
  * See also [PackageMapping] which can be used to change any intermediate part of a route.
  *
+ * ## URL validity
+ *
+ * The routeOverride value must be valid in a URL path as written, since Kobweb doesn't decode it. Characters that the
+ * browser would percent-encode, such as spaces, curly braces (outside of a dynamic segment), and non-ASCII characters,
+ * as well as `?` and `#`, result in a build error. If you want any of these in your URL, write their percent-encoded
+ * value instead, e.g. `@Page("about%20us")`.
+ *
  * ## Reserved routes
  *
  * Routes whose first segment is `api` (e.g. "/api" or "/api/users") are reserved for the Kobweb server, which serves

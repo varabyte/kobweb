@@ -5,7 +5,7 @@ import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.RouteOverride
 import com.varabyte.kobweb.ksp.common.toRoute
-import com.varabyte.kobweb.ksp.common.warnAboutProblems
+import com.varabyte.kobweb.ksp.common.reportProblems
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.util.getArgumentValue
 import com.varabyte.kobweb.ksp.util.receiverClass
@@ -17,7 +17,7 @@ import com.varabyte.kobweb.project.frontend.PageEntry
 /**
  * Convert this function, which is annotated with `@Page`, into a [PageEntry].
  *
- * @return null if the page is invalid, in which case a warning will have been logged.
+ * @return null if the page is invalid, in which case an error will have been logged.
  */
 fun KSFunctionDeclaration.toPageEntry(
     layoutFqn: String?,
@@ -37,7 +37,7 @@ fun KSFunctionDeclaration.toPageEntry(
 
     val currPackage = packageName.toPackageName()
     val routeOverride = pageAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }?.let { RouteOverride(it) }
-    routeOverride?.warnAboutProblems(pageAnnotation, logger)
+    routeOverride?.reportProblems(pageAnnotation, logger)
 
     if (routeOverride?.value?.startsWith("/") == true || currPackage.isSameOrSubpackageOf(qualifiedPagesPackage)) {
         // To maintain the general association between the file name and the slug, we reject route overrides which use
@@ -67,14 +67,14 @@ fun KSFunctionDeclaration.toPageEntry(
                 receiverFqn = receiverClass?.qualifiedName?.asString(),
             )
         } else {
-            logger.warn(
-                "Skipped over `@$pageSimpleName fun ${funName}`. Route override `${routeOverride}` is invalid, as it contains an inferred, catch-all, and/or optional dynamic segment in a middle location.",
+            logger.error(
+                "`@$pageSimpleName(\"$routeOverride\")` on `fun $funName` is invalid, as it contains an inferred, catch-all, and/or optional dynamic segment before the last segment, where they aren't allowed.",
                 this
             )
         }
     } else {
-        logger.warn(
-            "Skipped over `@$pageSimpleName fun ${funName}`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`.",
+        logger.error(
+            "`@$pageSimpleName fun $funName` is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage` (or use a route override that starts with a slash).",
             this
         )
     }

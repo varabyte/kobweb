@@ -24,7 +24,7 @@ class PackageMappingProcessingTest {
     @Test
     fun invalidMappings() {
         val pkg = PackageName("site.pages.users.user")
-        listOf("", " ", "{...}", "{...rest}", "{?}", "{id?}", "{...rest?}").forEach { value ->
+        listOf("", " ", "{...}", "{...rest}", "{?}", "{id?}", "{...rest?}", "a?b", "a#b", "a b", "{user", "{a.b}", "a//b").forEach { value ->
             val logger = RecordingLogger()
             assertThat(pkg.toMappedRouteSegment(value, logger)).isNull()
             assertThat(logger.errors).hasSize(1)
@@ -36,8 +36,7 @@ class PackageMappingProcessingTest {
         val pkg = PackageName("site.pages.users.user")
         listOf(
             "a/b" to "a/b",
-            "{user" to "{user",
-            "a?b" to "a?b",
+            "a/{b}" to "a/{b}",
         ).forEach { (value, expected) ->
             val logger = RecordingLogger()
             // Warnings only, so the mapping is still applied

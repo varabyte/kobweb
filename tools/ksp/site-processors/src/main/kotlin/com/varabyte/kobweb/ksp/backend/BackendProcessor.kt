@@ -24,7 +24,7 @@ import com.varabyte.kobweb.ksp.common.RouteOverride
 import com.varabyte.kobweb.ksp.common.getPackageRouteMapping
 import com.varabyte.kobweb.ksp.common.toRoute
 import com.varabyte.kobweb.ksp.common.toRouteSegmentsByPackage
-import com.varabyte.kobweb.ksp.common.warnAboutProblems
+import com.varabyte.kobweb.ksp.common.reportProblems
 import com.varabyte.kobweb.ksp.frontend.FrontendProcessor
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.resolveQualifiedName
@@ -161,7 +161,7 @@ internal class BackendProcessor(
             val apiAnnotation = property.getAnnotationsByName(API_FQN).firstOrNull()
             val routeOverride = apiAnnotation?.getArgumentValue()?.takeIf { it.isNotBlank() }
                 ?.let { RouteOverride(it) }
-                ?.also { it.warnAboutProblems(apiAnnotation, logger) }
+                ?.also { it.reportProblems(apiAnnotation, logger) }
 
             val resolvedRoute = property.containingFile!!.toRoute(
                 packageRoot = apiPackage,
@@ -217,7 +217,7 @@ private fun KSFunctionDeclaration.toApiEntry(
     val currPackage = packageName.toPackageName()
     val file = containingFile ?: error("Symbol does not come from a source file")
     val routeOverride = apiAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }?.let { RouteOverride(it) }
-    routeOverride?.warnAboutProblems(apiAnnotation, logger)
+    routeOverride?.reportProblems(apiAnnotation, logger)
 
     return if (routeOverride?.value?.startsWith("/") == true || currPackage.isSameOrSubpackageOf(qualifiedApiPackage)) {
         val resolvedRoute = file.toRoute(
@@ -229,8 +229,8 @@ private fun KSFunctionDeclaration.toApiEntry(
     } else {
         val funName = simpleName.asString()
         val annotationName = apiAnnotation.shortName.asString()
-        logger.warn(
-            "Skipped over `@$annotationName fun ${funName}`. It is defined under package `$currPackage` but must exist under `$qualifiedApiPackage`.",
+        logger.error(
+            "`@$annotationName fun $funName` is defined under package `$currPackage` but must exist under `$qualifiedApiPackage` (or use a route override that starts with a slash).",
             this
         )
         null

@@ -22,19 +22,26 @@ class RouteOverrideTest {
             "{...rest?}",
             "{id?}",
             "{user-id}",
+            "{user_id}",
+            "{userId2}",
+            // Dynamic segment names never appear in the URL, so they aren't limited to ASCII
+            "{café}",
         ).forEach { value ->
             assertThat(RouteOverride(value).findProblems()).isEmpty()
         }
     }
 
     @Test
+    fun strayCurlyBracesAreReported() {
+        listOf("{post", "post}", "a{b}c", "d/{id/e").forEach { value ->
+            assertThat(RouteOverride(value).findProblems()).hasSize(1)
+        }
+    }
+
+    @Test
     fun malformedDynamicSegmentsAreReported() {
         listOf(
-            "{post",
-            "post}",
-            "a{b}c",
             "{a}{b}",
-            "d/{id/e",
             "{a b}",
             "{a?b}",
             "{??}",
@@ -52,6 +59,8 @@ class RouteOverrideTest {
             "{{a}}",
             "{...{a}}",
             "{a#b}",
+            "{a+b}",
+            "{a:b}",
         ).forEach { value ->
             assertThat(RouteOverride(value).findProblems()).hasSize(1)
         }
@@ -66,13 +75,45 @@ class RouteOverrideTest {
 
     @Test
     fun nonPathCharactersAreReported() {
-        listOf("posts?draft", "about#team", "about us").forEach { value ->
+        listOf(
+            "posts?draft",
+            "about#team",
+            "about us",
+            "/d/about us/",
+            "about\tus",
+            "a<b>",
+            "a\"b",
+            "a`b",
+            "café",
+            "😀",
+        ).forEach { value ->
             assertThat(RouteOverride(value).findProblems()).hasSize(1)
         }
     }
 
     @Test
+    fun percentEncodedCharactersAreAllowed() {
+        listOf("about%20us", "%7Bx%7D", "caf%C3%A9", "a-b_c.d~e!$&'()*+,;=:@").forEach { value ->
+            assertThat(RouteOverride(value).findProblems()).isEmpty()
+        }
+    }
+
+    @Test
+    fun invalidCharactersSuggestTheirEncoding() {
+        val problem = RouteOverride("about usé😀").findProblems().single()
+        assertThat(problem).contains("a space (`%20`)")
+        assertThat(problem).contains("`é` (`%C3%A9`)")
+        assertThat(problem).contains("(`%F0%9F%98%80`)")
+
+        assertThat(RouteOverride("a\tb").findProblems().single()).contains("U+0009 (`%09`)")
+    }
+
+    @Test
     fun eachProblemIsReported() {
-        assertThat(RouteOverride("a//{b/c?d").findProblems()).hasSize(3)
+        // Empty segment, `{b`, `c?d`, `e f`, `{a.b}`
+        assertThat(RouteOverride("a//{b/c?d/e f/{a.b}").findProblems()).hasSize(5)
+
+        // Stray braces and other invalid characters in a single segment are reported separately
+        assertThat(RouteOverride("{a} b").findProblems()).hasSize(2)
     }
 }

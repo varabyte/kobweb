@@ -25,8 +25,9 @@ class PackageRouteMapping(val pkg: PackageName, val routeSegment: String, val fi
  * Convert the value of a `@PackageMapping` annotation declared in this package into the route segment it represents.
  *
  * An inferred dynamic segment, e.g. "{}", is named after this package. Blank values, catch-all segments, and optional
- * segments are rejected, as a package is never the last part of a route. Other suspicious values, e.g. a malformed
- * dynamic segment like "{user", are accepted but logged as warnings.
+ * segments are rejected, as a package is never the last part of a route, as are values that can't be part of a URL path
+ * or are malformed (see [RouteOverride.findProblems]). A value containing a slash is accepted but logged as a warning,
+ * since a mapping is expected to be a single route segment.
  *
  * @param symbol The node to attach any errors to, e.g. the annotation the value came from.
  *
@@ -42,8 +43,10 @@ fun PackageName.toMappedRouteSegment(value: String, logger: KSPLogger, symbol: K
         logger.warn("Package mapping `$value` for \"$this\" contains a slash, so it will add multiple segments to routes. Package mappings are expected to be a single route segment.", symbol)
     }
     // A package mapping is essentially a route override for a single segment, so the same problems apply
-    RouteOverride(value).findProblems().forEach { problem ->
-        logger.warn("Package mapping `$value` for \"$this\" may not work as expected. $problem", symbol)
+    val problems = RouteOverride(value).findProblems()
+    if (problems.isNotEmpty()) {
+        problems.forEach { problem -> logger.error("Package mapping `$value` for \"$this\" is invalid. $problem", symbol) }
+        return null
     }
 
     val dynamicRouteSegment = DynamicRouteSegment.tryCreate(value) ?: return value
@@ -63,8 +66,8 @@ fun PackageName.toMappedRouteSegment(value: String, logger: KSPLogger, symbol: K
  *
  * NOTE: We visit the annotation per-file instead of directly as visiting directly doesn't let us read the package
  *
- * @return null if this file doesn't declare a package mapping, or if it's invalid (in which case a warning or error
- *   will have been logged).
+ * @return null if this file doesn't declare a package mapping, or if it's invalid (in which case an error will have
+ *   been logged).
  */
 fun KSFile.getPackageRouteMapping(
     qualifiedPagesPackage: PackageName,
@@ -74,8 +77,8 @@ fun KSFile.getPackageRouteMapping(
     val packageMappingAnnotation = getAnnotationsByName(packageMappingFqn).singleOrNull() ?: return null
     val currPackage = packageName.toPackageName()
     if (!currPackage.isSameOrSubpackageOf(qualifiedPagesPackage)) {
-        logger.warn(
-            "Skipped over `@file:${packageMappingAnnotation.shortName.asString()}` annotation. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`.",
+        logger.error(
+            "`@file:${packageMappingAnnotation.shortName.asString()}` is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`.",
             packageMappingAnnotation
         )
         return null
