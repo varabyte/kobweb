@@ -19,6 +19,13 @@ dependencies {
     testImplementation(libs.kotlinx.serialization.json)
 }
 
+tasks.test {
+    // Used by KobwebConfSchemaTest. Declared as an input so that editing only the schema still reruns the tests.
+    val confSchema = layout.settingsDirectory.file("schemas/kobweb-conf.schema.json")
+    inputs.file(confSchema)
+    systemProperty("kobweb.conf.schema", confSchema.asFile.absolutePath)
+}
+
 kobwebPublication {
     artifactName.set("Kobweb Common")
     artifactId.set("kobweb-common")

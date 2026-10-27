@@ -15,6 +15,11 @@ import kotlinx.serialization.UseSerializers
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+// NOTE: The classes in this file are described by a hand-written JSON schema, used by editors for completion and
+// validation of `.kobweb/conf.yaml`, at `schemas/kobweb-conf.schema.json` (in the repo root). If you change these
+// classes, update the schema too. You don't have to remember: `KobwebConfSchemaTest` fails if the two disagree on
+// structure, types or defaults. Descriptions aren't checked, though, so keep them in sync with the KDocs by hand.
+
 /**
  * @property title The title of the site. See also: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title
  * @property basePath If specified, it means all content for this site live under a subfolder. So if this value is
@@ -167,7 +172,7 @@ class Server(
      * See also: https://ktor.io/docs/websocket.html
      * See also: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
      *
-     * @param pingPeriod The duration between pings or `0` to disable pings.
+     * @param pingPeriod The duration between pings or `0s` to disable pings.
      * @param timeout The write/ping timeout after that a connection will be closed.
      */
     @Serializable
