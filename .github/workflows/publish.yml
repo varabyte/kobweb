@@ -16,6 +16,9 @@ on:
         description: "Repository: Gradle Plugin Portal (release only)"
         default: false
 
+env:
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g"
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -41,6 +44,10 @@ jobs:
           build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
           build-scan-terms-of-use-agree: "yes"
           cache-read-only: false
+
+      # Run before the secrets are added, since the tests don't need them
+      - name: Test
+        run: ./gradlew check --stacktrace
 
       - name: Add secret Gradle properties
         env:
