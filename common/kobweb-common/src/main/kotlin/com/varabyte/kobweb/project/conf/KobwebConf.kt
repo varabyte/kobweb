@@ -43,6 +43,12 @@ class Server(
     val streaming: Streaming = Streaming(),
     val nativeLibraries: List<NativeLibrary> = emptyList(),
 ) {
+    init {
+        require(port in 1..65535) {
+            "Invalid port value $port. It must be between 1 and 65535."
+        }
+    }
+
     /**
      * A collection of files and paths needed by the Kobweb server to serve its files.
      */
@@ -122,6 +128,12 @@ class Server(
         val totalSizeCap: DataSize? = 10.mebibytes,
         val compressHistory: Boolean = true,
     ) {
+        init {
+            require(maxFileCount == null || maxFileCount >= 0) {
+                "Invalid maxFileCount value $maxFileCount. It must not be negative (use null or 0 for unbounded)."
+            }
+        }
+
         /**
          * The various logging levels supported by Logback, the engine used by the server to do logging.
          *
