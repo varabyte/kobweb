@@ -40,7 +40,7 @@ class KobwebConfTest {
         assertThat(decodeServer(
             """
             logging:
-              maxFileCount: null    
+              maxFileCount: null
             """.trimIndent()
         ).logging.maxFileCount).isNull()
 
