@@ -133,4 +133,29 @@ class RouteOverrideTest {
         // Stray braces and other invalid characters in a single segment are reported separately
         assertThat(RouteOverride("{a} b").findProblems()).hasSize(2)
     }
+
+    @Test
+    fun misplacedDynamicSegments() {
+        listOf(
+            "{}",
+            "{...rest}",
+            "{id?}",
+            "/d/{id}/f/{}",
+            "d/{id}/{...rest?}",
+        ).forEach { value ->
+            assertThat(RouteOverride(value).findProblems()).isEmpty()
+        }
+
+        listOf(
+            "/dynamic/{}/route/{example}",
+            "{...rest}/b",
+            "{id?}/b",
+            "a/{...rest?}/b",
+            // A trailing slash means the file's slug comes next, so the segment before it isn't the last one
+            "{...rest}/",
+        ).forEach { value ->
+            assertThat(RouteOverride(value).findProblems().single()).contains("before the last segment")
+            assertThat(RouteOverride(value).findProblems(excluding = setOf(RouteOverride.Problem.MISPLACED_DYNAMIC_SEGMENT))).isEmpty()
+        }
+    }
 }

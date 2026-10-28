@@ -10,7 +10,6 @@ import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.util.getArgumentValue
 import com.varabyte.kobweb.ksp.util.receiverClass
 import com.varabyte.kobweb.ksp.util.toPackageName
-import com.varabyte.kobweb.project.common.DynamicRouteSegment
 import com.varabyte.kobweb.project.common.PackageName
 import com.varabyte.kobweb.project.frontend.PageEntry
 
@@ -37,46 +36,25 @@ fun KSFunctionDeclaration.toPageEntry(
 
     val currPackage = packageName.toPackageName()
     val routeOverride = pageAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }?.let { RouteOverride(it) }
-    routeOverride?.reportProblems(pageAnnotation, logger)
-
     val route = file.toRoute(
         packageRoot = qualifiedPagesPackage,
         packageMappings = packageMappings,
         routeOverride = routeOverride,
-    )?.let { if (it.endsWith("/index")) it.removeSuffix("index") else it }
-
-    if (route != null) {
-        // To maintain the general association between the file name and the slug, we reject route overrides which use
-        // the "{}" inferred dynamic segment syntax in any part except for the last.
-        // e.g. "/dynamic/{example}/route/{}" is OK but "/dynamic/{}/route/{example}" is not.
-        // (While we're here, catch all segments, e.g. "{...rest}", and optional segments, e.g. "{example?}" are also
-        // only allowed in the final position.)
-        if (routeOverride == null ||
-            routeOverride.value.substringBeforeLast("/", missingDelimiterValue = "").split("/")
-                .none { segment ->
-                    val dynamicSegment = DynamicRouteSegment.tryCreate(segment)
-                    dynamicSegment != null && (dynamicSegment.isInferred || dynamicSegment.isCatchAll || dynamicSegment.isOptional)
-                }
-        ) {
-            return PageEntry(
-                qualifiedName!!.asString(),
-                route,
-                acceptsContext = parameters.size == 1,
-                layoutFqn = layoutFqn,
-                initRouteFqn = initRoutes[file.filePath]?.qualifiedName?.asString(),
-                receiverFqn = receiverClass?.qualifiedName?.asString(),
-            )
-        } else {
-            logger.error(
-                "`@$pageSimpleName(\"$routeOverride\")` on `fun $funName` is invalid, as it contains an inferred, catch-all, and/or optional dynamic segment before the last segment, where they aren't allowed.",
-                this
-            )
-        }
-    } else {
+    )?.let { if (it.endsWith("/index")) it.removeSuffix("index") else it } ?: run {
         logger.error(
             "`@$pageSimpleName fun $funName` is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage` (or use a route override that starts with a slash).",
             this
         )
+        return null
     }
-    return null
+    if (routeOverride?.reportProblems(pageAnnotation, logger) == true) return null
+
+    return PageEntry(
+        qualifiedName!!.asString(),
+        route,
+        acceptsContext = parameters.size == 1,
+        layoutFqn = layoutFqn,
+        initRouteFqn = initRoutes[file.filePath]?.qualifiedName?.asString(),
+        receiverFqn = receiverClass?.qualifiedName?.asString(),
+    )
 }

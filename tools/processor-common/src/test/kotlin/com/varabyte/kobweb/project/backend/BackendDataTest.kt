@@ -45,6 +45,11 @@ class BackendDataTest {
     }
 
     @Test
+    fun apiRoutesCanStartWithApi() {
+        assertThat(BackendData(apiMethods = listOf(ApiEntry("a.api.api", "/api"))).collectErrors()).isEmpty()
+    }
+
+    @Test
     fun duplicateApiStreamRoutesAreReported() {
         val data = BackendData(
             apiStreamProperties = listOf(

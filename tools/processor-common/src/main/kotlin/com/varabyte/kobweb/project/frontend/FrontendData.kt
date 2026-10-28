@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.project.frontend
 
-import com.varabyte.kobweb.project.common.DynamicRouteSegment
+import com.varabyte.kobweb.project.common.RouteEntry
+import com.varabyte.kobweb.project.common.assertValidRoutes
 import kotlinx.serialization.Serializable
 
 // A note on imports
@@ -58,54 +59,11 @@ fun FrontendData.assertValid(handleError: (String) -> Unit) {
 }
 
 private fun Iterable<PageEntry>.assertValidPages(handleError: (String) -> Unit) {
-    // Remove contents of dynamic segments to ensure we don't have two routes that resolve to the same dynamic path,
-    // e.g. a/{b}/c/{d} should conflict with "a/{x}/c/{y}"
-    fun String.anonymizeDynamicSegments(): String {
-        return this.split('/').joinToString("/") { originalSegment ->
-            val notDynamic = DynamicRouteSegment.tryCreate(originalSegment) == null
-            if (notDynamic) originalSegment else "{...}"
-        }
-    }
+    assertValidRoutes(routeLabel = "page", handleError)
 
-    val entriesByRoute = this.groupBy { it.route.anonymizeDynamicSegments() }
-    entriesByRoute.forEach { (route, pages) ->
-        if (pages.size > 1) {
-            handleError("The route \"$route\" was defined more than once. Used by: ${pages.joinToString(", ") { page -> page.fqn }}")
-        }
-
+    this.groupBy { it.route }.forEach { (route, pages) ->
         if (route.removePrefix("/").split('/', limit = 2).first() == "api") {
-            handleError("The route \"$route\" starts with \"api\", which is currently a reserved route path, so please choose another name. Used by ${pages.first().fqn}.")
-        }
-    }
-
-    // This is easiest to hit by accident when names are inferred from different places, e.g. a package mapped to "{}"
-    // under "users.user" plus a page with `@Page("{}")` in "User.kt" results in "/users/{user}/{user}"
-    this.forEach { entry ->
-        val repeatedNames = DynamicRouteSegment.findRepeatedNames(entry.route)
-        if (repeatedNames.isNotEmpty()) {
-            handleError("The route \"${entry.route}\" (${entry.fqn}) uses the dynamic segment name(s) ${repeatedNames.joinToString { "\"$it\"" }} more than once, so only one of the values can be read. Please rename one of them.")
-        }
-    }
-
-    // Collect all entries that end with an optional segment, e.g. "/a/b/c/{d?}", as we'll check if their parent dir is
-    // already registered separately, e.g. "/a/b/c/". If so, that means the former route can probably drop the ?, e.g.
-    // "/a/b/c/{d}", as the empty case will always be handled by the static route.
-    this.filter { entry ->
-        // Only the last segment in the route can be optional, so we only have to check that one
-        DynamicRouteSegment.tryCreate(entry.route.substringAfterLast('/'))?.isOptional ?: false
-    }.forEach { entry ->
-        val parentDir = entry.route.substringBeforeLast('/').anonymizeDynamicSegments() + "/"
-        val finalSegment = entry.route.substringAfterLast('/')
-        val matchingPageEntry = entriesByRoute[parentDir]?.first()
-        if (matchingPageEntry != null) {
-            handleError(
-                buildString {
-                    append("The route \"${parentDir}$finalSegment\" (${entry.fqn}) ends with a trailing optional segment, ")
-                    append("but \"$parentDir\" (${matchingPageEntry.fqn}) is also registered and will always take precedence in that case. ")
-                    append("To fix this issue, remove the question mark, ")
-                    append("i.e. \"$finalSegment\" -> \"${finalSegment.replace("?}", "}")}\".")
-                }
-            )
+            handleError("The page route \"$route\" starts with \"api\", which is currently a reserved route path, so please choose another name. Used by ${pages.first().fqn}.")
         }
     }
 }
@@ -179,13 +137,13 @@ class LayoutEntry(
  */
 @Serializable
 class PageEntry(
-    val fqn: String,
-    val route: String,
+    override val fqn: String,
+    override val route: String,
     val acceptsContext: Boolean = false,
     val layoutFqn: String? = null,
     val initRouteFqn: String? = null,
     val receiverFqn: String? = null,
-)
+) : RouteEntry
 
 /**
  * Metadata for code like `val MyStyle = CssStyle { ... }` or `val SM = ButtonSize()` (or any `CssStyle` subclass)

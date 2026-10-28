@@ -42,8 +42,9 @@ fun PackageName.toMappedRouteSegment(value: String, logger: KSPLogger, symbol: K
     if (value.contains('/')) {
         logger.warn("Package mapping `$value` for \"$this\" contains a slash, so it will add multiple segments to routes. Package mappings are expected to be a single route segment.", symbol)
     }
-    // A package mapping is essentially a route override for a single segment, so the same problems apply
-    val problems = RouteOverride(value).findProblems()
+    // A package mapping is essentially a route override for a single segment, so the same problems apply, except for
+    // where dynamic segments can go, which is stricter here (see below), as a package is never the last part of a route
+    val problems = RouteOverride(value).findProblems(excluding = setOf(RouteOverride.Problem.MISPLACED_DYNAMIC_SEGMENT))
     if (problems.isNotEmpty()) {
         problems.forEach { problem -> logger.error("Package mapping `$value` for \"$this\" is invalid. $problem", symbol) }
         return null

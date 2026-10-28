@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.project.backend
 
-import com.varabyte.kobweb.project.common.DynamicRouteSegment
+import com.varabyte.kobweb.project.common.RouteEntry
+import com.varabyte.kobweb.project.common.assertValidRoutes
 import kotlinx.serialization.Serializable
 
 /**
@@ -46,19 +47,7 @@ fun BackendData.assertValid(handleError: (String) -> Unit) {
 }
 
 private fun Iterable<ApiEntry>.assertValidApis(handleError: (String) -> Unit) {
-    val entriesByRoute = this.groupBy { it.route }
-    entriesByRoute.forEach { (route, apis) ->
-        if (apis.size > 1) {
-            handleError("The API route \"$route\" was defined more than once. Used by:\n${apis.joinToString("\n") { entry -> " - ${entry.fqn}" }}")
-        }
-    }
-
-    this.forEach { entry ->
-        val repeatedNames = DynamicRouteSegment.findRepeatedNames(entry.route)
-        if (repeatedNames.isNotEmpty()) {
-            handleError("The API route \"${entry.route}\" (${entry.fqn}) uses the dynamic segment name(s) ${repeatedNames.joinToString { "\"$it\"" }} more than once, so only one of the values can be read. Please rename one of them.")
-        }
-    }
+    assertValidRoutes(routeLabel = "API", handleError)
 }
 
 private fun Iterable<ApiStreamEntry>.assertValidApiStreams(handleError: (String) -> Unit) {
@@ -81,4 +70,4 @@ class ApiInterceptorEntry(val fqn: String)
 class ApiStreamEntry(val fqn: String, val route: String)
 
 @Serializable
-class ApiEntry(val fqn: String, val route: String)
+class ApiEntry(override val fqn: String, override val route: String) : RouteEntry

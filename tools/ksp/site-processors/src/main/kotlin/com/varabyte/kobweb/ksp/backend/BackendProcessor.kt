@@ -161,7 +161,6 @@ internal class BackendProcessor(
             val apiAnnotation = property.getAnnotationsByName(API_FQN).firstOrNull()
             val routeOverride = apiAnnotation?.getArgumentValue()?.takeIf { it.isNotBlank() }
                 ?.let { RouteOverride(it) }
-                ?.also { it.reportProblems(apiAnnotation, logger) }
 
             val resolvedRoute = property.containingFile!!.toRoute(
                 packageRoot = apiPackage,
@@ -174,6 +173,7 @@ internal class BackendProcessor(
                 )
                 return@mapNotNull null
             }
+            if (apiAnnotation != null && routeOverride?.reportProblems(apiAnnotation, logger) == true) return@mapNotNull null
 
             // Unlike API routes, streams are looked up by exact path, so there's no way to capture a dynamic value
             if (resolvedRoute.split('/').any { DynamicRouteSegment.tryCreate(it) != null }) {
@@ -223,20 +223,19 @@ private fun KSFunctionDeclaration.toApiEntry(
     val currPackage = packageName.toPackageName()
     val file = containingFile ?: error("Symbol does not come from a source file")
     val routeOverride = apiAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }?.let { RouteOverride(it) }
-    routeOverride?.reportProblems(apiAnnotation, logger)
-
+    val funName = simpleName.asString()
+    val annotationName = apiAnnotation.shortName.asString()
     val resolvedRoute = file.toRoute(
         packageRoot = qualifiedApiPackage,
         packageMappings = packageMappings,
         routeOverride = routeOverride,
     ) ?: run {
-        val funName = simpleName.asString()
-        val annotationName = apiAnnotation.shortName.asString()
         logger.error(
             "`@$annotationName fun $funName` is defined under package `$currPackage` but must exist under `$qualifiedApiPackage` (or use a route override that starts with a slash).",
             this
         )
         return null
     }
+    if (routeOverride?.reportProblems(apiAnnotation, logger) == true) return null
     return ApiEntry(qualifiedName!!.asString(), resolvedRoute)
 }
