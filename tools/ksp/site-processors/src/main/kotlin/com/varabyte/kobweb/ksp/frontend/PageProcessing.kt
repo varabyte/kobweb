@@ -39,7 +39,13 @@ fun KSFunctionDeclaration.toPageEntry(
     val routeOverride = pageAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }?.let { RouteOverride(it) }
     routeOverride?.reportProblems(pageAnnotation, logger)
 
-    if (routeOverride?.value?.startsWith("/") == true || currPackage.isSameOrSubpackageOf(qualifiedPagesPackage)) {
+    val route = file.toRoute(
+        packageRoot = qualifiedPagesPackage,
+        packageMappings = packageMappings,
+        routeOverride = routeOverride,
+    )?.let { if (it.endsWith("/index")) it.removeSuffix("index") else it }
+
+    if (route != null) {
         // To maintain the general association between the file name and the slug, we reject route overrides which use
         // the "{}" inferred dynamic segment syntax in any part except for the last.
         // e.g. "/dynamic/{example}/route/{}" is OK but "/dynamic/{}/route/{example}" is not.
@@ -52,12 +58,6 @@ fun KSFunctionDeclaration.toPageEntry(
                     dynamicSegment != null && (dynamicSegment.isInferred || dynamicSegment.isCatchAll || dynamicSegment.isOptional)
                 }
         ) {
-            val route = file.toRoute(
-                packageRoot = qualifiedPagesPackage,
-                packageMappings = packageMappings,
-                routeOverride = routeOverride,
-            ).let { if (it.endsWith("/index")) it.removeSuffix("index") else it }
-
             return PageEntry(
                 qualifiedName!!.asString(),
                 route,

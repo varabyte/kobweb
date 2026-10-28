@@ -18,6 +18,9 @@ import com.varabyte.kobweb.api.log.Logger
  * }
  * ```
  *
+ * Like API methods, streams must be declared under your site's api package, unless they're annotated with an `@Api`
+ * route override that starts with a slash.
+ *
  * For technical readers, note that streams are NOT websockets. Instead, if configured, a Kobweb server will open a
  * single web socket, which can then handle one (or more!) Kobweb streams. The API for streams mimics web sockets so
  * the experience will feel similar, but they're not 1:1 the same.

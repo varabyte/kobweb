@@ -32,8 +32,12 @@ import com.varabyte.kobweb.project.common.toRouteSegment
  *
  * @param packageRoot The root package that this package should live under. Passing it in prevents us from
  *   including it in the final route.
+ *
+ * @return null if this package is not [packageRoot] or one of its subpackages, as there's no route for it then.
  */
-fun PackageName.toRoute(packageRoot: PackageName, packageMappings: Map<PackageName, String>): String {
+fun PackageName.toRoute(packageRoot: PackageName, packageMappings: Map<PackageName, String>): String? {
+    if (!isSameOrSubpackageOf(packageRoot)) return null
+
     // We have a bunch of potential package to URL mappings, which work on fully qualified packages, so
     // we process each part of the package separately, going back to front. An example will help here.
     //

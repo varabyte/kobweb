@@ -167,7 +167,13 @@ internal class BackendProcessor(
                 packageRoot = apiPackage,
                 packageMappings = packageMappings,
                 routeOverride = routeOverride,
-            )
+            ) ?: run {
+                logger.error(
+                    "`val ${property.simpleName.asString()}` is defined under package `${property.packageName.asString()}` but must exist under `$apiPackage` (or use `@Api` with a route override that starts with a slash).",
+                    property
+                )
+                return@mapNotNull null
+            }
 
             // Unlike API routes, streams are looked up by exact path, so there's no way to capture a dynamic value
             if (resolvedRoute.split('/').any { DynamicRouteSegment.tryCreate(it) != null }) {
@@ -219,20 +225,18 @@ private fun KSFunctionDeclaration.toApiEntry(
     val routeOverride = apiAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }?.let { RouteOverride(it) }
     routeOverride?.reportProblems(apiAnnotation, logger)
 
-    return if (routeOverride?.value?.startsWith("/") == true || currPackage.isSameOrSubpackageOf(qualifiedApiPackage)) {
-        val resolvedRoute = file.toRoute(
-            packageRoot = qualifiedApiPackage,
-            packageMappings = packageMappings,
-            routeOverride = routeOverride,
-        )
-        ApiEntry(qualifiedName!!.asString(), resolvedRoute)
-    } else {
+    val resolvedRoute = file.toRoute(
+        packageRoot = qualifiedApiPackage,
+        packageMappings = packageMappings,
+        routeOverride = routeOverride,
+    ) ?: run {
         val funName = simpleName.asString()
         val annotationName = apiAnnotation.shortName.asString()
         logger.error(
             "`@$annotationName fun $funName` is defined under package `$currPackage` but must exist under `$qualifiedApiPackage` (or use a route override that starts with a slash).",
             this
         )
-        null
+        return null
     }
+    return ApiEntry(qualifiedName!!.asString(), resolvedRoute)
 }

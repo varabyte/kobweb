@@ -15,6 +15,14 @@ class RouteUtilsTest {
     }
 
     @Test
+    fun toRouteOutsideThePackageRoot() {
+        val root = PackageName("site.pages")
+        assertThat(PackageName("site.server").toRoute(root, emptyMap())).isNull()
+        assertThat(PackageName("site").toRoute(root, emptyMap())).isNull()
+        assertThat(PackageName("site.pagesextra").toRoute(root, emptyMap())).isNull()
+    }
+
+    @Test
     fun toRouteWithMappings() {
         val root = PackageName("site.pages")
         val mappings = mapOf(

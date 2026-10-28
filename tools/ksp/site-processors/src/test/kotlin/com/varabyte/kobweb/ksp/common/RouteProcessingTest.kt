@@ -49,6 +49,19 @@ class RouteProcessingTest {
     }
 
     @Test
+    fun filesOutsideThePackageRootHaveNoRouteUnlessTheOverrideIsAbsolute() {
+        val outsideFile = FakeKSFile("com.example.server", "Chat.kt")
+        assertThat(outsideFile.toRoute(null)).isNull()
+        assertThat(outsideFile.toRoute("chat")).isNull()
+        assertThat(outsideFile.toRoute("d/chat")).isNull()
+        assertThat(outsideFile.toRoute("/chat")).isEqualTo("/chat")
+        assertThat(outsideFile.toRoute("/")).isEqualTo("/chat")
+
+        // A package which only shares a prefix with the package root is not under it
+        assertThat(FakeKSFile("com.example.pagesextra", "Slug.kt").toRoute(null)).isNull()
+    }
+
+    @Test
     fun slugComesFromTheFileName() {
         assertThat(FakeKSFile("com.example.pages", "OurTeam.kt").toRoute(null)).isEqualTo("/our-team")
         assertThat(FakeKSFile("com.example.pages", "_draft_.kt").toRoute("blog/")).isEqualTo("/blog/draft")

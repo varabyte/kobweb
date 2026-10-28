@@ -43,14 +43,19 @@ private val RouteOverride.slug: String?
  * @param packageMappings A map of package to route mappings. See [PackageName.toRoute] for more information.
  * @param routeOverride If specified, this will influence the final route. Depending on whether it starts with and/or
  *   ends with a slash, it will either replace the entire route or affect parts of it.
+ *
+ * @return null if this file isn't under [packageRoot], unless the route override starts with a slash, since that sets
+ *   the full route explicitly, so the file's package doesn't matter.
  */
 fun KSFile.toRoute(
     packageRoot: PackageName,
     packageMappings: Map<PackageName, String>,
     routeOverride: RouteOverride?,
-): String {
+): String? {
     val slugFromFile = toSlug()
-    val routeWithoutSlug = routeOverride?.routeWithoutSlug ?: packageName.toPackageName().toRoute(packageRoot, packageMappings)
+    val routeWithoutSlug = routeOverride?.routeWithoutSlug
+        ?: packageName.toPackageName().toRoute(packageRoot, packageMappings)
+        ?: return null
     val routeExtra = routeOverride?.routeExtra.orEmpty()
     val slug = routeOverride?.slug?.let { value ->
         val dynamicRouteSegment = DynamicRouteSegment.tryCreate(value)
