@@ -51,8 +51,16 @@ suspend fun main(): Unit = withContext(Dispatchers.Default) {
         ?: throw KobwebException("Server must be started in the root of a Kobweb project")
 
     val confFile = KobwebConfFile(folder)
-    val conf = confFile.content
-        ?: throw KobwebException("Server cannot start without configuration: ${confFile.path} is missing")
+    if (!confFile.path.exists()) {
+        throw KobwebException("Server cannot start without configuration: ${confFile.path} is missing")
+    }
+    val conf = confFile.content ?: run {
+        // The file exists, so it failed to deserialize, e.g. malformed YAML or a value rejected by `KobwebConf`
+        throw KobwebException(
+            "Server cannot start, as its configuration could not be read from ${confFile.path}.",
+            confFile.deserializationException
+        )
+    }
 
     val env = ServerEnvironment.get()
 
