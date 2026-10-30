@@ -34,7 +34,7 @@ enum class RoutePathType {
  * resources folder or an API endpoint (like "/api/hello"). Since every path is either a page or not, these values
  * cover all cases.
  */
-enum class RoutePathTarget {
+enum class RoutePathDestination {
     /**
      * This path can point at either a page or a resource, e.g. a `Link`.
      */
@@ -66,18 +66,18 @@ enum class RoutePathTarget {
  *
  * @property mustExist Whether the IDE will enforce that this path refers to something that already exists and flag it
  *   otherwise. A path exists if it matches a page (i.e. declared by a `@Page`) or a resource (e.g. a file under the
- *   site's public resources folder or an API endpoint; see [RoutePathTarget]). For code that wants to navigate to a
- *   route or load a resource, this should be true! But there may also be code which works with hypothetical routes that
- *   shouldn't get flagged (like functions that register routes for example). Note that this check only consistently
- *   applies to paths that start with a slash. Routes with an authority are considered external and unknowable, and we
- *   can't always reason about relative routes because it depends on what they are appended to, outside of contexts
- *   where we know for sure what page we are on. Finally, if this annotation is applied to a getter and this value set
- *   to true, the IDE will enforce that to mean any route value checked against it must exist, e.g.
- *   `route.path == "/must-be-valid"`.
+ *   site's public resources folder or an API endpoint; see [RoutePathDestination]). For code that wants to navigate to
+ *   a route or load a resource, this should be true! But there may also be code which works with hypothetical routes
+ *   that shouldn't get flagged (like the functions that register new routes for example). Note that this check only
+ *   consistently applies to paths that start with a slash. Routes with an authority are considered external and
+ *   unknowable, and we can't always reason about relative routes because it depends on what they are appended to.
+ *   Finally, if this annotation is applied to a getter and this value set to true, the IDE will enforce that to mean
+ *   any route value checked against it must exist, e.g. `route.path == "/must-be-valid"`.
  *
- * @property target What this path is allowed to point at. For example, an `Image` composable could be set to a png of
- *   a cat, but assigning it to a page doesn't make sense, while `Router.tryRoutingTo` can only ever lead to a page. See
- *   [RoutePathTarget] for more details.
+ * @property destination What this path is allowed to lead to: a page, a resource (e.g. a public file or an API
+ *   endpoint), or either. For example, an `Image`'s `src` should lead to a resource such as a png of a cat, but never a
+ *   page, while `Router.tryRoutingTo` can only ever lead to a page, since Kobweb's client router doesn't know about
+ *   anything else. See [RoutePathDestination] for more details.
  */
 @Target(
     AnnotationTarget.VALUE_PARAMETER,
@@ -89,5 +89,5 @@ enum class RoutePathTarget {
 annotation class RoutePath(
     val type: RoutePathType = RoutePathType.URL,
     val mustExist: Boolean = true,
-    val target: RoutePathTarget = RoutePathTarget.PAGES_AND_RESOURCES,
+    val destination: RoutePathDestination = RoutePathDestination.PAGES_AND_RESOURCES,
 )

@@ -8,7 +8,7 @@ import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.core.PageContext
 import com.varabyte.kobweb.core.PageContextLocal
 import com.varabyte.kobweb.core.RoutePath
-import com.varabyte.kobweb.core.RoutePathTarget
+import com.varabyte.kobweb.core.RoutePathDestination
 import com.varabyte.kobweb.core.RoutePathType
 import com.varabyte.kobweb.core.data.MutableData
 import com.varabyte.kobweb.core.init.InitRouteContext
@@ -74,7 +74,7 @@ class RouteInterceptorScope(pathQueryAndFragment: String) {
      * be added for you.
      */
     @get:RoutePath(RoutePathType.PATH_ONLY, mustExist = false)
-    @set:RoutePath(RoutePathType.PATH_ONLY, mustExist = true, target = RoutePathTarget.PAGES_ONLY)
+    @set:RoutePath(RoutePathType.PATH_ONLY, mustExist = true, destination = RoutePathDestination.PAGES_ONLY)
     var path = route.path
         set(value) {
             field = if (value.startsWith('/')) value else "/$value"
@@ -450,7 +450,7 @@ class Router {
      */
     @IgnorableReturnValue
     fun tryRoutingTo(
-        @RoutePath(RoutePathType.PATH_QUERY_AND_FRAGMENT, target = RoutePathTarget.PAGES_ONLY)
+        @RoutePath(RoutePathType.PATH_QUERY_AND_FRAGMENT, destination = RoutePathDestination.PAGES_ONLY)
         pathQueryAndFragment: String,
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE,
