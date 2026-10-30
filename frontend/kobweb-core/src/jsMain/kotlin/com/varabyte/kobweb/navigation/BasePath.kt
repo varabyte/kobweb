@@ -1,5 +1,8 @@
 package com.varabyte.kobweb.navigation
 
+import com.varabyte.kobweb.core.RoutePath
+import com.varabyte.kobweb.core.RoutePathType
+
 /**
  * Represents a subpath under which the user's entire site is served under.
  *
@@ -32,7 +35,7 @@ interface BasePath {
      * By only working on absolute routes, we'll never accidentally prepend a base path onto a sub-route where any
      * middle parts are missing.
      */
-    fun prependTo(path: String): String
+    fun prependTo(@RoutePath(RoutePathType.PATH_QUERY_AND_FRAGMENT, mustExist = false) path: String): String
 
     companion object : BasePath {
         fun set(value: String) {
@@ -40,17 +43,24 @@ interface BasePath {
         }
 
         override val value get() = BasePathImpl.instance.value
-        override fun prependTo(path: String): String = BasePathImpl.instance.prependTo(path)
+        override fun prependTo(
+            @RoutePath(RoutePathType.PATH_QUERY_AND_FRAGMENT, mustExist = false) path: String
+        ): String = BasePathImpl.instance.prependTo(path)
     }
 }
 
 /** Conditionally prepend the base path only if the passed in condition is true. */
-fun BasePath.Companion.prependIf(condition: Boolean, path: String): String {
+fun BasePath.Companion.prependIf(
+    condition: Boolean,
+    @RoutePath(RoutePathType.PATH_QUERY_AND_FRAGMENT, mustExist = false) path: String
+): String {
     return if (condition) prependTo(path) else path
 }
 
 /** Remove the base path from some target *absolute* path (relative paths will be returned as is). */
-fun BasePath.Companion.remove(path: String): String {
+fun BasePath.Companion.remove(
+    @RoutePath(RoutePathType.PATH_QUERY_AND_FRAGMENT, mustExist = false) path: String
+): String {
     // dropLast because value always ends with a slash
     return if (value.isNotEmpty()) path.removePrefix(value.dropLast(1)) else path
 }
