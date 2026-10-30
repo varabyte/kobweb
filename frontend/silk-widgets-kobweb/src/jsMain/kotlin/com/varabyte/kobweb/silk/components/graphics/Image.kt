@@ -8,6 +8,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.RoutePath
+import com.varabyte.kobweb.core.RoutePathTarget
 import com.varabyte.kobweb.navigation.BasePath
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
@@ -86,7 +87,7 @@ enum class ImageFetchPriority {
  */
 @Composable
 fun Image(
-    @RoutePath(allowPages = false)
+    @RoutePath(target = RoutePathTarget.RESOURCES_ONLY)
     src: String,
     modifier: Modifier = Modifier,
     variant: CssStyleVariant<ImageKind>? = null,
@@ -130,7 +131,7 @@ fun Image(
  */
 @Composable
 fun Image(
-    @RoutePath(allowPages = false)
+    @RoutePath(target = RoutePathTarget.RESOURCES_ONLY)
     src: String,
     description: String,
     modifier: Modifier = Modifier,

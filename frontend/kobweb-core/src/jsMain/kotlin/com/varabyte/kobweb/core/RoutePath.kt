@@ -28,6 +28,32 @@ enum class RoutePathType {
 }
 
 /**
+ * What a route path is allowed to point at: Kobweb pages, resources, or both.
+ *
+ * Here, a resource is anything the server responds to directly that isn't a page, e.g. a file in the site's public
+ * resources folder or an API endpoint (like "/api/hello"). Since every path is either a page or not, these values
+ * cover all cases.
+ */
+enum class RoutePathTarget {
+    /**
+     * This path can point at either a page or a resource, e.g. a `Link`.
+     */
+    PAGES_AND_RESOURCES,
+
+    /**
+     * This path can only point at a page, e.g. `Router.tryRoutingTo`, since Kobweb's client router only knows about
+     * pages.
+     */
+    PAGES_ONLY,
+
+    /**
+     * This path can only point at a resource, e.g. an `Image`'s `src`, since the browser fetches it directly instead
+     * of going through Kobweb's router, so pointing it at a page makes no sense.
+     */
+    RESOURCES_ONLY,
+}
+
+/**
  * An annotation which targets a String that represents a route path.
  *
  * This has no use for the code directly, but the Kobweb IntelliJ Plugin can detect it and use it to generate useful
@@ -39,18 +65,19 @@ enum class RoutePathType {
  *   as an error. See [RoutePathType] for more details.
  *
  * @property mustExist Whether the IDE will enforce that this path refers to something that already exists and flag it
- *   otherwise. A path exists if it matches a page (i.e. declared by a `@Page`) or a public resource (i.e. a file under
- *   the site's public resources folder). For code that wants to navigate to a route or load a resource, this should be
- *   true! But there may also be code which works with hypothetical routes that shouldn't get flagged (like functions
- *   that register routes for example). Note that this check only consistently applies to paths that start with a slash.
- *   Routes with an authority are considered external and unknowable, and we can't always reason about relative routes
- *   because it depends on what they are appended to, outside of contexts where we know for sure what page we are on.
- *   Finally, if this annotation is applied to a getter and this value set to true, the IDE will enforce that to mean
- *   any route value checked against it must exist, e.g. `route.path == "/must-be-valid"`.
+ *   otherwise. A path exists if it matches a page (i.e. declared by a `@Page`) or a resource (e.g. a file under the
+ *   site's public resources folder or an API endpoint; see [RoutePathTarget]). For code that wants to navigate to a
+ *   route or load a resource, this should be true! But there may also be code which works with hypothetical routes that
+ *   shouldn't get flagged (like functions that register routes for example). Note that this check only consistently
+ *   applies to paths that start with a slash. Routes with an authority are considered external and unknowable, and we
+ *   can't always reason about relative routes because it depends on what they are appended to, outside of contexts
+ *   where we know for sure what page we are on. Finally, if this annotation is applied to a getter and this value set
+ *   to true, the IDE will enforce that to mean any route value checked against it must exist, e.g.
+ *   `route.path == "/must-be-valid"`.
  *
- * @property allowPages Whether this route path supports routes corresponding to Kobweb pages. This can be set to false
- *   for links that will correspond with pure resources instead, e.g. how an `Image` composable could be set to a png
- *   of a cat, but assigning it to a random page doesn't make sense.
+ * @property target What this path is allowed to point at. For example, an `Image` composable could be set to a png of
+ *   a cat, but assigning it to a page doesn't make sense, while `Router.tryRoutingTo` can only ever lead to a page. See
+ *   [RoutePathTarget] for more details.
  */
 @Target(
     AnnotationTarget.VALUE_PARAMETER,
@@ -62,5 +89,5 @@ enum class RoutePathType {
 annotation class RoutePath(
     val type: RoutePathType = RoutePathType.URL,
     val mustExist: Boolean = true,
-    val allowPages: Boolean = true,
+    val target: RoutePathTarget = RoutePathTarget.PAGES_AND_RESOURCES,
 )

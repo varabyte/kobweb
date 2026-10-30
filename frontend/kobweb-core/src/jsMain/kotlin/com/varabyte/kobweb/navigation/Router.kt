@@ -8,6 +8,7 @@ import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.core.PageContext
 import com.varabyte.kobweb.core.PageContextLocal
 import com.varabyte.kobweb.core.RoutePath
+import com.varabyte.kobweb.core.RoutePathTarget
 import com.varabyte.kobweb.core.RoutePathType
 import com.varabyte.kobweb.core.data.MutableData
 import com.varabyte.kobweb.core.init.InitRouteContext
@@ -73,7 +74,7 @@ class RouteInterceptorScope(pathQueryAndFragment: String) {
      * be added for you.
      */
     @get:RoutePath(RoutePathType.PATH_ONLY, mustExist = false)
-    @set:RoutePath(RoutePathType.PATH_ONLY, mustExist = true)
+    @set:RoutePath(RoutePathType.PATH_ONLY, mustExist = true, target = RoutePathTarget.PAGES_ONLY)
     var path = route.path
         set(value) {
             field = if (value.startsWith('/')) value else "/$value"
@@ -412,7 +413,7 @@ class Router {
 
     /**
      * Attempt to navigate **internally** within this site, or return false if that's not possible (i.e. because the
-     * path is external or because the route isn't found).
+     * path is external or, if [routeToErrorPageOnFail] is false, because the route isn't found).
      *
      * By internally, I mean this method expects a route path only -- no https:// origin in other words. "/",
      * "/about", "/help/contact", and "user/123" are valid examples.
@@ -421,12 +422,14 @@ class Router {
      *
      * ```
      * onClick { evt ->
-     *   if (ctx.router.tryRoutingTo(...)) {
+     *   if (ctx.router.tryRoutingTo(..., routeToErrorPageOnFail = false)) {
      *     evt.preventDefault()
      *   }
      * ```
      *
-     * That way, either the router handles the navigation or the browser does.
+     * That way, either the router handles the navigation or the browser does. (With the default
+     * `routeToErrorPageOnFail = true`, a path that doesn't match a page, such as a link to a public file, would show
+     * the error page instead of letting the browser load it.)
      *
      * Note that this method will automatically prepend this site's [BasePath] if it is configured and if
      * [pathQueryAndFragment] is absolute.
@@ -447,7 +450,8 @@ class Router {
      */
     @IgnorableReturnValue
     fun tryRoutingTo(
-        @RoutePath(RoutePathType.PATH_QUERY_AND_FRAGMENT) pathQueryAndFragment: String,
+        @RoutePath(RoutePathType.PATH_QUERY_AND_FRAGMENT, target = RoutePathTarget.PAGES_ONLY)
+        pathQueryAndFragment: String,
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE,
         routeToErrorPageOnFail: Boolean = true,
