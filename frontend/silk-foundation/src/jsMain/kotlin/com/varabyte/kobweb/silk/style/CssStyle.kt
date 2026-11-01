@@ -511,7 +511,8 @@ interface CssStyleScopeBase {
     // explicit color-mode parameter. However, it's so easy to accidentally use the wrong one inside a CssStyle block,
     // especially if refactoring code from a regular composable method into a CssStyle. This override captures this case
     // and prevents us from getting an annoying runtime error.
-    // NOTE: We should migrate this to context parameters when they become available.
+    // NOTE: Do *not* extract this to a context parameter extension function. The reason this needs to exist here is to
+    // ensure it takes precedence for people writing CssStyle blocks.
     fun Keyframes.toAnimation(
         duration: CSSTimeNumericValue? = null,
         timingFunction: AnimationTimingFunction? = null,
