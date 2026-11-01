@@ -73,7 +73,7 @@ abstract class StyleScope {
     }
 
     operator fun CssRule.invoke(createModifier: () -> Modifier) {
-        cssRule(this@StyleScope, createModifier)
+        cssRule(mediaQuery, toSelectorText(), createModifier)
     }
 }
 
