@@ -137,9 +137,15 @@ sealed interface Color : CSSColorValue {
      * @property saturation A percentage value (0-1) representing how grey the color is.
      * @property lightness A percentage value (0-1) representing how bright the color is.
      * @property alpha A percentage value (0-1) representing how transparent the color is.
+     *
+     * Out-of-range values are normalized the way browsers do: hues wrap around, and the other values are clamped.
      */
-    class Hsl internal constructor(val hue: Float, val saturation: Float, val lightness: Float, val alpha: Float) :
-        Color {
+    class Hsl internal constructor(hue: Float, saturation: Float, lightness: Float, alpha: Float) : Color {
+        val hue = hue.mod(360f)
+        val saturation = saturation.coerceIn(0f, 1f)
+        val lightness = lightness.coerceIn(0f, 1f)
+        val alpha = alpha.coerceIn(0f, 1f)
+
         override fun inverted() = toRgb().inverted()
         override fun darkened(byPercent: Float) = toRgb().darkened(byPercent)
 
@@ -260,11 +266,12 @@ sealed interface Color : CSSColorValue {
         fun rgba(value: Long): Rgb = rgba(value.toInRangeInt())
 
         fun rgb(r: Int, g: Int, b: Int): Rgb = rgba(r, g, b, 0xFF)
+        // Out-of-range channels are clamped, like browsers do for `rgb(300, 0, 0)`
         fun rgba(r: Int, g: Int, b: Int, a: Int): Rgb = RawRgb(
-            r.and(0xFF).shl(16)
-                .or(g.and(0xFF).shl(8))
-                .or(b.and(0xFF).shl(0))
-                .or(a.and(0xFF).shl(24))
+            r.coerceIn(0, 255).shl(16)
+                .or(g.coerceIn(0, 255).shl(8))
+                .or(b.coerceIn(0, 255).shl(0))
+                .or(a.coerceIn(0, 255).shl(24))
         )
 
         fun argb(a: Int, r: Int, g: Int, b: Int): Rgb = rgba(r, g, b, a)
