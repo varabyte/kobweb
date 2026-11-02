@@ -26,6 +26,7 @@ kotlin {
         jsTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.truthish)
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }

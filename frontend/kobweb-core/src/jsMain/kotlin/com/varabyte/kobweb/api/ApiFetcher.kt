@@ -8,6 +8,7 @@ import com.varabyte.kobweb.browser.http.bodyOf
 import com.varabyte.kobweb.browser.http.http
 import com.varabyte.kobweb.navigation.BasePath
 import org.w3c.dom.Window
+import org.w3c.dom.url.URL
 import org.w3c.fetch.RequestRedirect
 import org.w3c.fetch.Response
 
@@ -29,7 +30,21 @@ class ApiFetcher(private val window: Window) {
     var logOnError: Boolean by window.http::logOnError
 
     private fun toResource(apiPath: String): String {
-        return BasePath.prependTo("/api/${apiPath.trimStart('/')}")
+        val resource = "/api/${apiPath.trimStart('/')}"
+        // Browsers resolve "." and ".." segments (even percent-encoded ones) before fetching, so make sure they can't
+        // lead outside of "/api/". `URL` resolves them the same way.
+        require(URL(resource, "http://unused").pathname.startsWith("/api/")) {
+            "API path \"$apiPath\" leads outside of \"/api/\". Use `window.http` to fetch other URLs."
+        }
+        return BasePath.prependTo(resource)
+    }
+
+    /** Like [toResource], but for the `try` methods: returns null (and logs if [logOnError]) instead of throwing. */
+    private fun tryToResource(apiPath: String): String? = try {
+        toResource(apiPath)
+    } catch (e: IllegalArgumentException) {
+        if (logOnError) console.warn(e.message)
+        null
     }
 
     /**
@@ -88,7 +103,8 @@ class ApiFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
         transform: suspend Response.() -> T
-    ): T? = window.http.tryDelete(toResource(apiPath), headers, redirect, abortController, transform)
+    ): T? =
+        tryToResource(apiPath)?.let { window.http.tryDelete(it, headers, redirect, abortController, transform) }
 
     /**
      * Like [delete], but returns null if the request fails.
@@ -187,7 +203,8 @@ class ApiFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
         transform: suspend Response.() -> T
-    ): T? = window.http.tryGet(toResource(apiPath), headers, redirect, abortController, transform)
+    ): T? =
+        tryToResource(apiPath)?.let { window.http.tryGet(it, headers, redirect, abortController, transform) }
 
     /**
      * Like [get], but returns null if the request fails.
@@ -265,7 +282,8 @@ class ApiFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
         transform: suspend Response.() -> T
-    ): T? = window.http.tryHead(toResource(apiPath), headers, redirect, abortController, transform)
+    ): T? =
+        tryToResource(apiPath)?.let { window.http.tryHead(it, headers, redirect, abortController, transform) }
 
     /**
      * Like [head], but returns null if the request fails.
@@ -342,7 +360,8 @@ class ApiFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
         transform: suspend Response.() -> T
-    ): T? = window.http.tryOptions(toResource(apiPath), headers, redirect, abortController, transform)
+    ): T? =
+        tryToResource(apiPath)?.let { window.http.tryOptions(it, headers, redirect, abortController, transform) }
 
     /**
      * Like [options], but returns null if the request fails.
@@ -447,7 +466,8 @@ class ApiFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
         transform: suspend Response.() -> T
-    ): T? = window.http.tryPatch(toResource(apiPath), body, headers, redirect, abortController, transform)
+    ): T? =
+        tryToResource(apiPath)?.let { window.http.tryPatch(it, body, headers, redirect, abortController, transform) }
 
     /**
      * Like [patch], but returns null if the request fails.
@@ -555,7 +575,8 @@ class ApiFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
         transform: suspend Response.() -> T
-    ): T? = window.http.tryPost(toResource(apiPath), body, headers, redirect, abortController, transform)
+    ): T? =
+        tryToResource(apiPath)?.let { window.http.tryPost(it, body, headers, redirect, abortController, transform) }
 
     /**
      * Like [post], but returns null if the request fails.
@@ -663,7 +684,8 @@ class ApiFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
         transform: suspend Response.() -> T
-    ): T? = window.http.tryPut(toResource(apiPath), body, headers, redirect, abortController, transform)
+    ): T? =
+        tryToResource(apiPath)?.let { window.http.tryPut(it, body, headers, redirect, abortController, transform) }
 
     /**
      * Like [put], but returns null if the request fails.
@@ -746,7 +768,8 @@ class ApiFetcher(private val window: Window) {
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
         transform: suspend Response.() -> T
-    ): T? = window.http.tryQuery(toResource(apiPath), body, headers, redirect, abortController, transform)
+    ): T? =
+        tryToResource(apiPath)?.let { window.http.tryQuery(it, body, headers, redirect, abortController, transform) }
 
     /**
      * Like [query], but returns null if the request fails.
