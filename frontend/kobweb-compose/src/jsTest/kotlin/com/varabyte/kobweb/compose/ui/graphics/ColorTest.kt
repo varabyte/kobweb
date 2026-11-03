@@ -20,6 +20,13 @@ class ColorTest {
     }
 
     @Test
+    fun hslWithTinyNegativeHueWrapsToZero() {
+        // -1e-20 mod 360 rounds up to exactly 360
+        assertThat(Color.hsl(-1e-20f, 1f, 0.5f).hue).isEqualTo(0f)
+        assertThat(Color.hsl(-1e-20f, 1f, 0.5f).toRgb()).isEqualTo(Color.rgb(255, 0, 0))
+    }
+
+    @Test
     fun hslClampsSaturationAndLightnessLikeBrowsers() {
         assertThat(Color.hsl(0, 2f, 0.25f).toRgb()).isEqualTo(Color.rgb(127, 0, 0))
         assertThat(Color.hsl(0, -1f, 0.5f).toRgb()).isEqualTo(Color.hsl(0, 0f, 0.5f).toRgb())

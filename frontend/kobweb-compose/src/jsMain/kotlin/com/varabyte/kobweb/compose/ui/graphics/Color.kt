@@ -133,7 +133,7 @@ sealed interface Color : CSSColorValue {
      *
      * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl
      *
-     * @property hue An angle (0-360) representing the color based on its location in a color wheel.
+     * @property hue An angle in the range [0, 360) representing the color based on its location in a color wheel.
      * @property saturation A percentage value (0-1) representing how grey the color is.
      * @property lightness A percentage value (0-1) representing how bright the color is.
      * @property alpha A percentage value (0-1) representing how transparent the color is.
@@ -141,7 +141,8 @@ sealed interface Color : CSSColorValue {
      * Out-of-range values are normalized the way browsers do: hues wrap around, and the other values are clamped.
      */
     class Hsl internal constructor(hue: Float, saturation: Float, lightness: Float, alpha: Float) : Color {
-        val hue = hue.mod(360f)
+        // A tiny negative hue can round up to exactly 360 after `mod`
+        val hue = hue.mod(360f).let { if (it == 360f) 0f else it }
         val saturation = saturation.coerceIn(0f, 1f)
         val lightness = lightness.coerceIn(0f, 1f)
         val alpha = alpha.coerceIn(0f, 1f)
@@ -161,7 +162,7 @@ sealed interface Color : CSSColorValue {
             // https://en.wikipedia.org/wiki/HSL_and_HSV#Color_conversion_formulae
             val chroma = (1 - abs(2 * lightness - 1)) * saturation
             val intermediateValue = chroma * (1 - abs(((hue / 60) % 2) - 1))
-            val hueSection = (hue.toInt() % 360) / 60
+            val hueSection = (hue / 60f).toInt()
             val r: Float
             val g: Float
             val b: Float
