@@ -458,7 +458,7 @@ val fetchLucideIconsTask = tasks.register<FetchIconsTask>("fetchIcons") {
     description = "Download information that lets us create lucide-icons.json, which is used to generate icons."
 
     lucideRepoBase.set("https://github.com/lucide-icons/lucide")
-    lucideVersion.set("1.22.0")
+    lucideVersion.set("1.69.0")
     iconsFile.set(layout.projectDirectory.file(ICONS_JSON_FILE_NAME))
 }
 
