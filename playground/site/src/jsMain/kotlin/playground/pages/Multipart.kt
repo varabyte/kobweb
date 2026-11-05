@@ -1,7 +1,7 @@
 package playground.pages
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.browser.api
+import com.varabyte.kobweb.api.api
 import com.varabyte.kobweb.browser.http.bodyOf
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
