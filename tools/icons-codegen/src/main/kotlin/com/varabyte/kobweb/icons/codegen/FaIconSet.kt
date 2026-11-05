@@ -1,0 +1,202 @@
+package com.varabyte.kobweb.icons.codegen
+
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import java.io.File
+import java.net.URI
+
+/**
+ * Font Awesome's free icons (https://fontawesome.com), rendered with its icon font.
+ *
+ * The data file lists icon names per category, one category per line:
+ * ```
+ * fas=0,1,2,...,address-book,...
+ * far=address-book,...
+ * fab=42-group,500px,...
+ * ```
+ *
+ * where `fas`, `far`, and `fab` are Font Awesome's class names for its solid, regular, and brand icons. Each icon
+ * becomes a composable that renders it, e.g. `FaAddressBook`.
+ */
+class FaIconSet : IconSet {
+    override val id = "fa"
+
+    /** Icon categories, in the order they're listed in the data file. */
+    private enum class IconCategory(val className: String, val upstreamStyle: String) {
+        SOLID("fas", "solid"),
+        REGULAR("far", "regular"),
+        BRAND("fab", "brands"),
+    }
+
+    override fun fetch(version: String, dataFile: File) {
+        val iconsJson = URI("https://raw.githubusercontent.com/FortAwesome/Font-Awesome/$version/metadata/icons.json")
+            .openDownloadStream()
+            .use { it.readBytes().decodeToString() }
+
+        dataFile.writeText(dataFileTextFor(iconsJson))
+        println("Wrote ${dataFile.name}")
+    }
+
+    /** Converts the contents of Font Awesome's `metadata/icons.json` file into the contents of our data file. */
+    internal fun dataFileTextFor(iconsJson: String): String {
+        // Each entry lists the styles available for free, e.g. "address-book": {"free": ["solid", "regular"], ...}
+        val freeStyles: Map<String, Set<String>> = Json.parseToJsonElement(iconsJson).jsonObject
+            .mapValues { (_, icon) ->
+                icon.jsonObject["free"]?.jsonArray?.map { it.jsonPrimitive.content }?.toSet().orEmpty()
+            }
+            // Generated functions can either pick between solid and regular styles or render a brand, not both. In
+            // practice, only the "font-awesome" icon is a brand that also has other styles.
+            .mapValues { (_, styles) ->
+                if (styles.size > 1) styles - IconCategory.BRAND.upstreamStyle else styles
+            }
+
+        return buildString {
+            appendLine("# See the README.md for more information about this file. It is parsed by this project's generateIcons gradle task.")
+            for (category in IconCategory.entries) {
+                val names = freeStyles.filterValues { category.upstreamStyle in it }.keys
+                appendLine("${category.className}=${names.joinToString(",")}")
+            }
+        }
+    }
+
+    override fun generate(dataFile: File, options: IconCodegenOptions, outputDir: File) {
+        // {SOLID=[ad, address-book, address-card, ...], REGULAR=[address-book, address-card, angry, ...], ... }
+        val iconRawNames = dataFile
+            .readLines()
+            .filter { line -> !line.startsWith("#") }
+            .associate { line ->
+                val (className, names) = line.split("=", limit = 2)
+                val category = IconCategory.entries.find { it.className == className }
+                    ?: error("Unexpected category string: $className")
+
+                category to names
+                    .split(",")
+                    .filter { it.isNotEmpty() }
+                    // Some icons have aliases that differ only by dashes (e.g. "print-shop" and "printshop"), which
+                    // would generate near-identical method names (e.g. FaPrintShop and FaPrintshop). Keep only the
+                    // longest version of each name, since its dashes give us more readable method names.
+                    .groupBy { it.replace("-", "") }
+                    .map { (_, values) -> values.maxBy { it.length } }
+            }
+
+        // For each icon name, figure out what categories they are in. This will affect the function signature we
+        // generate, e.g. {ad=[SOLID], address-book=[SOLID, REGULAR], address-card=[SOLID, REGULAR], ...}
+        val iconCategories = mutableMapOf<String, MutableSet<IconCategory>>()
+        iconRawNames.forEach { (category, rawNames) ->
+            rawNames.forEach { rawName -> iconCategories.getOrPut(rawName) { mutableSetOf() }.add(category) }
+        }
+
+        val invalidGroupings = iconCategories.filterNot { (_, categories) ->
+            categories.size == 1 || categories == setOf(IconCategory.SOLID, IconCategory.REGULAR)
+        }
+        check(invalidGroupings.isEmpty()) {
+            "Found unexpected groupings. An icon should only be in its own category OR it can have solid and regular versions: $invalidGroupings"
+        }
+
+        iconCategories.keys.requireUniqueMethodNames { it.toMethodName() }
+
+        val visibility = options.visibility.modifierPrefix
+        val iconsHeader =
+            """
+            |//@formatter:off
+            |@file:Suppress("unused", "SpellCheckingInspection")
+            |
+            |// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            |// THIS FILE IS AUTOGENERATED.
+            |//
+            |// Do not edit this file by hand. Instead, update `${dataFile.name}` in the module root and run the Gradle
+            |// task "generateIcons"
+            |// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            |
+            |package ${options.packageName}
+            |
+            |import androidx.compose.runtime.*
+            |import com.varabyte.kobweb.compose.ui.Modifier
+            |
+            """.trimMargin()
+
+        val packageDir = outputDir.preparePackageDir(options.packageName)
+
+        packageDir.resolve("_FaIcon.kt").writeText(
+            iconsHeader + $$"""
+            |import com.varabyte.kobweb.compose.ui.toAttrs
+            |import org.jetbrains.compose.web.dom.Span
+            |
+            |$${visibility}enum class IconCategory(internal val className: String) {
+            |    REGULAR("far"),
+            |    SOLID("fas"),
+            |    BRAND("fab");
+            |}
+            |
+            |$${visibility}enum class IconStyle(internal val category: IconCategory) {
+            |    FILLED(IconCategory.SOLID),
+            |    OUTLINE(IconCategory.REGULAR);
+            |}
+            |
+            |// See: https://fontawesome.com/docs/web/style/size
+            |$${visibility}enum class IconSize(internal val className: String) {
+            |    // Relative sizes
+            |    XXS("fa-2xs"),
+            |    XS("fa-xs"),
+            |    SM("fa-sm"),
+            |    LG("fa-lg"),
+            |    XL("fa-xl"),
+            |    XXL("fa-2xl"),
+            |
+            |    // Literal sizes
+            |    X1("fa-1x"),
+            |    X2("fa-2x"),
+            |    X3("fa-3x"),
+            |    X4("fa-4x"),
+            |    X5("fa-5x"),
+            |    X6("fa-6x"),
+            |    X7("fa-7x"),
+            |    X8("fa-8x"),
+            |    X9("fa-9x"),
+            |    X10("fa-10x");
+            |}
+            |
+            |@Composable
+            |$${visibility}fun FaIcon(
+            |    name: String,
+            |    modifier: Modifier,
+            |    style: IconCategory = IconCategory.REGULAR,
+            |    size: IconSize? = null,
+            |) {
+            |    Span(
+            |        attrs = modifier.toAttrs {
+            |            classes(style.className, "fa-$name")
+            |            if (size != null) {
+            |                classes(size.className)
+            |            }
+            |        }
+            |    )
+            |}
+            |
+            """.trimMargin()
+        )
+
+        for ((rawName, categories) in iconCategories) {
+            val methodName = rawName.toMethodName()
+            val iconCode = when {
+                categories.size == 2 -> {
+                    "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, style: IconStyle = IconStyle.OUTLINE, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, style.category, size)"
+                }
+
+                else -> {
+                    val category = categories.single()
+                    "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, IconCategory.${category.name}, size)"
+                }
+            }
+
+            // Name files after the raw icon name, not the method name. Method names can differ only by case, which
+            // collides on case-insensitive file systems and is rejected by the Kotlin/JS compiler.
+            packageDir.resolve("$rawName.kt").writeText("$iconsHeader\n$iconCode")
+        }
+    }
+
+    /** Converts a raw icon name to its method name, e.g. "align-items" -> "FaAlignItems". */
+    private fun String.toMethodName() = "Fa" + split("-").joinToString("") { part -> part.replaceFirstChar { it.uppercase() } }
+}

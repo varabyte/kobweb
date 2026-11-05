@@ -8,217 +8,51 @@ plugins {
 group = "com.varabyte.kobwebx"
 version = libs.versions.kobweb.get()
 
-enum class IconCategory {
-    SOLID,
-    REGULAR,
-    BRAND,
-}
+// Keep in sync with the Font Awesome stylesheet that KobwebGenerateSiteIndexTask links to
+val FA_VERSION = "6.5.2"
+val ICON_LIST_FILE_NAME = "fa-icon-list.txt"
+val GENERATED_SRC_DIR = "build/generated/icons/src/jsMain/kotlin"
 
-@CacheableTask
-abstract class GenerateIconsTask : DefaultTask() {
-    @get:InputFile
-    @get:PathSensitive(PathSensitivity.NONE)
-    abstract val srcFile: RegularFileProperty
-
-    @get:OutputDirectory
-    abstract val genSrcRoot: DirectoryProperty
-
-    @TaskAction
-    fun generate() {
-        // {SOLID=[ad, address-book, address-card, ...], REGULAR=[address-book, address-card, angry, ...], ... }
-        val iconRawNames = srcFile.get().asFile
-            .readLines().asSequence()
-            .filter { line -> !line.startsWith("#") }
-            .associate { line ->
-                // Convert icon name to function name, e.g.
-                // align-left -> FaAlignLeft
-                line.split("=", limit = 2).let { parts ->
-                    val category = when (parts[0]) {
-                        "fas" -> IconCategory.SOLID
-                        "far" -> IconCategory.REGULAR
-                        "fab" -> IconCategory.BRAND
-                        else -> throw GradleException("Unexpected category string: ${parts[0]}")
-                    }
-                    val names = parts[1]
-
-                    category to names
-                        .split(",")
-                        // Some icons have aliases that differ only by dashes (e.g. "print-shop" and "printshop"),
-                        // which would generate near-identical method names (e.g. FaPrintShop and FaPrintshop). Keep
-                        // only the longest version of each name, since its dashes give us more readable method names.
-                        .groupBy { it.replace("-", "") }
-                        .map { (_, values) -> values.maxBy { it.length } }
-                }
-            }
-
-        // For each icon name, figure out what categories they are in. This will affect the function signature we generate.
-        // {ad=[SOLID], address-book=[SOLID, REGULAR], address-card=[SOLID, REGULAR], ...
-        val iconCategories = mutableMapOf<String, MutableSet<IconCategory>>()
-        iconRawNames.forEach { entry ->
-            val category = entry.key
-            entry.value.forEach { rawName ->
-                iconCategories.computeIfAbsent(rawName, { mutableSetOf() }).add(category)
-            }
-        }
-
-        // Sanity check results
-        iconCategories
-            .filterNot { entry ->
-                val categories = entry.value
-                categories.size == 1 ||
-                    (categories.size == 2 && categories.contains(IconCategory.SOLID) && categories.contains(IconCategory.REGULAR))
-            }
-            .let { invalidGroupings ->
-                if (invalidGroupings.isNotEmpty()) {
-                    throw GradleException("Found unexpected groupings. An icon should only be in its own category OR it can have solid and regular versions: $invalidGroupings")
-                }
-            }
-
-        // Generate four types of functions: solid only, regular only, solid or regular, and brand
-        // Convert icon name to method name, e.g. align-items -> FaAlignItems
-        @Suppress("DEPRECATION") // capitalize is way more readable than a direct replacement
-        fun rawNameToMethodName(rawName: String) = "Fa" + rawName.split("-").joinToString("") { it.capitalize() }
-
-        iconCategories.keys
-            .groupBy { rawNameToMethodName(it) }
-            .filterValues { it.size > 1 }
-            .let { clashes ->
-                if (clashes.isNotEmpty()) {
-                    throw GradleException("Multiple icons map to the same method name: $clashes")
-                }
-            }
-
-        val iconMethodEntries = iconCategories
-            .map { entry ->
-                val rawName = entry.key
-                val methodName = rawNameToMethodName(rawName)
-                val categories = entry.value
-
-                rawName to when {
-                    categories.size == 2 -> {
-                        "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = IconStyle.OUTLINE, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, style.category, size)"
-                    }
-
-                    categories.contains(IconCategory.SOLID) -> {
-                        "@Composable fun $methodName(modifier: Modifier = Modifier, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, IconCategory.SOLID, size)"
-                    }
-
-                    categories.contains(IconCategory.REGULAR) -> {
-                        "@Composable fun $methodName(modifier: Modifier = Modifier, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, IconCategory.REGULAR, size)"
-                    }
-
-                    categories.contains(IconCategory.BRAND) -> {
-                        "@Composable fun $methodName(modifier: Modifier = Modifier, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, IconCategory.BRAND, size)"
-                    }
-
-                    else -> throw GradleException("Unhandled icon entry: $entry")
-                }
-            }.toMap()
-
-        val iconsHeader =
-            """
-            |//@formatter:off
-            |@file:Suppress("unused", "SpellCheckingInspection")
-            |
-            |// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            |// THIS FILE IS AUTOGENERATED.
-            |//
-            |// Do not edit this file by hand. Instead, update `fa-icon-list.txt` in the module root and run the Gradle
-            |// task "generateIcons"
-            |// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            |
-            |package com.varabyte.kobweb.silk.components.icons.fa
-            |
-            |import androidx.compose.runtime.*
-            |import com.varabyte.kobweb.compose.ui.Modifier
-            |
-            """.trimMargin()
-
-        val dstDir = genSrcRoot.dir("com/varabyte/kobweb/silk/components/icons/fa").get().asFile
-        // Clean up previously generated files to avoid stale output
-        dstDir.deleteRecursively()
-        dstDir.mkdirs()
-
-        with(dstDir.resolve("_FaIcon.kt")) {
-            writeText(iconsHeader)
-            appendText(
-                $$"""
-                |import com.varabyte.kobweb.compose.ui.toAttrs
-                |import org.jetbrains.compose.web.dom.Span
-                |
-                |enum class IconCategory(internal val className: String) {
-                |    REGULAR("far"),
-                |    SOLID("fas"),
-                |    BRAND("fab");
-                |}
-                |
-                |enum class IconStyle(internal val category: IconCategory) {
-                |    FILLED(IconCategory.SOLID),
-                |    OUTLINE(IconCategory.REGULAR);
-                |}
-                |
-                |// See: https://fontawesome.com/docs/web/style/size
-                |enum class IconSize(internal val className: String) {
-                |    // Relative sizes
-                |    XXS("fa-2xs"),
-                |    XS("fa-xs"),
-                |    SM("fa-sm"),
-                |    LG("fa-lg"),
-                |    XL("fa-xl"),
-                |    XXL("fa-2xl"),
-                |
-                |    // Literal sizes
-                |    X1("fa-1x"),
-                |    X2("fa-2x"),
-                |    X3("fa-3x"),
-                |    X4("fa-4x"),
-                |    X5("fa-5x"),
-                |    X6("fa-6x"),
-                |    X7("fa-7x"),
-                |    X8("fa-8x"),
-                |    X9("fa-9x"),
-                |    X10("fa-10x");
-                |}
-                |
-                |@Composable
-                |fun FaIcon(
-                |    name: String,
-                |    modifier: Modifier,
-                |    style: IconCategory = IconCategory.REGULAR,
-                |    size: IconSize? = null,
-                |) {
-                |    Span(
-                |        attrs = modifier.toAttrs {
-                |            classes(style.className, "fa-$name")
-                |            if (size != null) {
-                |                classes(size.className)
-                |            }
-                |        }
-                |    )
-                |}
-                |
-                """.trimMargin()
-            )
-        }
-
-        // Name files after the raw icon name, not the method name. Method names can differ only by case, which
-        // collides on case-insensitive file systems and is rejected by the Kotlin/JS compiler.
-        iconMethodEntries.forEach { (rawName, iconCode) ->
-            with(dstDir.resolve("$rawName.kt")) {
-                writeText(iconsHeader)
-                appendText("\n")
-                appendText(iconCode)
-            }
-        }
-
-        logger.info("Generated ${iconMethodEntries.size} icon files")
+val iconsCodegen = configurations.dependencyScope("iconsCodegen")
+val iconsCodegenClasspath = configurations.resolvable("iconsCodegenClasspath") {
+    extendsFrom(iconsCodegen.get())
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
     }
 }
-val generateIconsTask = tasks.register<GenerateIconsTask>("generateIcons") {
+
+dependencies {
+    iconsCodegen(projects.tools.iconsCodegen)
+}
+
+tasks.register<JavaExec>("fetchIcons") {
+    group = "Icon"
+    description = "Download information that lets us create $ICON_LIST_FILE_NAME, which is used to generate icons."
+
+    classpath = iconsCodegenClasspath.get()
+    mainClass.set("com.varabyte.kobweb.icons.codegen.MainKt")
+    args("fetch", "fa", "--version", FA_VERSION, "--data", ICON_LIST_FILE_NAME)
+}
+
+val generateIconsTask = tasks.register<JavaExec>("generateIcons") {
     group = "Icon"
     description = "Generate Kotlin bindings for Font Awesome icons."
-    srcFile.set(layout.projectDirectory.file("fa-icon-list.txt"))
-    genSrcRoot.set(layout.projectDirectory.dir("build/generated/icons/src/jsMain/kotlin"))
+
+    classpath = iconsCodegenClasspath.get()
+    mainClass.set("com.varabyte.kobweb.icons.codegen.MainKt")
+    // Paths are relative to the project directory (the default working directory) so the build cache can be shared
+    // across machines
+    args(
+        "generate", "fa",
+        "--data", ICON_LIST_FILE_NAME,
+        "--out", GENERATED_SRC_DIR,
+        "--package", "com.varabyte.kobweb.silk.components.icons.fa",
+        "--visibility", "public",
+    )
+
+    inputs.file(ICON_LIST_FILE_NAME).withPathSensitivity(PathSensitivity.NONE)
+    outputs.dir(GENERATED_SRC_DIR)
+    outputs.cacheIf { true }
 }
 
 kotlin {

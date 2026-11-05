@@ -12,16 +12,20 @@ icons.
 
 ---
 
-Note that this directory contains a file called `fa-icon-list.txt`, which is parsed and used to generate code used in
-this project.
+This directory contains a file called `fa-icon-list.txt`, which is parsed and used to generate code used in this
+project. It is built from the `metadata/icons.json` file in the
+[Font Awesome GitHub repository](https://github.com/FortAwesome/Font-Awesome), at the release tag matching `FA_VERSION`
+in `build.gradle.kts`.
 
-To populate it, I visited the
-[Font Awesome free icon search](https://fontawesome.com/search?o=a&m=free&f=classic%2Cbrands), inspected the site using
-dev tools, and visited each of the 12 pages, copying the DOM subtree under the `<div id="icons-results">` element into a
-temporary text file.
+To update it (e.g. after changing `FA_VERSION`, along with the matching stylesheet URL in
+`KobwebGenerateSiteIndexTask`):
 
-I then manually reorganized the results (into solid, regular, and brand subsets) and migrated the XML format into the
-custom text format seen in the `fa-icon-list.txt` file (using regex search and replace).
+```bash
+./gradlew :frontend:silk-icons-fa:fetchIcons
+```
 
-I also removed the *brand* entry of the `font-awesome` icon, since there were already solid and regular versions of it,
-and having an icon that spans all three categories confused my codegen logic.
+Once updated, run the following to regenerate the Kotlin source:
+
+```bash
+./gradlew :frontend:silk-icons-fa:generateIcons
+```

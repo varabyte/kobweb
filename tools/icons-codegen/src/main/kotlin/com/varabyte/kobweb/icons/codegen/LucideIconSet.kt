@@ -35,15 +35,10 @@ class LucideIconSet : IconSet {
     override val id = "lucide"
 
     override fun fetch(version: String, dataFile: File) {
-        println("Fetching icons for version $version...")
-
-        val zipUrl = "https://github.com/lucide-icons/lucide/archive/refs/tags/$version.zip"
-        val connection = URI(zipUrl).toURL().openConnection()
-        connection.setRequestProperty("User-Agent", "kobweb-icons-codegen")
-
         val svgContents = mutableMapOf<String, String>()
         val jsonContents = mutableMapOf<String, String>()
-        ZipInputStream(connection.getInputStream()).use { zis ->
+        val zipUri = URI("https://github.com/lucide-icons/lucide/archive/refs/tags/$version.zip")
+        ZipInputStream(zipUri.openDownloadStream()).use { zis ->
             while (true) {
                 val entry = zis.nextEntry ?: break
                 if (entry.isDirectory || !entry.name.contains("/icons/")) continue
