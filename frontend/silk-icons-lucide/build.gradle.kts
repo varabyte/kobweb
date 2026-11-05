@@ -199,7 +199,7 @@ abstract class GenerateIconsTask : DefaultTask() {
         fun escapeKotlin(s: String): String = s
             .replace("\\", "\\\\")
             .replace("\"", "\\\"")
-            .replace("\$", "\\\$")
+            .replace("$", "\\$")
 
         fun rawNameToMethodName(rawName: String) = "Lucide" + rawName.split("-").joinToString("") {
             it.replaceFirstChar { c ->
