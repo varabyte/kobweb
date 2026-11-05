@@ -4,8 +4,8 @@ import java.io.File
 import kotlin.system.exitProcess
 
 private const val USAGE = """Usage:
-  fetch <icon-set> --version <version> --data <file>
-  generate <icon-set> --data <file> --out <dir> --package <name> --visibility <public|internal>"""
+  fetch <icon-set> --version <version> --icons <file>
+  generate <icon-set> --icons <file> --out <dir> --package <name> --visibility <public|internal>"""
 
 /**
  * Command-line entry point, used by Kobweb's own icon modules, which can't apply the Kobweb Gradle plugins since they
@@ -36,12 +36,12 @@ private fun run(args: List<String>) {
     fun flag(name: String) = flags[name] ?: throw IllegalArgumentException("Missing --$name")
 
     when (command) {
-        "fetch" -> iconSet.fetch(flag("version"), File(flag("data")))
+        "fetch" -> iconSet.fetch(flag("version"), File(flag("icons")))
         "generate" -> {
             val visibility = IconVisibility.entries.find { it.name.equals(flag("visibility"), ignoreCase = true) }
                 ?: throw IllegalArgumentException("Unknown visibility \"${flag("visibility")}\"")
-            iconSet.generate(
-                File(flag("data")),
+            iconSet.generateBindings(
+                File(flag("icons")),
                 IconCodegenOptions(packageName = flag("package"), visibility = visibility),
                 File(flag("out")),
             )

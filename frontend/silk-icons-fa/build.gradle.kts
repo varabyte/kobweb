@@ -31,7 +31,7 @@ tasks.register<JavaExec>("fetchIcons") {
 
     classpath = iconsCodegenClasspath.get()
     mainClass.set("com.varabyte.kobweb.icons.codegen.MainKt")
-    args("fetch", "fa", "--version", FA_VERSION, "--data", ICON_LIST_FILE_NAME)
+    args("fetch", "fa", "--version", FA_VERSION, "--icons", ICON_LIST_FILE_NAME)
 }
 
 val generateIconsTask = tasks.register<JavaExec>("generateIcons") {
@@ -44,7 +44,7 @@ val generateIconsTask = tasks.register<JavaExec>("generateIcons") {
     // across machines
     args(
         "generate", "fa",
-        "--data", ICON_LIST_FILE_NAME,
+        "--icons", ICON_LIST_FILE_NAME,
         "--out", GENERATED_SRC_DIR,
         "--package", "com.varabyte.kobweb.silk.components.icons.fa",
         "--visibility", "public",

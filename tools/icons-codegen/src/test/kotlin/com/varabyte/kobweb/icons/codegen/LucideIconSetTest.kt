@@ -10,20 +10,20 @@ import kotlin.io.path.createTempDirectory
 
 class LucideIconSetTest {
     private val rootDir = createTempDirectory("lucide-icon-set-test").toFile().also { it.deleteOnExit() }
-    private val dataFile = rootDir.resolve("lucide-icons.json")
+    private val iconsFile = rootDir.resolve("lucide-icons.json")
     private val outDir = rootDir.resolve("out")
     private val packageDir = outDir.resolve("test/icons")
 
-    private fun generateIconFile(dataJson: String, visibility: IconVisibility) {
-        dataFile.writeText(dataJson)
-        LucideIconSet().generate(dataFile, IconCodegenOptions(packageName = "test.icons", visibility), outDir)
+    private fun generateBindings(iconsJson: String, visibility: IconVisibility) {
+        iconsFile.writeText(iconsJson)
+        LucideIconSet().generateBindings(iconsFile, IconCodegenOptions(packageName = "test.icons", visibility), outDir)
     }
 
     private fun File.relativeFilePaths() = walkTopDown().filter { it.isFile }.map { it.relativeTo(this).path }.sorted().toList()
 
     @Test
     fun generatesIconFile() {
-        generateIconFile(
+        generateBindings(
             """
             {
               "version": "1.0.0",
@@ -92,7 +92,7 @@ class LucideIconSetTest {
 
     @Test
     fun internalVisibilityAppliesToIconsAndDeprecatedAliases() {
-        generateIconFile(
+        generateBindings(
             """
             {
               "version": "1.0.0",
@@ -120,7 +120,7 @@ class LucideIconSetTest {
 
     @Test
     fun namesDifferingOnlyByCaseGetSeparateFiles() {
-        generateIconFile(
+        generateBindings(
             """
             {
               "version": "1.0.0",
@@ -141,7 +141,7 @@ class LucideIconSetTest {
 
     @Test
     fun deprecatedAliasesDifferingOnlyByCaseAreGenerated() {
-        generateIconFile(
+        generateBindings(
             """
             {
               "version": "1.0.0",
@@ -160,7 +160,7 @@ class LucideIconSetTest {
 
     @Test
     fun deprecatedAliasesAreSkippedIfTheyShadowAnIconOrPointNowhere() {
-        generateIconFile(
+        generateBindings(
             """
             {
               "version": "1.0.0",
@@ -179,7 +179,7 @@ class LucideIconSetTest {
     @Test
     fun identicalMethodNamesAreRejected() {
         val e = assertThrows<IllegalStateException> {
-            generateIconFile(
+            generateBindings(
                 """
                 {
                   "version": "1.0.0",
@@ -201,7 +201,7 @@ class LucideIconSetTest {
         packageDir.mkdirs()
         packageDir.resolve("removed-icon.kt").writeText("// stale")
 
-        generateIconFile(
+        generateBindings(
             """
             {
               "version": "1.0.0",

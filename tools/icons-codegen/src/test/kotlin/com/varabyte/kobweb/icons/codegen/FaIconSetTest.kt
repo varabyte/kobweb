@@ -10,20 +10,20 @@ import kotlin.io.path.createTempDirectory
 
 class FaIconSetTest {
     private val rootDir = createTempDirectory("fa-icon-set-test").toFile().also { it.deleteOnExit() }
-    private val dataFile = rootDir.resolve("fa-icon-list.txt")
+    private val iconsFile = rootDir.resolve("fa-icon-list.txt")
     private val outDir = rootDir.resolve("out")
     private val packageDir = outDir.resolve("test/icons")
 
-    private fun generateIconFiles(dataText: String, visibility: IconVisibility) {
-        dataFile.writeText(dataText)
-        FaIconSet().generate(dataFile, IconCodegenOptions(packageName = "test.icons", visibility), outDir)
+    private fun generateBindings(iconsText: String, visibility: IconVisibility) {
+        iconsFile.writeText(iconsText)
+        FaIconSet().generateBindings(iconsFile, IconCodegenOptions(packageName = "test.icons", visibility), outDir)
     }
 
     private fun File.relativeFilePaths() = walkTopDown().filter { it.isFile }.map { it.relativeTo(this).path }.sorted().toList()
 
     @Test
-    fun dataFileListsFreeIconsPerCategory() {
-        val dataText = FaIconSet().dataFileTextFor(
+    fun iconsFileListsFreeIconsPerCategory() {
+        val iconsText = FaIconSet().iconsFileTextFor(
             """
             {
               "address-book": {"label": "Address Book", "free": ["solid", "regular"]},
@@ -35,7 +35,7 @@ class FaIconSetTest {
             """.trimIndent()
         )
 
-        assertThat(dataText).isEqualTo(
+        assertThat(iconsText).isEqualTo(
             """
             # See the README.md for more information about this file. It is parsed by this project's generateIcons gradle task.
             fas=address-book,bell,font-awesome
@@ -48,7 +48,7 @@ class FaIconSetTest {
 
     @Test
     fun generatesIconFilesPerCategory() {
-        generateIconFiles(
+        generateBindings(
             """
             # A comment
             fas=address-book,bell
@@ -89,7 +89,7 @@ class FaIconSetTest {
 
     @Test
     fun internalVisibilityAppliesToIconsAndSupportCode() {
-        generateIconFiles(
+        generateBindings(
             """
             fas=bell
             far=
@@ -108,7 +108,7 @@ class FaIconSetTest {
 
     @Test
     fun namesDifferingOnlyByDashesKeepTheLongestOne() {
-        generateIconFiles(
+        generateBindings(
             """
             fas=print-shop,printshop
             far=
@@ -123,7 +123,7 @@ class FaIconSetTest {
     @Test
     fun brandsWithOtherStylesAreRejected() {
         val e = assertThrows<IllegalStateException> {
-            generateIconFiles(
+            generateBindings(
                 """
                 fas=font-awesome
                 far=

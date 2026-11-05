@@ -39,18 +39,18 @@ interface IconSet {
     /** A short, unique id for this icon set, e.g. "fa" or "lucide". */
     val id: String
 
-    /** Downloads upstream icon data for [version] and writes it to [dataFile]. */
-    fun fetch(version: String, dataFile: File)
+    /** Downloads upstream icon data for [version] and writes it to [iconsFile]. */
+    fun fetch(version: String, iconsFile: File)
 
     /**
-     * Writes Kotlin bindings for the icons in [dataFile] under the source root [outputDir].
+     * Writes Kotlin bindings for the icons in [iconsFile] under the source root [outputDir].
      *
      * Files go into the directory matching [IconCodegenOptions.packageName], which is deleted first to clear out
      * bindings for icons that no longer exist.
      *
-     * @param dataFile A file written by [fetch].
+     * @param iconsFile A file written by [fetch].
      */
-    fun generate(dataFile: File, options: IconCodegenOptions, outputDir: File)
+    fun generateBindings(iconsFile: File, options: IconCodegenOptions, outputDir: File)
 
     companion object {
         val all: List<IconSet> = listOf(FaIconSet(), LucideIconSet())
