@@ -1,7 +1,3 @@
-import java.net.URI
-import java.util.zip.ZipInputStream
-import javax.xml.parsers.DocumentBuilderFactory
-
 plugins {
     id("kobweb-compilation-settings")
     alias(libs.plugins.kotlin.multiplatform)
@@ -12,479 +8,50 @@ plugins {
 group = "com.varabyte.kobwebx"
 version = libs.versions.kobweb.get()
 
+val LUCIDE_VERSION = "1.69.0"
 val ICONS_JSON_FILE_NAME = "lucide-icons.json"
+val GENERATED_SRC_DIR = "build/generated/icons/src/jsMain/kotlin"
 
-@CacheableTask
-abstract class FetchIconsTask : DefaultTask() {
-    @get:Input
-    abstract val lucideRepoBase: Property<String>
-
-    @get:Input
-    abstract val lucideVersion: Property<String>
-
-    @get:OutputFile
-    abstract val iconsFile: RegularFileProperty
-
-    @TaskAction
-    fun generateLucideIcons() {
-        val lucideRepoBase = lucideRepoBase.get()
-        val lucideVersion = lucideVersion.get()
-        val iconsFile = iconsFile.get().asFile
-
-        fun parseSvgElements(svgContent: String): List<Pair<String, Map<String, String>>> {
-            val factory = DocumentBuilderFactory.newInstance()
-            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false)
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
-            val builder = factory.newDocumentBuilder()
-            val doc = builder.parse(svgContent.byteInputStream())
-            val svgRoot = doc.documentElement
-
-            val elements = mutableListOf<Pair<String, Map<String, String>>>()
-            val children = svgRoot.childNodes
-            for (i in 0 until children.length) {
-                val node = children.item(i)
-                if (node is org.w3c.dom.Element) {
-                    val tag = node.tagName
-                    val attrs = mutableMapOf<String, String>()
-                    val attrNodes = node.attributes
-                    for (j in 0 until attrNodes.length) {
-                        val attr = attrNodes.item(j)
-                        attrs[attr.nodeName] = attr.nodeValue
-                    }
-                    elements.add(tag to attrs)
-                }
-            }
-            return elements
-        }
-
-        fun jsonEscape(s: String): String = s
-            .replace("\\", "\\\\")
-            .replace("\"", "\\\"")
-            .replace("\n", "\\n")
-            .replace("\r", "\\r")
-            .replace("\t", "\\t")
-
-        logger.lifecycle("Fetching icons for version $lucideVersion...")
-
-        val iconSvgElements = mutableMapOf<String, List<Pair<String, Map<String, String>>>>()
-        val deprecatedIcons = mutableMapOf<String, String>()
-
-        val zipUrl = "${lucideRepoBase}/archive/refs/tags/$lucideVersion.zip"
-        val connection = URI(zipUrl).toURL().openConnection()
-        connection.setRequestProperty("User-Agent", "kobweb-silk-icons-lucide-generator")
-
-        val svgContents = mutableMapOf<String, String>()
-        val jsonContents = mutableMapOf<String, String>()
-
-        ZipInputStream(connection.getInputStream()).use { zis ->
-            while (true) {
-                val entry = zis.nextEntry ?: break
-                if (entry.isDirectory) continue
-
-                if (entry.name.contains("/icons/") && entry.name.endsWith(".svg")) {
-                    val iconName = entry.name.substringAfterLast("/").removeSuffix(".svg")
-                    svgContents[iconName] = zis.readBytes().decodeToString()
-                } else if (entry.name.contains("/icons/") && entry.name.endsWith(".json")) {
-                    val iconName = entry.name.substringAfterLast("/").removeSuffix(".json")
-                    jsonContents[iconName] = zis.readBytes().decodeToString()
-                }
-            }
-        }
-
-        for ((iconName, svgContent) in svgContents) {
-            iconSvgElements[iconName] = parseSvgElements(svgContent)
-        }
-
-        for ((iconName, content) in jsonContents) {
-            val aliasesBlock = "\"aliases\"\\s*:\\s*\\[(.*?)\\]".toRegex(RegexOption.DOT_MATCHES_ALL)
-                .find(content)?.groupValues?.get(1)
-            if (aliasesBlock != null) {
-                val aliasObjects = "\\{(.*?)\\}".toRegex(RegexOption.DOT_MATCHES_ALL).findAll(aliasesBlock)
-                for (aliasObj in aliasObjects) {
-                    val objContent = aliasObj.groupValues[1]
-                    val nameMatch = "\"name\"\\s*:\\s*\"([^\"]+)\"".toRegex().find(objContent)
-                    val isDeprecated = "\"deprecated\"\\s*:\\s*true".toRegex().containsMatchIn(objContent)
-                    if (nameMatch != null && isDeprecated) {
-                        deprecatedIcons[nameMatch.groupValues[1]] = iconName
-                    }
-                }
-            }
-        }
-
-        iconsFile.bufferedWriter().use { writer ->
-            writer.write("{\n")
-            writer.write("  \"version\": \"$lucideVersion\",\n")
-
-            writer.write("  \"icons\": {\n")
-            val sortedIcons = iconSvgElements.keys.sorted()
-            sortedIcons.forEachIndexed { index, iconName ->
-                val elements = iconSvgElements[iconName]!!
-                writer.write("    \"${jsonEscape(iconName)}\": [")
-                elements.forEachIndexed { elemIndex, (tag, attributes) ->
-                    writer.write("{\"tag\":\"${jsonEscape(tag)}\"")
-                    if (attributes.isNotEmpty()) {
-                        writer.write(",\"attrs\":{")
-                        attributes.entries.forEachIndexed { attrIndex, (key, value) ->
-                            writer.write("\"${jsonEscape(key)}\":\"${jsonEscape(value)}\"")
-                            if (attrIndex < attributes.size - 1) writer.write(",")
-                        }
-                        writer.write("}")
-                    }
-                    writer.write("}")
-                    if (elemIndex < elements.size - 1) writer.write(",")
-                }
-                writer.write("]")
-                if (index < sortedIcons.size - 1) writer.write(",")
-                writer.write("\n")
-            }
-            writer.write("  },\n")
-
-            writer.write("  \"deprecated\": {")
-            val sortedDeprecated = deprecatedIcons.keys.sorted()
-            sortedDeprecated.forEachIndexed { index, deprecatedName ->
-                writer.write("\"${jsonEscape(deprecatedName)}\":\"${jsonEscape(deprecatedIcons[deprecatedName]!!)}\"")
-                if (index < sortedDeprecated.size - 1) writer.write(",")
-            }
-            writer.write("}\n")
-
-            writer.write("}\n")
-        }
-        logger.lifecycle("Written ${iconSvgElements.size} icons to ${iconsFile.name}")
+val iconsCodegen = configurations.dependencyScope("iconsCodegen")
+val iconsCodegenClasspath = configurations.resolvable("iconsCodegenClasspath") {
+    extendsFrom(iconsCodegen.get())
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
     }
 }
 
-// Reads `lucide-icons.json` (generated by fetchLucideIcons) and produces one Kotlin file per icon.
-//
-// The JSON input looks like:
-// {
-//   "version": "1.6.0",
-//   "icons": {
-//     "arrow-right": [{"tag":"path","attrs":{"d":"M5 12h14"}},{"tag":"path","attrs":{"d":"m12 5 7 7-7 7"}}],
-//     "accessibility": [{"tag":"circle","attrs":{"cx":"16","cy":"4","r":"1"}},{"tag":"path","attrs":{"d":"m18 19 1-7-6 1"}}],
-//     ...
-//   },
-//   "deprecated": {"old-name":"new-name", ...}
-// }
-//
-// Each icon entry becomes a Kotlin composable like:
-//   @Composable
-//   fun LucideArrowRight(modifier: Modifier = Modifier, ...) {
-//       createIcon(...) {
-//           Path { d("M5 12h14") }
-//           Path { d("m12 5 7 7-7 7") }
-//       }
-//   }
-@CacheableTask
-abstract class GenerateIconsTask : DefaultTask() {
-    @get:InputFile
-    @get:PathSensitive(PathSensitivity.NONE)
-    abstract val iconsFile: RegularFileProperty
-
-    @get:OutputDirectory
-    abstract val outputDir: DirectoryProperty
-
-    // Represents parsed SVG element data, separating parsing from code generation
-    sealed class ElementInfo(val tag: String) {
-        class Path(val d: String) : ElementInfo("path")
-        class Simple(tag: String, val attrs: List<Pair<String, String>>) : ElementInfo(tag)
-        class Points(tag: String, val points: List<String>) : ElementInfo(tag)
-        class Unsupported(tag: String) : ElementInfo(tag)
-    }
-
-    @TaskAction
-    fun generate() {
-        val indent = "    "
-
-        fun escapeKotlin(s: String): String = s
-            .replace("\\", "\\\\")
-            .replace("\"", "\\\"")
-            .replace("$", "\\$")
-
-        fun rawNameToMethodName(rawName: String) = "Lucide" + rawName.split("-").joinToString("") {
-            it.replaceFirstChar { c ->
-                if (c.isLowerCase()) c.titlecase() else c.toString()
-            }
-        }
-
-        // Maps SVG element tags to their known attribute names for code generation
-        val simpleElementAttrs = mapOf(
-            "circle" to listOf("cx", "cy", "r"),
-            "ellipse" to listOf("cx", "cy", "rx", "ry"),
-            "line" to listOf("x1", "y1", "x2", "y2"),
-            "rect" to listOf("x", "y", "width", "height", "rx", "ry"),
-        )
-
-        fun toElementInfo(tag: String, attributes: Map<String, String>): ElementInfo {
-            if (tag == "path") {
-                return ElementInfo.Path(attributes["d"] ?: "")
-            }
-
-            simpleElementAttrs[tag]?.let { attrNames ->
-                val attrs = attrNames.mapNotNull { attr ->
-                    attributes[attr]?.let { value -> attr to value }
-                }
-                return ElementInfo.Simple(tag, attrs)
-            }
-
-            if (tag == "polyline" || tag == "polygon") {
-                val pairs = attributes["points"]?.trim()?.split("\\s+|,".toRegex())?.chunked(2)?.mapNotNull { coords ->
-                    if (coords.size == 2) {
-                        val x = coords[0].toDoubleOrNull()
-                        val y = coords[1].toDoubleOrNull()
-                        if (x != null && y != null) "$x to $y" else null
-                    } else null
-                } ?: throw GradleException("Failed to parse `points` attribute: tag=$tag, attrs=$attributes")
-                return ElementInfo.Points(tag, pairs)
-            }
-
-            return ElementInfo.Unsupported(tag)
-        }
-
-        fun StringBuilder.appendElement(element: ElementInfo) {
-            val tagCapitalized = element.tag.replaceFirstChar { it.uppercase() }
-            when (element) {
-                is ElementInfo.Path -> {
-                    appendLine("$indent${indent}Path {")
-                    appendLine("$indent$indent${indent}d(\"${escapeKotlin(element.d)}\")")
-                    appendLine("$indent${indent}}")
-                }
-                is ElementInfo.Simple -> {
-                    appendLine("$indent${indent}$tagCapitalized {")
-                    for ((attr, value) in element.attrs) {
-                        appendLine("$indent$indent${indent}$attr($value)")
-                    }
-                    appendLine("$indent${indent}}")
-                }
-                is ElementInfo.Points -> {
-                    appendLine("$indent${indent}$tagCapitalized {")
-                    if (element.points.isNotEmpty()) {
-                        appendLine("$indent$indent${indent}points(${element.points.joinToString(", ")})")
-                    }
-                    appendLine("$indent${indent}}")
-                }
-                is ElementInfo.Unsupported -> {
-                    appendLine("$indent${indent}// Unsupported SVG element: ${element.tag}")
-                }
-            }
-        }
-
-        val generatedJsonFile = iconsFile.asFile.get().name
-
-        // Clean up previously generated files to avoid stale output
-        val outDir = outputDir.get().asFile
-        val packageDir = File(outDir, "com/varabyte/kobweb/silk/components/icons/lucide")
-        if (packageDir.exists()) {
-            packageDir.deleteRecursively()
-        }
-
-        val jsonText = iconsFile.get().asFile.readText()
-
-        // All regex patterns are collected here for easier reasoning.
-        // Note: we use simple regexes because lucide-icons.json is machine-generated by
-        // our own fetchLucideIcons task, so its structure is predictable and stable.
-
-        // Extracts the top-level "icons": { ... } block from the JSON
-        val iconsBlockRegex = "\"icons\"\\s*:\\s*\\{(.*?)\\}\\s*,\\s*\"deprecated\"".toRegex(RegexOption.DOT_MATCHES_ALL)
-
-        // Matches one icon line:  "icon-name": [{...}, ...]
-        // e.g. "arrow-right": [{"tag":"path","attrs":{"d":"M5 12h14"}},{"tag":"path","attrs":{"d":"m12 5 7 7-7 7"}}]
-        val iconPattern = "\"([^\"]+)\"\\s*:\\s*\\[(.*)\\]".toRegex()
-
-        // Matches one element object: {"tag":"circle","attrs":{"cx":"16","cy":"4","r":"1"}}
-        val elemPattern = "\\{\"tag\":\"([^\"]+)\"(?:,\"attrs\":\\{([^}]*)\\})?\\}".toRegex()
-
-        // Matches one key-value attribute pair: "cx":"16"
-        val attrPattern = "\"([^\"]+)\":\"([^\"]*(?:\\\\\"[^\"]*)*)\"".toRegex()
-
-        // Extracts the top-level "deprecated": { ... } block from the JSON
-        val deprecatedBlockRegex = "\"deprecated\"\\s*:\\s*\\{(.*)\\}".toRegex(RegexOption.DOT_MATCHES_ALL)
-
-        // Matches one deprecated mapping: "old-name":"new-name"
-        val deprecatedPattern = "\"([^\"]+)\":\"([^\"]+)\"".toRegex()
-
-        val iconsBlockMatch = iconsBlockRegex.find(jsonText)
-            ?: throw GradleException("Could not find 'icons' block in $generatedJsonFile")
-        val iconsBlock = iconsBlockMatch.groupValues[1]
-
-        // icon name -> list of ElementInfo
-        val activeIcons = mutableMapOf<String, List<ElementInfo>>()
-
-        for (line in iconsBlock.split("\n")) {
-            val trimmed = line.trim().removeSuffix(",")
-            if (trimmed.isEmpty()) continue
-            val match = iconPattern.matchEntire(trimmed)
-            if (match == null) {
-                // Non-matching lines are expected (e.g. braces, whitespace); warn if it looks like a real entry
-                if (trimmed.startsWith("\"")) {
-                    logger.warn("Skipping unrecognized icon entry in $generatedJsonFile: $trimmed")
-                }
-                continue
-            }
-            val iconName = match.groupValues[1]
-            val elementsStr = match.groupValues[2]
-
-            val elements = mutableListOf<ElementInfo>()
-            for (elemMatch in elemPattern.findAll(elementsStr)) {
-                val tag = elemMatch.groupValues[1]
-                val attrsStr = elemMatch.groupValues[2]
-                val attrs = mutableMapOf<String, String>()
-                if (attrsStr.isNotEmpty()) {
-                    for (attrMatch in attrPattern.findAll(attrsStr)) {
-                        attrs[attrMatch.groupValues[1]] = attrMatch.groupValues[2]
-                    }
-                }
-                elements.add(toElementInfo(tag, attrs))
-            }
-            activeIcons[iconName] = elements
-        }
-
-        val deprecatedBlockMatch = deprecatedBlockRegex.find(jsonText)
-        val deprecatedIcons = mutableMapOf<String, String>()
-        if (deprecatedBlockMatch != null) {
-            val deprecatedStr = deprecatedBlockMatch.groupValues[1]
-            for (m in deprecatedPattern.findAll(deprecatedStr)) {
-                deprecatedIcons[m.groupValues[1]] = m.groupValues[2]
-            }
-        }
-
-        val activeMethodNames = activeIcons.keys.map { rawNameToMethodName(it) }.toSet()
-
-        // Deprecated aliases are skipped (below) if they share a method name with an active icon, but any other
-        // method name clash would generate conflicting declarations.
-        val generatedDeprecatedNames = deprecatedIcons
-            .filter { (deprecatedName, canonicalName) ->
-                rawNameToMethodName(deprecatedName) !in activeMethodNames && canonicalName in activeIcons
-            }
-            .keys
-        (activeIcons.keys + generatedDeprecatedNames)
-            .groupBy { rawNameToMethodName(it) }
-            .filterValues { it.size > 1 }
-            .let { clashes ->
-                if (clashes.isNotEmpty()) {
-                    throw GradleException("Multiple icons map to the same method name: $clashes")
-                }
-            }
-
-        val iconParams = "modifier: Modifier = Modifier, strokeWidth: Number = 2"
-
-        val supportedTags = setOf("circle", "ellipse", "line", "path", "polygon", "polyline", "rect")
-
-        fun importsForTag(tag: String): String? =
-            if (tag in supportedTags) "import com.varabyte.kobweb.compose.dom.svg.${tag.replaceFirstChar { it.uppercase() }}" else null
-
-        fun importsForIcon(elements: List<ElementInfo>): String {
-            val tags = elements.map { it.tag }.toSet()
-            return tags.sorted().mapNotNull { importsForTag(it) }.joinToString("\n")
-        }
-
-        val fileHeader = buildString {
-            appendLine("//@formatter:off")
-            appendLine("@file:Suppress(\"unused\", \"SpellCheckingInspection\", \"PackageDirectoryMismatch\")")
-            appendLine()
-            appendLine("// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            appendLine("// THIS FILE IS AUTOGENERATED.")
-            appendLine("//")
-            appendLine("// Do not edit this file by hand. Instead, run the `fetchLucideIcons` Gradle task to update")
-            appendLine("// `$generatedJsonFile` in the module root, then run the Gradle task \"generateIcons\".")
-            appendLine("// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            appendLine()
-            appendLine("package com.varabyte.kobweb.silk.components.icons.lucide")
-            appendLine()
-        }
-
-        // Generate one file per active icon
-        for ((iconName, elements) in activeIcons.entries.sortedBy { it.key }) {
-            val methodName = rawNameToMethodName(iconName)
-            val svgImports = importsForIcon(elements)
-
-            val fileContent = buildString {
-                appendLine("import androidx.compose.runtime.Composable")
-                appendLine("import com.varabyte.kobweb.compose.dom.svg.SVGStrokeLineCap")
-                appendLine("import com.varabyte.kobweb.compose.dom.svg.SVGStrokeLineJoin")
-                appendLine("import com.varabyte.kobweb.compose.dom.svg.ViewBox")
-                appendLine("import com.varabyte.kobweb.compose.ui.Modifier")
-                appendLine("import com.varabyte.kobweb.compose.ui.toAttrs")
-                appendLine("import com.varabyte.kobweb.silk.components.icons.IconRenderStyle")
-                appendLine("import com.varabyte.kobweb.silk.components.icons.createIcon")
-                appendLine("import org.jetbrains.compose.web.css.*")
-                if (svgImports.isNotEmpty()) {
-                    appendLine(svgImports)
-                }
-                appendLine()
-                appendLine("@Composable")
-                appendLine("fun $methodName(")
-                appendLine("${indent}$iconParams,")
-                appendLine(") {")
-                appendLine("${indent}createIcon(")
-                appendLine("$indent${indent}viewBox = ViewBox.sized(24),")
-                appendLine("$indent${indent}renderStyle = IconRenderStyle.Stroke(strokeWidth),")
-                appendLine("$indent${indent}attrs = modifier.toAttrs {")
-                appendLine("$indent$indent${indent}strokeLineCap(SVGStrokeLineCap.Round)")
-                appendLine("$indent$indent${indent}strokeLineJoin(SVGStrokeLineJoin.Round)")
-                appendLine("$indent${indent}}")
-                appendLine("${indent}) {")
-                for (element in elements) {
-                    appendElement(element)
-                }
-                appendLine("${indent}}")
-                appendLine("}")
-            }
-
-            // Name files after the raw (kebab-case) icon name, not the method name. Method names can differ only by
-            // case (e.g. "letter-s" -> LucideLetterS, "letters" -> LucideLetters), which collides on case-insensitive
-            // file systems and is rejected by the Kotlin/JS compiler.
-            val file = packageDir.resolve("$iconName.kt")
-            file.parentFile.mkdirs()
-            file.writeText(fileHeader)
-            file.appendText(fileContent)
-        }
-
-        // Generate deprecated alias files
-        for ((deprecatedName, canonicalName) in deprecatedIcons.entries.sortedBy { it.key }) {
-            val deprecatedMethodName = rawNameToMethodName(deprecatedName)
-            if (deprecatedMethodName in activeMethodNames) continue
-            val canonicalMethodName = rawNameToMethodName(canonicalName)
-
-            if (canonicalName !in activeIcons) continue
-
-            val fileContent = buildString {
-                appendLine("import androidx.compose.runtime.Composable")
-                appendLine("import com.varabyte.kobweb.compose.ui.Modifier")
-                appendLine("import org.jetbrains.compose.web.css.*")
-                appendLine()
-                appendLine("@Deprecated(\"Use $canonicalMethodName instead.\", ReplaceWith(\"$canonicalMethodName(modifier = modifier, strokeWidth = strokeWidth)\"))")
-                appendLine("@Composable")
-                appendLine("fun $deprecatedMethodName(")
-                appendLine("${indent}$iconParams,")
-                appendLine(") = $canonicalMethodName(modifier = modifier, strokeWidth = strokeWidth)")
-            }
-
-            val file = packageDir.resolve("deprecated").resolve("$deprecatedName.kt")
-            file.parentFile.mkdirs()
-            file.writeText(fileHeader)
-            file.appendText(fileContent)
-        }
-
-        logger.info("Generated ${activeIcons.size} icon files + ${deprecatedIcons.size} deprecated aliases")
-    }
+dependencies {
+    iconsCodegen(projects.tools.iconsCodegen)
 }
 
-val fetchLucideIconsTask = tasks.register<FetchIconsTask>("fetchIcons") {
+tasks.register<JavaExec>("fetchIcons") {
     group = "Icon"
-    description = "Download information that lets us create lucide-icons.json, which is used to generate icons."
+    description = "Download information that lets us create $ICONS_JSON_FILE_NAME, which is used to generate icons."
 
-    lucideRepoBase.set("https://github.com/lucide-icons/lucide")
-    lucideVersion.set("1.69.0")
-    iconsFile.set(layout.projectDirectory.file(ICONS_JSON_FILE_NAME))
+    classpath = iconsCodegenClasspath.get()
+    mainClass.set("com.varabyte.kobweb.icons.codegen.MainKt")
+    args("fetch", "lucide", "--version", LUCIDE_VERSION, "--data", ICONS_JSON_FILE_NAME)
 }
 
-val generateIconsTask = tasks.register<GenerateIconsTask>("generateIcons") {
+val generateIconsTask = tasks.register<JavaExec>("generateIcons") {
     group = "Icon"
     description = "Generate Kotlin bindings for Lucide icons."
 
-    iconsFile.set(layout.projectDirectory.file(ICONS_JSON_FILE_NAME))
-    outputDir.set(layout.buildDirectory.dir("generated/icons/src/jsMain/kotlin"))
+    classpath = iconsCodegenClasspath.get()
+    mainClass.set("com.varabyte.kobweb.icons.codegen.MainKt")
+    // Paths are relative to the project directory (the default working directory) so the build cache can be shared
+    // across machines
+    args(
+        "generate", "lucide",
+        "--data", ICONS_JSON_FILE_NAME,
+        "--out", GENERATED_SRC_DIR,
+        "--package", "com.varabyte.kobweb.silk.components.icons.lucide",
+        "--visibility", "public",
+    )
+
+    inputs.file(ICONS_JSON_FILE_NAME).withPathSensitivity(PathSensitivity.NONE)
+    outputs.dir(GENERATED_SRC_DIR)
+    outputs.cacheIf { true }
 }
 
 kotlin {
@@ -494,7 +61,7 @@ kotlin {
 
     sourceSets {
         jsMain {
-            kotlin.srcDir(generateIconsTask.flatMap { it.outputDir })
+            kotlin.srcDir(generateIconsTask)
             dependencies {
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.html.core)
