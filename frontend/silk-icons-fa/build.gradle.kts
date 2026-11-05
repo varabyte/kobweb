@@ -43,9 +43,9 @@ abstract class GenerateIconsTask : DefaultTask() {
 
                     category to names
                         .split(",")
-                        // Each icon gets written to its own file, so to prevent file name collisions from ever
-                        // happening, normalize each name to its version without dashes (since those get removed later)
-                        // and keep only the longest version (e.g. "print-shop" would win out over "printshop".
+                        // Some icons have aliases that differ only by dashes (e.g. "print-shop" and "printshop"),
+                        // which would generate near-identical method names (e.g. FaPrintShop and FaPrintshop). Keep
+                        // only the longest version of each name, since its dashes give us more readable method names.
                         .groupBy { it.replace("-", "") }
                         .map { (_, values) -> values.maxBy { it.length } }
                 }
@@ -75,15 +75,26 @@ abstract class GenerateIconsTask : DefaultTask() {
             }
 
         // Generate four types of functions: solid only, regular only, solid or regular, and brand
+        // Convert icon name to method name, e.g. align-items -> FaAlignItems
+        @Suppress("DEPRECATION") // capitalize is way more readable than a direct replacement
+        fun rawNameToMethodName(rawName: String) = "Fa" + rawName.split("-").joinToString("") { it.capitalize() }
+
+        iconCategories.keys
+            .groupBy { rawNameToMethodName(it) }
+            .filterValues { it.size > 1 }
+            .let { clashes ->
+                if (clashes.isNotEmpty()) {
+                    throw GradleException("Multiple icons map to the same method name: $clashes")
+                }
+            }
+
         val iconMethodEntries = iconCategories
             .map { entry ->
                 val rawName = entry.key
-                // Convert e.g. "align-items" to "FaAlignItems"
-                @Suppress("DEPRECATION") // capitalize is way more readable than a direct replacement
-                val methodName = "Fa${rawName.split("-").joinToString("") { it.capitalize() }}"
+                val methodName = rawNameToMethodName(rawName)
                 val categories = entry.value
 
-                methodName to when {
+                rawName to when {
                     categories.size == 2 -> {
                         "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = IconStyle.OUTLINE, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, style.category, size)"
                     }
@@ -124,6 +135,8 @@ abstract class GenerateIconsTask : DefaultTask() {
             """.trimMargin()
 
         val dstDir = genSrcRoot.dir("com/varabyte/kobweb/silk/components/icons/fa").get().asFile
+        // Clean up previously generated files to avoid stale output
+        dstDir.deleteRecursively()
         dstDir.mkdirs()
 
         with(dstDir.resolve("_FaIcon.kt")) {
@@ -188,8 +201,10 @@ abstract class GenerateIconsTask : DefaultTask() {
             )
         }
 
-        iconMethodEntries.forEach { (methodName, iconCode) ->
-            with(dstDir.resolve("$methodName.kt")) {
+        // Name files after the raw icon name, not the method name. Method names can differ only by case, which
+        // collides on case-insensitive file systems and is rejected by the Kotlin/JS compiler.
+        iconMethodEntries.forEach { (rawName, iconCode) ->
+            with(dstDir.resolve("$rawName.kt")) {
                 writeText(iconsHeader)
                 appendText("\n")
                 appendText(iconCode)

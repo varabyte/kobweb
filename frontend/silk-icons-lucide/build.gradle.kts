@@ -349,7 +349,22 @@ abstract class GenerateIconsTask : DefaultTask() {
         }
 
         val activeMethodNames = activeIcons.keys.map { rawNameToMethodName(it) }.toSet()
-        val activeMethodNamesLowerCase = activeMethodNames.map { it.lowercase() }.toSet()
+
+        // Deprecated aliases are skipped (below) if they share a method name with an active icon, but any other
+        // method name clash would generate conflicting declarations.
+        val generatedDeprecatedNames = deprecatedIcons
+            .filter { (deprecatedName, canonicalName) ->
+                rawNameToMethodName(deprecatedName) !in activeMethodNames && canonicalName in activeIcons
+            }
+            .keys
+        (activeIcons.keys + generatedDeprecatedNames)
+            .groupBy { rawNameToMethodName(it) }
+            .filterValues { it.size > 1 }
+            .let { clashes ->
+                if (clashes.isNotEmpty()) {
+                    throw GradleException("Multiple icons map to the same method name: $clashes")
+                }
+            }
 
         val iconParams = "modifier: Modifier = Modifier, strokeWidth: Number = 2"
 
@@ -416,7 +431,10 @@ abstract class GenerateIconsTask : DefaultTask() {
                 appendLine("}")
             }
 
-            val file = packageDir.resolve("$methodName.kt")
+            // Name files after the raw (kebab-case) icon name, not the method name. Method names can differ only by
+            // case (e.g. "letter-s" -> LucideLetterS, "letters" -> LucideLetters), which collides on case-insensitive
+            // file systems and is rejected by the Kotlin/JS compiler.
+            val file = packageDir.resolve("$iconName.kt")
             file.parentFile.mkdirs()
             file.writeText(fileHeader)
             file.appendText(fileContent)
@@ -426,7 +444,6 @@ abstract class GenerateIconsTask : DefaultTask() {
         for ((deprecatedName, canonicalName) in deprecatedIcons.entries.sortedBy { it.key }) {
             val deprecatedMethodName = rawNameToMethodName(deprecatedName)
             if (deprecatedMethodName in activeMethodNames) continue
-            if (deprecatedMethodName.lowercase() in activeMethodNamesLowerCase) continue
             val canonicalMethodName = rawNameToMethodName(canonicalName)
 
             if (canonicalName !in activeIcons) continue
@@ -443,7 +460,7 @@ abstract class GenerateIconsTask : DefaultTask() {
                 appendLine(") = $canonicalMethodName(modifier = modifier, strokeWidth = strokeWidth)")
             }
 
-            val file = packageDir.resolve("deprecated").resolve("$deprecatedMethodName.kt")
+            val file = packageDir.resolve("deprecated").resolve("$deprecatedName.kt")
             file.parentFile.mkdirs()
             file.writeText(fileHeader)
             file.appendText(fileContent)

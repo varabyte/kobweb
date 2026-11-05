@@ -100,19 +100,29 @@ abstract class GenerateIconsTask : DefaultTask() {
             .asSequence()
             .map { it.trim() }
             .filter { line -> !line.startsWith("#") && line.isNotBlank() }
-            // Each icon gets written to its own file, so to prevent file name collisions from ever happening,
-            // normalize each name to its version without underscores (since those get removed later) and keep
-            // only the longest version (e.g. "print_shop" would win out over "printshop".
+            // Some icons have aliases that differ only by underscores (e.g. "print_shop" and "printshop"), which would
+            // generate near-identical method names (e.g. MsPrintShop and MsPrintshop). Keep only the longest version
+            // of each name, since its underscores give us more readable method names.
             .groupBy { it.replace("_", "") }
             .map { (_, values) -> values.maxBy { it.length } }
 
-        val iconMethodEntries = iconRawNames.associate { rawName ->
-            // Convert icon name to function name, e.g.
-            // home -> MsHome, arrow_back -> MsArrowBack
-            @Suppress("DEPRECATION") // capitalize is way more readable than a direct replacement
-            val methodName = "Ms" + rawName.split("_").joinToString("") { it.capitalize() }
+        // Convert icon name to method name, e.g. home -> MsHome, arrow_back -> MsArrowBack
+        @Suppress("DEPRECATION") // capitalize is way more readable than a direct replacement
+        fun rawNameToMethodName(rawName: String) = "Ms" + rawName.split("_").joinToString("") { it.capitalize() }
 
-            methodName to "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = OUTLINED) = MsIcon(\"$rawName\", modifier, style)"
+        iconRawNames
+            .groupBy { rawNameToMethodName(it) }
+            .filterValues { it.size > 1 }
+            .let { clashes ->
+                if (clashes.isNotEmpty()) {
+                    throw GradleException("Multiple icons map to the same method name: $clashes")
+                }
+            }
+
+        val iconMethodEntries = iconRawNames.associate { rawName ->
+            val methodName = rawNameToMethodName(rawName)
+
+            rawName to "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = OUTLINED) = MsIcon(\"$rawName\", modifier, style)"
         }
 
         val iconsHeader =
@@ -136,6 +146,8 @@ abstract class GenerateIconsTask : DefaultTask() {
             """.trimMargin()
 
         val dstDir = genSrcRoot.dir("com/varabyte/kobweb/silk/components/icons/ms").get().asFile
+        // Clean up previously generated files to avoid stale output
+        dstDir.deleteRecursively()
         dstDir.mkdirs()
 
         with(dstDir.resolve("_MsIcon.kt")) {
@@ -180,8 +192,10 @@ abstract class GenerateIconsTask : DefaultTask() {
             )
         }
 
-        iconMethodEntries.forEach { (methodName, iconCode) ->
-            with(dstDir.resolve("$methodName.kt")) {
+        // Name files after the raw icon name, not the method name. Method names can differ only by case, which
+        // collides on case-insensitive file systems and is rejected by the Kotlin/JS compiler.
+        iconMethodEntries.forEach { (rawName, iconCode) ->
+            with(dstDir.resolve("$rawName.kt")) {
                 writeText(iconsHeader)
                 appendText("\n")
                 appendText(iconCode)

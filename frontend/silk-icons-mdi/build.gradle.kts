@@ -47,9 +47,10 @@ abstract class GenerateIconsTask : DefaultTask() {
 
                     style to names
                         .split(",")
-                        // Each icon gets written to its own file, so to prevent file name collisions from ever happening,
-                        // normalize each name to its version without underscores (since those get removed later) and keep
-                        // only the longest version (e.g. "print_shop" would win out over "printshop".
+                        // Some icons have aliases that differ only by underscores (e.g. "print_shop" and
+                        // "printshop"), which would generate near-identical method names (e.g. MdiPrintShop and
+                        // MdiPrintshop). Keep only the longest version of each name, since its underscores give us
+                        // more readable method names.
                         .groupBy { it.replace("_", "") }
                         .map { (_, values) -> values.maxBy { it.length } }
                         .toList()
@@ -65,17 +66,28 @@ abstract class GenerateIconsTask : DefaultTask() {
             }
         }
 
+        // Convert icon name to method name, e.g. arrow_back -> MdiArrowBack
+        @Suppress("DEPRECATION") // capitalize is way more readable than a direct replacement
+        fun rawNameToMethodName(rawName: String) = "Mdi" + rawName.split("_").joinToString("") { it.capitalize() }
+
+        iconStyleGroups.keys
+            .groupBy { rawNameToMethodName(it) }
+            .filterValues { it.size > 1 }
+            .let { clashes ->
+                if (clashes.isNotEmpty()) {
+                    throw GradleException("Multiple icons map to the same method name: $clashes")
+                }
+            }
+
         val iconMethodEntries = iconStyleGroups
             .map { entry ->
                 // TODO(194): Figure out how ligature fallbacks to work, if people report us breaking on legacy browsers.
                 //  See also: https://developers.google.com/fonts/docs/material_icons#using_the_icons_in_html
                 val rawName = entry.key
-
-                @Suppress("DEPRECATION") // capitalize is way more readable than a direct replacement
-                val methodName = "Mdi" + rawName.split("_").joinToString("") { it.capitalize() }
+                val methodName = rawNameToMethodName(rawName)
                 val styles = entry.value
 
-                methodName to when {
+                rawName to when {
                     // A rare solo-style icon? No need to allow a user to pass in a style parameter in that case
                     styles.size == 1 -> {
                         "@Composable fun $methodName(modifier: Modifier = Modifier) = MdIcon(\"$rawName\", modifier, ${styles.first().name})"
@@ -120,6 +132,8 @@ abstract class GenerateIconsTask : DefaultTask() {
             """.trimMargin()
 
         val dstDir = genSrcRoot.dir("com/varabyte/kobweb/silk/components/icons/mdi").get().asFile
+        // Clean up previously generated files to avoid stale output
+        dstDir.deleteRecursively()
         dstDir.mkdirs()
 
         with(dstDir.resolve("_MdIcon.kt")) {
@@ -171,8 +185,10 @@ abstract class GenerateIconsTask : DefaultTask() {
             )
         }
 
-        iconMethodEntries.forEach { (methodName, iconCode) ->
-            with(dstDir.resolve("$methodName.kt")) {
+        // Name files after the raw icon name, not the method name. Method names can differ only by case, which
+        // collides on case-insensitive file systems and is rejected by the Kotlin/JS compiler.
+        iconMethodEntries.forEach { (rawName, iconCode) ->
+            with(dstDir.resolve("$rawName.kt")) {
                 writeText(iconsHeader)
                 appendText("\n")
                 appendText(iconCode)
