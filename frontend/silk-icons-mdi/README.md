@@ -14,7 +14,7 @@ which adds to the size of your page, something you should be mindful of if you d
 This directory contains a file called `md-icon-list.txt`, which is parsed and used to generate code used in this
 project. It is built from the codepoint files under `font/` in
 [`google/material-design-icons`](https://github.com/google/material-design-icons), one per style, at the commit
-pinned by `MDI_VERSION` in `build.gradle.kts`.
+pinned by `silkIcons.version` in `build.gradle.kts`.
 
 To update it:
 

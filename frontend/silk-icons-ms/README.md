@@ -25,7 +25,7 @@ This directory contains a file called `ms-icon-list.txt`, which is parsed and us
 
 To update it, run the `fetchIcons` Gradle task, which downloads the codepoint file from
 [`google/material-design-icons`](https://github.com/google/material-design-icons) at the commit pinned by
-`MS_VERSION` in `build.gradle.kts`:
+`silkIcons.version` in `build.gradle.kts`:
 
 ```bash
 ./gradlew :frontend:silk-icons-ms:fetchIcons

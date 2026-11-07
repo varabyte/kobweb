@@ -14,11 +14,14 @@ icons.
 
 This directory contains a file called `fa-icon-list.txt`, which is parsed and used to generate code used in this
 project. It is built from the `metadata/icons.json` file in the
-[Font Awesome GitHub repository](https://github.com/FortAwesome/Font-Awesome), at the release tag matching `FA_VERSION`
-in `build.gradle.kts`.
+[Font Awesome GitHub repository](https://github.com/FortAwesome/Font-Awesome), at the release tag matching
+`silkIcons.version` in `build.gradle.kts`.
 
-To update it (e.g. after changing `FA_VERSION`, along with the matching stylesheet URL in
-`KobwebGenerateSiteIndexTask`):
+Kobweb sites load Font Awesome's stylesheet from a CDN URL in `KobwebGenerateSiteIndexTask` that includes the version.
+When you change `silkIcons.version`, update that URL to the same version. Otherwise, icons added in the new version
+compile but render blank.
+
+To update `fa-icon-list.txt` (e.g. after changing `silkIcons.version`):
 
 ```bash
 ./gradlew :frontend:silk-icons-fa:fetchIcons
