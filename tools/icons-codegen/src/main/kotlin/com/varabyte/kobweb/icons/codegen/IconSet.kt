@@ -53,6 +53,6 @@ interface IconSet {
     fun generateBindings(iconsFile: File, options: IconCodegenOptions, outputDir: File)
 
     companion object {
-        val all: List<IconSet> = listOf(FaIconSet(), LucideIconSet())
+        val all: List<IconSet> = listOf(FaIconSet(), LucideIconSet(), MdiIconSet(), MsIconSet())
     }
 }

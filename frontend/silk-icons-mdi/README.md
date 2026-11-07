@@ -11,13 +11,19 @@ which adds to the size of your page, something you should be mindful of if you d
 
 ---
 
-Note that this directory contains a file called `md-icon-list.txt`, which is parsed and used to generate code used in
-this project.
+This directory contains a file called `md-icon-list.txt`, which is parsed and used to generate code used in this
+project. It is built from the codepoint files under `font/` in
+[`google/material-design-icons`](https://github.com/google/material-design-icons), one per style, at the commit
+pinned by `MDI_VERSION` in `build.gradle.kts`.
 
-To populate it, I visited the
-[Material Design Icons GitHub repository](https://github.com/google/material-design-icons/tree/master/font), copied the
-contents of each of the codepoint files, converted them into comma-separated lists, and deleted the ligature fallback
-codes.
+To update it:
 
-I then manually reorganized the results (into default, outlined, rounded, sharp and two-toned subsets) and migrated the
-temporary text file into the custom text format seen in the `md-icon-list.txt` file.
+```bash
+./gradlew :frontend:silk-icons-mdi:fetchIcons
+```
+
+Once updated, regenerate the Kotlin source:
+
+```bash
+./gradlew :frontend:silk-icons-mdi:generateIcons
+```
