@@ -39,6 +39,9 @@ interface IconSet {
     /** A short, unique id for this icon set, e.g. "fa" or "lucide". */
     val id: String
 
+    /** The default name for this set's icons file, which [fetch] writes and [generateBindings] reads. */
+    val iconsFileName: String get() = "$id-icons.txt"
+
     /** Downloads upstream icon data for [version] and writes it to [iconsFile]. */
     fun fetch(version: String, iconsFile: File)
 

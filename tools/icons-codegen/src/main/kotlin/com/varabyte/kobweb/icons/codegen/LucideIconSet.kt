@@ -33,6 +33,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  */
 class LucideIconSet : IconSet {
     override val id = "lucide"
+    override val iconsFileName = "lucide-icons.json"
 
     override fun fetch(version: String, iconsFile: File) {
         val svgContents = mutableMapOf<String, String>()

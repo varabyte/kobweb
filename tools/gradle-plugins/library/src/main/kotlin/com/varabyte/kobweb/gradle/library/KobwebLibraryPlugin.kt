@@ -3,6 +3,7 @@ package com.varabyte.kobweb.gradle.library
 import com.varabyte.kobweb.ProcessorMode
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
 import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
+import com.varabyte.kobweb.gradle.core.icons.setupIcons
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
@@ -29,6 +30,7 @@ class KobwebLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
         val libraryBlock = project.kobwebBlock.createLibraryBlock()
+        project.setupIcons()
         project.applyKspPlugin()
         project.setKspMode(ProcessorMode.LIBRARY)
 

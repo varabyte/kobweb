@@ -30,6 +30,7 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebStartTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebUnpackServerJarTask
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
+import com.varabyte.kobweb.gradle.core.icons.setupIcons
 import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
@@ -83,6 +84,7 @@ class KobwebApplicationPlugin @Inject constructor(
 ) : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
+        project.setupIcons()
         project.applyKspPlugin()
         project.setKspMode(ProcessorMode.APP)
 

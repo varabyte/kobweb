@@ -41,6 +41,9 @@ kobweb {
         handlers.blockquote.set(SilkCalloutBlockquoteHandler(labels = mapOf("QUOTE" to "")))
     }
     kspProcessorDependency.set("com.varabyte.kobweb:site-processors")
+    icons {
+        lucide { version.set("1.69.0") }
+    }
 }
 
 val generateTestMarkdownTask = tasks.register("generateTestMarkdown") {
@@ -77,7 +80,6 @@ kotlin {
             implementation("com.varabyte.kobweb:kobweb-core")
             implementation("com.varabyte.kobweb:kobweb-silk")
             implementation("com.varabyte.kobwebx:silk-icons-fa")
-            implementation("com.varabyte.kobwebx:silk-icons-lucide")
             implementation("com.varabyte.kobwebx:silk-icons-mdi")
             implementation("com.varabyte.kobwebx:silk-icons-ms")
             implementation("com.varabyte.kobwebx:kobwebx-markdown")
