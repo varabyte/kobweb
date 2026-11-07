@@ -19,7 +19,7 @@ kotlin {
     sourceSets {
         jsMain {
             dependencies {
-                api(projects.frontend.silkWidgets)
+                implementation(projects.frontend.silkWidgets)
             }
         }
     }
