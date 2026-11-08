@@ -2,7 +2,6 @@ package com.varabyte.kobweb.icons.codegen.material
 
 import com.varabyte.kobweb.icons.codegen.fetch.GitHubRepo
 import com.varabyte.kobweb.icons.codegen.fetch.VersionSpec
-import com.varabyte.kobweb.icons.codegen.fetch.openDownloadStream
 
 /**
  * Google's https://github.com/google/material-design-icons repo at some [commit], which hosts the fonts for both
@@ -16,13 +15,12 @@ internal class MaterialDesignIconsRepo(private val commit: String) {
      * Each line of a codepoints file maps a ligature name to its codepoint, e.g. "arrow_back e5c4".
      */
     fun fetchCodepointNames(path: String): List<String> {
-        val uri = gitHubRepo.rawFileUri(commit, path)
-        val names = uri.openDownloadStream().use { it.readBytes().decodeToString() }
+        val names = gitHubRepo.fetchFileText(commit, path)
             .lineSequence()
             .filter { it.isNotBlank() }
             .map { it.substringBefore(' ') }
             .toList()
-        check(names.isNotEmpty()) { "No icon codepoints parsed from $uri" }
+        check(names.isNotEmpty()) { "No icon codepoints parsed from $path at $commit" }
         return names
     }
 

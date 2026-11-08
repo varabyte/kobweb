@@ -1,31 +1,35 @@
 package com.varabyte.kobweb.icons.codegen.fetch
 
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import java.io.InputStream
 import java.net.URI
 
-/** A public GitHub repository, e.g. "lucide-icons/lucide", queried through GitHub's REST API. */
+/** A public GitHub repository, e.g. "lucide-icons/lucide", which upstream icon data is downloaded from. */
 internal class GitHubRepo(private val name: String) {
     /** Returns the names of all of this repo's tags, e.g. "1.70.0". */
     fun fetchTagNames(): List<String> {
-        val refs = URI("https://api.github.com/repos/$name/git/matching-refs/tags/")
-            .openDownloadStream()
-            .use { Json.parseToJsonElement(it.readBytes().decodeToString()).jsonArray }
-        return refs.map { it.jsonObject.getValue("ref").jsonPrimitive.content.removePrefix("refs/tags/") }
+        return fetchApiJson("git/matching-refs/tags/").jsonArray
+            .map { it.jsonObject.getValue("ref").jsonPrimitive.content.removePrefix("refs/tags/") }
     }
 
     /** Returns the SHA of the latest commit on [branch]. */
     fun fetchHeadCommit(branch: String): String {
-        return URI("https://api.github.com/repos/$name/commits/$branch")
-            .openDownloadStream()
-            .use { Json.parseToJsonElement(it.readBytes().decodeToString()).jsonObject }
-            .getValue("sha").jsonPrimitive.content
+        return fetchApiJson("commits/$branch").jsonObject.getValue("sha").jsonPrimitive.content
     }
 
-    /** Returns the URI that serves the raw contents of the file at [path] (relative to the repo root) at [ref]. */
-    fun rawFileUri(ref: String, path: String) = URI("https://raw.githubusercontent.com/$name/$ref/$path")
+    /** Downloads the text of the file at [path] (relative to the repo root) at [ref], e.g. a tag or commit SHA. */
+    fun fetchFileText(ref: String, path: String): String {
+        return URI("https://raw.githubusercontent.com/$name/$ref/$path").openDownloadStream().readAllText()
+    }
+
+    /** Opens a stream for downloading a zip archive of the whole repo at [tag]. */
+    fun openTagArchiveStream(tag: String): InputStream {
+        return URI("https://github.com/$name/archive/refs/tags/$tag.zip").openDownloadStream()
+    }
 
     /** Resolves [spec] to one of this repo's release tags, only looking them up if the spec isn't exact. */
     fun resolveRelease(spec: VersionSpec): String {
@@ -46,5 +50,20 @@ internal class GitHubRepo(private val name: String) {
                     "Use a commit SHA or \"${VersionSpec.LATEST}\" instead."
             )
         }
+    }
+
+    /** Queries GitHub's REST API at [path], relative to this repo's API root. */
+    private fun fetchApiJson(path: String): JsonElement {
+        return Json.parseToJsonElement(URI("https://api.github.com/repos/$name/$path").openDownloadStream().readAllText())
+    }
+
+    private fun InputStream.readAllText() = use { it.readBytes().decodeToString() }
+
+    /** Opens a connection for downloading from this URI, logging what's being fetched. */
+    private fun URI.openDownloadStream(): InputStream {
+        println("Fetching $this")
+        val connection = toURL().openConnection()
+        connection.setRequestProperty("User-Agent", "kobweb-icons-codegen")
+        return connection.getInputStream()
     }
 }
