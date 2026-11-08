@@ -19,6 +19,9 @@ dependencies {
     // Common Gradle plugin used by Library, Application, and Worker plugins
     api(projects.tools.gradlePlugins.core)
 
+    // Knows each icon set's stylesheet
+    implementation(projects.tools.iconsCodegen)
+
     // For generating code / html
     implementation(libs.kotlinpoet)
 

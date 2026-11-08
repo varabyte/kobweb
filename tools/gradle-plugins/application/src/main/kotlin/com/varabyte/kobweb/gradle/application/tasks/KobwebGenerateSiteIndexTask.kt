@@ -12,6 +12,7 @@ import com.varabyte.kobweb.gradle.core.util.downloadOrCached
 import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.gradle.core.util.toSha256
+import com.varabyte.kobweb.icons.codegen.IconSet
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_LIBRARY
 import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.dom.append
@@ -323,47 +324,37 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         val headElements = mutableListOf(indexBlock.serializedHead.get())
 
         // Icon sets from `kobweb { icons { ... } }` and from Kobweb's silk-icons artifacts share one stylesheet each. If
-        // both provide Font Awesome, the app's chosen version wins, since its bindings may use icons the older artifact
+        // both provide the same set, the app's chosen version wins, since its bindings may use icons the older artifact
         // version lacks.
-        val iconSetVersions = iconSetVersions.get()
-        val appFaVersion = iconSetVersions["fa"]
+        val appIconSetVersions = iconSetVersions.get()
+        val silkIconSetVersions = buildMap {
+            if (hasFaDependency.get()) put("fa", SILK_ICONS_VERSIONS.getValue("fa"))
+            if (hasMdiDependency.get()) put("mdi", SILK_ICONS_VERSIONS.getValue("mdi"))
+            if (hasMsDependency.get()) put("ms", SILK_ICONS_VERSIONS.getValue("ms"))
+        }
+
+        val appFaVersion = appIconSetVersions["fa"]
+        val silkFaVersion = silkIconSetVersions["fa"]
         // Loading both stylesheets wouldn't help, since they share class names and the later one wins. Within a major
         // version, a newer stylesheet still has all the older icons, so only warn across major versions.
-        if (appFaVersion != null && hasFaDependency.get() &&
-            appFaVersion.substringBefore('.') != SILK_ICONS_FA_VERSION.substringBefore('.')
+        if (appFaVersion != null && silkFaVersion != null &&
+            appFaVersion.substringBefore('.') != silkFaVersion.substringBefore('.')
         ) {
             logger.warn(
                 "w: This app generates Font Awesome $appFaVersion icons, but a dependency uses Kobweb's silk-icons-fa " +
-                    "artifact, which was built for $SILK_ICONS_FA_VERSION. Only the $appFaVersion stylesheet is loaded, " +
+                    "artifact, which was built for $silkFaVersion. Only the $appFaVersion stylesheet is loaded, " +
                     "so any of the dependency's icons that $appFaVersion renamed or removed will render blank."
             )
         }
-        val faVersion = appFaVersion ?: SILK_ICONS_FA_VERSION.takeIf { hasFaDependency.get() }
-        if (faVersion != null) {
-            headElements.add(HtmlUtil.serializeHeadContents {
-                link {
-                    rel = "stylesheet"
-                    href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/$faVersion/css/all.min.css"
-                }
-            })
-        }
 
-        if ("mdi" in iconSetVersions || hasMdiDependency.get()) {
+        val stylesheetVersions = silkIconSetVersions + appIconSetVersions
+        IconSet.all.forEach { iconSet ->
+            val version = stylesheetVersions[iconSet.id] ?: return@forEach
+            val stylesheetUrl = iconSet.stylesheetUrl(version) ?: return@forEach
             headElements.add(HtmlUtil.serializeHeadContents {
                 link {
                     rel = "stylesheet"
-                    href =
-                        "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Icons+Outlined&family=Material+Icons+Two+Tone&family=Material+Icons+Round&family=Material+Icons+Sharp"
-                }
-            })
-        }
-
-        if ("ms" in iconSetVersions || hasMsDependency.get()) {
-            headElements.add(HtmlUtil.serializeHeadContents {
-                link {
-                    rel = "stylesheet"
-                    href =
-                        "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&family=Material+Symbols+Rounded&family=Material+Symbols+Sharp"
+                    href = stylesheetUrl
                 }
             })
         }
@@ -435,9 +426,13 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     }
 
     companion object {
-        /** The Font Awesome version that Kobweb's published silk-icons-fa artifact generates bindings for. */
+        /** The icon set versions that Kobweb's published silk-icons-* artifacts generate bindings for. */
         // TODO: Delete this once icon artifacts and libraries publish which icon set versions they use. Until then, keep
-        //  it in sync with frontend/silk-icons-fa/build.gradle.kts.
-        private const val SILK_ICONS_FA_VERSION = "6.5.2"
+        //  it in sync with the versions in frontend/silk-icons-*/build.gradle.kts.
+        private val SILK_ICONS_VERSIONS = mapOf(
+            "fa" to "6.5.2",
+            "mdi" to "49d4db35df873165d6bd6ba09b063c7dafbac2f4",
+            "ms" to "49d4db35df873165d6bd6ba09b063c7dafbac2f4",
+        )
     }
 }

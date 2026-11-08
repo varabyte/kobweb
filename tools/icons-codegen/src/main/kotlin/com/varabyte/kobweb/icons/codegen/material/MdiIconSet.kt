@@ -40,6 +40,10 @@ class MdiIconSet : IconSet {
 
     override fun resolveVersion(spec: String) = MaterialDesignIconsRepo.resolveCommit(VersionSpec(spec))
 
+    /** Google Fonts doesn't version its stylesheets, so this ignores [version]. */
+    override fun stylesheetUrl(version: String) =
+        "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Icons+Outlined&family=Material+Icons+Two+Tone&family=Material+Icons+Round&family=Material+Icons+Sharp"
+
     override fun fetch(version: String, iconsFile: File) {
         val repo = MaterialDesignIconsRepo(commit = version)
         val lines = IconStyle.entries.map { style ->

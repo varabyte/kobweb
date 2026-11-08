@@ -39,6 +39,8 @@ class FaIconSet : IconSet {
 
     override fun resolveVersion(spec: String) = gitHubRepo.resolveRelease(VersionSpec(spec))
 
+    override fun stylesheetUrl(version: String) = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/$version/css/all.min.css"
+
     override fun fetch(version: String, iconsFile: File) {
         val iconsJson = gitHubRepo.fetchFileText(version, "metadata/icons.json")
 

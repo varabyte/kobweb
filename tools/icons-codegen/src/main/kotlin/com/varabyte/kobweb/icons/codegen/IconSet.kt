@@ -65,6 +65,12 @@ interface IconSet {
      */
     fun generateBindings(iconsFile: File, options: IconCodegenOptions, outputDir: File)
 
+    /**
+     * The stylesheet a page must load for this set's bindings at [version] to render, or null if they need none (e.g.
+     * because they draw SVGs instead of using an icon font).
+     */
+    fun stylesheetUrl(version: String): String? = null
+
     companion object {
         val all: List<IconSet> = listOf(FaIconSet(), LucideIconSet(), MdiIconSet(), MsIconSet())
     }

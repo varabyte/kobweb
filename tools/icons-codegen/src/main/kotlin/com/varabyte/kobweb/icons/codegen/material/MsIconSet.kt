@@ -29,6 +29,10 @@ class MsIconSet : IconSet {
 
     override fun resolveVersion(spec: String) = MaterialDesignIconsRepo.resolveCommit(VersionSpec(spec))
 
+    /** Google Fonts doesn't version its stylesheets, so this ignores [version]. */
+    override fun stylesheetUrl(version: String) =
+        "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&family=Material+Symbols+Rounded&family=Material+Symbols+Sharp"
+
     override fun fetch(version: String, iconsFile: File) {
         // Material Symbols ships the same set of icons across all of its styles (outlined, rounded, sharp), so we only
         // need a single list of names. We still fetch every family, though, to verify that assumption holds.
