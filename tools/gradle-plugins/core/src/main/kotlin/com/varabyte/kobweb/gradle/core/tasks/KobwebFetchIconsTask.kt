@@ -11,7 +11,7 @@ import org.gradle.api.tasks.UntrackedTask
 
 @UntrackedTask(because = "It downloads from the network, which Gradle can't check for changes.")
 abstract class KobwebFetchIconsTask :
-    KobwebTask("Download data for the icon sets in `kobweb { icons { ... } }` into this module's icons store, which should be checked in.") {
+    KobwebTask("Download data for the icon sets in the `icons { ... }` block into this module's icons store, which should be checked in.") {
     /** Each configured icon set's id mapped to its requested version, e.g. `"fa" to "6.+"`. */
     @get:Input
     abstract val versionSpecs: MapProperty<String, String>
@@ -23,7 +23,7 @@ abstract class KobwebFetchIconsTask :
     @TaskAction
     fun execute() {
         if (versionSpecs.get().isEmpty()) {
-            logger.warn("w: No icon sets are configured in `kobweb { icons { ... } }`, so there's nothing to fetch.")
+            logger.warn("w: No icon sets are configured in the `icons { ... }` block, so there's nothing to fetch.")
             return
         }
 

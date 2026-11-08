@@ -11,8 +11,10 @@ version = "1.0-SNAPSHOT"
 
 kobweb {
     kspProcessorDependency.set("com.varabyte.kobweb:site-processors")
-    icons {
-        fa { version.set("7.+") }
+    library {
+        icons {
+            fa { version.set("7.+") }
+        }
     }
 }
 

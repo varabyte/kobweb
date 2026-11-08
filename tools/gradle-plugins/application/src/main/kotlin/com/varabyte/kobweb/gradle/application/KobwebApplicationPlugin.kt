@@ -4,7 +4,9 @@ import com.varabyte.kobweb.ProcessorMode
 import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
+import com.varabyte.kobweb.gradle.application.extensions.createIconsBlock
 import com.varabyte.kobweb.gradle.application.extensions.export
+import com.varabyte.kobweb.gradle.application.extensions.icons
 import com.varabyte.kobweb.gradle.application.extensions.remoteDebugging
 import com.varabyte.kobweb.gradle.application.extensions.server
 import com.varabyte.kobweb.gradle.application.ksp.kspBackendFile
@@ -32,7 +34,6 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebUnpackServerJarTask
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
 import com.varabyte.kobweb.gradle.core.icons.lockedVersions
 import com.varabyte.kobweb.gradle.core.icons.setupIcons
-import com.varabyte.kobweb.gradle.core.extensions.icons
 import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
@@ -86,7 +87,6 @@ class KobwebApplicationPlugin @Inject constructor(
 ) : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
-        project.setupIcons()
         project.applyKspPlugin()
         project.setKspMode(ProcessorMode.APP)
 
@@ -107,6 +107,7 @@ class KobwebApplicationPlugin @Inject constructor(
 
         val kobwebBlock = project.kobwebBlock
         val appBlock = kobwebBlock.createAppBlock(project.providers, kobwebFolder, kobwebConf)
+        project.setupIcons(appBlock.createIconsBlock())
 
         val env =
             project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV
@@ -321,9 +322,9 @@ class KobwebApplicationPlugin @Inject constructor(
                 publicPath = kobwebBlock.publicPath
                 compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
                 dependencies = project.getTransitiveJsDependencyResults()
-                iconSetVersions = project.kobwebBlock.icons.lockedVersions()
+                iconSetVersions = appBlock.icons.lockedVersions()
                 warnOnVersionMismatch = project.provider {
-                    project.kobwebBlock.icons.iconSets.mapValues { (_, iconSet) -> iconSet.warnOnVersionMismatch.get() }
+                    appBlock.icons.iconSets.mapValues { (_, iconSet) -> iconSet.warnOnVersionMismatch.get() }
                 }
             }
 

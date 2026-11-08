@@ -8,10 +8,6 @@ import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.newInstance
-import javax.inject.Inject
 
 /** Who can use the icon bindings generated from an [IconsBlock]. */
 enum class IconVisibility {
@@ -33,8 +29,10 @@ enum class IconVisibility {
  *
  * ```
  * kobweb {
- *     icons {
- *         lucide { version.set("1.70.0") }
+ *     app { // or `library`
+ *         icons {
+ *             lucide { version.set("1.70.0") }
+ *         }
  *     }
  * }
  * ```
@@ -42,8 +40,12 @@ enum class IconVisibility {
  * After adding an icon set or changing its version, run the `kobwebFetchIcons` task. It downloads the set's data into
  * this module's `kobweb-store/icons` folder, which should be checked in. Builds only read from that folder, never from
  * the network. To pick up newer releases for a version like "latest", run the task again.
+ *
+ * Apps and libraries each have their own subclass, which can add settings for icon sets ([S]) that only make sense for
+ * one of them.
  */
-abstract class IconsBlock @Inject constructor(
+abstract class IconsBlock<S : IconsBlock.IconSetBlock>(
+    private val iconSetType: Class<S>,
     private val objects: ObjectFactory,
     internal val providers: ProviderFactory,
     layout: ProjectLayout,
@@ -51,6 +53,7 @@ abstract class IconsBlock @Inject constructor(
     /** The folder that `kobwebFetchIcons` writes icon data and lock files to, which should be checked in. */
     internal val storeDir: Directory = layout.projectDirectory.dir("kobweb-store/icons")
 
+    /** Settings for a single icon set, shared by apps and libraries. */
     abstract class IconSetBlock {
         /**
          * The upstream version to generate bindings for: an exact version, a prefix like "1.+" for the newest matching
@@ -61,19 +64,8 @@ abstract class IconsBlock @Inject constructor(
          */
         abstract val version: Property<String>
 
-        /**
-         * Whether to warn when a library generated bindings for this icon set at a version that the stylesheet this
-         * site loads might not fully support, since some of that library's icons may render blank.
-         *
-         * You are welcome to turn the warning off once you've checked that those icons render.
-         *
-         * NOTE: Only apps load stylesheets, so this does nothing in a library.
-         */
-        abstract val warnOnVersionMismatch: Property<Boolean>
-
         init {
             version.convention("latest")
-            warnOnVersionMismatch.convention(true)
         }
     }
 
@@ -88,20 +80,20 @@ abstract class IconsBlock @Inject constructor(
 
     abstract val visibility: Property<IconVisibility>
 
-    private val _iconSets = mutableMapOf<String, IconSetBlock>()
+    private val _iconSets = mutableMapOf<String, S>()
 
     /** The configured icon sets, keyed by their id (e.g. "fa"), which is also the name of their subpackage. */
-    val iconSets: Map<String, IconSetBlock> get() = _iconSets
+    val iconSets: Map<String, S> get() = _iconSets
 
-    private fun iconSet(id: String, configure: Action<IconSetBlock>) {
-        configure.execute(_iconSets.getOrPut(id) { objects.newInstance<IconSetBlock>() })
+    private fun iconSet(id: String, configure: Action<S>) {
+        configure.execute(_iconSets.getOrPut(id) { objects.newInstance(iconSetType) })
     }
 
     /** Font Awesome (https://fontawesome.com), whose versions are release tags, e.g. "6.5.2". */
-    fun fa(configure: Action<IconSetBlock> = Action {}) = iconSet("fa", configure)
+    fun fa(configure: Action<S> = Action {}) = iconSet("fa", configure)
 
     /** Lucide (https://lucide.dev), whose versions are release tags, e.g. "1.70.0". */
-    fun lucide(configure: Action<IconSetBlock> = Action {}) = iconSet("lucide", configure)
+    fun lucide(configure: Action<S> = Action {}) = iconSet("lucide", configure)
 
     /**
      * Google's Material Icons (https://developers.google.com/fonts/docs/material_icons), whose versions are commit SHAs
@@ -110,7 +102,7 @@ abstract class IconsBlock @Inject constructor(
      * This is the older of Google's two Material icon sets. Its successor is Material Symbols ([ms]), which Google
      * publishes from the same repository.
      */
-    fun mdi(configure: Action<IconSetBlock> = Action {}) = iconSet("mdi", configure)
+    fun mdi(configure: Action<S> = Action {}) = iconSet("mdi", configure)
 
     /**
      * Google's Material Symbols (https://developers.google.com/fonts/docs/material_symbols), whose versions are commit
@@ -119,17 +111,10 @@ abstract class IconsBlock @Inject constructor(
      * This is the newer of Google's two Material icon sets, the successor to Material Icons ([mdi]). Google publishes
      * both from the same repository, despite its name.
      */
-    fun ms(configure: Action<IconSetBlock> = Action {}) = iconSet("ms", configure)
+    fun ms(configure: Action<S> = Action {}) = iconSet("ms", configure)
 
     init {
         rootPackage.convention(".components.icons")
         visibility.convention(IconVisibility.INTERNAL)
     }
-}
-
-val KobwebBlock.icons: IconsBlock
-    get() = extensions.getByType<IconsBlock>()
-
-internal fun KobwebBlock.createIconsBlock(): IconsBlock {
-    return extensions.create<IconsBlock>("icons")
 }

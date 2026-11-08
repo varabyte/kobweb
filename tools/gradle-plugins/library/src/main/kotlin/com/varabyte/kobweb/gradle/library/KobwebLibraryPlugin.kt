@@ -2,7 +2,6 @@ package com.varabyte.kobweb.gradle.library
 
 import com.varabyte.kobweb.ProcessorMode
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
-import com.varabyte.kobweb.gradle.core.extensions.icons
 import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
 import com.varabyte.kobweb.gradle.core.icons.lockedVersions
 import com.varabyte.kobweb.gradle.core.icons.setupIcons
@@ -15,7 +14,9 @@ import com.varabyte.kobweb.gradle.core.ksp.setKspMode
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJs
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
 import com.varabyte.kobweb.gradle.core.util.generateModuleMetadataFor
+import com.varabyte.kobweb.gradle.library.extensions.createIconsBlock
 import com.varabyte.kobweb.gradle.library.extensions.createLibraryBlock
+import com.varabyte.kobweb.gradle.library.extensions.icons
 import com.varabyte.kobweb.gradle.library.extensions.index
 import com.varabyte.kobweb.gradle.library.extensions.library
 import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateLibraryMetadataTask
@@ -32,14 +33,14 @@ class KobwebLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
         val libraryBlock = project.kobwebBlock.createLibraryBlock()
-        project.setupIcons()
+        project.setupIcons(libraryBlock.createIconsBlock())
         project.applyKspPlugin()
         project.setKspMode(ProcessorMode.LIBRARY)
 
         val kobwebGenerateLibraryMetadataTask = project.tasks
             .register<KobwebGenerateLibraryMetadataTask>("kobwebGenerateLibraryMetadata") {
                 indexHead = project.kobwebBlock.library.index.serializedHead
-                iconSetVersions = project.kobwebBlock.icons.lockedVersions()
+                iconSetVersions = libraryBlock.icons.lockedVersions()
             }
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)

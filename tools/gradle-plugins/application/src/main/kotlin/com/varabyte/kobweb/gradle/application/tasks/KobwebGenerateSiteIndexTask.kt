@@ -86,7 +86,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     abstract val dependencies: ListProperty<ResolvedDependencyResult>
 
     /**
-     * Icon sets the app generates bindings for in `kobweb { icons { ... } }`, mapped to their locked versions, e.g.
+     * Icon sets the app generates bindings for in `kobweb { app { icons { ... } } }`, mapped to their locked versions, e.g.
      * `"fa" to "6.5.2"`.
      */
     @get:Input
@@ -365,8 +365,8 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                         "But given conflicting module mappings ($mappings), if any of those icons were renamed or " +
                         "removed in $version, they will render blank. To silence this warning, you can update your " +
                         "dependencies (if possible), set this app's \"$id\" version explicitly (via " +
-                        "`kobweb { icons { $id { version.set(\"...\") } } }`), or disable this warning (via " +
-                        "`kobweb { icons { $id { warnOnVersionMismatch.set(false) } } }`)."
+                        "`kobweb { app { icons { $id { version.set(\"...\") } } } }`), or disable this warning (via " +
+                        "`kobweb { app { icons { $id { warnOnVersionMismatch.set(false) } } } }`)."
                 )
             }
 

@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.gradle.core.icons
 
 import com.varabyte.kobweb.gradle.core.extensions.IconsBlock
-import com.varabyte.kobweb.gradle.core.extensions.createIconsBlock
 import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
@@ -15,13 +14,12 @@ import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
 /**
- * Adds the `kobweb { icons { ... } }` block and the tasks that fetch icon data and generate bindings from it.
+ * Adds the tasks that fetch icon data for [iconsBlock] and generate bindings from it.
  *
- * Only apps and library plugins should call this.
+ * Only apps and library plugins should call this, each with their own `icons { ... }` block.
  */
-fun Project.setupIcons() {
+fun Project.setupIcons(iconsBlock: IconsBlock<*>) {
     val kobwebBlock = kobwebBlock
-    val iconsBlock = kobwebBlock.createIconsBlock()
 
     val iconVersionSpecs = provider {
         iconsBlock.iconSets.mapValues { (_, iconSetBlock) -> iconSetBlock.version.get() }
@@ -56,7 +54,7 @@ fun Project.setupIcons() {
  *
  * Sets that haven't been fetched yet are left out; `kobwebGenerateIcons` reports those.
  */
-fun IconsBlock.lockedVersions(): Provider<Map<String, String>> {
+fun IconsBlock<*>.lockedVersions(): Provider<Map<String, String>> {
     return providers.provider {
         iconSets.keys.mapNotNull { id ->
             IconsLock.readFrom(IconsLock.fileFor(storeDir.asFile, id))?.let { lock -> id to lock.version }

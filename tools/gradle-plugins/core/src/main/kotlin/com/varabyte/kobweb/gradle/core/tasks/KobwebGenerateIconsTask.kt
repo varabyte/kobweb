@@ -21,7 +21,7 @@ import com.varabyte.kobweb.icons.codegen.IconVisibility as CodegenIconVisibility
 
 @CacheableTask
 abstract class KobwebGenerateIconsTask :
-    KobwebTask("Generate Kotlin bindings for the icon sets in `kobweb { icons { ... } }`, from data fetched by kobwebFetchIcons.") {
+    KobwebTask("Generate Kotlin bindings for the icon sets in the `icons { ... }` block, from data fetched by kobwebFetchIcons.") {
     /** Each configured icon set's id mapped to its requested version, e.g. `"fa" to "6.+"`. */
     @get:Input
     abstract val versionSpecs: MapProperty<String, String>
@@ -49,7 +49,7 @@ abstract class KobwebGenerateIconsTask :
         val rootPackageName = PackageName(projectGroup.get()).resolve(PackageShortcut(rootPackage.get()))
         rootPackageName.findProblems().takeIf { it.isNotEmpty() }?.let { problems ->
             throw GradleException(
-                "Invalid `rootPackage` \"${rootPackage.get()}\" in `kobweb { icons { ... } }`: ${problems.joinToString(" ")}"
+                "Invalid `rootPackage` \"${rootPackage.get()}\" in the `icons { ... }` block: ${problems.joinToString(" ")}"
             )
         }
         val codegenVisibility = CodegenIconVisibility.valueOf(visibility.get().name)
