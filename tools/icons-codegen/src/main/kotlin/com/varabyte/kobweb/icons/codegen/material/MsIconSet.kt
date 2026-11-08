@@ -89,7 +89,7 @@ class MsIconSet : IconSet {
             |
             |import androidx.compose.runtime.*
             |import com.varabyte.kobweb.compose.ui.Modifier
-            |import ${options.packageName}.IconStyle.*
+            |import ${options.packageName}.MsIconStyle.*
             |
             """.trimMargin()
 
@@ -101,16 +101,16 @@ class MsIconSet : IconSet {
             |import org.jetbrains.compose.web.dom.Span
             |import org.jetbrains.compose.web.dom.Text
             |
-            |$${visibility}enum class IconStyle {
+            |$${visibility}enum class MsIconStyle {
             |    OUTLINED,
             |    ROUNDED,
             |    SHARP;
             |}
             |
-            |@Deprecated("Use IconStyle instead", ReplaceWith("IconStyle"))
-            |$${visibility}typealias MsIconStyle = IconStyle
+            |@Deprecated("Use MsIconStyle instead", ReplaceWith("MsIconStyle"))
+            |$${visibility}typealias IconStyle = MsIconStyle
             |
-            |private fun IconStyle.toClassNameSuffix(): String {
+            |private fun MsIconStyle.toClassNameSuffix(): String {
             |    return when (this) {
             |        OUTLINED -> "-outlined"
             |        ROUNDED -> "-rounded"
@@ -122,7 +122,7 @@ class MsIconSet : IconSet {
             |$${visibility}fun MsIcon(
             |    name: String,
             |    modifier: Modifier,
-            |    style: IconStyle = OUTLINED,
+            |    style: MsIconStyle = OUTLINED,
             |) {
             |    Span(
             |        attrs = modifier.toAttrs { classes("material-symbols${style.toClassNameSuffix()}") }
@@ -135,7 +135,7 @@ class MsIconSet : IconSet {
         )
 
         for (rawName in iconRawNames) {
-            val iconCode = "@Composable ${visibility}fun ${methodNamer.methodNameFor(rawName)}(modifier: Modifier = Modifier, style: IconStyle = OUTLINED) = MsIcon(\"$rawName\", modifier, style)"
+            val iconCode = "@Composable ${visibility}fun ${methodNamer.methodNameFor(rawName)}(modifier: Modifier = Modifier, style: MsIconStyle = OUTLINED) = MsIcon(\"$rawName\", modifier, style)"
 
             // Name files after the raw icon name, not the method name. Method names can differ only by case, which
             // collides on case-insensitive file systems and is rejected by the Kotlin/JS compiler.

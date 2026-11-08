@@ -112,6 +112,7 @@ import playground.components.icons.fa.FaCloud
 import playground.components.icons.fa.FaDollarSign
 import playground.components.icons.fa.FaGithub
 import playground.components.icons.fa.FaHouse
+import playground.components.icons.fa.FaIconStyle
 import playground.components.icons.fa.FaStar
 import playground.components.icons.fa.FaUser
 import playground.components.icons.lucide.LucideCloud
@@ -123,18 +124,16 @@ import playground.components.icons.lucide.LucideStar
 import playground.components.icons.lucide.LucideSwords
 import playground.components.icons.mdi.MdiClose
 import playground.components.icons.mdi.MdiHome
+import playground.components.icons.mdi.MdiIconStyle
 import playground.components.icons.mdi.MdiMenu
 import playground.components.icons.mdi.MdiSearch
 import playground.components.icons.ms.MsClose
 import playground.components.icons.ms.MsHome
+import playground.components.icons.ms.MsIconStyle
 import playground.components.icons.ms.MsMenu
 import playground.components.icons.ms.MsSearch
 import playground.components.layouts.PageLayoutData
 import playground.components.widgets.GoHomeLink
-import playground.components.icons.fa.IconStyle as FaIconStyle
-import playground.components.icons.mdi.IconStyle as MdiIconStyle
-import playground.components.icons.ms.IconStyle as MsIconStyle
-
 val WidgetSectionStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()

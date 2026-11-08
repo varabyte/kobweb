@@ -47,9 +47,9 @@ class MdiIconSetTest {
 
             import androidx.compose.runtime.*
             import com.varabyte.kobweb.compose.ui.Modifier
-            import test.icons.IconStyle.*
+            import test.icons.MdiIconStyle.*
 
-            @Composable fun MdiHome(modifier: Modifier = Modifier, style: IconStyle = FILLED) = MdiIcon("home", modifier, style)
+            @Composable fun MdiHome(modifier: Modifier = Modifier, style: MdiIconStyle = FILLED) = MdiIcon("home", modifier, style)
             """.trimIndent()
         )
     }
@@ -86,7 +86,7 @@ class MdiIconSetTest {
         )
 
         assertThat(packageDir.resolve("label.kt").readText()).endsWith(
-            "\n@Composable fun MdiLabel(modifier: Modifier = Modifier, style: IconStyle = OUTLINED) = MdiIcon(\"label\", modifier, style.also { it.assertValidStyle(\"MdiLabel\", OUTLINED, ROUNDED) })"
+            "\n@Composable fun MdiLabel(modifier: Modifier = Modifier, style: MdiIconStyle = OUTLINED) = MdiIcon(\"label\", modifier, style.also { it.assertValidStyle(\"MdiLabel\", OUTLINED, ROUNDED) })"
         )
     }
 
@@ -105,7 +105,7 @@ class MdiIconSetTest {
 
         assertThat(packageDir.resolve("home.kt").readText()).contains("\n@Composable internal fun MdiHome(")
         val supportCode = packageDir.resolve("_MdiIcon.kt").readText()
-        assertThat(supportCode).contains("\ninternal enum class IconStyle {")
+        assertThat(supportCode).contains("\ninternal enum class MdiIconStyle {")
         assertThat(supportCode).contains("\ninternal fun MdiIcon(")
     }
 

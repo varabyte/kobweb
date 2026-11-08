@@ -125,19 +125,19 @@ class FaIconSet : IconSet {
             |import com.varabyte.kobweb.compose.ui.toAttrs
             |import org.jetbrains.compose.web.dom.Span
             |
-            |$${visibility}enum class IconCategory(internal val className: String) {
+            |$${visibility}enum class FaIconCategory(internal val className: String) {
             |    REGULAR("far"),
             |    SOLID("fas"),
             |    BRAND("fab");
             |}
             |
-            |$${visibility}enum class IconStyle(internal val category: IconCategory) {
-            |    FILLED(IconCategory.SOLID),
-            |    OUTLINE(IconCategory.REGULAR);
+            |$${visibility}enum class FaIconStyle(internal val category: FaIconCategory) {
+            |    FILLED(FaIconCategory.SOLID),
+            |    OUTLINE(FaIconCategory.REGULAR);
             |}
             |
             |// See: https://fontawesome.com/docs/web/style/size
-            |$${visibility}enum class IconSize(internal val className: String) {
+            |$${visibility}enum class FaIconSize(internal val className: String) {
             |    // Relative sizes
             |    XXS("fa-2xs"),
             |    XS("fa-xs"),
@@ -163,8 +163,8 @@ class FaIconSet : IconSet {
             |$${visibility}fun FaIcon(
             |    name: String,
             |    modifier: Modifier,
-            |    style: IconCategory = IconCategory.REGULAR,
-            |    size: IconSize? = null,
+            |    style: FaIconCategory = FaIconCategory.REGULAR,
+            |    size: FaIconSize? = null,
             |) {
             |    Span(
             |        attrs = modifier.toAttrs {
@@ -176,6 +176,15 @@ class FaIconSet : IconSet {
             |    )
             |}
             |
+            |@Deprecated("Use FaIconCategory instead", ReplaceWith("FaIconCategory"))
+            |$${visibility}typealias IconCategory = FaIconCategory
+            |
+            |@Deprecated("Use FaIconStyle instead", ReplaceWith("FaIconStyle"))
+            |$${visibility}typealias IconStyle = FaIconStyle
+            |
+            |@Deprecated("Use FaIconSize instead", ReplaceWith("FaIconSize"))
+            |$${visibility}typealias IconSize = FaIconSize
+            |
             """.trimMargin()
         )
 
@@ -183,12 +192,12 @@ class FaIconSet : IconSet {
             val methodName = methodNamer.methodNameFor(rawName)
             val iconCode = when {
                 categories.size == 2 -> {
-                    "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, style: IconStyle = IconStyle.OUTLINE, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, style.category, size)"
+                    "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, style: FaIconStyle = FaIconStyle.OUTLINE, size: FaIconSize? = null) = FaIcon(\"$rawName\", modifier, style.category, size)"
                 }
 
                 else -> {
                     val category = categories.single()
-                    "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, IconCategory.${category.name}, size)"
+                    "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, size: FaIconSize? = null) = FaIcon(\"$rawName\", modifier, FaIconCategory.${category.name}, size)"
                 }
             }
 

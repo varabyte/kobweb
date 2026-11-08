@@ -73,14 +73,14 @@ class FaIconSetTest {
             import androidx.compose.runtime.*
             import com.varabyte.kobweb.compose.ui.Modifier
 
-            @Composable fun FaAddressBook(modifier: Modifier = Modifier, style: IconStyle = IconStyle.OUTLINE, size: IconSize? = null) = FaIcon("address-book", modifier, style.category, size)
+            @Composable fun FaAddressBook(modifier: Modifier = Modifier, style: FaIconStyle = FaIconStyle.OUTLINE, size: FaIconSize? = null) = FaIcon("address-book", modifier, style.category, size)
             """.trimIndent()
         )
         assertThat(packageDir.resolve("bell.kt").readText()).endsWith(
-            "\n@Composable fun FaBell(modifier: Modifier = Modifier, size: IconSize? = null) = FaIcon(\"bell\", modifier, IconCategory.SOLID, size)"
+            "\n@Composable fun FaBell(modifier: Modifier = Modifier, size: FaIconSize? = null) = FaIcon(\"bell\", modifier, FaIconCategory.SOLID, size)"
         )
         assertThat(packageDir.resolve("github.kt").readText()).endsWith(
-            "\n@Composable fun FaGithub(modifier: Modifier = Modifier, size: IconSize? = null) = FaIcon(\"github\", modifier, IconCategory.BRAND, size)"
+            "\n@Composable fun FaGithub(modifier: Modifier = Modifier, size: FaIconSize? = null) = FaIcon(\"github\", modifier, FaIconCategory.BRAND, size)"
         )
     }
 
@@ -97,9 +97,9 @@ class FaIconSetTest {
 
         assertThat(packageDir.resolve("bell.kt").readText()).contains("\n@Composable internal fun FaBell(")
         val supportCode = packageDir.resolve("_FaIcon.kt").readText()
-        assertThat(supportCode).contains("\ninternal enum class IconCategory(")
-        assertThat(supportCode).contains("\ninternal enum class IconStyle(")
-        assertThat(supportCode).contains("\ninternal enum class IconSize(")
+        assertThat(supportCode).contains("\ninternal enum class FaIconCategory(")
+        assertThat(supportCode).contains("\ninternal enum class FaIconStyle(")
+        assertThat(supportCode).contains("\ninternal enum class FaIconSize(")
         assertThat(supportCode).contains("\ninternal fun FaIcon(")
     }
 

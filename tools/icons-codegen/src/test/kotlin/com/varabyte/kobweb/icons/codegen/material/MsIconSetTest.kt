@@ -78,9 +78,9 @@ class MsIconSetTest {
 
             import androidx.compose.runtime.*
             import com.varabyte.kobweb.compose.ui.Modifier
-            import test.icons.IconStyle.*
+            import test.icons.MsIconStyle.*
 
-            @Composable fun MsArrowBack(modifier: Modifier = Modifier, style: IconStyle = OUTLINED) = MsIcon("arrow_back", modifier, style)
+            @Composable fun MsArrowBack(modifier: Modifier = Modifier, style: MsIconStyle = OUTLINED) = MsIcon("arrow_back", modifier, style)
             """.trimIndent()
         )
     }
@@ -91,8 +91,8 @@ class MsIconSetTest {
 
         assertThat(packageDir.resolve("home.kt").readText()).contains("\n@Composable internal fun MsHome(")
         val supportCode = packageDir.resolve("_MsIcon.kt").readText()
-        assertThat(supportCode).contains("\ninternal enum class IconStyle {")
-        assertThat(supportCode).contains("\ninternal typealias MsIconStyle = IconStyle")
+        assertThat(supportCode).contains("\ninternal enum class MsIconStyle {")
+        assertThat(supportCode).contains("\ninternal typealias IconStyle = MsIconStyle")
         assertThat(supportCode).contains("\ninternal fun MsIcon(")
     }
 

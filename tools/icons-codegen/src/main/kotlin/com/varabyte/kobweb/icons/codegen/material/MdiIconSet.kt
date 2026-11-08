@@ -91,7 +91,7 @@ class MdiIconSet : IconSet {
             |
             |import androidx.compose.runtime.*
             |import com.varabyte.kobweb.compose.ui.Modifier
-            |import ${options.packageName}.IconStyle.*
+            |import ${options.packageName}.MdiIconStyle.*
             |
             """.trimMargin()
 
@@ -103,7 +103,7 @@ class MdiIconSet : IconSet {
             |import org.jetbrains.compose.web.dom.Span
             |import org.jetbrains.compose.web.dom.Text
             |
-            |$${visibility}enum class IconStyle {
+            |$${visibility}enum class MdiIconStyle {
             |    FILLED,
             |    OUTLINED,
             |    ROUNDED,
@@ -111,7 +111,10 @@ class MdiIconSet : IconSet {
             |    TWO_TONED;
             |}
             |
-            |private fun IconStyle.toClassNameSuffix(): String {
+            |@Deprecated("Use MdiIconStyle instead", ReplaceWith("MdiIconStyle"))
+            |$${visibility}typealias IconStyle = MdiIconStyle
+            |
+            |private fun MdiIconStyle.toClassNameSuffix(): String {
             |    return when (this) {
             |        FILLED -> ""
             |        OUTLINED -> "-outlined"
@@ -121,7 +124,7 @@ class MdiIconSet : IconSet {
             |    }
             |}
             |
-            |internal fun IconStyle.assertValidStyle(methodName: String, vararg validStyles: IconStyle) {
+            |internal fun MdiIconStyle.assertValidStyle(methodName: String, vararg validStyles: MdiIconStyle) {
             |    if (this !in validStyles) {
             |        error("Attempted to render \"$methodName\" with style $this. Must be one of: ${validStyles.joinToString()}")
             |    }
@@ -131,7 +134,7 @@ class MdiIconSet : IconSet {
             |$${visibility}fun MdiIcon(
             |    name: String,
             |    modifier: Modifier,
-            |    style: IconStyle = FILLED,
+            |    style: MdiIconStyle = FILLED,
             |) {
             |    Span(
             |        attrs = modifier.toAttrs { classes("material-icons${style.toClassNameSuffix()}") }
@@ -142,7 +145,7 @@ class MdiIconSet : IconSet {
             |
             |@Deprecated("Use MdiIcon instead", ReplaceWith("MdiIcon(name, modifier, style)"))
             |@Composable
-            |$${visibility}fun MdIcon(name: String, modifier: Modifier, style: IconStyle = FILLED) = MdiIcon(name, modifier, style)
+            |$${visibility}fun MdIcon(name: String, modifier: Modifier, style: MdiIconStyle = FILLED) = MdiIcon(name, modifier, style)
             |
             """.trimMargin()
         )
@@ -156,11 +159,11 @@ class MdiIconSet : IconSet {
                 1 -> "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier) = MdiIcon(\"$rawName\", modifier, ${styles.first().name})"
 
                 // This icon supports all styles. No need to assert input parameters.
-                IconStyle.entries.size -> "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, style: IconStyle = FILLED) = MdiIcon(\"$rawName\", modifier, style)"
+                IconStyle.entries.size -> "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, style: MdiIconStyle = FILLED) = MdiIcon(\"$rawName\", modifier, style)"
 
                 // Not all styles are valid. For now, we throw a runtime exception (via assertValidStyle) to inform
                 // the user about this, but we can always decide to relax this later.
-                else -> "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, style: IconStyle = ${styles.first().name}) = MdiIcon(\"$rawName\", modifier, style.also { it.assertValidStyle(\"$methodName\", ${styles.joinToString { it.name }}) })"
+                else -> "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, style: MdiIconStyle = ${styles.first().name}) = MdiIcon(\"$rawName\", modifier, style.also { it.assertValidStyle(\"$methodName\", ${styles.joinToString { it.name }}) })"
             }
 
             // Name files after the raw icon name, not the method name. Method names can differ only by case, which
