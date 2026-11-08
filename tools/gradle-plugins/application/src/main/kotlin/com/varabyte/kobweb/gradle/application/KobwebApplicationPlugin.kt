@@ -30,8 +30,9 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebStartTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebUnpackServerJarTask
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
-import com.varabyte.kobweb.gradle.core.icons.lockedIconVersions
+import com.varabyte.kobweb.gradle.core.icons.lockedVersions
 import com.varabyte.kobweb.gradle.core.icons.setupIcons
+import com.varabyte.kobweb.gradle.core.extensions.icons
 import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
@@ -320,7 +321,10 @@ class KobwebApplicationPlugin @Inject constructor(
                 publicPath = kobwebBlock.publicPath
                 compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
                 dependencies = project.getTransitiveJsDependencyResults()
-                iconSetVersions = project.lockedIconVersions()
+                iconSetVersions = project.kobwebBlock.icons.lockedVersions()
+                warnOnVersionMismatch = project.provider {
+                    project.kobwebBlock.icons.iconSets.mapValues { (_, iconSet) -> iconSet.warnOnVersionMismatch.get() }
+                }
             }
 
             val jsRunTasks = listOf(jsTarget.browserDevelopmentRun, jsTarget.browserProductionRun)

@@ -5,6 +5,7 @@ import com.varabyte.kobweb.gradle.core.metadata.ModuleMetadata
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.RootAndFile
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_MODULE
+import com.varabyte.kobweb.project.common.nonStrictDefault
 import kotlinx.serialization.json.Json
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
@@ -49,9 +50,6 @@ abstract class KobwebCopyTask(desc: String) : KobwebTask(desc) {
         include(KOBWEB_METADATA_MODULE)
     }
 
-    // Modules built with newer versions of Kobweb may add fields we don't know about
-    private val moduleMetadataJson = Json { ignoreUnknownKeys = true }
-
     /**
      * A file found inside a Kobweb module (i.e. a jar or directory containing a Kobweb module.json file).
      */
@@ -63,7 +61,7 @@ abstract class KobwebCopyTask(desc: String) : KobwebTask(desc) {
     ): List<KobwebModuleFile> {
         val fileTree = this
         val moduleFile = fileTree.matching(kobwebModulePattern).files.firstOrNull() ?: return emptyList()
-        val metadata = moduleMetadataJson.decodeFromString(ModuleMetadata.serializer(), moduleFile.readText())
+        val metadata = Json.nonStrictDefault.decodeFromString(ModuleMetadata.serializer(), moduleFile.readText())
 
         return buildList {
             fileTree.matching(createPatternSet(metadata)).visit {

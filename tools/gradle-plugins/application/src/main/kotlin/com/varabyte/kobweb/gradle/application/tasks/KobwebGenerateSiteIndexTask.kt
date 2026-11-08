@@ -13,7 +13,9 @@ import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.gradle.core.util.toSha256
 import com.varabyte.kobweb.icons.codegen.IconSet
+import com.varabyte.kobweb.icons.codegen.stylesheet.IconStylesheet
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_LIBRARY
+import com.varabyte.kobweb.project.common.nonStrictDefault
 import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.dom.append
 import kotlinx.html.dom.document
@@ -89,6 +91,13 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
      */
     @get:Input
     abstract val iconSetVersions: MapProperty<String, String>
+
+    /**
+     * Icon sets the app generates bindings for, mapped to whether to warn when their stylesheet may not render every
+     * library's icons.
+     */
+    @get:Input
+    abstract val warnOnVersionMismatch: MapProperty<String, Boolean>
 
     @get:Input
     val hasFaDependency: Provider<Boolean>
@@ -316,6 +325,60 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         )
     }
 
+    /** The name of the dependency this artifact belongs to, e.g. "sitelib-js-1.0.klib" -> "sitelib". */
+    private val File.dependencyName get() = nameWithoutExtension.substringBeforeLast("-js-")
+
+    /**
+     * Returns a stylesheet link for each icon set that this app or its dependencies generate bindings for.
+     *
+     * A page can only load one stylesheet per set, since different versions share class names and the later one wins.
+     * The app's own version is its explicit choice, so it wins; otherwise, the icon set picks the version to load.
+     */
+    private fun iconStylesheetLinks(librariesMetadata: Map<File, LibraryMetadata>): List<String> {
+        val appIconSetVersions = iconSetVersions.get()
+
+        // Icon set id -> the modules that generate its bindings
+        val moduleVersionsByIconSet = mutableMapOf<String, ModuleIconVersions>()
+        fun addBindings(id: String, module: String, version: String) {
+            moduleVersionsByIconSet.getOrPut(id) { ModuleIconVersions() }[module] = version
+        }
+        appIconSetVersions.forEach { (id, version) -> addBindings(id, module = "this app", version) }
+        if (hasFaDependency.get()) addBindings("fa", module = "silk-icons-fa", SILK_ICONS_VERSIONS.getValue("fa"))
+        if (hasMdiDependency.get()) addBindings("mdi", module = "silk-icons-mdi", SILK_ICONS_VERSIONS.getValue("mdi"))
+        if (hasMsDependency.get()) addBindings("ms", module = "silk-icons-ms", SILK_ICONS_VERSIONS.getValue("ms"))
+        librariesMetadata.forEach { (file, libraryMetadata) ->
+            libraryMetadata.iconSets.forEach { (id, version) -> addBindings(id, module = file.dependencyName, version) }
+        }
+
+        return IconSet.all.mapNotNull { iconSet ->
+            val moduleVersions = moduleVersionsByIconSet[iconSet.id] ?: return@mapNotNull null
+            val stylesheet = iconSet.stylesheet ?: return@mapNotNull null
+            val version = appIconSetVersions[iconSet.id] ?: stylesheet.versionFor(moduleVersions.versions)
+            val incompatibleModules = moduleVersions.incompatibleWith(stylesheet, version)
+            if (incompatibleModules.isNotEmpty() && warnOnVersionMismatch.get()[iconSet.id] != false) {
+                val mappings = incompatibleModules.entries.joinToString { (module, bindingsVersion) ->
+                    "\"$module\" -> \"$bindingsVersion\""
+                }
+                val id = iconSet.id
+                logger.warn(
+                    "w: Only one \"$id\" icon stylesheet can be loaded, so this site loads it for version $version. " +
+                        "But given conflicting module mappings ($mappings), if any of those icons were renamed or " +
+                        "removed in $version, they will render blank. To silence this warning, you can update your " +
+                        "dependencies (if possible), set this app's \"$id\" version explicitly (via " +
+                        "`kobweb { icons { $id { version.set(\"...\") } } }`), or disable this warning (via " +
+                        "`kobweb { icons { $id { warnOnVersionMismatch.set(false) } } }`)."
+                )
+            }
+
+            HtmlUtil.serializeHeadContents {
+                link {
+                    rel = "stylesheet"
+                    href = stylesheet.urlFor(version)
+                }
+            }
+        }
+    }
+
     @TaskAction
     fun execute() {
         // Collect all <head> elements together. These will almost always be defined only by the app, but libraries are
@@ -323,51 +386,20 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         // artifacts.
         val headElements = mutableListOf(indexBlock.serializedHead.get())
 
-        // Icon sets from `kobweb { icons { ... } }` and from Kobweb's silk-icons artifacts share one stylesheet each. If
-        // both provide the same set, the app's chosen version wins, since its bindings may use icons the older artifact
-        // version lacks.
-        val appIconSetVersions = iconSetVersions.get()
-        val silkIconSetVersions = buildMap {
-            if (hasFaDependency.get()) put("fa", SILK_ICONS_VERSIONS.getValue("fa"))
-            if (hasMdiDependency.get()) put("mdi", SILK_ICONS_VERSIONS.getValue("mdi"))
-            if (hasMsDependency.get()) put("ms", SILK_ICONS_VERSIONS.getValue("ms"))
-        }
+        // Read every Kobweb library's metadata up front, since both icon stylesheets and library <head> elements need it
+        val librariesMetadata: Map<File, LibraryMetadata> = compileClasspath.mapNotNull { file ->
+            var libraryMetadata: LibraryMetadata? = null
+            file.searchZipFor(KOBWEB_METADATA_LIBRARY) { bytes ->
+                libraryMetadata = Json.nonStrictDefault.decodeFromString(LibraryMetadata.serializer(), bytes.decodeToString())
+            }
+            libraryMetadata?.let { file to it }
+        }.toMap()
 
-        val appFaVersion = appIconSetVersions["fa"]
-        val silkFaVersion = silkIconSetVersions["fa"]
-        // Loading both stylesheets wouldn't help, since they share class names and the later one wins. Within a major
-        // version, a newer stylesheet still has all the older icons, so only warn across major versions.
-        if (appFaVersion != null && silkFaVersion != null &&
-            appFaVersion.substringBefore('.') != silkFaVersion.substringBefore('.')
-        ) {
-            logger.warn(
-                "w: This app generates Font Awesome $appFaVersion icons, but a dependency uses Kobweb's silk-icons-fa " +
-                    "artifact, which was built for $silkFaVersion. Only the $appFaVersion stylesheet is loaded, " +
-                    "so any of the dependency's icons that $appFaVersion renamed or removed will render blank."
-            )
-        }
-
-        val stylesheetVersions = silkIconSetVersions + appIconSetVersions
-        IconSet.all.forEach { iconSet ->
-            val version = stylesheetVersions[iconSet.id] ?: return@forEach
-            val stylesheetUrl = iconSet.stylesheetUrl(version) ?: return@forEach
-            headElements.add(HtmlUtil.serializeHeadContents {
-                link {
-                    rel = "stylesheet"
-                    href = stylesheetUrl
-                }
-            })
-        }
+        headElements.addAll(iconStylesheetLinks(librariesMetadata))
 
         val headElementsFromDependencies = mutableMapOf<File, List<String>>()
-        compileClasspath.forEach { file ->
-            var libraryMetadata: LibraryMetadata? = null
-
-            file.searchZipFor(KOBWEB_METADATA_LIBRARY) { bytes ->
-                libraryMetadata = Json.decodeFromString(LibraryMetadata.serializer(), bytes.decodeToString())
-            }
-
-            libraryMetadata?.index?.headElements?.let { headElementsStr ->
+        librariesMetadata.forEach { (file, libraryMetadata) ->
+            libraryMetadata.index.headElements?.let { headElementsStr ->
                 if (headElementsStr.isBlank()) {
                     return@forEach
                 }
@@ -402,7 +434,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                     logger.lifecycle("```")
 
                     headElementsFromDependencies.forEach { (artifact, elements) ->
-                        val dep = artifact.nameWithoutExtension.substringBeforeLast("-js-")
+                        val dep = artifact.dependencyName
                         logger.lifecycle("* Requested by \"${artifact.name}:\"")
                         elements.forEach { element -> logger.lifecycle("  $element") }
                         logger.lifecycle("  ! Call `kobweb.app.index.excludeHtmlForDependencies.add(\"$dep\")` in your build.gradle.kts file to reject these elements.")
@@ -427,12 +459,28 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
 
     companion object {
         /** The icon set versions that Kobweb's published silk-icons-* artifacts generate bindings for. */
-        // TODO: Delete this once icon artifacts and libraries publish which icon set versions they use. Until then, keep
+        // TODO: Delete this once icon artifacts publish which icon set versions they use. Until then, keep
         //  it in sync with the versions in frontend/silk-icons-*/build.gradle.kts.
         private val SILK_ICONS_VERSIONS = mapOf(
             "fa" to "6.5.2",
             "mdi" to "49d4db35df873165d6bd6ba09b063c7dafbac2f4",
             "ms" to "49d4db35df873165d6bd6ba09b063c7dafbac2f4",
         )
+    }
+}
+
+/** The modules that generate bindings for one icon set, each with the version it generated them at. */
+private class ModuleIconVersions {
+    private val versionsByModule = mutableMapOf<String, String>()
+
+    val versions: Collection<String> get() = versionsByModule.values
+
+    operator fun set(module: String, version: String) {
+        versionsByModule[module] = version
+    }
+
+    /** The modules (with their versions) whose icons [stylesheet] at [stylesheetVersion] might not render. */
+    fun incompatibleWith(stylesheet: IconStylesheet, stylesheetVersion: String): Map<String, String> {
+        return versionsByModule.filterValues { version -> !stylesheet.serves(stylesheetVersion, version) }
     }
 }

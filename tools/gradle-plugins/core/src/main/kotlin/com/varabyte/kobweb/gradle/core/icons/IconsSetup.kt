@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.gradle.core.icons
 
+import com.varabyte.kobweb.gradle.core.extensions.IconsBlock
 import com.varabyte.kobweb.gradle.core.extensions.createIconsBlock
-import com.varabyte.kobweb.gradle.core.extensions.icons
 import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
@@ -9,7 +9,6 @@ import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.tasks.KobwebFetchIconsTask
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateIconsTask
 import org.gradle.api.Project
-import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
@@ -29,11 +28,11 @@ fun Project.setupIcons() {
     }
     val kobwebFetchIconsTask = tasks.register<KobwebFetchIconsTask>("kobwebFetchIcons") {
         versionSpecs.set(iconVersionSpecs)
-        storeDir.set(iconsStoreDir)
+        storeDir.set(iconsBlock.storeDir)
     }
     val kobwebGenerateIconsTask = tasks.register<KobwebGenerateIconsTask>("kobwebGenerateIcons") {
         versionSpecs.set(iconVersionSpecs)
-        storeDir.set(iconsStoreDir)
+        storeDir.set(iconsBlock.storeDir)
         projectGroup.set(provider { project.group.toString() })
         rootPackage.set(iconsBlock.rootPackage)
         visibility.set(iconsBlock.visibility)
@@ -53,20 +52,14 @@ fun Project.setupIcons() {
 }
 
 /**
- * The icon sets configured in `kobweb { icons { ... } }`, mapped to the exact versions their data was fetched for, e.g.
- * `"fa" to "6.5.2"`.
+ * The configured icon sets, mapped to the exact versions their data was fetched for, e.g. `"fa" to "6.5.2"`.
  *
  * Sets that haven't been fetched yet are left out; `kobwebGenerateIcons` reports those.
  */
-fun Project.lockedIconVersions(): Provider<Map<String, String>> {
-    val iconsBlock = kobwebBlock.icons
-    val storeDir = iconsStoreDir.asFile
-    return provider {
-        iconsBlock.iconSets.keys.mapNotNull { id ->
-            IconsLock.readFrom(IconsLock.fileFor(storeDir, id))?.let { lock -> id to lock.version }
+fun IconsBlock.lockedVersions(): Provider<Map<String, String>> {
+    return providers.provider {
+        iconSets.keys.mapNotNull { id ->
+            IconsLock.readFrom(IconsLock.fileFor(storeDir.asFile, id))?.let { lock -> id to lock.version }
         }.toMap()
     }
 }
-
-/** The folder that `kobwebFetchIcons` writes icon data and lock files to, which should be checked in. */
-private val Project.iconsStoreDir: Directory get() = layout.projectDirectory.dir("kobweb-store/icons")

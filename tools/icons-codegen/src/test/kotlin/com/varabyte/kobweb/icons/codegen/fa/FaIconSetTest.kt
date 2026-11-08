@@ -118,6 +118,31 @@ class FaIconSetTest {
     }
 
     @Test
+    fun stylesheetIsLoadedForTheNewestVersion() {
+        val stylesheet = FaIconSet().stylesheet
+        assertThat(stylesheet.versionFor(listOf("6.5.2", "6.10.0", "6.7.1"))).isEqualTo("6.10.0")
+    }
+
+    @Test
+    fun stylesheetServesOlderBindingsWithTheSameMajorVersion() {
+        val stylesheet = FaIconSet().stylesheet
+        assertThat(stylesheet.serves(stylesheetVersion = "6.7.1", bindingsVersion = "6.5.2")).isTrue()
+        assertThat(stylesheet.serves(stylesheetVersion = "6.5.2", bindingsVersion = "6.5.2")).isTrue()
+    }
+
+    @Test
+    fun stylesheetDoesNotServeNewerBindings() {
+        val stylesheet = FaIconSet().stylesheet
+        assertThat(stylesheet.serves(stylesheetVersion = "6.5.2", bindingsVersion = "6.7.1")).isFalse()
+    }
+
+    @Test
+    fun stylesheetDoesNotServeBindingsWithAnotherMajorVersion() {
+        val stylesheet = FaIconSet().stylesheet
+        assertThat(stylesheet.serves(stylesheetVersion = "7.3.1", bindingsVersion = "6.5.2")).isFalse()
+    }
+
+    @Test
     fun brandsWithOtherStylesAreRejected() {
         val e = assertThrows<IllegalStateException> {
             generateBindings(

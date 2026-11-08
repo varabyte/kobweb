@@ -33,7 +33,8 @@ internal class VersionSpec(val text: String) {
 
         private val RELEASE_TAG = Regex("""\d+(\.\d+)*""")
 
-        private val RELEASE_ORDER = Comparator<String> { a, b ->
+        /** Orders numeric release versions like "1.70.0" from oldest to newest. */
+        val RELEASE_ORDER = Comparator<String> { a, b ->
             val aParts = a.split('.').map { it.toLong() }
             val bParts = b.split('.').map { it.toLong() }
             aParts.zip(bParts).map { (aPart, bPart) -> aPart.compareTo(bPart) }.firstOrNull { it != 0 }

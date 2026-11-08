@@ -3,8 +3,11 @@
 package com.varabyte.kobweb.gradle.core.extensions
 
 import org.gradle.api.Action
+import org.gradle.api.file.Directory
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.newInstance
@@ -40,7 +43,14 @@ enum class IconVisibility {
  * this module's `kobweb-store/icons` folder, which should be checked in. Builds only read from that folder, never from
  * the network. To pick up newer releases for a version like "latest", run the task again.
  */
-abstract class IconsBlock @Inject constructor(private val objects: ObjectFactory) {
+abstract class IconsBlock @Inject constructor(
+    private val objects: ObjectFactory,
+    internal val providers: ProviderFactory,
+    layout: ProjectLayout,
+) {
+    /** The folder that `kobwebFetchIcons` writes icon data and lock files to, which should be checked in. */
+    internal val storeDir: Directory = layout.projectDirectory.dir("kobweb-store/icons")
+
     abstract class IconSetBlock {
         /**
          * The upstream version to generate bindings for: an exact version, a prefix like "1.+" for the newest matching
@@ -51,8 +61,19 @@ abstract class IconsBlock @Inject constructor(private val objects: ObjectFactory
          */
         abstract val version: Property<String>
 
+        /**
+         * Whether to warn when a library generated bindings for this icon set at a version that the stylesheet this
+         * site loads might not fully support, since some of that library's icons may render blank.
+         *
+         * You are welcome to turn the warning off once you've checked that those icons render.
+         *
+         * NOTE: Only apps load stylesheets, so this does nothing in a library.
+         */
+        abstract val warnOnVersionMismatch: Property<Boolean>
+
         init {
             version.convention("latest")
+            warnOnVersionMismatch.convention(true)
         }
     }
 
@@ -70,7 +91,7 @@ abstract class IconsBlock @Inject constructor(private val objects: ObjectFactory
     private val _iconSets = mutableMapOf<String, IconSetBlock>()
 
     /** The configured icon sets, keyed by their id (e.g. "fa"), which is also the name of their subpackage. */
-    internal val iconSets: Map<String, IconSetBlock> get() = _iconSets
+    val iconSets: Map<String, IconSetBlock> get() = _iconSets
 
     private fun iconSet(id: String, configure: Action<IconSetBlock>) {
         configure.execute(_iconSets.getOrPut(id) { objects.newInstance<IconSetBlock>() })
