@@ -4,7 +4,7 @@ import java.io.File
 import kotlin.system.exitProcess
 
 private const val USAGE = """Usage:
-  fetch <icon-set> --version <version> --icons <file>
+  fetch <icon-set> --version <version, e.g. 1.70.0, 1.+, or latest> --icons <file>
   generate <icon-set> --icons <file> --out <dir> --package <name> --visibility <public|internal>"""
 
 /**
@@ -36,7 +36,7 @@ private fun run(args: List<String>) {
     fun flag(name: String) = flags[name] ?: throw IllegalArgumentException("Missing --$name")
 
     when (command) {
-        "fetch" -> iconSet.fetch(flag("version"), File(flag("icons")))
+        "fetch" -> iconSet.fetch(iconSet.resolveVersion(flag("version")), File(flag("icons")))
         "generate" -> {
             val visibility = IconVisibility.entries.find { it.name.equals(flag("visibility"), ignoreCase = true) }
                 ?: throw IllegalArgumentException("Unknown visibility \"${flag("visibility")}\"")

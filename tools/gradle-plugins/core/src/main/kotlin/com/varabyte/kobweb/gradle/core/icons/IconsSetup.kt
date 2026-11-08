@@ -7,7 +7,6 @@ import com.varabyte.kobweb.gradle.core.kmp.buildTargets
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.tasks.KobwebFetchIconsTask
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateIconsTask
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
@@ -23,23 +22,24 @@ fun Project.setupIcons() {
     val iconsBlock = kobwebBlock.createIconsBlock()
 
     val iconsStoreDir = layout.projectDirectory.dir("kobweb-store/icons")
-    val iconVersions = provider {
-        iconsBlock.iconSets.mapValues { (id, iconSetBlock) ->
-            iconSetBlock.version.orNull
-                ?: throw GradleException("The \"$id\" icon set in `kobweb { icons { ... } }` needs a version.")
-        }
+    val iconVersionSpecs = provider {
+        iconsBlock.iconSets.mapValues { (_, iconSetBlock) -> iconSetBlock.version.get() }
     }
-    tasks.register<KobwebFetchIconsTask>("kobwebFetchIcons") {
-        versions.set(iconVersions)
+    val kobwebFetchIconsTask = tasks.register<KobwebFetchIconsTask>("kobwebFetchIcons") {
+        versionSpecs.set(iconVersionSpecs)
         storeDir.set(iconsStoreDir)
     }
     val kobwebGenerateIconsTask = tasks.register<KobwebGenerateIconsTask>("kobwebGenerateIcons") {
-        versions.set(iconVersions)
+        versionSpecs.set(iconVersionSpecs)
         storeDir.set(iconsStoreDir)
         projectGroup.set(provider { project.group.toString() })
         rootPackage.set(iconsBlock.rootPackage)
         visibility.set(iconsBlock.visibility)
         outputDir.set(layout.buildDirectory.dir(kobwebBlock.baseGenDir.map { "$it/icons/src/jsMain/kotlin" }))
+        // So that `./gradlew kobwebFetchIcons build` generates from freshly fetched data.
+        // Normally mustRunAfter is a sign that inputs and outputs aren't set up correctly, but here, we don't want to
+        // trigger a fetch, because that would force a network request on every build.
+        mustRunAfter(kobwebFetchIconsTask)
     }
     pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
         buildTargets.withType<KotlinJsIrTarget>().configureEach {

@@ -20,6 +20,8 @@ import java.io.File
 class MsIconSet : IconSet {
     override val id = "ms"
 
+    override fun resolveVersion(spec: String) = MaterialDesignIconsRepo.resolveCommit(VersionSpec(spec))
+
     override fun fetch(version: String, iconsFile: File) {
         // Material Symbols ships the same set of icons across all of its styles (outlined, rounded, sharp), so we only
         // need a single list of names. We still fetch every family, though, to verify that assumption holds.

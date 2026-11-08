@@ -22,9 +22,9 @@ import com.varabyte.kobweb.icons.codegen.IconVisibility as CodegenIconVisibility
 @CacheableTask
 abstract class KobwebGenerateIconsTask :
     KobwebTask("Generate Kotlin bindings for the icon sets in `kobweb { icons { ... } }`, from data fetched by kobwebFetchIcons.") {
-    /** Each configured icon set's id mapped to its version. */
+    /** Each configured icon set's id mapped to its requested version, e.g. `"fa" to "6.+"`. */
     @get:Input
-    abstract val versions: MapProperty<String, String>
+    abstract val versionSpecs: MapProperty<String, String>
 
     /** The folder that kobwebFetchIcons writes fetched data and lock files to. */
     @get:InputFiles
@@ -60,7 +60,7 @@ abstract class KobwebGenerateIconsTask :
         outDir.mkdirs()
 
         val storeRoot = storeDir.get().asFile
-        versions.get().forEach { (id, version) ->
+        versionSpecs.get().forEach { (id, spec) ->
             val iconSet = IconSet.all.single { it.id == id }
             val iconsFile = storeRoot.resolve(iconSet.iconsFileName)
             val lock = IconsLock.readFrom(IconsLock.fileFor(storeRoot, id))
@@ -70,10 +70,11 @@ abstract class KobwebGenerateIconsTask :
                         "in the files it writes to ${storeRoot.relativeTo(projectLayout.projectDirectory.asFile)}."
                 )
             }
-            if (lock.version != version) {
+            if (lock.spec != spec) {
                 throw GradleException(
-                    "The \"$id\" icon set is configured to use version $version, but its fetched data is for version " +
-                        "${lock.version}. Run the kobwebFetchIcons task to update it."
+                    "The \"$id\" icon set is configured to use version \"$spec\", but its data was fetched for " +
+                        "\"${lock.spec}\"${if (lock.version != lock.spec) " (resolved to ${lock.version})" else ""}. " +
+                        "Run the kobwebFetchIcons task to update it."
                 )
             }
 

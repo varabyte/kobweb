@@ -42,6 +42,12 @@ interface IconSet {
     /** The default name for this set's icons file, which [fetch] writes and [generateBindings] reads. */
     val iconsFileName: String get() = "$id-icons.txt"
 
+    /**
+     * Turns a requested [spec] (an exact version, a prefix like "1.+", or "latest") into the exact version to [fetch],
+     * looking up upstream releases if needed.
+     */
+    fun resolveVersion(spec: String): String
+
     /** Downloads upstream icon data for [version] and writes it to [iconsFile]. */
     fun fetch(version: String, iconsFile: File)
 

@@ -38,12 +38,22 @@ enum class IconVisibility {
  *
  * After adding an icon set or changing its version, run the `kobwebFetchIcons` task. It downloads the set's data into
  * this module's `kobweb-store/icons` folder, which should be checked in. Builds only read from that folder, never from
- * the network.
+ * the network. To pick up newer releases for a version like "latest", run the task again.
  */
 abstract class IconsBlock @Inject constructor(private val objects: ObjectFactory) {
     abstract class IconSetBlock {
-        /** The upstream version to generate bindings for. */
+        /**
+         * The upstream version to generate bindings for: an exact version, a prefix like "1.+" for the newest matching
+         * release, or "latest" (the default).
+         *
+         * `kobwebFetchIcons` resolves this to an exact version and records it, so builds keep using that version until
+         * the next fetch.
+         */
         abstract val version: Property<String>
+
+        init {
+            version.convention("latest")
+        }
     }
 
     /**
@@ -67,10 +77,10 @@ abstract class IconsBlock @Inject constructor(private val objects: ObjectFactory
     }
 
     /** Font Awesome (https://fontawesome.com), whose versions are release tags, e.g. "6.5.2". */
-    fun fa(configure: Action<IconSetBlock>) = iconSet("fa", configure)
+    fun fa(configure: Action<IconSetBlock> = Action {}) = iconSet("fa", configure)
 
     /** Lucide (https://lucide.dev), whose versions are release tags, e.g. "1.70.0". */
-    fun lucide(configure: Action<IconSetBlock>) = iconSet("lucide", configure)
+    fun lucide(configure: Action<IconSetBlock> = Action {}) = iconSet("lucide", configure)
 
     /**
      * Google's Material Icons (https://developers.google.com/fonts/docs/material_icons), whose versions are commit SHAs
@@ -79,7 +89,7 @@ abstract class IconsBlock @Inject constructor(private val objects: ObjectFactory
      * This is the older of Google's two Material icon sets. Its successor is Material Symbols ([ms]), which Google
      * publishes from the same repository.
      */
-    fun mdi(configure: Action<IconSetBlock>) = iconSet("mdi", configure)
+    fun mdi(configure: Action<IconSetBlock> = Action {}) = iconSet("mdi", configure)
 
     /**
      * Google's Material Symbols (https://developers.google.com/fonts/docs/material_symbols), whose versions are commit
@@ -88,7 +98,7 @@ abstract class IconsBlock @Inject constructor(private val objects: ObjectFactory
      * This is the newer of Google's two Material icon sets, the successor to Material Icons ([mdi]). Google publishes
      * both from the same repository, despite its name.
      */
-    fun ms(configure: Action<IconSetBlock>) = iconSet("ms", configure)
+    fun ms(configure: Action<IconSetBlock> = Action {}) = iconSet("ms", configure)
 
     init {
         rootPackage.convention(".components.icons")

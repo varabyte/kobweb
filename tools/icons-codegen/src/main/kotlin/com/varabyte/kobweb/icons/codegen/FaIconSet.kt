@@ -30,6 +30,8 @@ class FaIconSet : IconSet {
         BRAND("fab", "brands"),
     }
 
+    override fun resolveVersion(spec: String) = GitHubRepo("FortAwesome/Font-Awesome").resolveRelease(VersionSpec(spec))
+
     override fun fetch(version: String, iconsFile: File) {
         val iconsJson = URI("https://raw.githubusercontent.com/FortAwesome/Font-Awesome/$version/metadata/icons.json")
             .openDownloadStream()

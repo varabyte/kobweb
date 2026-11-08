@@ -31,6 +31,8 @@ class MdiIconSet : IconSet {
         TWO_TONED("mdit", "MaterialIconsTwoTone-Regular"),
     }
 
+    override fun resolveVersion(spec: String) = MaterialDesignIconsRepo.resolveCommit(VersionSpec(spec))
+
     override fun fetch(version: String, iconsFile: File) {
         val repo = MaterialDesignIconsRepo(commit = version)
         val lines = IconStyle.entries.map { style ->

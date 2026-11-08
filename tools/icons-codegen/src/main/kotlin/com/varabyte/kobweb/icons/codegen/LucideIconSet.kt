@@ -35,6 +35,8 @@ class LucideIconSet : IconSet {
     override val id = "lucide"
     override val iconsFileName = "lucide-icons.json"
 
+    override fun resolveVersion(spec: String) = GitHubRepo("lucide-icons/lucide").resolveRelease(VersionSpec(spec))
+
     override fun fetch(version: String, iconsFile: File) {
         val svgContents = mutableMapOf<String, String>()
         val jsonContents = mutableMapOf<String, String>()

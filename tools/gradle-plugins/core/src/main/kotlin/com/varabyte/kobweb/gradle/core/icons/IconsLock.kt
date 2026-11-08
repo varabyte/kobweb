@@ -7,11 +7,12 @@ import java.io.File
  *
  * It's checked in next to the data, as a `<id>.lock` file.
  */
-internal class IconsLock(val version: String) {
+internal class IconsLock(val spec: String, val version: String) {
     fun writeTo(file: File) {
         file.writeText(
             """
             |# Written by the kobwebFetchIcons task. Check this file in, but don't edit it by hand.
+            |spec=$spec
             |version=$version
             |
             """.trimMargin()
@@ -22,7 +23,7 @@ internal class IconsLock(val version: String) {
         /** The lock file for the icon set with this [id], inside a module's icons store [storeDir]. */
         fun fileFor(storeDir: File, id: String): File = storeDir.resolve("$id.lock")
 
-        /** Reads a lock file written by [writeTo], returning null if it doesn't exist. */
+        /** Reads a lock file written by [writeTo], returning null if it doesn't exist or is incomplete. */
         fun readFrom(file: File): IconsLock? {
             if (!file.exists()) return null
             val entries = file.readLines()
@@ -30,7 +31,9 @@ internal class IconsLock(val version: String) {
                 .filter { line -> line.isNotBlank() && !line.startsWith("#") }
                 .mapNotNull { line -> line.split('=', limit = 2).takeIf { it.size == 2 } }
                 .associate { (key, value) -> key to value }
-            return entries["version"]?.let(::IconsLock)
+            val spec = entries["spec"] ?: return null
+            val version = entries["version"] ?: return null
+            return IconsLock(spec, version)
         }
     }
 }
