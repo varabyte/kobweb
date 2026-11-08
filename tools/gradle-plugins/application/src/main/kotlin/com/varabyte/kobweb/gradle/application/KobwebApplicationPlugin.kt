@@ -321,7 +321,6 @@ class KobwebApplicationPlugin @Inject constructor(
             kobwebGenSiteIndexTask.configure {
                 publicPath = kobwebBlock.publicPath
                 compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
-                dependencies = project.getTransitiveJsDependencyResults()
                 iconSetVersions = appBlock.icons.lockedVersions()
                 warnOnVersionMismatch = project.provider {
                     appBlock.icons.iconSets.mapValues { (_, iconSet) -> iconSet.warnOnVersionMismatch.get() }

@@ -11,7 +11,6 @@ version = libs.versions.kobweb.get()
 
 silkIcons {
     iconSet.set("fa")
-    // Keep in sync with the Font Awesome stylesheet that KobwebGenerateSiteIndexTask links to
     version.set("6.5.2")
     iconsFile.set("fa-icon-list.txt")
 }

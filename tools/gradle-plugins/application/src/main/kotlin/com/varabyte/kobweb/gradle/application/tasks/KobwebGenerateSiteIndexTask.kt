@@ -6,14 +6,15 @@ import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.extensions.interceptUrls
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
+import com.varabyte.kobweb.gradle.core.metadata.IconsMetadata
 import com.varabyte.kobweb.gradle.core.metadata.LibraryMetadata
 import com.varabyte.kobweb.gradle.core.util.HtmlUtil
 import com.varabyte.kobweb.gradle.core.util.downloadOrCached
-import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.gradle.core.util.toSha256
 import com.varabyte.kobweb.icons.codegen.IconSet
 import com.varabyte.kobweb.icons.codegen.stylesheet.IconStylesheet
+import com.varabyte.kobweb.ksp.KOBWEB_METADATA_ICONS
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_LIBRARY
 import com.varabyte.kobweb.project.common.nonStrictDefault
 import com.varabyte.kobweb.project.conf.KobwebConf
@@ -24,17 +25,14 @@ import kotlinx.html.head
 import kotlinx.html.link
 import kotlinx.html.unsafe
 import kotlinx.serialization.json.Json
-import org.gradle.api.artifacts.result.ResolvedDependencyResult
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFile
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
@@ -82,9 +80,6 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val compileClasspath: ConfigurableFileCollection
 
-    @get:Internal
-    abstract val dependencies: ListProperty<ResolvedDependencyResult>
-
     /**
      * Icon sets the app generates bindings for in `kobweb { app { icons { ... } } }`, mapped to their locked versions, e.g.
      * `"fa" to "6.5.2"`.
@@ -98,18 +93,6 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
      */
     @get:Input
     abstract val warnOnVersionMismatch: MapProperty<String, Boolean>
-
-    @get:Input
-    val hasFaDependency: Provider<Boolean>
-        get() = dependencies.hasDependencyNamed("com.varabyte.kobwebx:silk-icons-fa")
-
-    @get:Input
-    val hasMdiDependency: Provider<Boolean>
-        get() = dependencies.hasDependencyNamed("com.varabyte.kobwebx:silk-icons-mdi")
-
-    @get:Input
-    val hasMsDependency: Provider<Boolean>
-        get() = dependencies.hasDependencyNamed("com.varabyte.kobwebx:silk-icons-ms")
 
     private val httpProtocolRegex = Regex("""^https?://""")
     // matches `url(https://example.com)`, `url('https://example.com')`, and `url("https://example.com")`
@@ -334,7 +317,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
      * A page can only load one stylesheet per set, since different versions share class names and the later one wins.
      * The app's own version is its explicit choice, so it wins; otherwise, the icon set picks the version to load.
      */
-    private fun iconStylesheetLinks(librariesMetadata: Map<File, LibraryMetadata>): List<String> {
+    private fun iconStylesheetLinks(): List<String> {
         val appIconSetVersions = iconSetVersions.get()
 
         // Icon set id -> the modules that generate its bindings
@@ -343,11 +326,11 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             moduleVersionsByIconSet.getOrPut(id) { ModuleIconVersions() }[module] = version
         }
         appIconSetVersions.forEach { (id, version) -> addBindings(id, module = "this app", version) }
-        if (hasFaDependency.get()) addBindings("fa", module = "silk-icons-fa", SILK_ICONS_VERSIONS.getValue("fa"))
-        if (hasMdiDependency.get()) addBindings("mdi", module = "silk-icons-mdi", SILK_ICONS_VERSIONS.getValue("mdi"))
-        if (hasMsDependency.get()) addBindings("ms", module = "silk-icons-ms", SILK_ICONS_VERSIONS.getValue("ms"))
-        librariesMetadata.forEach { (file, libraryMetadata) ->
-            libraryMetadata.iconSets.forEach { (id, version) -> addBindings(id, module = file.dependencyName, version) }
+        compileClasspath.forEach { file ->
+            file.searchZipFor(KOBWEB_METADATA_ICONS) { bytes ->
+                val iconsMetadata = Json.nonStrictDefault.decodeFromString(IconsMetadata.serializer(), bytes.decodeToString())
+                iconsMetadata.iconSets.forEach { (id, version) -> addBindings(id, module = file.dependencyName, version) }
+            }
         }
 
         return IconSet.all.mapNotNull { iconSet ->
@@ -386,20 +369,17 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         // artifacts.
         val headElements = mutableListOf(indexBlock.serializedHead.get())
 
-        // Read every Kobweb library's metadata up front, since both icon stylesheets and library <head> elements need it
-        val librariesMetadata: Map<File, LibraryMetadata> = compileClasspath.mapNotNull { file ->
+        headElements.addAll(iconStylesheetLinks())
+
+        val headElementsFromDependencies = mutableMapOf<File, List<String>>()
+        compileClasspath.forEach { file ->
             var libraryMetadata: LibraryMetadata? = null
+
             file.searchZipFor(KOBWEB_METADATA_LIBRARY) { bytes ->
                 libraryMetadata = Json.nonStrictDefault.decodeFromString(LibraryMetadata.serializer(), bytes.decodeToString())
             }
-            libraryMetadata?.let { file to it }
-        }.toMap()
 
-        headElements.addAll(iconStylesheetLinks(librariesMetadata))
-
-        val headElementsFromDependencies = mutableMapOf<File, List<String>>()
-        librariesMetadata.forEach { (file, libraryMetadata) ->
-            libraryMetadata.index.headElements?.let { headElementsStr ->
+            libraryMetadata?.index?.headElements?.let { headElementsStr ->
                 if (headElementsStr.isBlank()) {
                     return@forEach
                 }
@@ -454,17 +434,6 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 indexBlock.scriptAttributes.get(),
                 buildTarget
             )
-        )
-    }
-
-    companion object {
-        /** The icon set versions that Kobweb's published silk-icons-* artifacts generate bindings for. */
-        // TODO: Delete this once icon artifacts publish which icon set versions they use. Until then, keep
-        //  it in sync with the versions in frontend/silk-icons-*/build.gradle.kts.
-        private val SILK_ICONS_VERSIONS = mapOf(
-            "fa" to "6.5.2",
-            "mdi" to "49d4db35df873165d6bd6ba09b063c7dafbac2f4",
-            "ms" to "49d4db35df873165d6bd6ba09b063c7dafbac2f4",
         )
     }
 }

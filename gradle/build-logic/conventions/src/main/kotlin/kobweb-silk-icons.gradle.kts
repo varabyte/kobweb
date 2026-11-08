@@ -19,6 +19,32 @@ class CodegenArguments(@get:Input val args: Provider<List<String>>) : CommandLin
     override fun asArguments(): Iterable<String> = args.get()
 }
 
+/**
+ * Writes the Kobweb icons metadata that apps read to find out which icon set (and version) a jar has bindings for, so
+ * they can load its stylesheet.
+ *
+ * This build can't depend on the Kobweb Gradle plugins, so the JSON is written by hand. It mirrors `IconsMetadata` in
+ * `tools/gradle-plugins/core`, which is where its format is defined.
+ */
+abstract class GenerateIconsMetadataTask : DefaultTask() {
+    @get:Input
+    abstract val iconSet: Property<String>
+
+    @get:Input
+    abstract val version: Property<String>
+
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @TaskAction
+    fun generate() {
+        outputDir.file("META-INF/kobweb/icons.json").get().asFile.apply {
+            parentFile.mkdirs()
+            writeText("""{"iconSets":{"${iconSet.get()}":"${version.get()}"}}""")
+        }
+    }
+}
+
 val silkIcons = extensions.create<SilkIconsExtension>("silkIcons")
 
 val generatedSrcDir = "build/generated/icons/src/jsMain/kotlin"
@@ -73,6 +99,12 @@ val generateIconsTask = tasks.register<JavaExec>("generateIcons") {
     outputs.cacheIf { true }
 }
 
+val generateIconsMetadataTask = tasks.register<GenerateIconsMetadataTask>("generateIconsMetadata") {
+    iconSet.set(silkIcons.iconSet)
+    version.set(silkIcons.version)
+    outputDir.set(layout.buildDirectory.dir("generated/kobweb/icons/metadata"))
+}
+
 pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
     // Type-safe `libs` accessors aren't generated for precompiled script plugins, so look libraries up by name
     val libs = the<VersionCatalogsExtension>().named("libs")
@@ -84,6 +116,7 @@ pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
 
         sourceSets.named("jsMain") {
             kotlin.srcDir(generateIconsTask)
+            resources.srcDir(generateIconsMetadataTask)
             dependencies {
                 implementation(libs.findLibrary("compose-runtime").get())
                 implementation(libs.findLibrary("compose-html-core").get())

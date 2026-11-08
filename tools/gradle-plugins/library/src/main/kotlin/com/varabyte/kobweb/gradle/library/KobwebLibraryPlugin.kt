@@ -13,6 +13,7 @@ import com.varabyte.kobweb.gradle.core.ksp.applyKspPlugin
 import com.varabyte.kobweb.gradle.core.ksp.setKspMode
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJs
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
+import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateIconsMetadataTask
 import com.varabyte.kobweb.gradle.core.util.generateModuleMetadataFor
 import com.varabyte.kobweb.gradle.library.extensions.createIconsBlock
 import com.varabyte.kobweb.gradle.library.extensions.createLibraryBlock
@@ -40,6 +41,9 @@ class KobwebLibraryPlugin : Plugin<Project> {
         val kobwebGenerateLibraryMetadataTask = project.tasks
             .register<KobwebGenerateLibraryMetadataTask>("kobwebGenerateLibraryMetadata") {
                 indexHead = project.kobwebBlock.library.index.serializedHead
+            }
+        val kobwebGenerateIconsMetadataTask = project.tasks
+            .register<KobwebGenerateIconsMetadataTask>("kobwebGenerateIconsMetadata") {
                 iconSetVersions = libraryBlock.icons.lockedVersions()
             }
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
@@ -48,6 +52,7 @@ class KobwebLibraryPlugin : Plugin<Project> {
             project.generateModuleMetadataFor(jsTarget)
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
                 resources.srcDir(kobwebGenerateLibraryMetadataTask)
+                resources.srcDir(kobwebGenerateIconsMetadataTask)
             }
         }
 
