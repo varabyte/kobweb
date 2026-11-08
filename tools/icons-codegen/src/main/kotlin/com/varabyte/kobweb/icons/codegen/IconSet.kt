@@ -1,5 +1,9 @@
 package com.varabyte.kobweb.icons.codegen
 
+import com.varabyte.kobweb.icons.codegen.fa.FaIconSet
+import com.varabyte.kobweb.icons.codegen.lucide.LucideIconSet
+import com.varabyte.kobweb.icons.codegen.material.MdiIconSet
+import com.varabyte.kobweb.icons.codegen.material.MsIconSet
 import java.io.File
 
 /**

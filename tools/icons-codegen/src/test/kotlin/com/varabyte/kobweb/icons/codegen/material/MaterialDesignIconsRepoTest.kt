@@ -1,5 +1,6 @@
-package com.varabyte.kobweb.icons.codegen
+package com.varabyte.kobweb.icons.codegen.material
 
+import com.varabyte.kobweb.icons.codegen.fetch.VersionSpec
 import com.varabyte.truthish.assertThat
 import com.varabyte.truthish.assertThrows
 import org.junit.Test

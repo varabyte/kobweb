@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.icons.codegen
+package com.varabyte.kobweb.icons.codegen.fetch
 
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray

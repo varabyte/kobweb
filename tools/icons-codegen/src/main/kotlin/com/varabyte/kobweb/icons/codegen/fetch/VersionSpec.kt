@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.icons.codegen
+package com.varabyte.kobweb.icons.codegen.fetch
 
 /**
  * A version requested for an icon set: an exact version (e.g. "1.70.0"), a prefix ending in "+" (e.g. "1.+"), or

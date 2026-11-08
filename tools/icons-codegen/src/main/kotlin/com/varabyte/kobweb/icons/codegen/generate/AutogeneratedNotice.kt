@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.icons.codegen
+package com.varabyte.kobweb.icons.codegen.generate
 
 import java.io.File
 

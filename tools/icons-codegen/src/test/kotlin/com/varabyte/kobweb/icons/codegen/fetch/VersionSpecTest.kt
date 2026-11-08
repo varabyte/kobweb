@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.icons.codegen
+package com.varabyte.kobweb.icons.codegen.fetch
 
 import com.varabyte.truthish.assertThat
 import org.junit.Test

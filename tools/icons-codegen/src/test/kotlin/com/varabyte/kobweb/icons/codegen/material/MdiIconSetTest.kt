@@ -1,7 +1,9 @@
 @file:Suppress("SpellCheckingInspection")
 
-package com.varabyte.kobweb.icons.codegen
+package com.varabyte.kobweb.icons.codegen.material
 
+import com.varabyte.kobweb.icons.codegen.IconCodegenOptions
+import com.varabyte.kobweb.icons.codegen.IconVisibility
 import com.varabyte.truthish.assertThat
 import org.junit.Test
 import java.io.File
