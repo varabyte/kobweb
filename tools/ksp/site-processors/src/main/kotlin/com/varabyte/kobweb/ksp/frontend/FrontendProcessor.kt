@@ -53,6 +53,7 @@ import com.varabyte.kobweb.ksp.util.receiverClass
 import com.varabyte.kobweb.ksp.util.toPackageName
 import com.varabyte.kobweb.project.common.FqNameShortcut
 import com.varabyte.kobweb.project.common.PackageName
+import com.varabyte.kobweb.project.common.nonStrictDefault
 import com.varabyte.kobweb.project.frontend.CssStyleEntry
 import com.varabyte.kobweb.project.frontend.CssStyleVariantEntry
 import com.varabyte.kobweb.project.frontend.FrontendData
@@ -732,7 +733,7 @@ internal class FrontendProcessor(
             path = path,
             extensionName = extension,
         ).writer().use { writer ->
-            writer.write(Json.encodeToString<FrontendData>(result.data))
+            writer.write(Json.nonStrictDefault.encodeToString<FrontendData>(result.data))
         }
     }
 

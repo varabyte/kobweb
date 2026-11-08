@@ -13,6 +13,7 @@ import com.varabyte.kobweb.ksp.common.RESPONSE_FQN
 import com.varabyte.kobweb.project.backend.ApiInterceptorEntry
 import com.varabyte.kobweb.project.backend.AppBackendData
 import com.varabyte.kobweb.project.common.PackageName
+import com.varabyte.kobweb.project.common.nonStrictDefault
 import kotlinx.serialization.json.Json
 
 internal class AppBackendProcessor(
@@ -73,7 +74,7 @@ internal class AppBackendProcessor(
             path = path,
             extensionName = extension,
         ).writer().use { writer ->
-            writer.write(Json.encodeToString(appBackendData))
+            writer.write(Json.nonStrictDefault.encodeToString(appBackendData))
         }
     }
 }

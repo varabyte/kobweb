@@ -3,6 +3,7 @@ package com.varabyte.kobweb.gradle.worker.tasks
 import com.varabyte.kobweb.gradle.core.metadata.WorkerMetadata
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_WORKER
+import com.varabyte.kobweb.project.common.nonStrictDefault
 import kotlinx.serialization.json.Json
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -20,7 +21,7 @@ abstract class KobwebGenerateWorkerMetadataTask :
         val workerMetadataFile = getGenResDir().get().file(KOBWEB_METADATA_WORKER)
         workerMetadataFile.asFile.apply {
             parentFile.mkdirs()
-            writeText(Json.encodeToString(WorkerMetadata()))
+            writeText(Json.nonStrictDefault.encodeToString(WorkerMetadata()))
         }
     }
 }

@@ -38,6 +38,7 @@ import com.varabyte.kobweb.project.backend.InitApiEntry
 import com.varabyte.kobweb.project.backend.assertValid
 import com.varabyte.kobweb.project.common.DynamicRouteSegment
 import com.varabyte.kobweb.project.common.PackageName
+import com.varabyte.kobweb.project.common.nonStrictDefault
 import com.varabyte.kobweb.project.frontend.FrontendData
 import kotlinx.serialization.json.Json
 
@@ -203,7 +204,7 @@ internal class BackendProcessor(
             path = path,
             extensionName = extension,
         ).writer().use { writer ->
-            writer.write(Json.encodeToString(result.data))
+            writer.write(Json.nonStrictDefault.encodeToString(result.data))
         }
     }
 

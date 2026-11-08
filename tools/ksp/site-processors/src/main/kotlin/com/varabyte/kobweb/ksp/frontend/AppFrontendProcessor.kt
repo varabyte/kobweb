@@ -11,6 +11,7 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.varabyte.kobweb.ksp.common.APP_FQN
 import com.varabyte.kobweb.project.common.PackageName
+import com.varabyte.kobweb.project.common.nonStrictDefault
 import com.varabyte.kobweb.project.frontend.AppFrontendData
 import com.varabyte.kobweb.project.frontend.AppEntry
 import kotlinx.serialization.json.Json
@@ -65,7 +66,7 @@ internal class AppFrontendProcessor(
             path = path,
             extensionName = extension,
         ).writer().use { writer ->
-            writer.write(Json.encodeToString(appFrontendData))
+            writer.write(Json.nonStrictDefault.encodeToString(appFrontendData))
         }
     }
 }

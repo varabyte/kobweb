@@ -3,6 +3,7 @@ package com.varabyte.kobweb.gradle.core.tasks
 import com.varabyte.kobweb.gradle.core.metadata.ModuleMetadata
 import com.varabyte.kobweb.gradle.core.util.KobwebVersionUtil
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_MODULE
+import com.varabyte.kobweb.project.common.nonStrictDefault
 import kotlinx.serialization.json.Json
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -36,7 +37,7 @@ abstract class KobwebGenerateModuleMetadataTask :
         val moduleMetadataFile = getGenResDir().get().file(KOBWEB_METADATA_MODULE)
         moduleMetadataFile.asFile.apply {
             parentFile.mkdirs()
-            writeText(Json.encodeToString(
+            writeText(Json.nonStrictDefault.encodeToString(
                 ModuleMetadata(getKobwebVersion(), projectGroup.get(), publicPath.get())
             ))
         }

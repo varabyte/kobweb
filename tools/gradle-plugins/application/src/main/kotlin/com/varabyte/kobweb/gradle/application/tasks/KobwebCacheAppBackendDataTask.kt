@@ -5,6 +5,7 @@ import com.varabyte.kobweb.ksp.KOBWEB_METADATA_BACKEND
 import com.varabyte.kobweb.project.backend.AppBackendData
 import com.varabyte.kobweb.project.backend.BackendData
 import com.varabyte.kobweb.project.backend.merge
+import com.varabyte.kobweb.project.common.nonStrictDefault
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -76,7 +77,7 @@ abstract class KobwebCacheAppBackendDataTask : DefaultTask() {
             add(appBackendData.backendData)
             compileClasspath.forEach { file ->
                 file.searchZipFor(KOBWEB_METADATA_BACKEND) { bytes ->
-                    add(Json.decodeFromString<BackendData>(bytes.decodeToString()))
+                    add(Json.nonStrictDefault.decodeFromString<BackendData>(bytes.decodeToString()))
                 }
             }
         }

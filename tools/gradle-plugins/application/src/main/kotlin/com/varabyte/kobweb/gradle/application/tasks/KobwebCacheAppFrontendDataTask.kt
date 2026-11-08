@@ -2,6 +2,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
+import com.varabyte.kobweb.project.common.nonStrictDefault
 import com.varabyte.kobweb.project.frontend.AppFrontendData
 import com.varabyte.kobweb.project.frontend.FrontendData
 import com.varabyte.kobweb.project.frontend.merge
@@ -71,7 +72,7 @@ abstract class KobwebCacheAppFrontendDataTask : DefaultTask() {
             add(appFrontendData.frontendData)
             compileClasspath.forEach { file ->
                 file.searchZipFor(KOBWEB_METADATA_FRONTEND) { bytes ->
-                    add(Json.decodeFromString<FrontendData>(bytes.decodeToString()))
+                    add(Json.nonStrictDefault.decodeFromString<FrontendData>(bytes.decodeToString()))
                 }
             }
         }
