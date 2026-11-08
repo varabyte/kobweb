@@ -43,7 +43,9 @@ kobweb {
     kspProcessorDependency.set("com.varabyte.kobweb:site-processors")
     icons {
         fa { version.set("7.+") }
-        lucide { version.set("1.69.0") }
+        lucide { version.set("1.+") }
+        // Google's Material icons have no release tags, so their versions are commit SHAs and can't use a prefix like
+        // "1.+". Leaving the version unset means "latest", i.e. whatever their repo's main branch has when fetched.
         mdi()
         ms()
     }
