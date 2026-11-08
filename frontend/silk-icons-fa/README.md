@@ -9,11 +9,11 @@ Note that, when this module is depended on, Kobweb adds the following entry to t
 template:
 
 ```html
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/<version>/css/all.min.css" />
 ```
 
-which adds to the size of your page, something you should be mindful of if you don't plan to use any of these (awesome!)
-icons.
+where `<version>` is this module's `silkIcons.version` (see `build.gradle.kts`). This adds to the size of your page,
+something you should be mindful of if you don't plan to use any of these (awesome!) icons.
 
 A page can only load one Font Awesome stylesheet, so if your app also generates its own Font Awesome bindings, the
 stylesheet uses your app's version instead.
