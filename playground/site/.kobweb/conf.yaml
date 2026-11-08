@@ -5,10 +5,10 @@ server:
   files:
     dev:
       contentRoot: "build/processedResources/js/main/public"
-      script: "build/kotlin-webpack/js/developmentExecutable/playground.js"
-      api: "build/libs/playground.jar"
+      script: "build/kotlin-webpack/js/developmentExecutable/playground-site.js"
+      api: "build/libs/playground-site.jar"
     prod:
-      script: "build/kotlin-webpack/js/productionExecutable/playground.js"
+      script: "build/kotlin-webpack/js/productionExecutable/playground-site.js"
       siteRoot: ".kobweb/site"
 
   port: 8080

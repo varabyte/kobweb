@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
 }
 
-group = "playground"
+group = "playground.site"
 version = "1.0-SNAPSHOT"
 
 kobweb {
@@ -31,7 +31,7 @@ kobweb {
     }
     markdown {
         defaultLayout.set(".components.layouts.MarkdownLayout")
-        imports.add(".components.widgets.*")
+        imports.add("playground.sitelib.components.widgets.*")
         process.set { markdownEntries ->
             generateMarkdown("markdown/listing.md", buildString {
                 // Disable the layout for this page; it looks weird when centered

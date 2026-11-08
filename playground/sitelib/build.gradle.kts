@@ -6,7 +6,7 @@ plugins {
     id("com.varabyte.kobweb.library")
 }
 
-group = "playground"
+group = "playground.sitelib"
 version = "1.0-SNAPSHOT"
 
 kobweb {
