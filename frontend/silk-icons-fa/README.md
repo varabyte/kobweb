@@ -1,5 +1,10 @@
 Support for integration of font awesome icons in your project.
 
+> [!TIP]
+> This artifact's bindings are generated at a single Font Awesome version, chosen by Kobweb. To pick the version
+> yourself (e.g. to use newer icons), you can instead generate bindings in your own project, using
+> `kobweb { app { icons { fa { version.set("...") } } } }` or `kobweb { library { ... } }`.
+
 Note that, when this module is depended on, Kobweb adds the following entry to the `<head>` block in your document
 template:
 
@@ -10,6 +15,9 @@ template:
 which adds to the size of your page, something you should be mindful of if you don't plan to use any of these (awesome!)
 icons.
 
+A page can only load one Font Awesome stylesheet, so if your app also generates its own Font Awesome bindings, the
+stylesheet uses your app's version instead.
+
 ---
 
 This directory contains a file called `fa-icon-list.txt`, which is parsed and used to generate code used in this
@@ -17,9 +25,8 @@ project. It is built from the `metadata/icons.json` file in the
 [Font Awesome GitHub repository](https://github.com/FortAwesome/Font-Awesome), at the release tag matching
 `silkIcons.version` in `build.gradle.kts`.
 
-Kobweb sites load Font Awesome's stylesheet from a CDN URL in `KobwebGenerateSiteIndexTask` that includes the version.
-When you change `silkIcons.version`, update that URL to the same version. Otherwise, icons added in the new version
-compile but render blank.
+The built artifact records `silkIcons.version`, and sites load the Font Awesome stylesheet for that version, so the two
+stay in sync automatically.
 
 To update `fa-icon-list.txt` (e.g. after changing `silkIcons.version`):
 
