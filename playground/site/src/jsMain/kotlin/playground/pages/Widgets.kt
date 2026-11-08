@@ -84,29 +84,6 @@ import com.varabyte.kobweb.silk.components.icons.TrashIcon
 import com.varabyte.kobweb.silk.components.icons.UploadIcon
 import com.varabyte.kobweb.silk.components.icons.UserIcon
 import com.varabyte.kobweb.silk.components.icons.WarningIcon
-import com.varabyte.kobweb.silk.components.icons.fa.FaBolt
-import com.varabyte.kobweb.silk.components.icons.fa.FaCheck
-import com.varabyte.kobweb.silk.components.icons.fa.FaCloud
-import com.varabyte.kobweb.silk.components.icons.fa.FaDollarSign
-import com.varabyte.kobweb.silk.components.icons.fa.FaGithub
-import com.varabyte.kobweb.silk.components.icons.fa.FaHouse
-import com.varabyte.kobweb.silk.components.icons.fa.FaStar
-import com.varabyte.kobweb.silk.components.icons.fa.FaUser
-import playground.components.icons.lucide.LucideCloud
-import playground.components.icons.lucide.LucideHeart
-import playground.components.icons.lucide.LucideHouse
-import playground.components.icons.lucide.LucideSearch
-import playground.components.icons.lucide.LucideSettings
-import playground.components.icons.lucide.LucideStar
-import playground.components.icons.lucide.LucideSwords
-import com.varabyte.kobweb.silk.components.icons.mdi.MdiClose
-import com.varabyte.kobweb.silk.components.icons.mdi.MdiHome
-import com.varabyte.kobweb.silk.components.icons.mdi.MdiMenu
-import com.varabyte.kobweb.silk.components.icons.mdi.MdiSearch
-import com.varabyte.kobweb.silk.components.icons.ms.MsClose
-import com.varabyte.kobweb.silk.components.icons.ms.MsHome
-import com.varabyte.kobweb.silk.components.icons.ms.MsMenu
-import com.varabyte.kobweb.silk.components.icons.ms.MsSearch
 import com.varabyte.kobweb.silk.components.layout.SimpleGrid
 import com.varabyte.kobweb.silk.components.layout.numColumns
 import com.varabyte.kobweb.silk.components.navigation.Link
@@ -129,11 +106,34 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Hr
 import org.jetbrains.compose.web.dom.Text
+import playground.components.icons.fa.FaBolt
+import playground.components.icons.fa.FaCheck
+import playground.components.icons.fa.FaCloud
+import playground.components.icons.fa.FaDollarSign
+import playground.components.icons.fa.FaGithub
+import playground.components.icons.fa.FaHouse
+import playground.components.icons.fa.FaStar
+import playground.components.icons.fa.FaUser
+import playground.components.icons.lucide.LucideCloud
+import playground.components.icons.lucide.LucideHeart
+import playground.components.icons.lucide.LucideHouse
+import playground.components.icons.lucide.LucideSearch
+import playground.components.icons.lucide.LucideSettings
+import playground.components.icons.lucide.LucideStar
+import playground.components.icons.lucide.LucideSwords
+import playground.components.icons.mdi.MdiClose
+import playground.components.icons.mdi.MdiHome
+import playground.components.icons.mdi.MdiMenu
+import playground.components.icons.mdi.MdiSearch
+import playground.components.icons.ms.MsClose
+import playground.components.icons.ms.MsHome
+import playground.components.icons.ms.MsMenu
+import playground.components.icons.ms.MsSearch
 import playground.components.layouts.PageLayoutData
 import playground.components.widgets.GoHomeLink
-import com.varabyte.kobweb.silk.components.icons.fa.IconStyle as FaIconStyle
-import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle as MdiIconStyle
-import com.varabyte.kobweb.silk.components.icons.ms.IconStyle as MsIconStyle
+import playground.components.icons.fa.IconStyle as FaIconStyle
+import playground.components.icons.mdi.IconStyle as MdiIconStyle
+import playground.components.icons.ms.IconStyle as MsIconStyle
 
 val WidgetSectionStyle = CssStyle.base {
     Modifier

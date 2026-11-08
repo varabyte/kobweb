@@ -25,6 +25,7 @@ import org.gradle.api.artifacts.result.ResolvedDependencyResult
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
@@ -80,6 +81,13 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
 
     @get:Internal
     abstract val dependencies: ListProperty<ResolvedDependencyResult>
+
+    /**
+     * Icon sets the app generates bindings for in `kobweb { icons { ... } }`, mapped to their locked versions, e.g.
+     * `"fa" to "6.5.2"`.
+     */
+    @get:Input
+    abstract val iconSetVersions: MapProperty<String, String>
 
     @get:Input
     val hasFaDependency: Provider<Boolean>
@@ -314,16 +322,33 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         // artifacts.
         val headElements = mutableListOf(indexBlock.serializedHead.get())
 
-        if (hasFaDependency.get()) {
+        // Icon sets from `kobweb { icons { ... } }` and from Kobweb's silk-icons artifacts share one stylesheet each. If
+        // both provide Font Awesome, the app's chosen version wins, since its bindings may use icons the older artifact
+        // version lacks.
+        val iconSetVersions = iconSetVersions.get()
+        val appFaVersion = iconSetVersions["fa"]
+        // Loading both stylesheets wouldn't help, since they share class names and the later one wins. Within a major
+        // version, a newer stylesheet still has all the older icons, so only warn across major versions.
+        if (appFaVersion != null && hasFaDependency.get() &&
+            appFaVersion.substringBefore('.') != SILK_ICONS_FA_VERSION.substringBefore('.')
+        ) {
+            logger.warn(
+                "w: This app generates Font Awesome $appFaVersion icons, but a dependency uses Kobweb's silk-icons-fa " +
+                    "artifact, which was built for $SILK_ICONS_FA_VERSION. Only the $appFaVersion stylesheet is loaded, " +
+                    "so any of the dependency's icons that $appFaVersion renamed or removed will render blank."
+            )
+        }
+        val faVersion = appFaVersion ?: SILK_ICONS_FA_VERSION.takeIf { hasFaDependency.get() }
+        if (faVersion != null) {
             headElements.add(HtmlUtil.serializeHeadContents {
                 link {
                     rel = "stylesheet"
-                    href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+                    href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/$faVersion/css/all.min.css"
                 }
             })
         }
 
-        if (hasMdiDependency.get()) {
+        if ("mdi" in iconSetVersions || hasMdiDependency.get()) {
             headElements.add(HtmlUtil.serializeHeadContents {
                 link {
                     rel = "stylesheet"
@@ -333,7 +358,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             })
         }
 
-        if (hasMsDependency.get()) {
+        if ("ms" in iconSetVersions || hasMsDependency.get()) {
             headElements.add(HtmlUtil.serializeHeadContents {
                 link {
                     rel = "stylesheet"
@@ -407,5 +432,12 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 buildTarget
             )
         )
+    }
+
+    companion object {
+        /** The Font Awesome version that Kobweb's published silk-icons-fa artifact generates bindings for. */
+        // TODO: Delete this once icon artifacts and libraries publish which icon set versions they use. Until then, keep
+        //  it in sync with frontend/silk-icons-fa/build.gradle.kts.
+        private const val SILK_ICONS_FA_VERSION = "6.5.2"
     }
 }

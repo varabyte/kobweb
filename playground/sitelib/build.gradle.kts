@@ -11,6 +11,9 @@ version = "1.0-SNAPSHOT"
 
 kobweb {
     kspProcessorDependency.set("com.varabyte.kobweb:site-processors")
+    icons {
+        fa { version.set("7.+") }
+    }
 }
 
 kotlin {
@@ -22,7 +25,6 @@ kotlin {
             implementation(libs.compose.html.core)
             implementation("com.varabyte.kobweb:kobweb-core")
             implementation("com.varabyte.kobweb:kobweb-silk")
-            implementation("com.varabyte.kobwebx:silk-icons-fa")
             implementation(project(":workers:sum"))
         }
         jvmMain.dependencies {
