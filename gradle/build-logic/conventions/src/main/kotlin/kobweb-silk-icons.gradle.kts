@@ -33,6 +33,10 @@ abstract class GenerateIconsMetadataTask : DefaultTask() {
     @get:Input
     abstract val version: Property<String>
 
+    /** The fully qualified package of the bindings, e.g. "com.varabyte.kobweb.silk.components.icons.fa". */
+    @get:Input
+    abstract val packageName: Property<String>
+
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
@@ -40,7 +44,9 @@ abstract class GenerateIconsMetadataTask : DefaultTask() {
     fun generate() {
         outputDir.file("META-INF/kobweb/icons.json").get().asFile.apply {
             parentFile.mkdirs()
-            writeText("""{"iconSets":{"${iconSet.get()}":"${version.get()}"}}""")
+            writeText(
+                """{"iconSets":{"${iconSet.get()}":{"version":"${version.get()}","packageName":"${packageName.get()}"}}}"""
+            )
         }
     }
 }
@@ -48,6 +54,7 @@ abstract class GenerateIconsMetadataTask : DefaultTask() {
 val silkIcons = extensions.create<SilkIconsExtension>("silkIcons")
 
 val generatedSrcDir = "build/generated/icons/src/jsMain/kotlin"
+val iconsPackageName = silkIcons.iconSet.map { "com.varabyte.kobweb.silk.components.icons.$it" }
 
 val iconsCodegen = configurations.dependencyScope("iconsCodegen")
 val iconsCodegenClasspath = configurations.resolvable("iconsCodegenClasspath") {
@@ -89,7 +96,7 @@ val generateIconsTask = tasks.register<JavaExec>("generateIcons") {
             "generate", silkIcons.iconSet.get(),
             "--icons", silkIcons.iconsFile.get(),
             "--out", generatedSrcDir,
-            "--package", "com.varabyte.kobweb.silk.components.icons.${silkIcons.iconSet.get()}",
+            "--package", iconsPackageName.get(),
             "--visibility", "public",
         )
     }))
@@ -102,6 +109,7 @@ val generateIconsTask = tasks.register<JavaExec>("generateIcons") {
 val generateIconsMetadataTask = tasks.register<GenerateIconsMetadataTask>("generateIconsMetadata") {
     iconSet.set(silkIcons.iconSet)
     version.set(silkIcons.version)
+    packageName.set(iconsPackageName)
     outputDir.set(layout.buildDirectory.dir("generated/kobweb/icons/metadata"))
 }
 

@@ -18,6 +18,10 @@ abstract class KobwebGenerateIconsMetadataTask :
     @get:Input
     abstract val iconSetVersions: MapProperty<String, String>
 
+    /** This module's icon sets mapped to their packages, e.g. `"fa" to "com.example.components.icons.fa"`. */
+    @get:Input
+    abstract val iconSetPackageNames: MapProperty<String, String>
+
     @OutputDirectory
     fun getGenResDir() = projectLayout.buildDirectory.dir("generated/kobweb/icons/metadata")
 
@@ -27,7 +31,10 @@ abstract class KobwebGenerateIconsMetadataTask :
         // Modules without icon sets don't get the file, so remove it if an earlier build wrote one
         iconsMetadataFile.delete()
 
-        val iconSets = iconSetVersions.get()
+        val packageNames = iconSetPackageNames.get()
+        val iconSets = iconSetVersions.get().mapValues { (id, version) ->
+            IconsMetadata.IconSet(version, packageNames.getValue(id))
+        }
         if (iconSets.isEmpty()) return
 
         iconsMetadataFile.parentFile.mkdirs()

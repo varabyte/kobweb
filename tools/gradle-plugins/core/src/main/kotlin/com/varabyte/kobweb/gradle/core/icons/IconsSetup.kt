@@ -7,6 +7,8 @@ import com.varabyte.kobweb.gradle.core.kmp.buildTargets
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.tasks.KobwebFetchIconsTask
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateIconsTask
+import com.varabyte.kobweb.project.common.PackageName
+import com.varabyte.kobweb.project.common.PackageShortcut
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.register
@@ -59,5 +61,19 @@ fun IconsBlock<*>.lockedVersions(): Provider<Map<String, String>> {
         iconSets.keys.mapNotNull { id ->
             IconsLock.readFrom(IconsLock.fileFor(storeDir.asFile, id))?.let { lock -> id to lock.version }
         }.toMap()
+    }
+}
+
+/**
+ * The configured icon sets, mapped to the packages their bindings are generated into, e.g.
+ * `"fa" to "com.example.components.icons.fa"`.
+ *
+ * @param projectGroup The Gradle group of the current project, which is used to resolve [IconsBlock.rootPackage]
+ *   shortcuts.
+ */
+fun IconsBlock<*>.packageNames(projectGroup: Provider<String>): Provider<Map<String, String>> {
+    return projectGroup.map { group ->
+        val rootPackageName = PackageName(group).resolve(PackageShortcut(rootPackage.get()))
+        iconSets.keys.associateWith { id -> "${rootPackageName.value}.$id" }
     }
 }

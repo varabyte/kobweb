@@ -33,6 +33,7 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebUnpackServerJarTask
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
 import com.varabyte.kobweb.gradle.core.icons.lockedVersions
+import com.varabyte.kobweb.gradle.core.icons.packageNames
 import com.varabyte.kobweb.gradle.core.icons.setupIcons
 import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
@@ -322,6 +323,8 @@ class KobwebApplicationPlugin @Inject constructor(
                 publicPath = kobwebBlock.publicPath
                 compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
                 iconSetVersions = appBlock.icons.lockedVersions()
+                iconSetPackageNames = appBlock.icons.packageNames(project.provider { project.group.toString() })
+                projectName = project.name
                 warnOnVersionMismatch = project.provider {
                     appBlock.icons.iconSets.mapValues { (_, iconSet) -> iconSet.warnOnVersionMismatch.get() }
                 }

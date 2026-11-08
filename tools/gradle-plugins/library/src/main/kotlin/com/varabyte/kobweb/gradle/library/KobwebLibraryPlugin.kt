@@ -4,6 +4,7 @@ import com.varabyte.kobweb.ProcessorMode
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
 import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
 import com.varabyte.kobweb.gradle.core.icons.lockedVersions
+import com.varabyte.kobweb.gradle.core.icons.packageNames
 import com.varabyte.kobweb.gradle.core.icons.setupIcons
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
@@ -45,6 +46,7 @@ class KobwebLibraryPlugin : Plugin<Project> {
         val kobwebGenerateIconsMetadataTask = project.tasks
             .register<KobwebGenerateIconsMetadataTask>("kobwebGenerateIconsMetadata") {
                 iconSetVersions = libraryBlock.icons.lockedVersions()
+                iconSetPackageNames = libraryBlock.icons.packageNames(project.provider { project.group.toString() })
             }
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
