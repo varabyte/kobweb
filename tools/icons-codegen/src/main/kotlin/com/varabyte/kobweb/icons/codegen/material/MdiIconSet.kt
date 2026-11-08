@@ -97,7 +97,7 @@ class MdiIconSet : IconSet {
 
         val packageDir = options.preparePackageDir(outputDir)
 
-        packageDir.resolve("_MdIcon.kt").writeText(
+        packageDir.resolve("_MdiIcon.kt").writeText(
             iconsHeader + $$"""
             |import com.varabyte.kobweb.compose.ui.toAttrs
             |import org.jetbrains.compose.web.dom.Span
@@ -128,7 +128,7 @@ class MdiIconSet : IconSet {
             |}
             |
             |@Composable
-            |$${visibility}fun MdIcon(
+            |$${visibility}fun MdiIcon(
             |    name: String,
             |    modifier: Modifier,
             |    style: IconStyle = FILLED,
@@ -140,6 +140,10 @@ class MdiIconSet : IconSet {
             |    }
             |}
             |
+            |@Deprecated("Use MdiIcon instead", ReplaceWith("MdiIcon(name, modifier, style)"))
+            |@Composable
+            |$${visibility}fun MdIcon(name: String, modifier: Modifier, style: IconStyle = FILLED) = MdiIcon(name, modifier, style)
+            |
             """.trimMargin()
         )
 
@@ -149,14 +153,14 @@ class MdiIconSet : IconSet {
             val methodName = methodNamer.methodNameFor(rawName)
             val iconCode = when (styles.size) {
                 // A rare solo-style icon? No need to allow a user to pass in a style parameter in that case
-                1 -> "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier) = MdIcon(\"$rawName\", modifier, ${styles.first().name})"
+                1 -> "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier) = MdiIcon(\"$rawName\", modifier, ${styles.first().name})"
 
                 // This icon supports all styles. No need to assert input parameters.
-                IconStyle.entries.size -> "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, style: IconStyle = FILLED) = MdIcon(\"$rawName\", modifier, style)"
+                IconStyle.entries.size -> "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, style: IconStyle = FILLED) = MdiIcon(\"$rawName\", modifier, style)"
 
                 // Not all styles are valid. For now, we throw a runtime exception (via assertValidStyle) to inform
                 // the user about this, but we can always decide to relax this later.
-                else -> "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, style: IconStyle = ${styles.first().name}) = MdIcon(\"$rawName\", modifier, style.also { it.assertValidStyle(\"$methodName\", ${styles.joinToString { it.name }}) })"
+                else -> "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, style: IconStyle = ${styles.first().name}) = MdiIcon(\"$rawName\", modifier, style.also { it.assertValidStyle(\"$methodName\", ${styles.joinToString { it.name }}) })"
             }
 
             // Name files after the raw icon name, not the method name. Method names can differ only by case, which
