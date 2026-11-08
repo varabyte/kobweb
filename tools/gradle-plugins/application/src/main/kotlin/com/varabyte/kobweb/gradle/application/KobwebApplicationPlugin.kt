@@ -14,6 +14,7 @@ import com.varabyte.kobweb.gradle.application.ksp.kspFrontendFile
 import com.varabyte.kobweb.gradle.application.tasks.KobwebBrowserCacheIdTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCacheAppBackendDataTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCacheAppFrontendDataTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebCacheIconSetsTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopySupplementalResourcesTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyWorkerJsOutputTask
@@ -62,6 +63,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.Sync
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.assign
@@ -72,6 +74,7 @@ import org.gradle.kotlin.dsl.withType
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.attributes.KlibPackaging
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrLink
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
@@ -319,12 +322,25 @@ class KobwebApplicationPlugin @Inject constructor(
                 dependencies = project.getTransitiveJsDependencyResults()
             }
 
+            val kobwebCacheIconSetsTask = project.tasks.register<KobwebCacheIconSetsTask>("kobwebCacheIconSets") {
+                projectName = project.name
+                iconSetVersions = appBlock.icons.lockedVersions()
+                iconSetPackageNames = appBlock.icons.packageNames(project.provider { project.group.toString() })
+                compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
+                iconSetsFile = this.kobwebCacheFile("iconSets.json")
+            }
+            // Linking is where icon package clashes would otherwise fail first, with a cryptic error
+            project.tasks.withType<KotlinJsIrLink>().configureEach {
+                inputs.file(kobwebCacheIconSetsTask.flatMap { it.iconSetsFile })
+                    .withPropertyName("kobwebIconSetsFile")
+                    .withPathSensitivity(PathSensitivity.NONE)
+            }
+
             kobwebGenSiteIndexTask.configure {
                 publicPath = kobwebBlock.publicPath
                 compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
                 iconSetVersions = appBlock.icons.lockedVersions()
-                iconSetPackageNames = appBlock.icons.packageNames(project.provider { project.group.toString() })
-                projectName = project.name
+                iconSetsFile = kobwebCacheIconSetsTask.flatMap { it.iconSetsFile }
                 warnOnVersionMismatch = project.provider {
                     appBlock.icons.iconSets.mapValues { (_, iconSet) -> iconSet.warnOnVersionMismatch.get() }
                 }

@@ -14,7 +14,6 @@ import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.gradle.core.util.toSha256
 import com.varabyte.kobweb.icons.codegen.IconSet
 import com.varabyte.kobweb.icons.codegen.stylesheet.IconStylesheet
-import com.varabyte.kobweb.ksp.KOBWEB_METADATA_ICONS
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_LIBRARY
 import com.varabyte.kobweb.project.common.nonStrictDefault
 import com.varabyte.kobweb.project.conf.KobwebConf
@@ -25,14 +24,15 @@ import kotlinx.html.head
 import kotlinx.html.link
 import kotlinx.html.unsafe
 import kotlinx.serialization.json.Json
-import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFile
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
@@ -88,16 +88,10 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:Input
     abstract val iconSetVersions: MapProperty<String, String>
 
-    /**
-     * Icon sets the app generates bindings for, mapped to the packages they're generated into, e.g.
-     * `"fa" to "com.example.components.icons.fa"`.
-     */
-    @get:Input
-    abstract val iconSetPackageNames: MapProperty<String, String>
-
-    /** The name of this app's Gradle project, e.g. "site", used to refer to it in icon warnings and errors. */
-    @get:Input
-    abstract val projectName: Property<String>
+    /** The icon sets of this app and its dependencies, as written by [KobwebCacheIconSetsTask]. */
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val iconSetsFile: RegularFileProperty
 
     /**
      * Icon sets the app generates bindings for, mapped to whether to warn when their stylesheet may not render every
@@ -320,64 +314,20 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         )
     }
 
-    /** The name of the dependency this artifact belongs to, e.g. "sitelib-js-1.0.klib" -> "sitelib". */
-    private val File.dependencyName get() = nameWithoutExtension.substringBeforeLast("-js-")
-
-    /** The icon sets of every module that generates icon bindings (this app and its dependencies), by module name. */
-    private fun readIconSetsByModule(): Map<String, Map<String, IconsMetadata.IconSet>> {
-        val appPackageNames = iconSetPackageNames.get()
-        return buildMap {
-            put(projectName.get(), iconSetVersions.get().mapValues { (id, version) ->
-                IconsMetadata.IconSet(version, appPackageNames.getValue(id))
-            })
-            compileClasspath.forEach { file ->
-                file.searchZipFor(KOBWEB_METADATA_ICONS) { bytes ->
-                    val iconsMetadata = Json.nonStrictDefault.decodeFromString(IconsMetadata.serializer(), bytes.decodeToString())
-                    put(file.dependencyName, iconsMetadata.iconSets)
-                }
-            }
-        }
-    }
-
-    /**
-     * Fails if multiple modules generate icon bindings into the same package.
-     *
-     * Bindings are internal by default, so this compiles, but Kotlin/JS links declarations by their fully qualified
-     * name, so one module's code would end up calling another's bindings, and the site would crash when it loads.
-     */
-    private fun checkIconPackagesAreUnique(iconSetsByModule: Map<String, Map<String, IconsMetadata.IconSet>>) {
-        val modulesByPackageName = mutableMapOf<String, MutableList<String>>()
-        iconSetsByModule.forEach { (module, iconSets) ->
-            iconSets.values.forEach { iconSet ->
-                modulesByPackageName.getOrPut(iconSet.packageName) { mutableListOf() }.add(module)
-            }
-        }
-        modulesByPackageName.forEach { (packageName, modules) ->
-            if (modules.size > 1) {
-                throw GradleException(
-                    "e: Multiple modules (${modules.joinToString { "\"$it\"" }}) generate icon bindings into the same " +
-                        "package, \"$packageName\", which would crash the site when it loads. To fix this, give these " +
-                        "modules different Gradle groups, generate the icons once in a library that they share (with " +
-                        "`visibility.set(IconVisibility.PUBLIC)` in its `icons` block), or set `rootPackage` in one of " +
-                        "their `icons` blocks."
-                )
-            }
-        }
-    }
-
     /**
      * Returns a stylesheet link for each icon set that this app or its dependencies generate bindings for.
      *
      * A page can only load one stylesheet per set, since different versions share class names and the later one wins.
      * The app's own version is its explicit choice, so it wins; otherwise, the icon set picks the version to load.
      */
-    private fun iconStylesheetLinks(iconSetsByModule: Map<String, Map<String, IconsMetadata.IconSet>>): List<String> {
+    private fun iconStylesheetLinks(): List<String> {
         val appIconSetVersions = iconSetVersions.get()
+        val iconsMetadataByModule = Json.decodeFromString<Map<String, IconsMetadata>>(iconSetsFile.get().asFile.readText())
 
         // Icon set id -> the modules that generate its bindings
         val moduleVersionsByIconSet = mutableMapOf<String, ModuleIconVersions>()
-        iconSetsByModule.forEach { (module, iconSets) ->
-            iconSets.forEach { (id, iconSet) ->
+        iconsMetadataByModule.forEach { (module, iconsMetadata) ->
+            iconsMetadata.iconSets.forEach { (id, iconSet) ->
                 moduleVersionsByIconSet.getOrPut(id) { ModuleIconVersions() }[module] = iconSet.version
             }
         }
@@ -418,9 +368,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         // artifacts.
         val headElements = mutableListOf(indexBlock.serializedHead.get())
 
-        val iconSetsByModule = readIconSetsByModule()
-        checkIconPackagesAreUnique(iconSetsByModule)
-        headElements.addAll(iconStylesheetLinks(iconSetsByModule))
+        headElements.addAll(iconStylesheetLinks())
 
         val headElementsFromDependencies = mutableMapOf<File, List<String>>()
         compileClasspath.forEach { file ->
