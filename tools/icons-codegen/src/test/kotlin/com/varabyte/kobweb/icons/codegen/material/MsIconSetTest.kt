@@ -27,8 +27,8 @@ class MsIconSetTest {
         val iconsText = MsIconSet().iconsFileTextFor(
             "abc123",
             mapOf(
-                "MaterialSymbolsOutlined" to listOf("arrow_back", "home"),
-                "MaterialSymbolsRounded" to listOf("home", "arrow_back"),
+                MsIconSet.Style.OUTLINED to listOf("arrow_back", "home"),
+                MsIconSet.Style.ROUNDED to listOf("home", "arrow_back"),
             )
         )
 
@@ -43,13 +43,13 @@ class MsIconSetTest {
     }
 
     @Test
-    fun familiesWithDifferentIconsAreRejected() {
+    fun stylesWithDifferentIconsAreRejected() {
         val e = assertThrows<IllegalStateException> {
             MsIconSet().iconsFileTextFor(
                 "abc123",
                 mapOf(
-                    "MaterialSymbolsOutlined" to listOf("arrow_back", "home"),
-                    "MaterialSymbolsRounded" to listOf("home"),
+                    MsIconSet.Style.OUTLINED to listOf("arrow_back", "home"),
+                    MsIconSet.Style.ROUNDED to listOf("home"),
                 )
             )
         }

@@ -18,5 +18,5 @@ dependencies {
 kobwebPublication {
     artifactName.set("Kobweb Icons Codegen")
     artifactId.set("kobweb-icons-codegen")
-    description.set("Downloads icon set data and generates Kotlin bindings for it. Used by the Kobweb Gradle plugin.")
+    description.set("Downloads icon set data and generates Kotlin bindings for it. Used by the Kobweb Gradle plugin and the Kobweb IntelliJ plugin.")
 }

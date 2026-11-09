@@ -23,7 +23,18 @@ internal class GitHubRepo(private val name: String) {
 
     /** Downloads the text of the file at [path] (relative to the repo root) at [ref], e.g. a tag or commit SHA. */
     fun fetchFileText(ref: String, path: String): String {
-        return URI("https://raw.githubusercontent.com/$name/$ref/$path").openDownloadStream().readAllText()
+        return fileUri(ref, path).openDownloadStream().readAllText()
+    }
+
+    /**
+     * The URL for downloading the file at [path] at [ref].
+     *
+     * [path] is the file's real name in the repo, which gets percent-encoded here, e.g. the brackets in
+     * "MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].codepoints".
+     */
+    internal fun fileUri(ref: String, path: String): URI {
+        // This URI constructor percent-encodes characters that aren't legal in a path, unlike URI(String)
+        return URI("https", "raw.githubusercontent.com", "/$name/$ref/$path", null)
     }
 
     /** Opens a stream for downloading a zip archive of the whole repo at [tag]. */

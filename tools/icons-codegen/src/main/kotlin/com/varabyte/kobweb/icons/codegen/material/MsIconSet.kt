@@ -29,6 +29,24 @@ import java.io.File
 class MsIconSet : IconSet {
     override val id = "ms"
 
+    /**
+     * Material Symbols' styles, each a separate font family with the same icons.
+     *
+     * @property familyName The style's font family name, which its font files in google/material-design-icons are
+     *   named after.
+     */
+    enum class Style(val familyName: String) {
+        OUTLINED("MaterialSymbolsOutlined"),
+        ROUNDED("MaterialSymbolsRounded"),
+        SHARP("MaterialSymbolsSharp");
+
+        /**
+         * The path of the variable font's codepoints file in google/material-design-icons, which lists its icon names.
+         * The bracketed suffix names the font's variable axes.
+         */
+        val codepointsPath get() = "variablefont/$familyName[FILL,GRAD,opsz,wght].codepoints"
+    }
+
     override fun resolveVersion(spec: String) = MaterialDesignIconsRepo.resolveCommit(VersionSpec(spec))
 
     // Google Fonts doesn't version its stylesheets
@@ -40,26 +58,22 @@ class MsIconSet : IconSet {
         // Material Symbols ships the same set of icons across all of its styles (outlined, rounded, sharp), so we only
         // need a single list of names. We still fetch every family, though, to verify that assumption holds.
         val repo = MaterialDesignIconsRepo(commit = version)
-        val namesByFamily = FAMILIES.associateWith { family ->
-            repo.fetchCodepointNames("variablefont/$family$AXIS_SUFFIX.codepoints")
-        }
+        val namesByStyle = Style.entries.associateWith { style -> repo.fetchCodepointNames(style.codepointsPath) }
 
-        iconsFile.writeText(iconsFileTextFor(version, namesByFamily))
+        iconsFile.writeText(iconsFileTextFor(version, namesByStyle))
         println("Wrote ${iconsFile.name}")
     }
 
-    /**
-     * Converts the icon names listed in each Material Symbols font family (e.g. "MaterialSymbolsOutlined") into the
-     * contents of our icons file.
-     */
-    internal fun iconsFileTextFor(version: String, namesByFamily: Map<String, List<String>>): String {
-        val (primaryFamily, names) = namesByFamily.entries.first()
-        namesByFamily.forEach { (family, familyNames) ->
-            if (familyNames.toSet() != names.toSet()) {
-                val missing = names - familyNames.toSet()
-                val extra = familyNames - names.toSet()
+    /** Converts the icon names listed in each Material Symbols style's font into the contents of our icons file. */
+    internal fun iconsFileTextFor(version: String, namesByStyle: Map<Style, List<String>>): String {
+        val (primaryStyle, names) = namesByStyle.entries.first()
+        namesByStyle.forEach { (style, styleNames) ->
+            if (styleNames.toSet() != names.toSet()) {
+                val missing = names - styleNames.toSet()
+                val extra = styleNames - names.toSet()
                 error(
-                    "Icon names for $family differ from $primaryFamily, but this task assumes they are the same. " +
+                    "Icon names for ${style.familyName} differ from ${primaryStyle.familyName}, " +
+                        "but this task assumes they are the same. " +
                         "Missing: ${missing.take(10)}${if (missing.size > 10) " (+${missing.size - 10} more)" else ""}, " +
                         "extra: ${extra.take(10)}${if (extra.size > 10) " (+${extra.size - 10} more)" else ""}"
                 )
@@ -151,15 +165,4 @@ class MsIconSet : IconSet {
     }
 
     private val methodNamer = IconMethodNamer(prefix = "Ms", separator = '_')
-
-    companion object {
-        private val FAMILIES = listOf(
-            "MaterialSymbolsOutlined",
-            "MaterialSymbolsRounded",
-            "MaterialSymbolsSharp",
-        )
-
-        /** URL-encoded axis suffix in the codepoints file names: [FILL,GRAD,opsz,wght] */
-        private const val AXIS_SUFFIX = "%5BFILL%2CGRAD%2Copsz%2Cwght%5D"
-    }
 }

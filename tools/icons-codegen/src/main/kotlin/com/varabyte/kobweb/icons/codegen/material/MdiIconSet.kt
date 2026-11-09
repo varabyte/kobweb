@@ -31,13 +31,21 @@ import java.io.File
 class MdiIconSet : IconSet {
     override val id = "mdi"
 
-    /** Icon styles, in the order they're listed in the icons file. */
-    private enum class IconStyle(val key: String, val fontName: String) {
+    /**
+     * Material Icons' styles, each with its own font, in the order they're listed in the icons file.
+     *
+     * @property key The style's key in the icons file.
+     * @property fontName The base name of the style's font files in google/material-design-icons.
+     */
+    enum class Style(val key: String, val fontName: String) {
         FILLED("mdi", "MaterialIcons-Regular"),
         OUTLINED("mdio", "MaterialIconsOutlined-Regular"),
         ROUNDED("mdir", "MaterialIconsRound-Regular"),
         SHARP("mdis", "MaterialIconsSharp-Regular"),
-        TWO_TONED("mdit", "MaterialIconsTwoTone-Regular"),
+        TWO_TONED("mdit", "MaterialIconsTwoTone-Regular");
+
+        /** The path of the font's codepoints file in google/material-design-icons, which lists its icon names. */
+        val codepointsPath get() = "font/$fontName.codepoints"
     }
 
     override fun resolveVersion(spec: String) = MaterialDesignIconsRepo.resolveCommit(VersionSpec(spec))
@@ -49,8 +57,8 @@ class MdiIconSet : IconSet {
 
     override fun fetch(version: String, iconsFile: File) {
         val repo = MaterialDesignIconsRepo(commit = version)
-        val lines = IconStyle.entries.map { style ->
-            val names = repo.fetchCodepointNames("font/${style.fontName}.codepoints")
+        val lines = Style.entries.map { style ->
+            val names = repo.fetchCodepointNames(style.codepointsPath)
             "${style.key}=${names.joinToString(",")}"
         }
 
@@ -62,12 +70,12 @@ class MdiIconSet : IconSet {
     }
 
     override fun generateBindings(iconsFile: File, options: IconCodegenOptions, outputDir: File) {
-        val iconRawNames: Map<IconStyle, List<String>> = iconsFile
+        val iconRawNames: Map<Style, List<String>> = iconsFile
             .readLines()
             .filter { line -> !line.startsWith("#") }
             .associate { line ->
                 val (key, names) = line.split("=", limit = 2)
-                val style = IconStyle.entries.find { it.key == key } ?: error("Unexpected style grouping: $key")
+                val style = Style.entries.find { it.key == key } ?: error("Unexpected style grouping: $key")
 
                 style to names
                     .split(",")
@@ -80,7 +88,7 @@ class MdiIconSet : IconSet {
             }
 
         // For each icon name, figure out what styles it's available in. This affects the function signature we generate.
-        val iconStyleGroups = mutableMapOf<String, MutableSet<IconStyle>>()
+        val iconStyleGroups = mutableMapOf<String, MutableSet<Style>>()
         iconRawNames.forEach { (style, rawNames) ->
             rawNames.forEach { rawName -> iconStyleGroups.getOrPut(rawName) { mutableSetOf() }.add(style) }
         }
@@ -166,7 +174,7 @@ class MdiIconSet : IconSet {
                 1 -> "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier) = MdiIcon(\"$rawName\", modifier, ${styles.first().name})"
 
                 // This icon supports all styles. No need to assert input parameters.
-                IconStyle.entries.size -> "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, style: MdiIconStyle = FILLED) = MdiIcon(\"$rawName\", modifier, style)"
+                Style.entries.size -> "@Composable ${visibility}fun $methodName(modifier: Modifier = Modifier, style: MdiIconStyle = FILLED) = MdiIcon(\"$rawName\", modifier, style)"
 
                 // Not all styles are valid. For now, we throw a runtime exception (via assertValidStyle) to inform
                 // the user about this, but we can always decide to relax this later.
