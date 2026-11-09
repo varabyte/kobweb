@@ -17,7 +17,6 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
-import com.varabyte.kobweb.icons.codegen.IconVisibility as CodegenIconVisibility
 
 @CacheableTask
 abstract class KobwebGenerateIconsTask :
@@ -52,7 +51,7 @@ abstract class KobwebGenerateIconsTask :
                 "Invalid `rootPackage` \"${rootPackage.get()}\" in the `icons { ... }` block: ${problems.joinToString(" ")}"
             )
         }
-        val codegenVisibility = CodegenIconVisibility.valueOf(visibility.get().name)
+        val isPublic = visibility.get() == IconVisibility.PUBLIC
 
         // Clear out bindings for icon sets that are no longer configured
         val outDir = outputDir.get().asFile
@@ -80,7 +79,7 @@ abstract class KobwebGenerateIconsTask :
 
             iconSet.generateBindings(
                 iconsFile,
-                IconCodegenOptions(packageName = "${rootPackageName.value}.$id", visibility = codegenVisibility),
+                IconCodegenOptions(packageName = "${rootPackageName.value}.$id", isPublic = isPublic),
                 outDir,
             )
         }

@@ -3,7 +3,6 @@
 package com.varabyte.kobweb.icons.codegen.fa
 
 import com.varabyte.kobweb.icons.codegen.IconCodegenOptions
-import com.varabyte.kobweb.icons.codegen.IconVisibility
 import com.varabyte.truthish.assertThat
 import com.varabyte.truthish.assertThrows
 import org.junit.Test
@@ -16,9 +15,9 @@ class FaIconSetTest {
     private val outDir = rootDir.resolve("out")
     private val packageDir = outDir.resolve("test/icons")
 
-    private fun generateBindings(iconsText: String, visibility: IconVisibility) {
+    private fun generateBindings(iconsText: String, isPublic: Boolean) {
         iconsFile.writeText(iconsText)
-        FaIconSet().generateBindings(iconsFile, IconCodegenOptions(packageName = "test.icons", visibility), outDir)
+        FaIconSet().generateBindings(iconsFile, IconCodegenOptions(packageName = "test.icons", isPublic), outDir)
     }
 
     private fun File.relativeFilePaths() = walkTopDown().filter { it.isFile }.map { it.relativeTo(this).path }.sorted().toList()
@@ -58,7 +57,7 @@ class FaIconSetTest {
             far=address-book
             fab=github
             """.trimIndent(),
-            IconVisibility.PUBLIC,
+            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("_FaIcon.kt", "address-book.kt", "bell.kt", "github.kt")
@@ -92,7 +91,7 @@ class FaIconSetTest {
             far=
             fab=
             """.trimIndent(),
-            IconVisibility.INTERNAL,
+            isPublic = false,
         )
 
         assertThat(packageDir.resolve("bell.kt").readText()).contains("\n@Composable internal fun FaBell(")
@@ -111,7 +110,7 @@ class FaIconSetTest {
             far=
             fab=
             """.trimIndent(),
-            IconVisibility.PUBLIC,
+            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("_FaIcon.kt", "print-shop.kt")
@@ -151,7 +150,7 @@ class FaIconSetTest {
                 far=
                 fab=font-awesome
                 """.trimIndent(),
-                IconVisibility.PUBLIC,
+                isPublic = true,
             )
         }
         assertThat(e.message!!).contains("Found unexpected groupings")

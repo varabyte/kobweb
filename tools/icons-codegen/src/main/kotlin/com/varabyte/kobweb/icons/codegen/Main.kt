@@ -38,11 +38,14 @@ private fun run(args: List<String>) {
     when (command) {
         "fetch" -> iconSet.fetch(iconSet.resolveVersion(flag("version")), File(flag("icons")))
         "generate" -> {
-            val visibility = IconVisibility.entries.find { it.name.equals(flag("visibility"), ignoreCase = true) }
-                ?: throw IllegalArgumentException("Unknown visibility \"${flag("visibility")}\"")
+            val isPublic = when (flag("visibility")) {
+                "public" -> true
+                "internal" -> false
+                else -> throw IllegalArgumentException("Unknown visibility \"${flag("visibility")}\"")
+            }
             iconSet.generateBindings(
                 File(flag("icons")),
-                IconCodegenOptions(packageName = flag("package"), visibility = visibility),
+                IconCodegenOptions(packageName = flag("package"), isPublic = isPublic),
                 File(flag("out")),
             )
         }

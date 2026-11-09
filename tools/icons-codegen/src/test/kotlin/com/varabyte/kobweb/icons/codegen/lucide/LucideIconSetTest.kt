@@ -3,7 +3,6 @@
 package com.varabyte.kobweb.icons.codegen.lucide
 
 import com.varabyte.kobweb.icons.codegen.IconCodegenOptions
-import com.varabyte.kobweb.icons.codegen.IconVisibility
 import com.varabyte.truthish.assertThat
 import com.varabyte.truthish.assertThrows
 import org.junit.Test
@@ -16,9 +15,9 @@ class LucideIconSetTest {
     private val outDir = rootDir.resolve("out")
     private val packageDir = outDir.resolve("test/icons")
 
-    private fun generateBindings(iconsJson: String, visibility: IconVisibility) {
+    private fun generateBindings(iconsJson: String, isPublic: Boolean) {
         iconsFile.writeText(iconsJson)
-        LucideIconSet().generateBindings(iconsFile, IconCodegenOptions(packageName = "test.icons", visibility), outDir)
+        LucideIconSet().generateBindings(iconsFile, IconCodegenOptions(packageName = "test.icons", isPublic), outDir)
     }
 
     private fun File.relativeFilePaths() = walkTopDown().filter { it.isFile }.map { it.relativeTo(this).path }.sorted().toList()
@@ -35,7 +34,7 @@ class LucideIconSetTest {
               "deprecated": {}
             }
             """.trimIndent(),
-            IconVisibility.PUBLIC,
+            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("arrow-right.kt")
@@ -98,7 +97,7 @@ class LucideIconSetTest {
               "deprecated": {"x-circle":"circle-x"}
             }
             """.trimIndent(),
-            IconVisibility.INTERNAL,
+            isPublic = false,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("circle-x.kt", "deprecated/x-circle.kt")
@@ -127,7 +126,7 @@ class LucideIconSetTest {
               "deprecated": {}
             }
             """.trimIndent(),
-            IconVisibility.PUBLIC,
+            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("letter-s.kt", "letters.kt")
@@ -147,7 +146,7 @@ class LucideIconSetTest {
               "deprecated": {"arrow-down-az":"arrow-down-a-z"}
             }
             """.trimIndent(),
-            IconVisibility.PUBLIC,
+            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("arrow-down-a-z.kt", "deprecated/arrow-down-az.kt")
@@ -166,7 +165,7 @@ class LucideIconSetTest {
               "deprecated": {"grid2x2":"grid-2x2","gone":"no-such-icon"}
             }
             """.trimIndent(),
-            IconVisibility.PUBLIC,
+            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("grid-2x2.kt")
@@ -186,7 +185,7 @@ class LucideIconSetTest {
                   "deprecated": {}
                 }
                 """.trimIndent(),
-                IconVisibility.PUBLIC,
+                isPublic = true,
             )
         }
         assertThat(e.message!!).contains("LucideArrow1=[arrow-1, arrow1]")
@@ -207,7 +206,7 @@ class LucideIconSetTest {
               "deprecated": {}
             }
             """.trimIndent(),
-            IconVisibility.PUBLIC,
+            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("house.kt")

@@ -3,7 +3,6 @@
 package com.varabyte.kobweb.icons.codegen.material
 
 import com.varabyte.kobweb.icons.codegen.IconCodegenOptions
-import com.varabyte.kobweb.icons.codegen.IconVisibility
 import com.varabyte.truthish.assertThat
 import com.varabyte.truthish.assertThrows
 import org.junit.Test
@@ -16,9 +15,9 @@ class MsIconSetTest {
     private val outDir = rootDir.resolve("out")
     private val packageDir = outDir.resolve("test/icons")
 
-    private fun generateBindings(iconsText: String, visibility: IconVisibility) {
+    private fun generateBindings(iconsText: String, isPublic: Boolean) {
         iconsFile.writeText(iconsText)
-        MsIconSet().generateBindings(iconsFile, IconCodegenOptions(packageName = "test.icons", visibility), outDir)
+        MsIconSet().generateBindings(iconsFile, IconCodegenOptions(packageName = "test.icons", isPublic), outDir)
     }
 
     private fun File.relativeFilePaths() = walkTopDown().filter { it.isFile }.map { it.relativeTo(this).path }.sorted().toList()
@@ -64,7 +63,7 @@ class MsIconSetTest {
             # A comment
             arrow_back
             """.trimIndent(),
-            IconVisibility.PUBLIC,
+            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("_MsIcon.kt", "arrow_back.kt")
@@ -87,7 +86,7 @@ class MsIconSetTest {
 
     @Test
     fun internalVisibilityAppliesToIconsAndSupportCode() {
-        generateBindings("home", IconVisibility.INTERNAL)
+        generateBindings("home", isPublic = false)
 
         assertThat(packageDir.resolve("home.kt").readText()).contains("\n@Composable internal fun MsHome(")
         val supportCode = packageDir.resolve("_MsIcon.kt").readText()
@@ -103,7 +102,7 @@ class MsIconSetTest {
             add_chart
             addchart
             """.trimIndent(),
-            IconVisibility.PUBLIC,
+            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("_MsIcon.kt", "add_chart.kt")

@@ -8,32 +8,21 @@ import com.varabyte.kobweb.icons.codegen.stylesheet.IconStylesheet
 import java.io.File
 
 /**
- * The visibility of generated icon bindings.
+ * @property isPublic Whether generated bindings are public, so modules depending on this one can use them, instead of
+ *   internal.
  *
- * Kobweb's published icon artifacts use [PUBLIC], since sharing the icons is their whole point. That also suits a
- * module that generates icons for the rest of a multi-module project.
- *
- * Otherwise, when users express an intention to declare icons dynamically through their build script, [INTERNAL] keeps
- * bindings out of a module's API. Different modules (say, a library and the app using it) can then generate the same
- * icon set, even at different versions, without their bindings clashing or showing up next to each other in
- * autocomplete.
+ *   If set to false, bindings will be made internal, thereby staying out of the module's API. Different modules (say, a
+ *   library and the app using it) can then generate the same icon set, even at different versions, without their
+ *   bindings clashing or showing up next to each other in autocomplete.
  */
-enum class IconVisibility {
-    PUBLIC,
-    INTERNAL;
-
-    /** The modifier to put in front of a generated declaration (empty for public, Kotlin's default). */
-    internal val modifierPrefix: String
-        get() = when (this) {
-            PUBLIC -> ""
-            INTERNAL -> "internal "
-        }
-}
-
 class IconCodegenOptions(
     val packageName: String,
-    val visibility: IconVisibility,
+    val isPublic: Boolean,
 )
+
+/** The modifier to put in front of a generated declaration (empty for public, Kotlin's default). */
+internal val IconCodegenOptions.modifierPrefix: String
+    get() = if (isPublic) "" else "internal "
 
 /**
  * A set of icons (e.g. Font Awesome or Lucide) that we can download data for and generate Kotlin bindings from.
