@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.gradle.core.tasks
 
-import com.varabyte.kobweb.gradle.core.extensions.IconVisibility
 import com.varabyte.kobweb.gradle.core.icons.IconsLock
 import com.varabyte.kobweb.icons.codegen.IconCodegenOptions
 import com.varabyte.kobweb.icons.codegen.IconSet
@@ -38,7 +37,7 @@ abstract class KobwebGenerateIconsTask :
     abstract val rootPackage: Property<String>
 
     @get:Input
-    abstract val visibility: Property<IconVisibility>
+    abstract val public: Property<Boolean>
 
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
@@ -51,8 +50,6 @@ abstract class KobwebGenerateIconsTask :
                 "Invalid `rootPackage` \"${rootPackage.get()}\" in the `icons { ... }` block: ${problems.joinToString(" ")}"
             )
         }
-        val isPublic = visibility.get() == IconVisibility.PUBLIC
-
         // Clear out bindings for icon sets that are no longer configured
         val outDir = outputDir.get().asFile
         outDir.deleteRecursively()
@@ -79,7 +76,7 @@ abstract class KobwebGenerateIconsTask :
 
             iconSet.generateBindings(
                 iconsFile,
-                IconCodegenOptions(packageName = "${rootPackageName.value}.$id", isPublic = isPublic),
+                IconCodegenOptions(packageName = "${rootPackageName.value}.$id", isPublic = public.get()),
                 outDir,
             )
         }

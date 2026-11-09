@@ -86,8 +86,7 @@ abstract class KobwebCacheIconSetsTask : DefaultTask() {
                     "e: Multiple modules (${modules.joinToString { "\"$it\"" }}) generate icon bindings into the same " +
                         "package, \"$packageName\", which would crash the site when it loads. To fix this, give these " +
                         "modules different Gradle groups, generate the icons once in a library that they share (with " +
-                        "`visibility.set(IconVisibility.PUBLIC)` in its `icons` block), or set `rootPackage` in one of " +
-                        "their `icons` blocks."
+                        "`public.set(true)` in its `icons` block), or set `rootPackage` in one of their `icons` blocks."
                 )
             }
         }

@@ -35,7 +35,8 @@ class KobwebLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
         val libraryBlock = project.kobwebBlock.createLibraryBlock()
-        project.setupIcons(libraryBlock.createIconsBlock())
+        val iconsBlock = libraryBlock.createIconsBlock()
+        project.setupIcons(iconsBlock, isPublic = iconsBlock.public)
         project.applyKspPlugin()
         project.setKspMode(ProcessorMode.LIBRARY)
 

@@ -111,7 +111,8 @@ class KobwebApplicationPlugin @Inject constructor(
 
         val kobwebBlock = project.kobwebBlock
         val appBlock = kobwebBlock.createAppBlock(project.providers, kobwebFolder, kobwebConf)
-        project.setupIcons(appBlock.createIconsBlock())
+        // Nothing depends on an app, so its icon bindings never need to be public
+        project.setupIcons(appBlock.createIconsBlock(), isPublic = project.provider { false })
 
         val env =
             project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV

@@ -9,21 +9,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
 
-/** Who can use the icon bindings generated from an [IconsBlock]. */
-enum class IconVisibility {
-    /**
-     * Modules that depend on this one can use its icon bindings too.
-     *
-     * By default, icon bindings are internal, so each module (every library and the app) can generate the icons it
-     * needs without naming conflicts. Use this instead when a module exists to share icons, e.g. a single icons
-     * library for an entire project.
-     */
-    PUBLIC,
-
-    /** Only this module can use the bindings. */
-    INTERNAL,
-}
-
 /**
  * A block for generating Kotlin bindings for icon sets, such as Font Awesome or Lucide, at versions you choose.
  *
@@ -78,8 +63,6 @@ abstract class IconsBlock<S : IconsBlock.IconSetBlock>(
      */
     abstract val rootPackage: Property<String>
 
-    abstract val visibility: Property<IconVisibility>
-
     private val _iconSets = mutableMapOf<String, S>()
 
     /** The configured icon sets, keyed by their id (e.g. "fa"), which is also the name of their subpackage. */
@@ -115,6 +98,5 @@ abstract class IconsBlock<S : IconsBlock.IconSetBlock>(
 
     init {
         rootPackage.convention(".components.icons")
-        visibility.convention(IconVisibility.INTERNAL)
     }
 }

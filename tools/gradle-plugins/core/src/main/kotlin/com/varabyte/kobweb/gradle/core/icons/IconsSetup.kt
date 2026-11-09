@@ -19,8 +19,10 @@ import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
  * Adds the tasks that fetch icon data for [iconsBlock] and generate bindings from it.
  *
  * Only apps and library plugins should call this, each with their own `icons { ... }` block.
+ *
+ * @param isPublic Whether the generated bindings are public instead of internal.
  */
-fun Project.setupIcons(iconsBlock: IconsBlock<*>) {
+fun Project.setupIcons(iconsBlock: IconsBlock<*>, isPublic: Provider<Boolean>) {
     val kobwebBlock = kobwebBlock
 
     val iconVersionSpecs = provider {
@@ -35,7 +37,7 @@ fun Project.setupIcons(iconsBlock: IconsBlock<*>) {
         storeDir.set(iconsBlock.storeDir)
         projectGroup.set(provider { project.group.toString() })
         rootPackage.set(iconsBlock.rootPackage)
-        visibility.set(iconsBlock.visibility)
+        public.set(isPublic)
         outputDir.set(layout.buildDirectory.dir(kobwebBlock.baseGenDir.map { "$it/icons/src/jsMain/kotlin" }))
         // So that `./gradlew kobwebFetchIcons build` generates from freshly fetched data.
         // Normally mustRunAfter is a sign that inputs and outputs aren't set up correctly, but here, we don't want to
