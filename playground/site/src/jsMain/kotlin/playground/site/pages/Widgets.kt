@@ -347,7 +347,7 @@ fun WidgetsPage() {
                     val faIcons = mapOf<String, @Composable () -> Unit>(
                         "Home" to { FaHouse() },
                         "Cloud" to { FaCloud() },
-                        "Star" to { FaStar(style = FaIconStyle.FILLED) },
+                        "Star" to { FaStar(style = FaIconStyle.SOLID) },
                         "GitHub" to { FaGithub() }
                     )
 
@@ -523,7 +523,7 @@ fun WidgetsPage() {
                     Column(Modifier.gap(0.5.cssRem)) {
                         var username by remember { mutableStateOf("") }
                         InputGroup {
-                            LeftInset { FaUser(style = FaIconStyle.FILLED) }
+                            LeftInset { FaUser(style = FaIconStyle.SOLID) }
                             TextInput(
                                 username,
                                 placeholder = "username",

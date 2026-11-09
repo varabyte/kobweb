@@ -23,7 +23,7 @@ class FaIconSetTest {
     private fun File.relativeFilePaths() = walkTopDown().filter { it.isFile }.map { it.relativeTo(this).path }.sorted().toList()
 
     @Test
-    fun iconsFileListsFreeIconsPerCategory() {
+    fun iconsFileListsFreeIconsPerStyle() {
         val iconsText = FaIconSet().iconsFileTextFor(
             "6.5.2",
             """
@@ -49,7 +49,7 @@ class FaIconSetTest {
     }
 
     @Test
-    fun generatesIconFilesPerCategory() {
+    fun generatesIconFilesPerStyle() {
         generateBindings(
             """
             # A comment
@@ -72,14 +72,14 @@ class FaIconSetTest {
             import androidx.compose.runtime.*
             import com.varabyte.kobweb.compose.ui.Modifier
 
-            @Composable fun FaAddressBook(modifier: Modifier = Modifier, style: FaIconStyle = FaIconStyle.OUTLINE, size: FaIconSize? = null) = FaIcon("address-book", modifier, style.category, size)
+            @Composable fun FaAddressBook(modifier: Modifier = Modifier, style: FaIconStyle = FaIconStyle.REGULAR, size: FaIconSize? = null) = FaIcon("address-book", modifier, style, size)
             """.trimIndent()
         )
         assertThat(packageDir.resolve("bell.kt").readText()).endsWith(
-            "\n@Composable fun FaBell(modifier: Modifier = Modifier, size: FaIconSize? = null) = FaIcon(\"bell\", modifier, FaIconCategory.SOLID, size)"
+            "\n@Composable fun FaBell(modifier: Modifier = Modifier, size: FaIconSize? = null) = FaIcon(\"bell\", modifier, FaIconStyle.SOLID, size)"
         )
         assertThat(packageDir.resolve("github.kt").readText()).endsWith(
-            "\n@Composable fun FaGithub(modifier: Modifier = Modifier, size: FaIconSize? = null) = FaIcon(\"github\", modifier, FaIconCategory.BRAND, size)"
+            "\n@Composable fun FaGithub(modifier: Modifier = Modifier, size: FaIconSize? = null) = FaBrandIcon(\"github\", modifier, size)"
         )
     }
 
@@ -96,10 +96,11 @@ class FaIconSetTest {
 
         assertThat(packageDir.resolve("bell.kt").readText()).contains("\n@Composable internal fun FaBell(")
         val supportCode = packageDir.resolve("_FaIcon.kt").readText()
-        assertThat(supportCode).contains("\ninternal enum class FaIconCategory(")
         assertThat(supportCode).contains("\ninternal enum class FaIconStyle(")
         assertThat(supportCode).contains("\ninternal enum class FaIconSize(")
         assertThat(supportCode).contains("\ninternal fun FaIcon(")
+        assertThat(supportCode).contains("\ninternal fun FaBrandIcon(")
+        assertThat(supportCode).contains("\ninternal object IconStyle {")
     }
 
     @Test
