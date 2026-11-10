@@ -10,13 +10,13 @@ import com.varabyte.kobweb.core.data.add
 import com.varabyte.kobweb.core.init.InitRoute
 import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.silk.components.forms.Button
+import com.varabyte.kobweb.silk.components.icons.fa.FaArrowUp
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.text.SpanText
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.H1
 import org.jetbrains.compose.web.dom.Text
-import playground.sitelib.components.icons.fa.FaArrowUp
 import playground.sitelib.components.layouts.PageLayoutData
 
 @InitRoute
