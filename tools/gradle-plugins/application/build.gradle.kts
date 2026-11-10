@@ -19,9 +19,7 @@ dependencies {
     // Common Gradle plugin used by Library, Application, and Worker plugins
     api(projects.tools.gradlePlugins.core)
 
-    // Knows each icon set's stylesheet
-    implementation(projects.tools.icons.codegen)
-    // Reads which icon sets dependencies have bindings for
+    // Reads which stylesheets dependencies' icon bindings need
     implementation(projects.tools.icons.metadata)
 
     // For generating code / html

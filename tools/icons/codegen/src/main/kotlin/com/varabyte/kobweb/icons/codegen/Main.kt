@@ -1,11 +1,13 @@
 package com.varabyte.kobweb.icons.codegen
 
+import com.varabyte.kobweb.icons.codegen.generate.writeMetadata
 import java.io.File
 import kotlin.system.exitProcess
 
 private const val USAGE = """Usage:
   fetch <icon-set> --version <version, e.g. 1.70.0, 1.+, or latest> --icons <file>
-  generate <icon-set> --icons <file> --out <dir> --package <name> --visibility <public|internal>"""
+  generate <icon-set> --icons <file> --out <dir> --package <name> --visibility <public|internal>
+  metadata <icon-set> --version <version> --out <dir>"""
 
 /**
  * Command-line entry point, used by Kobweb's own icon modules, which can't apply the Kobweb Gradle plugins since they
@@ -49,6 +51,7 @@ private fun run(args: List<String>) {
                 File(flag("out")),
             )
         }
+        "metadata" -> iconSet.writeMetadata(flag("version"), File(flag("out")))
         else -> throw IllegalArgumentException("Unknown command \"$command\"")
     }
 }

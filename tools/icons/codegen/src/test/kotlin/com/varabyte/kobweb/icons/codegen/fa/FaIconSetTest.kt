@@ -118,28 +118,9 @@ class FaIconSetTest {
     }
 
     @Test
-    fun stylesheetIsLoadedForTheNewestVersion() {
-        val stylesheet = FaIconSet().stylesheet
-        assertThat(stylesheet.versionFor(listOf("6.5.2", "6.10.0", "6.7.1"))).isEqualTo("6.10.0")
-    }
-
-    @Test
-    fun stylesheetServesOlderBindingsWithTheSameMajorVersion() {
-        val stylesheet = FaIconSet().stylesheet
-        assertThat(stylesheet.serves(stylesheetVersion = "6.7.1", bindingsVersion = "6.5.2")).isTrue()
-        assertThat(stylesheet.serves(stylesheetVersion = "6.5.2", bindingsVersion = "6.5.2")).isTrue()
-    }
-
-    @Test
-    fun stylesheetDoesNotServeNewerBindings() {
-        val stylesheet = FaIconSet().stylesheet
-        assertThat(stylesheet.serves(stylesheetVersion = "6.5.2", bindingsVersion = "6.7.1")).isFalse()
-    }
-
-    @Test
-    fun stylesheetDoesNotServeBindingsWithAnotherMajorVersion() {
-        val stylesheet = FaIconSet().stylesheet
-        assertThat(stylesheet.serves(stylesheetVersion = "7.3.1", bindingsVersion = "6.5.2")).isFalse()
+    fun stylesheetUrlFollowsVersion() {
+        assertThat(FaIconSet().stylesheetUrl("6.5.2"))
+            .isEqualTo("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css")
     }
 
     @Test

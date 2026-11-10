@@ -19,41 +19,10 @@ class CodegenArguments(@get:Input val args: Provider<List<String>>) : CommandLin
     override fun asArguments(): Iterable<String> = args.get()
 }
 
-/**
- * Writes the Kobweb icons metadata that apps read to find out which icon set (and version) a jar has bindings for, so
- * they can load its stylesheet.
- *
- * This build can't depend on the Kobweb Gradle plugins, so the JSON is written by hand. It mirrors `IconsMetadata` in
- * `tools/icons/metadata`, which is where its format is defined.
- */
-abstract class GenerateIconsMetadataTask : DefaultTask() {
-    @get:Input
-    abstract val iconSet: Property<String>
-
-    @get:Input
-    abstract val version: Property<String>
-
-    /** The fully qualified package of the bindings, e.g. "com.varabyte.kobweb.silk.components.icons.fa". */
-    @get:Input
-    abstract val packageName: Property<String>
-
-    @get:OutputDirectory
-    abstract val outputDir: DirectoryProperty
-
-    @TaskAction
-    fun generate() {
-        outputDir.file("META-INF/kobweb/icons.json").get().asFile.apply {
-            parentFile.mkdirs()
-            writeText(
-                """{"iconSets":{"${iconSet.get()}":{"version":"${version.get()}","packageName":"${packageName.get()}"}}}"""
-            )
-        }
-    }
-}
-
 val silkIcons = extensions.create<SilkIconsExtension>("silkIcons")
 
 val generatedSrcDir = "build/generated/icons/src/jsMain/kotlin"
+val generatedMetadataDir = "build/generated/kobweb/icons/metadata"
 val iconsPackageName = silkIcons.iconSet.map { "com.varabyte.kobweb.silk.components.icons.$it" }
 
 val iconsCodegen = configurations.dependencyScope("iconsCodegen")
@@ -106,11 +75,22 @@ val generateIconsTask = tasks.register<JavaExec>("generateIcons") {
     outputs.cacheIf { true }
 }
 
-val generateIconsMetadataTask = tasks.register<GenerateIconsMetadataTask>("generateIconsMetadata") {
-    iconSet.set(silkIcons.iconSet)
-    version.set(silkIcons.version)
-    packageName.set(iconsPackageName)
-    outputDir.set(layout.buildDirectory.dir("generated/kobweb/icons/metadata"))
+val generateIconsMetadataTask = tasks.register<JavaExec>("generateIconsMetadata") {
+    group = "Icon"
+    description = "Generate the icons.json file that tells apps which stylesheet this module's icons need."
+
+    classpath = iconsCodegenClasspath.get()
+    mainClass.set("com.varabyte.kobweb.icons.codegen.MainKt")
+    argumentProviders.add(CodegenArguments(provider {
+        listOf(
+            "metadata", silkIcons.iconSet.get(),
+            "--version", silkIcons.version.get(),
+            "--out", generatedMetadataDir,
+        )
+    }))
+
+    outputs.dir(generatedMetadataDir)
+    outputs.cacheIf { true }
 }
 
 pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {

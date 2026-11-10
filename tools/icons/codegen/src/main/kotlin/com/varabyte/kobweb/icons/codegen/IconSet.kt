@@ -4,7 +4,6 @@ import com.varabyte.kobweb.icons.codegen.fa.FaIconSet
 import com.varabyte.kobweb.icons.codegen.lucide.LucideIconSet
 import com.varabyte.kobweb.icons.codegen.material.MdiIconSet
 import com.varabyte.kobweb.icons.codegen.material.MsIconSet
-import com.varabyte.kobweb.icons.codegen.stylesheet.IconStylesheet
 import java.io.File
 
 /**
@@ -56,10 +55,10 @@ interface IconSet {
     fun generateBindings(iconsFile: File, options: IconCodegenOptions, outputDir: File)
 
     /**
-     * The stylesheet a page must load for this set's bindings to render, or null if they need none (e.g. because they
-     * draw SVGs instead of using an icon font).
+     * The URL of the stylesheet a page must load for bindings generated at [version] to render, or null if they need
+     * none (e.g. because they draw SVGs instead of using an icon font).
      */
-    val stylesheet: IconStylesheet? get() = null
+    fun stylesheetUrl(version: String): String? = null
 
     companion object {
         val all: List<IconSet> = listOf(FaIconSet(), LucideIconSet(), MdiIconSet(), MsIconSet())

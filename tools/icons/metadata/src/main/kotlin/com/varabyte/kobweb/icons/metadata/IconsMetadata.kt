@@ -13,10 +13,11 @@ import kotlinx.serialization.Serializable
 class IconsMetadata(val iconSets: Map<String, IconSet>) {
     /**
      * @param version The version the bindings were generated at, e.g. "6.5.2".
-     * @param packageName The package the bindings were generated into, e.g. "com.example.components.icons.fa".
+     * @param stylesheet The URL of the stylesheet a page must load for the bindings to render, or null if they need
+     *   none.
      */
     @Serializable
-    class IconSet(val version: String, val packageName: String)
+    class IconSet(val version: String, val stylesheet: String? = null)
 
     companion object {
         /** Where this file lives inside an artifact. */

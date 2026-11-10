@@ -11,7 +11,6 @@ import com.varabyte.kobweb.gradle.core.util.HtmlUtil
 import com.varabyte.kobweb.gradle.core.util.downloadOrCached
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.gradle.core.util.toSha256
-import com.varabyte.kobweb.icons.codegen.IconSet
 import com.varabyte.kobweb.icons.metadata.IconsMetadata
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_LIBRARY
 import com.varabyte.kobweb.project.common.nonStrictDefault
@@ -296,22 +295,22 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
 
     /** Returns a stylesheet link for each icon set that this app's dependencies have bindings for. */
     private fun iconStylesheetLinks(): List<String> {
-        // Icon set id -> the version that a dependency has bindings for
-        val versionsByIconSet = mutableMapOf<String, String>()
+        // Icon set id -> the stylesheet its bindings need
+        val stylesheetsByIconSet = sortedMapOf<String, String>()
         compileClasspath.forEach { file ->
             file.searchZipFor(IconsMetadata.PATH) { bytes ->
                 val iconsMetadata = Json.nonStrictDefault.decodeFromString(IconsMetadata.serializer(), bytes.decodeToString())
-                iconsMetadata.iconSets.forEach { (id, iconSet) -> versionsByIconSet[id] = iconSet.version }
+                iconsMetadata.iconSets.forEach { (id, iconSet) ->
+                    iconSet.stylesheet?.let { stylesheetsByIconSet[id] = it }
+                }
             }
         }
 
-        return IconSet.all.mapNotNull { iconSet ->
-            val version = versionsByIconSet[iconSet.id] ?: return@mapNotNull null
-            val stylesheet = iconSet.stylesheet ?: return@mapNotNull null
+        return stylesheetsByIconSet.values.map { stylesheet ->
             HtmlUtil.serializeHeadContents {
                 link {
                     rel = "stylesheet"
-                    href = stylesheet.urlFor(version)
+                    href = stylesheet
                 }
             }
         }
