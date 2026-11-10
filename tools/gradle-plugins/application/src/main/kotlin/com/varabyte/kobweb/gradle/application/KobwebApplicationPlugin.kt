@@ -56,6 +56,9 @@ import com.varabyte.kobweb.server.api.SiteLayout
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.component.ComponentIdentifier
+import org.gradle.api.artifacts.result.ResolvedComponentResult
+import org.gradle.api.artifacts.result.ResolvedDependencyResult
 import org.gradle.api.file.RegularFile
 import org.gradle.api.tasks.Sync
 import org.gradle.build.event.BuildEventsListenerRegistry
@@ -316,6 +319,14 @@ class KobwebApplicationPlugin @Inject constructor(
             kobwebGenSiteIndexTask.configure {
                 publicPath = kobwebBlock.publicPath
                 compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
+                val classpath = project.configurations.named(jsTarget.compileClasspath)
+                trustedIconsArtifacts.from(
+                    classpath.flatMap { it.incoming.artifacts.resolvedArtifacts }
+                        .zip(classpath.flatMap { it.incoming.resolutionResult.rootComponent }) { artifacts, root ->
+                            val trustedComponents = root.trustedIconsSources()
+                            artifacts.filter { it.id.componentIdentifier in trustedComponents }.map { it.file }
+                        }
+                )
             }
 
             val jsRunTasks = listOf(jsTarget.browserDevelopmentRun, jsTarget.browserProductionRun)
@@ -453,3 +464,25 @@ class KobwebApplicationPlugin @Inject constructor(
 }
 
 val Project.kobwebBuildTarget get() = project.extra["kobwebBuildTarget"] as BuildTarget
+
+/**
+ * The components in this dependency graph whose icons metadata can add stylesheets to the site.
+ *
+ * Only Kobweb's own artifacts are trusted, i.e. those in the `com.varabyte` groups, which only we can publish to on Maven
+ * Central. Checking the group (rather than, say, whether a component is a Maven module) also covers Kobweb's own
+ * projects when a build includes Kobweb's source, as its playground does. Everyone else should add `<head>` elements
+ * through their `kobweb { library { index { ... } } }` block instead, which users can see and opt out of.
+ */
+private fun ResolvedComponentResult.trustedIconsSources(): Set<ComponentIdentifier> {
+    val visited = mutableSetOf<ComponentIdentifier>()
+    val trusted = mutableSetOf<ComponentIdentifier>()
+    val toVisit = ArrayDeque(listOf(this))
+    while (toVisit.isNotEmpty()) {
+        val component = toVisit.removeFirst()
+        if (!visited.add(component.id)) continue
+        val group = component.moduleVersion?.group
+        if (group != null && (group == "com.varabyte" || group.startsWith("com.varabyte."))) trusted.add(component.id)
+        component.dependencies.filterIsInstance<ResolvedDependencyResult>().forEach { toVisit.add(it.selected) }
+    }
+    return trusted
+}
