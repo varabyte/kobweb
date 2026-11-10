@@ -6,7 +6,7 @@ import kotlin.system.exitProcess
 
 private const val USAGE = """Usage:
   fetch <icon-set> --version <version> --icons <file>
-  generate <icon-set> --icons <file> --out <dir> --package <name> --visibility <public|internal>
+  generate <icon-set> --icons <file> --out <dir> --package <name>
   metadata <icon-set> --version <version> --out <dir>"""
 
 /**
@@ -39,18 +39,7 @@ private fun run(args: List<String>) {
 
     when (command) {
         "fetch" -> iconSet.fetch(flag("version"), File(flag("icons")))
-        "generate" -> {
-            val isPublic = when (flag("visibility")) {
-                "public" -> true
-                "internal" -> false
-                else -> throw IllegalArgumentException("Unknown visibility \"${flag("visibility")}\"")
-            }
-            iconSet.generateBindings(
-                File(flag("icons")),
-                IconCodegenOptions(packageName = flag("package"), isPublic = isPublic),
-                File(flag("out")),
-            )
-        }
+        "generate" -> iconSet.generateBindings(File(flag("icons")), flag("package"), File(flag("out")))
         "metadata" -> iconSet.writeMetadata(flag("version"), File(flag("out")))
         else -> throw IllegalArgumentException("Unknown command \"$command\"")
     }

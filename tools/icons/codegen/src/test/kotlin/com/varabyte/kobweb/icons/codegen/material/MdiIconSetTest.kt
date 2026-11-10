@@ -2,7 +2,6 @@
 
 package com.varabyte.kobweb.icons.codegen.material
 
-import com.varabyte.kobweb.icons.codegen.IconCodegenOptions
 import com.varabyte.truthish.assertThat
 import org.junit.Test
 import java.io.File
@@ -14,9 +13,9 @@ class MdiIconSetTest {
     private val outDir = rootDir.resolve("out")
     private val packageDir = outDir.resolve("test/icons")
 
-    private fun generateBindings(iconsText: String, isPublic: Boolean) {
+    private fun generateBindings(iconsText: String) {
         iconsFile.writeText(iconsText)
-        MdiIconSet().generateBindings(iconsFile, IconCodegenOptions(packageName = "test.icons", isPublic), outDir)
+        MdiIconSet().generateBindings(iconsFile, "test.icons", outDir)
     }
 
     private fun File.relativeFilePaths() = walkTopDown().filter { it.isFile }.map { it.relativeTo(this).path }.sorted().toList()
@@ -32,7 +31,6 @@ class MdiIconSetTest {
             mdis=home
             mdit=home
             """.trimIndent(),
-            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("_MdiIcon.kt", "home.kt")
@@ -63,7 +61,6 @@ class MdiIconSetTest {
             mdis=
             mdit=tonality
             """.trimIndent(),
-            isPublic = true,
         )
 
         assertThat(packageDir.resolve("tonality.kt").readText()).endsWith(
@@ -81,31 +78,11 @@ class MdiIconSetTest {
             mdis=
             mdit=
             """.trimIndent(),
-            isPublic = true,
         )
 
         assertThat(packageDir.resolve("label.kt").readText()).endsWith(
             "\n@Composable fun MdiLabel(modifier: Modifier = Modifier, style: MdiIconStyle = OUTLINED) = MdiIcon(\"label\", modifier, style.also { it.assertValidStyle(\"MdiLabel\", OUTLINED, ROUNDED) })"
         )
-    }
-
-    @Test
-    fun internalVisibilityAppliesToIconsAndSupportCode() {
-        generateBindings(
-            """
-            mdi=home
-            mdio=
-            mdir=
-            mdis=
-            mdit=
-            """.trimIndent(),
-            isPublic = false,
-        )
-
-        assertThat(packageDir.resolve("home.kt").readText()).contains("\n@Composable internal fun MdiHome(")
-        val supportCode = packageDir.resolve("_MdiIcon.kt").readText()
-        assertThat(supportCode).contains("\ninternal enum class MdiIconStyle {")
-        assertThat(supportCode).contains("\ninternal fun MdiIcon(")
     }
 
     @Test
@@ -118,7 +95,6 @@ class MdiIconSetTest {
             mdis=
             mdit=
             """.trimIndent(),
-            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("_MdiIcon.kt", "add_chart.kt")

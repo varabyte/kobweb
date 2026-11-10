@@ -2,7 +2,6 @@
 
 package com.varabyte.kobweb.icons.codegen.fa
 
-import com.varabyte.kobweb.icons.codegen.IconCodegenOptions
 import com.varabyte.truthish.assertThat
 import com.varabyte.truthish.assertThrows
 import org.junit.Test
@@ -15,9 +14,9 @@ class FaIconSetTest {
     private val outDir = rootDir.resolve("out")
     private val packageDir = outDir.resolve("test/icons")
 
-    private fun generateBindings(iconsText: String, isPublic: Boolean) {
+    private fun generateBindings(iconsText: String) {
         iconsFile.writeText(iconsText)
-        FaIconSet().generateBindings(iconsFile, IconCodegenOptions(packageName = "test.icons", isPublic), outDir)
+        FaIconSet().generateBindings(iconsFile, "test.icons", outDir)
     }
 
     private fun File.relativeFilePaths() = walkTopDown().filter { it.isFile }.map { it.relativeTo(this).path }.sorted().toList()
@@ -57,7 +56,6 @@ class FaIconSetTest {
             far=address-book
             fab=github
             """.trimIndent(),
-            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("_FaIcon.kt", "address-book.kt", "bell.kt", "github.kt")
@@ -84,26 +82,6 @@ class FaIconSetTest {
     }
 
     @Test
-    fun internalVisibilityAppliesToIconsAndSupportCode() {
-        generateBindings(
-            """
-            fas=bell
-            far=
-            fab=
-            """.trimIndent(),
-            isPublic = false,
-        )
-
-        assertThat(packageDir.resolve("bell.kt").readText()).contains("\n@Composable internal fun FaBell(")
-        val supportCode = packageDir.resolve("_FaIcon.kt").readText()
-        assertThat(supportCode).contains("\ninternal enum class FaIconStyle(")
-        assertThat(supportCode).contains("\ninternal enum class FaIconSize(")
-        assertThat(supportCode).contains("\ninternal fun FaIcon(")
-        assertThat(supportCode).contains("\ninternal fun FaBrandIcon(")
-        assertThat(supportCode).contains("\ninternal object IconStyle {")
-    }
-
-    @Test
     fun namesDifferingOnlyByDashesKeepTheLongestOne() {
         generateBindings(
             """
@@ -111,7 +89,6 @@ class FaIconSetTest {
             far=
             fab=
             """.trimIndent(),
-            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("_FaIcon.kt", "print-shop.kt")
@@ -132,7 +109,6 @@ class FaIconSetTest {
                 far=
                 fab=font-awesome
                 """.trimIndent(),
-                isPublic = true,
             )
         }
         assertThat(e.message!!).contains("Found unexpected groupings")

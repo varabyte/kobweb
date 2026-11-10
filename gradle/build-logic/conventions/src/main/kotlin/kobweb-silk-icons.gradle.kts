@@ -66,7 +66,6 @@ val generateIconsTask = tasks.register<JavaExec>("generateIcons") {
             "--icons", silkIcons.iconsFile.get(),
             "--out", generatedSrcDir,
             "--package", iconsPackageName.get(),
-            "--visibility", "public",
         )
     }))
 

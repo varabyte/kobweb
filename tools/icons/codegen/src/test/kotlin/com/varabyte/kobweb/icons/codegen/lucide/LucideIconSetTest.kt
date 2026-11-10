@@ -2,7 +2,6 @@
 
 package com.varabyte.kobweb.icons.codegen.lucide
 
-import com.varabyte.kobweb.icons.codegen.IconCodegenOptions
 import com.varabyte.truthish.assertThat
 import com.varabyte.truthish.assertThrows
 import org.junit.Test
@@ -15,9 +14,9 @@ class LucideIconSetTest {
     private val outDir = rootDir.resolve("out")
     private val packageDir = outDir.resolve("test/icons")
 
-    private fun generateBindings(iconsJson: String, isPublic: Boolean) {
+    private fun generateBindings(iconsJson: String) {
         iconsFile.writeText(iconsJson)
-        LucideIconSet().generateBindings(iconsFile, IconCodegenOptions(packageName = "test.icons", isPublic), outDir)
+        LucideIconSet().generateBindings(iconsFile, "test.icons", outDir)
     }
 
     private fun File.relativeFilePaths() = walkTopDown().filter { it.isFile }.map { it.relativeTo(this).path }.sorted().toList()
@@ -34,7 +33,6 @@ class LucideIconSetTest {
               "deprecated": {}
             }
             """.trimIndent(),
-            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("arrow-right.kt")
@@ -86,34 +84,6 @@ class LucideIconSetTest {
     }
 
     @Test
-    fun internalVisibilityAppliesToIconsAndDeprecatedAliases() {
-        generateBindings(
-            """
-            {
-              "version": "1.0.0",
-              "icons": {
-                "circle-x": [{"tag":"path","attrs":{"d":"m15 9-6 6"}}]
-              },
-              "deprecated": {"x-circle":"circle-x"}
-            }
-            """.trimIndent(),
-            isPublic = false,
-        )
-
-        assertThat(packageDir.relativeFilePaths()).containsExactly("circle-x.kt", "deprecated/x-circle.kt")
-        assertThat(packageDir.resolve("circle-x.kt").readText()).contains("\ninternal fun LucideCircleX(\n")
-        assertThat(packageDir.resolve("deprecated/x-circle.kt").readText()).contains(
-            """
-            @Deprecated("Use LucideCircleX instead.", ReplaceWith("LucideCircleX(modifier = modifier, strokeWidth = strokeWidth)"))
-            @Composable
-            internal fun LucideXCircle(
-                modifier: Modifier = Modifier, strokeWidth: Number = 2,
-            ) = LucideCircleX(modifier = modifier, strokeWidth = strokeWidth)
-            """.trimIndent()
-        )
-    }
-
-    @Test
     fun namesDifferingOnlyByCaseGetSeparateFiles() {
         generateBindings(
             """
@@ -126,7 +96,6 @@ class LucideIconSetTest {
               "deprecated": {}
             }
             """.trimIndent(),
-            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("letter-s.kt", "letters.kt")
@@ -146,7 +115,6 @@ class LucideIconSetTest {
               "deprecated": {"arrow-down-az":"arrow-down-a-z"}
             }
             """.trimIndent(),
-            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("arrow-down-a-z.kt", "deprecated/arrow-down-az.kt")
@@ -165,7 +133,6 @@ class LucideIconSetTest {
               "deprecated": {"grid2x2":"grid-2x2","gone":"no-such-icon"}
             }
             """.trimIndent(),
-            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("grid-2x2.kt")
@@ -185,7 +152,6 @@ class LucideIconSetTest {
                   "deprecated": {}
                 }
                 """.trimIndent(),
-                isPublic = true,
             )
         }
         assertThat(e.message!!).contains("LucideArrow1=[arrow-1, arrow1]")
@@ -206,7 +172,6 @@ class LucideIconSetTest {
               "deprecated": {}
             }
             """.trimIndent(),
-            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("house.kt")

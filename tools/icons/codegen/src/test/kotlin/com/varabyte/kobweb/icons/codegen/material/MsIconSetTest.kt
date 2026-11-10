@@ -2,7 +2,6 @@
 
 package com.varabyte.kobweb.icons.codegen.material
 
-import com.varabyte.kobweb.icons.codegen.IconCodegenOptions
 import com.varabyte.truthish.assertThat
 import com.varabyte.truthish.assertThrows
 import org.junit.Test
@@ -15,9 +14,9 @@ class MsIconSetTest {
     private val outDir = rootDir.resolve("out")
     private val packageDir = outDir.resolve("test/icons")
 
-    private fun generateBindings(iconsText: String, isPublic: Boolean) {
+    private fun generateBindings(iconsText: String) {
         iconsFile.writeText(iconsText)
-        MsIconSet().generateBindings(iconsFile, IconCodegenOptions(packageName = "test.icons", isPublic), outDir)
+        MsIconSet().generateBindings(iconsFile, "test.icons", outDir)
     }
 
     private fun File.relativeFilePaths() = walkTopDown().filter { it.isFile }.map { it.relativeTo(this).path }.sorted().toList()
@@ -63,7 +62,6 @@ class MsIconSetTest {
             # A comment
             arrow_back
             """.trimIndent(),
-            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("_MsIcon.kt", "arrow_back.kt")
@@ -85,24 +83,12 @@ class MsIconSetTest {
     }
 
     @Test
-    fun internalVisibilityAppliesToIconsAndSupportCode() {
-        generateBindings("home", isPublic = false)
-
-        assertThat(packageDir.resolve("home.kt").readText()).contains("\n@Composable internal fun MsHome(")
-        val supportCode = packageDir.resolve("_MsIcon.kt").readText()
-        assertThat(supportCode).contains("\ninternal enum class MsIconStyle {")
-        assertThat(supportCode).contains("\ninternal typealias IconStyle = MsIconStyle")
-        assertThat(supportCode).contains("\ninternal fun MsIcon(")
-    }
-
-    @Test
     fun namesDifferingOnlyByUnderscoresKeepTheLongestOne() {
         generateBindings(
             """
             add_chart
             addchart
             """.trimIndent(),
-            isPublic = true,
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("_MsIcon.kt", "add_chart.kt")
