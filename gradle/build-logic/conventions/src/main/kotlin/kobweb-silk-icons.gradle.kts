@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
-// Shared setup for the `silk-icons-*` modules, which generate their Kotlin bindings with `tools/icons-codegen`.
+// Shared setup for the `silk-icons-*` modules, which generate their Kotlin bindings with `tools/icons/codegen`.
 // Each module says which icon set it wraps in a `silkIcons { ... }` block.
 
 abstract class SilkIconsExtension {
@@ -65,7 +65,7 @@ val iconsCodegenClasspath = configurations.resolvable("iconsCodegenClasspath") {
 }
 
 dependencies {
-    iconsCodegen(project(":tools:icons-codegen"))
+    iconsCodegen(project(":tools:icons:codegen"))
 }
 
 tasks.register<JavaExec>("fetchIcons") {

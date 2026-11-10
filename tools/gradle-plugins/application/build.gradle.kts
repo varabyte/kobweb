@@ -20,7 +20,7 @@ dependencies {
     api(projects.tools.gradlePlugins.core)
 
     // Knows each icon set's stylesheet
-    implementation(projects.tools.iconsCodegen)
+    implementation(projects.tools.icons.codegen)
 
     // For generating code / html
     implementation(libs.kotlinpoet)
