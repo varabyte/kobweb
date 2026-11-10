@@ -6,14 +6,13 @@ import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.extensions.interceptUrls
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
-import com.varabyte.kobweb.gradle.core.metadata.IconsMetadata
 import com.varabyte.kobweb.gradle.core.metadata.LibraryMetadata
 import com.varabyte.kobweb.gradle.core.util.HtmlUtil
 import com.varabyte.kobweb.gradle.core.util.downloadOrCached
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.gradle.core.util.toSha256
 import com.varabyte.kobweb.icons.codegen.IconSet
-import com.varabyte.kobweb.ksp.KOBWEB_METADATA_ICONS
+import com.varabyte.kobweb.icons.metadata.IconsMetadata
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_LIBRARY
 import com.varabyte.kobweb.project.common.nonStrictDefault
 import com.varabyte.kobweb.project.conf.KobwebConf
@@ -300,7 +299,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         // Icon set id -> the version that a dependency has bindings for
         val versionsByIconSet = mutableMapOf<String, String>()
         compileClasspath.forEach { file ->
-            file.searchZipFor(KOBWEB_METADATA_ICONS) { bytes ->
+            file.searchZipFor(IconsMetadata.PATH) { bytes ->
                 val iconsMetadata = Json.nonStrictDefault.decodeFromString(IconsMetadata.serializer(), bytes.decodeToString())
                 iconsMetadata.iconSets.forEach { (id, iconSet) -> versionsByIconSet[id] = iconSet.version }
             }

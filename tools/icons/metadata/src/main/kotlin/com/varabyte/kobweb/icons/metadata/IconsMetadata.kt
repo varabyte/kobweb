@@ -1,9 +1,11 @@
-package com.varabyte.kobweb.gradle.core.metadata
+package com.varabyte.kobweb.icons.metadata
 
 import kotlinx.serialization.Serializable
 
 /**
- * The icon sets that a module generated bindings for, which apps use to load each set's stylesheet.
+ * The icon sets that an artifact has bindings for, which apps use to load each set's stylesheet.
+ *
+ * Artifacts include this as a JSON file at [PATH].
  *
  * @param iconSets The icon sets, keyed by their id (e.g. "fa").
  */
@@ -15,4 +17,9 @@ class IconsMetadata(val iconSets: Map<String, IconSet>) {
      */
     @Serializable
     class IconSet(val version: String, val packageName: String)
+
+    companion object {
+        /** Where this file lives inside an artifact. */
+        const val PATH = "META-INF/kobweb/icons.json"
+    }
 }

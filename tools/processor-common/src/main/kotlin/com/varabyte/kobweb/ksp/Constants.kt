@@ -15,7 +15,6 @@ const val KOBWEB_METADATA_MODULE = "$KOBWEB_METADATA_SUBFOLDER/module.json"
 
 const val KOBWEB_METADATA_FRONTEND = "$KOBWEB_METADATA_SUBFOLDER/frontend.json"
 const val KOBWEB_METADATA_BACKEND = "$KOBWEB_METADATA_SUBFOLDER/backend.json"
-const val KOBWEB_METADATA_ICONS = "$KOBWEB_METADATA_SUBFOLDER/icons.json"
 
 // Top-level metadata files that identify what sort of Kobweb artifact this is
 

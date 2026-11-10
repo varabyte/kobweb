@@ -21,6 +21,8 @@ dependencies {
 
     // Knows each icon set's stylesheet
     implementation(projects.tools.icons.codegen)
+    // Reads which icon sets dependencies have bindings for
+    implementation(projects.tools.icons.metadata)
 
     // For generating code / html
     implementation(libs.kotlinpoet)

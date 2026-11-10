@@ -24,7 +24,7 @@ class CodegenArguments(@get:Input val args: Provider<List<String>>) : CommandLin
  * they can load its stylesheet.
  *
  * This build can't depend on the Kobweb Gradle plugins, so the JSON is written by hand. It mirrors `IconsMetadata` in
- * `tools/gradle-plugins/core`, which is where its format is defined.
+ * `tools/icons/metadata`, which is where its format is defined.
  */
 abstract class GenerateIconsMetadataTask : DefaultTask() {
     @get:Input
