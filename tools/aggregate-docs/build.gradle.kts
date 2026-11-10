@@ -59,8 +59,9 @@ val excludedProjects = setOf(
     projects.tools.ksp.workerProcessor,
     projects.tools.ksp.kspExt,
     projects.tools.aggregateDocs,
-    projects.tools.processorCommon,
+    projects.tools.icons.codegen,
     projects.tools.icons.metadata,
+    projects.tools.processorCommon,
 )
 
 dependencies {
