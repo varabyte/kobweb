@@ -25,7 +25,6 @@ dependencies {
 
     implementation(projects.common.kobwebCommon)
     api(projects.tools.processorCommon)
-    implementation(projects.tools.iconsCodegen)
 }
 
 gradlePlugin {

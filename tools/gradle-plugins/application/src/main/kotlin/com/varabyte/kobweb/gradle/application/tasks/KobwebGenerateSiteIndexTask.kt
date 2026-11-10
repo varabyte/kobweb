@@ -13,7 +13,7 @@ import com.varabyte.kobweb.gradle.core.util.downloadOrCached
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.gradle.core.util.toSha256
 import com.varabyte.kobweb.icons.codegen.IconSet
-import com.varabyte.kobweb.icons.codegen.stylesheet.IconStylesheet
+import com.varabyte.kobweb.ksp.KOBWEB_METADATA_ICONS
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_LIBRARY
 import com.varabyte.kobweb.project.common.nonStrictDefault
 import com.varabyte.kobweb.project.conf.KobwebConf
@@ -26,13 +26,10 @@ import kotlinx.html.unsafe
 import kotlinx.serialization.json.Json
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFile
-import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
@@ -80,25 +77,6 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val compileClasspath: ConfigurableFileCollection
-
-    /**
-     * Icon sets the app generates bindings for in `kobweb { app { icons { ... } } }`, mapped to their locked versions, e.g.
-     * `"fa" to "6.5.2"`.
-     */
-    @get:Input
-    abstract val iconSetVersions: MapProperty<String, String>
-
-    /** The icon sets of this app and its dependencies, as written by [KobwebCacheIconSetsTask]. */
-    @get:InputFile
-    @get:PathSensitive(PathSensitivity.NONE)
-    abstract val iconSetsFile: RegularFileProperty
-
-    /**
-     * Icon sets the app generates bindings for, mapped to whether to warn when their stylesheet may not render every
-     * library's icons.
-     */
-    @get:Input
-    abstract val warnOnVersionMismatch: MapProperty<String, Boolean>
 
     private val httpProtocolRegex = Regex("""^https?://""")
     // matches `url(https://example.com)`, `url('https://example.com')`, and `url("https://example.com")`
@@ -314,44 +292,23 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         )
     }
 
-    /**
-     * Returns a stylesheet link for each icon set that this app or its dependencies generate bindings for.
-     *
-     * A page can only load one stylesheet per set, since different versions share class names and the later one wins.
-     * The app's own version is its explicit choice, so it wins; otherwise, the icon set picks the version to load.
-     */
-    private fun iconStylesheetLinks(): List<String> {
-        val appIconSetVersions = iconSetVersions.get()
-        val iconsMetadataByModule = Json.decodeFromString<Map<String, IconsMetadata>>(iconSetsFile.get().asFile.readText())
+    /** The name of the dependency this artifact belongs to, e.g. "sitelib-js-1.0.klib" -> "sitelib". */
+    private val File.dependencyName get() = nameWithoutExtension.substringBeforeLast("-js-")
 
-        // Icon set id -> the modules that generate its bindings
-        val moduleVersionsByIconSet = mutableMapOf<String, ModuleIconVersions>()
-        iconsMetadataByModule.forEach { (module, iconsMetadata) ->
-            iconsMetadata.iconSets.forEach { (id, iconSet) ->
-                moduleVersionsByIconSet.getOrPut(id) { ModuleIconVersions() }[module] = iconSet.version
+    /** Returns a stylesheet link for each icon set that this app's dependencies have bindings for. */
+    private fun iconStylesheetLinks(): List<String> {
+        // Icon set id -> the version that a dependency has bindings for
+        val versionsByIconSet = mutableMapOf<String, String>()
+        compileClasspath.forEach { file ->
+            file.searchZipFor(KOBWEB_METADATA_ICONS) { bytes ->
+                val iconsMetadata = Json.nonStrictDefault.decodeFromString(IconsMetadata.serializer(), bytes.decodeToString())
+                iconsMetadata.iconSets.forEach { (id, iconSet) -> versionsByIconSet[id] = iconSet.version }
             }
         }
 
         return IconSet.all.mapNotNull { iconSet ->
-            val moduleVersions = moduleVersionsByIconSet[iconSet.id] ?: return@mapNotNull null
+            val version = versionsByIconSet[iconSet.id] ?: return@mapNotNull null
             val stylesheet = iconSet.stylesheet ?: return@mapNotNull null
-            val version = appIconSetVersions[iconSet.id] ?: stylesheet.versionFor(moduleVersions.versions)
-            val incompatibleModules = moduleVersions.incompatibleWith(stylesheet, version)
-            if (incompatibleModules.isNotEmpty() && warnOnVersionMismatch.get()[iconSet.id] != false) {
-                val mappings = incompatibleModules.entries.joinToString { (module, bindingsVersion) ->
-                    "\"$module\" -> \"$bindingsVersion\""
-                }
-                val id = iconSet.id
-                logger.warn(
-                    "w: Only one \"$id\" icon stylesheet can be loaded, so this site loads it for version $version. " +
-                        "But given conflicting module mappings ($mappings), if any of those icons were renamed or " +
-                        "removed in $version, they will render blank. To silence this warning, you can update your " +
-                        "dependencies (if possible), set this app's \"$id\" version explicitly (via " +
-                        "`kobweb { app { icons { $id { version.set(\"...\") } } } }`), or disable this warning (via " +
-                        "`kobweb { app { icons { $id { warnOnVersionMismatch.set(false) } } } }`)."
-                )
-            }
-
             HtmlUtil.serializeHeadContents {
                 link {
                     rel = "stylesheet"
@@ -434,21 +391,5 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 buildTarget
             )
         )
-    }
-}
-
-/** The modules that generate bindings for one icon set, each with the version it generated them at. */
-private class ModuleIconVersions {
-    private val versionsByModule = mutableMapOf<String, String>()
-
-    val versions: Collection<String> get() = versionsByModule.values
-
-    operator fun set(module: String, version: String) {
-        versionsByModule[module] = version
-    }
-
-    /** The modules (with their versions) whose icons [stylesheet] at [stylesheetVersion] might not render. */
-    fun incompatibleWith(stylesheet: IconStylesheet, stylesheetVersion: String): Map<String, String> {
-        return versionsByModule.filterValues { version -> !stylesheet.serves(stylesheetVersion, version) }
     }
 }
