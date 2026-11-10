@@ -12,15 +12,11 @@ import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.text.SpanText
-import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.H1
 import org.jetbrains.compose.web.dom.Text
-import org.w3c.dom.SMOOTH
-import org.w3c.dom.ScrollBehavior
-import org.w3c.dom.ScrollToOptions
-import playground.site.components.icons.fa.FaArrowUp
+import playground.sitelib.components.icons.fa.FaArrowUp
 import playground.sitelib.components.layouts.PageLayoutData
 
 @InitRoute

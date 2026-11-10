@@ -15,7 +15,7 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.H1
 import org.jetbrains.compose.web.dom.Text
-import playground.site.components.icons.fa.FaArrowUp
+import playground.sitelib.components.icons.fa.FaArrowUp
 import playground.sitelib.components.layouts.PageLayoutData
 
 @InitRoute
