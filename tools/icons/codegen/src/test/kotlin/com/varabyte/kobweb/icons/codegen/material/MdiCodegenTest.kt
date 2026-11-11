@@ -7,7 +7,7 @@ import org.junit.Test
 import java.io.File
 import kotlin.io.path.createTempDirectory
 
-class MdiIconSetTest {
+class MdiCodegenTest {
     private val rootDir = createTempDirectory("mdi-icon-set-test").toFile().also { it.deleteOnExit() }
     private val iconsFile = rootDir.resolve("md-icon-list.txt")
     private val outDir = rootDir.resolve("out")
@@ -15,7 +15,7 @@ class MdiIconSetTest {
 
     private fun generateBindings(iconsText: String) {
         iconsFile.writeText(iconsText)
-        MdiIconSet().generateBindings(iconsFile, "test.icons", outDir)
+        MdiCodegen().generateBindings(iconsFile, "test.icons", outDir)
     }
 
     private fun File.relativeFilePaths() = walkTopDown().filter { it.isFile }.map { it.relativeTo(this).path }.sorted().toList()

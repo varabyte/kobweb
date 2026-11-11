@@ -8,7 +8,7 @@ import org.junit.Test
 import java.io.File
 import kotlin.io.path.createTempDirectory
 
-class LucideIconSetTest {
+class LucideCodegenTest {
     private val rootDir = createTempDirectory("lucide-icon-set-test").toFile().also { it.deleteOnExit() }
     private val iconsFile = rootDir.resolve("lucide-icons.json")
     private val outDir = rootDir.resolve("out")
@@ -16,7 +16,7 @@ class LucideIconSetTest {
 
     private fun generateBindings(iconsJson: String) {
         iconsFile.writeText(iconsJson)
-        LucideIconSet().generateBindings(iconsFile, "test.icons", outDir)
+        LucideCodegen().generateBindings(iconsFile, "test.icons", outDir)
     }
 
     private fun File.relativeFilePaths() = walkTopDown().filter { it.isFile }.map { it.relativeTo(this).path }.sorted().toList()

@@ -1,9 +1,9 @@
 package com.varabyte.kobweb.icons.codegen
 
-import com.varabyte.kobweb.icons.codegen.fa.FaIconSet
-import com.varabyte.kobweb.icons.codegen.lucide.LucideIconSet
-import com.varabyte.kobweb.icons.codegen.material.MdiIconSet
-import com.varabyte.kobweb.icons.codegen.material.MsIconSet
+import com.varabyte.kobweb.icons.codegen.fa.FaCodegen
+import com.varabyte.kobweb.icons.codegen.lucide.LucideCodegen
+import com.varabyte.kobweb.icons.codegen.material.MdiCodegen
+import com.varabyte.kobweb.icons.codegen.material.MsCodegen
 import java.io.File
 
 /**
@@ -11,7 +11,7 @@ import java.io.File
  *
  * Fetching and generating are separate steps so the downloaded data can be checked in, keeping builds off the network.
  */
-interface IconSet {
+interface IconSetCodegen {
     /** A short, unique id for this icon set, e.g. "fa" or "lucide". */
     val id: String
 
@@ -35,6 +35,6 @@ interface IconSet {
     fun stylesheetUrl(version: String): String? = null
 
     companion object {
-        val all: List<IconSet> = listOf(FaIconSet(), LucideIconSet(), MdiIconSet(), MsIconSet())
+        val all: List<IconSetCodegen> = listOf(FaCodegen(), LucideCodegen(), MdiCodegen(), MsCodegen())
     }
 }

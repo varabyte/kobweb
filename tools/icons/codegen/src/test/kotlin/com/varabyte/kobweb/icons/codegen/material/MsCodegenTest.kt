@@ -8,7 +8,7 @@ import org.junit.Test
 import java.io.File
 import kotlin.io.path.createTempDirectory
 
-class MsIconSetTest {
+class MsCodegenTest {
     private val rootDir = createTempDirectory("ms-icon-set-test").toFile().also { it.deleteOnExit() }
     private val iconsFile = rootDir.resolve("ms-icon-list.txt")
     private val outDir = rootDir.resolve("out")
@@ -16,18 +16,18 @@ class MsIconSetTest {
 
     private fun generateBindings(iconsText: String) {
         iconsFile.writeText(iconsText)
-        MsIconSet().generateBindings(iconsFile, "test.icons", outDir)
+        MsCodegen().generateBindings(iconsFile, "test.icons", outDir)
     }
 
     private fun File.relativeFilePaths() = walkTopDown().filter { it.isFile }.map { it.relativeTo(this).path }.sorted().toList()
 
     @Test
     fun iconsFileListsNamesOnce() {
-        val iconsText = MsIconSet().iconsFileTextFor(
+        val iconsText = MsCodegen().iconsFileTextFor(
             "abc123",
             mapOf(
-                MsIconSet.Style.OUTLINED to listOf("arrow_back", "home"),
-                MsIconSet.Style.ROUNDED to listOf("home", "arrow_back"),
+                MsCodegen.Style.OUTLINED to listOf("arrow_back", "home"),
+                MsCodegen.Style.ROUNDED to listOf("home", "arrow_back"),
             )
         )
 
@@ -44,11 +44,11 @@ class MsIconSetTest {
     @Test
     fun stylesWithDifferentIconsAreRejected() {
         val e = assertThrows<IllegalStateException> {
-            MsIconSet().iconsFileTextFor(
+            MsCodegen().iconsFileTextFor(
                 "abc123",
                 mapOf(
-                    MsIconSet.Style.OUTLINED to listOf("arrow_back", "home"),
-                    MsIconSet.Style.ROUNDED to listOf("home"),
+                    MsCodegen.Style.OUTLINED to listOf("arrow_back", "home"),
+                    MsCodegen.Style.ROUNDED to listOf("home"),
                 )
             )
         }

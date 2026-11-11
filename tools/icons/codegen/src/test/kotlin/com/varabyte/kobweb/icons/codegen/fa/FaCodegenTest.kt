@@ -8,7 +8,7 @@ import org.junit.Test
 import java.io.File
 import kotlin.io.path.createTempDirectory
 
-class FaIconSetTest {
+class FaCodegenTest {
     private val rootDir = createTempDirectory("fa-icon-set-test").toFile().also { it.deleteOnExit() }
     private val iconsFile = rootDir.resolve("fa-icon-list.txt")
     private val outDir = rootDir.resolve("out")
@@ -16,14 +16,14 @@ class FaIconSetTest {
 
     private fun generateBindings(iconsText: String) {
         iconsFile.writeText(iconsText)
-        FaIconSet().generateBindings(iconsFile, "test.icons", outDir)
+        FaCodegen().generateBindings(iconsFile, "test.icons", outDir)
     }
 
     private fun File.relativeFilePaths() = walkTopDown().filter { it.isFile }.map { it.relativeTo(this).path }.sorted().toList()
 
     @Test
     fun iconsFileListsFreeIconsPerStyle() {
-        val iconsText = FaIconSet().iconsFileTextFor(
+        val iconsText = FaCodegen().iconsFileTextFor(
             "6.5.2",
             """
             {
@@ -96,7 +96,7 @@ class FaIconSetTest {
 
     @Test
     fun stylesheetUrlFollowsVersion() {
-        assertThat(FaIconSet().stylesheetUrl("6.5.2"))
+        assertThat(FaCodegen().stylesheetUrl("6.5.2"))
             .isEqualTo("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css")
     }
 

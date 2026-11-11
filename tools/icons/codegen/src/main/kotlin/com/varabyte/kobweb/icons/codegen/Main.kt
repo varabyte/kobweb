@@ -28,8 +28,8 @@ fun main(args: Array<String>) {
 private fun run(args: List<String>) {
     require(args.size >= 2) { "Missing command or icon set." }
     val (command, iconSetId) = args
-    val iconSet = IconSet.all.find { it.id == iconSetId }
-        ?: throw IllegalArgumentException("Unknown icon set \"$iconSetId\". Expected one of: ${IconSet.all.map { it.id }}")
+    val iconSet = IconSetCodegen.all.find { it.id == iconSetId }
+        ?: throw IllegalArgumentException("Unknown icon set \"$iconSetId\". Expected one of: ${IconSetCodegen.all.map { it.id }}")
 
     val flags = args.drop(2).chunked(2).associate { flagAndValue ->
         require(flagAndValue.size == 2 && flagAndValue[0].startsWith("--")) { "Malformed arguments: $flagAndValue" }
