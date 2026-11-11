@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.icons.codegen.material
 
 import com.varabyte.kobweb.icons.codegen.fetch.GitHubRepo
+import com.varabyte.kobweb.icons.model.mdi.MdiIconSet
 
 /**
  * Google's https://github.com/google/material-design-icons repo at some [commit], which hosts the fonts for both
@@ -24,6 +25,6 @@ internal class MaterialDesignIconsRepo(private val commit: String) {
     }
 
     companion object {
-        private val gitHubRepo = GitHubRepo("google/material-design-icons")
+        private val gitHubRepo = GitHubRepo(MdiIconSet.gitHubRepo)
     }
 }

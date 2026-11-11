@@ -39,7 +39,7 @@ import javax.xml.parsers.DocumentBuilderFactory
 class LucideCodegen : IconSetCodegen {
     override val id = "lucide"
 
-    private val gitHubRepo = GitHubRepo("lucide-icons/lucide")
+    private val gitHubRepo = GitHubRepo(LucideIconSet.gitHubRepo)
 
     override fun fetch(version: String, iconsFile: File) {
         val svgContents = mutableMapOf<String, String>()

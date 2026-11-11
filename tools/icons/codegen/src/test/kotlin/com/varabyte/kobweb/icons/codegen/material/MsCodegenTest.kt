@@ -2,6 +2,7 @@
 
 package com.varabyte.kobweb.icons.codegen.material
 
+import com.varabyte.kobweb.icons.model.ms.MsIconSet
 import com.varabyte.truthish.assertThat
 import com.varabyte.truthish.assertThrows
 import org.junit.Test
@@ -26,8 +27,8 @@ class MsCodegenTest {
         val iconsText = MsCodegen().iconsFileTextFor(
             "abc123",
             mapOf(
-                MsCodegen.Style.OUTLINED to listOf("arrow_back", "home"),
-                MsCodegen.Style.ROUNDED to listOf("home", "arrow_back"),
+                MsIconSet.Style.OUTLINED to listOf("arrow_back", "home"),
+                MsIconSet.Style.ROUNDED to listOf("home", "arrow_back"),
             )
         )
 
@@ -47,8 +48,8 @@ class MsCodegenTest {
             MsCodegen().iconsFileTextFor(
                 "abc123",
                 mapOf(
-                    MsCodegen.Style.OUTLINED to listOf("arrow_back", "home"),
-                    MsCodegen.Style.ROUNDED to listOf("home"),
+                    MsIconSet.Style.OUTLINED to listOf("arrow_back", "home"),
+                    MsIconSet.Style.ROUNDED to listOf("home"),
                 )
             )
         }
