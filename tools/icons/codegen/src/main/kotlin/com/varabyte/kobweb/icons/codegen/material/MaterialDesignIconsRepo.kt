@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.icons.codegen.material
 
 import com.varabyte.kobweb.icons.codegen.fetch.GitHubRepo
-import com.varabyte.kobweb.icons.model.mdi.MdiIconSet
-import com.varabyte.kobweb.icons.parsers.mdi.GoogleCodepoints
+import com.varabyte.kobweb.icons.model.material.MdiIconSet
+import com.varabyte.kobweb.icons.parsers.material.GoogleCodepoints
 
 /**
  * Google's https://github.com/google/material-design-icons repo at some [commit], which hosts the fonts for both

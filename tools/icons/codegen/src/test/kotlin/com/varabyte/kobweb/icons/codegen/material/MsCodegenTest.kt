@@ -2,7 +2,7 @@
 
 package com.varabyte.kobweb.icons.codegen.material
 
-import com.varabyte.kobweb.icons.model.ms.MsIconSet
+import com.varabyte.kobweb.icons.model.material.MsIconSet
 import com.varabyte.truthish.assertThat
 import com.varabyte.truthish.assertThrows
 import org.junit.Test
@@ -53,7 +53,7 @@ class MsCodegenTest {
                 )
             )
         }
-        assertThat(e.message!!).contains("Icon names for MaterialSymbolsRounded differ from MaterialSymbolsOutlined")
+        assertThat(e.message!!).contains("Icon names for font family \"Material Symbols Rounded\" differ from \"Material Symbols Outlined\"")
     }
 
     @Test
@@ -90,18 +90,14 @@ class MsCodegenTest {
         val sharedText = packageDir.resolve("_MsIcon.kt").readText()
         assertThat(sharedText).contains(
             """
-            private fun MsIconStyle.toClassNameSuffix(): String {
-                return when (this) {
-                    OUTLINED -> "-outlined"
-                    ROUNDED -> "-rounded"
-                    SHARP -> "-sharp"
-                }
+            enum class MsIconStyle(internal val className: String) {
+                OUTLINED("material-symbols-outlined"),
+                ROUNDED("material-symbols-rounded"),
+                SHARP("material-symbols-sharp");
             }
             """.trimIndent()
         )
-        assertThat(sharedText).contains(
-            $$"""attrs = modifier.toAttrs { classes("material-symbols${style.toClassNameSuffix()}") }"""
-        )
+        assertThat(sharedText).contains("attrs = modifier.toAttrs { classes(style.className) }")
     }
 
     @Test

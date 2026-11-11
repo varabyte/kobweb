@@ -101,20 +101,16 @@ class MdiCodegenTest {
         val sharedText = packageDir.resolve("_MdiIcon.kt").readText()
         assertThat(sharedText).contains(
             """
-            private fun MdiIconStyle.toClassNameSuffix(): String {
-                return when (this) {
-                    FILLED -> ""
-                    OUTLINED -> "-outlined"
-                    ROUNDED -> "-round"
-                    SHARP -> "-sharp"
-                    TWO_TONED -> "-two-tone"
-                }
+            enum class MdiIconStyle(internal val className: String) {
+                FILLED("material-icons"),
+                OUTLINED("material-icons-outlined"),
+                ROUNDED("material-icons-round"),
+                SHARP("material-icons-sharp"),
+                TWO_TONED("material-icons-two-tone");
             }
             """.trimIndent()
         )
-        assertThat(sharedText).contains(
-            $$"""attrs = modifier.toAttrs { classes("material-icons${style.toClassNameSuffix()}") }"""
-        )
+        assertThat(sharedText).contains("attrs = modifier.toAttrs { classes(style.className) }")
     }
 
     @Test
@@ -184,7 +180,7 @@ class MdiCodegenTest {
     @Test
     fun stylesheetUrlLoadsEveryStyle() {
         assertThat(MdiCodegen().stylesheetUrl("abc123")).isEqualTo(
-            "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Icons+Outlined&family=Material+Icons+Two+Tone&family=Material+Icons+Round&family=Material+Icons+Sharp"
+            "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Icons+Outlined&family=Material+Icons+Round&family=Material+Icons+Sharp&family=Material+Icons+Two+Tone"
         )
     }
 
