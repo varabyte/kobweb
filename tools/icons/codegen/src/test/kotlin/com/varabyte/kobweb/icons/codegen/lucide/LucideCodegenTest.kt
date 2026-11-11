@@ -30,7 +30,7 @@ class LucideCodegenTest {
               "icons": {
                 "arrow-right": [{"tag":"path","attrs":{"d":"M5 12h14"}},{"tag":"circle","attrs":{"cx":"16","cy":"4","r":"1"}}]
               },
-              "deprecated": {}
+              "renamed": {}
             }
             """.trimIndent(),
         )
@@ -93,7 +93,7 @@ class LucideCodegenTest {
                 "letter-s": [{"tag":"path","attrs":{"d":"M1 1"}}],
                 "letters": [{"tag":"path","attrs":{"d":"M2 2"}}]
               },
-              "deprecated": {}
+              "renamed": {}
             }
             """.trimIndent(),
         )
@@ -112,7 +112,7 @@ class LucideCodegenTest {
               "icons": {
                 "arrow-down-a-z": [{"tag":"path","attrs":{"d":"M1 1"}}]
               },
-              "deprecated": {"arrow-down-az":"arrow-down-a-z"}
+              "renamed": {"arrow-down-az":"arrow-down-a-z"}
             }
             """.trimIndent(),
         )
@@ -130,12 +130,33 @@ class LucideCodegenTest {
               "icons": {
                 "grid-2x2": [{"tag":"path","attrs":{"d":"M1 1"}}]
               },
-              "deprecated": {"grid2x2":"grid-2x2","gone":"no-such-icon"}
+              "renamed": {"grid2x2":"grid-2x2","gone":"no-such-icon"}
             }
             """.trimIndent(),
         )
 
         assertThat(packageDir.relativeFilePaths()).containsExactly("grid-2x2.kt")
+    }
+
+    @Test
+    fun deprecatedIconsAreMarkedDeprecated() {
+        generateBindings(
+            """
+            {
+              "version": "1.0.0",
+              "icons": {
+                "badge-euro": [{"tag":"path","attrs":{"d":"M1 1"}}],
+                "house": [{"tag":"path","attrs":{"d":"M2 2"}}]
+              },
+              "renamed": {},
+              "deprecated": ["badge-euro"]
+            }
+            """.trimIndent(),
+        )
+
+        assertThat(packageDir.resolve("badge-euro.kt").readText())
+            .contains("\n@Deprecated(\"Lucide has deprecated this icon.\")\n@Composable\nfun LucideBadgeEuro(\n")
+        assertThat(packageDir.resolve("house.kt").readText()).doesNotContain("@Deprecated")
     }
 
     @Test
@@ -149,7 +170,7 @@ class LucideCodegenTest {
                     "arrow-1": [{"tag":"path","attrs":{"d":"M1 1"}}],
                     "arrow1": [{"tag":"path","attrs":{"d":"M2 2"}}]
                   },
-                  "deprecated": {}
+                  "renamed": {}
                 }
                 """.trimIndent(),
             )
@@ -169,7 +190,7 @@ class LucideCodegenTest {
               "icons": {
                 "house": [{"tag":"path","attrs":{"d":"M1 1"}}]
               },
-              "deprecated": {}
+              "renamed": {}
             }
             """.trimIndent(),
         )
