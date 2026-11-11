@@ -27,11 +27,10 @@ class FaCodegenTest {
             "6.5.2",
             """
             {
-              "address-book": {"label": "Address Book", "free": ["solid", "regular"]},
-              "bell": {"label": "Bell", "free": ["solid"]},
-              "github": {"label": "GitHub", "free": ["brands"]},
-              "pro-only": {"label": "Pro Only", "free": []},
-              "font-awesome": {"label": "Font Awesome", "free": ["brands", "solid", "regular"]}
+              "address-book": {"label": "Address Book", "unicode": "f2b9", "free": ["solid", "regular"]},
+              "bell": {"label": "Bell", "unicode": "f0f3", "free": ["solid"]},
+              "github": {"label": "GitHub", "unicode": "f09b", "free": ["brands"]},
+              "font-awesome": {"label": "Font Awesome", "unicode": "f2b4", "free": ["brands", "solid", "regular"]}
             }
             """.trimIndent()
         )
