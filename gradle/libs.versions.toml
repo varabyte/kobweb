@@ -8,7 +8,7 @@ dokka = "2.2.0"
 gradle-publish = "2.1.1"
 jsoup = "1.22.2"
 kaml = "0.104.0"
-kobwebIcons = "0.7.0"
+kobwebIcons = "0.7.1"
 kotlin = "2.4.10"
 kotlinpoet = "2.3.0"
 kotlinx-coroutines = "1.11.0"
@@ -34,7 +34,7 @@ dokka-plugin = { module = "org.jetbrains.dokka:org.jetbrains.dokka.gradle.plugin
 gradle-publish-plugin = { module = "com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin", version.ref = "gradle-publish" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
-kobweb-icons-parsers = { module = "com.varabyte.kobweb.icons:parsers", version.ref = "kobwebIcons" }
+kobweb-icons-parsers = { module = "com.varabyte.kobweb.icons:kobweb-icons-parsers", version.ref = "kobwebIcons" }
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 kotlinpoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinpoet" }
 kotlin-assignment-plugin = { module = "org.jetbrains.kotlin:kotlin-assignment", version.ref = "kotlin" }
