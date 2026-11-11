@@ -81,6 +81,157 @@ class FaCodegenTest {
     }
 
     @Test
+    fun stylesHaveTheirCssClasses() {
+        generateBindings(
+            """
+            fas=bell
+            far=
+            fab=
+            """.trimIndent(),
+        )
+
+        assertThat(packageDir.resolve("_FaIcon.kt").readText()).contains(
+            """
+            enum class FaIconStyle(internal val className: String) {
+                SOLID("fas"),
+                REGULAR("far");
+            }
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun sizesHaveTheirCssClasses() {
+        generateBindings(
+            """
+            fas=bell
+            far=
+            fab=
+            """.trimIndent(),
+        )
+
+        assertThat(packageDir.resolve("_FaIcon.kt").readText()).contains(
+            """
+            enum class FaIconSize(internal val className: String) {
+                // Relative sizes
+                XXS("fa-2xs"),
+                XS("fa-xs"),
+                SM("fa-sm"),
+                LG("fa-lg"),
+                XL("fa-xl"),
+                XXL("fa-2xl"),
+
+                // Literal sizes
+                X1("fa-1x"),
+                X2("fa-2x"),
+                X3("fa-3x"),
+                X4("fa-4x"),
+                X5("fa-5x"),
+                X6("fa-6x"),
+                X7("fa-7x"),
+                X8("fa-8x"),
+                X9("fa-9x"),
+                X10("fa-10x");
+            }
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun iconsRenderAsSpansWithStyleNameAndSizeClasses() {
+        generateBindings(
+            """
+            fas=bell
+            far=
+            fab=github
+            """.trimIndent(),
+        )
+
+        val sharedText = packageDir.resolve("_FaIcon.kt").readText()
+        assertThat(sharedText).contains(
+            """
+            @Composable
+            fun FaIcon(
+                name: String,
+                modifier: Modifier,
+                style: FaIconStyle = FaIconStyle.REGULAR,
+                size: FaIconSize? = null,
+            ) {
+                FaIconSpan(style.className, name, modifier, size)
+            }
+
+            @Composable
+            fun FaBrandIcon(
+                name: String,
+                modifier: Modifier,
+                size: FaIconSize? = null,
+            ) {
+                FaIconSpan("fab", name, modifier, size)
+            }
+            """.trimIndent()
+        )
+        assertThat(sharedText).contains(
+            $$"""
+            @Composable
+            private fun FaIconSpan(styleClassName: String, name: String, modifier: Modifier, size: FaIconSize?) {
+                Span(
+                    attrs = modifier.toAttrs {
+                        classes(styleClassName, "fa-$name")
+                        if (size != null) {
+                            classes(size.className)
+                        }
+                    }
+                )
+            }
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun legacyNamesAreDeprecatedAliases() {
+        generateBindings(
+            """
+            fas=bell
+            far=
+            fab=
+            """.trimIndent(),
+        )
+
+        val sharedText = packageDir.resolve("_FaIcon.kt").readText()
+        assertThat(sharedText).contains(
+            """
+            @Deprecated("Use FaIconStyle instead", ReplaceWith("FaIconStyle"))
+            object IconStyle {
+                @Deprecated("Use FaIconStyle.SOLID instead", ReplaceWith("FaIconStyle.SOLID"))
+                val FILLED = FaIconStyle.SOLID
+
+                @Deprecated("Use FaIconStyle.REGULAR instead", ReplaceWith("FaIconStyle.REGULAR"))
+                val OUTLINE = FaIconStyle.REGULAR
+            }
+            """.trimIndent()
+        )
+        assertThat(sharedText).contains(
+            """
+            @Deprecated("Use FaIconSize instead", ReplaceWith("FaIconSize"))
+            typealias IconSize = FaIconSize
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun unknownStylePrefixesAreRejected() {
+        val e = assertThrows<IllegalStateException> {
+            generateBindings(
+                """
+                fas=bell
+                fal=bell
+                """.trimIndent(),
+            )
+        }
+        assertThat(e.message!!).isEqualTo("Unexpected style prefix: fal")
+    }
+
+    @Test
     fun namesDifferingOnlyByDashesKeepTheLongestOne() {
         generateBindings(
             """

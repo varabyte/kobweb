@@ -179,6 +179,109 @@ class LucideCodegenTest {
     }
 
     @Test
+    fun otherSvgElementsBecomeBuilderCalls() {
+        generateBindings(
+            """
+            {
+              "version": "1.0.0",
+              "icons": {
+                "shapes": [
+                  {"tag":"rect","attrs":{"x":"1","y":"2","width":"3","height":"4","rx":"5"}},
+                  {"tag":"ellipse","attrs":{"cx":"12","cy":"12","rx":"10","ry":"4"}},
+                  {"tag":"line","attrs":{"x1":"0","y1":"0","x2":"24","y2":"24"}},
+                  {"tag":"polyline","attrs":{"points":"1 2 3 4"}},
+                  {"tag":"polygon","attrs":{"points":"5,6 7.5,8"}},
+                  {"tag":"g"}
+                ]
+              },
+              "renamed": {}
+            }
+            """.trimIndent(),
+        )
+
+        val iconText = packageDir.resolve("shapes.kt").readText()
+        assertThat(iconText).contains(
+            """
+            import org.jetbrains.compose.web.css.*
+            import com.varabyte.kobweb.compose.dom.svg.Ellipse
+            import com.varabyte.kobweb.compose.dom.svg.Line
+            import com.varabyte.kobweb.compose.dom.svg.Polygon
+            import com.varabyte.kobweb.compose.dom.svg.Polyline
+            import com.varabyte.kobweb.compose.dom.svg.Rect
+
+            """.trimIndent()
+        )
+        assertThat(iconText).contains(
+            """
+                ) {
+                    Rect {
+                        x(1)
+                        y(2)
+                        width(3)
+                        height(4)
+                        rx(5)
+                    }
+                    Ellipse {
+                        cx(12)
+                        cy(12)
+                        rx(10)
+                        ry(4)
+                    }
+                    Line {
+                        x1(0)
+                        y1(0)
+                        x2(24)
+                        y2(24)
+                    }
+                    Polyline {
+                        points(1.0 to 2.0, 3.0 to 4.0)
+                    }
+                    Polygon {
+                        points(5.0 to 6.0, 7.5 to 8.0)
+                    }
+                    // Unsupported SVG element: g
+                }
+            }
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun pathDataIsEscapedForKotlin() {
+        generateBindings(
+            $$"""
+            {
+              "version": "1.0.0",
+              "icons": {
+                "odd": [{"tag":"path","attrs":{"d":"M1 1 \"$x\" \\"}}]
+              },
+              "renamed": {}
+            }
+            """.trimIndent(),
+        )
+
+        assertThat(packageDir.resolve("odd.kt").readText()).contains($$"""d("M1 1 \"\$x\" \\")""")
+    }
+
+    @Test
+    fun pointsElementsWithoutPointsAreRejected() {
+        val e = assertThrows<IllegalStateException> {
+            generateBindings(
+                """
+                {
+                  "version": "1.0.0",
+                  "icons": {
+                    "broken": [{"tag":"polyline"}]
+                  },
+                  "renamed": {}
+                }
+                """.trimIndent(),
+            )
+        }
+        assertThat(e.message!!).isEqualTo("Failed to parse `points` attribute: tag=polyline, attrs={}")
+    }
+
+    @Test
     fun staleFilesAreRemoved() {
         packageDir.mkdirs()
         packageDir.resolve("removed-icon.kt").writeText("// stale")

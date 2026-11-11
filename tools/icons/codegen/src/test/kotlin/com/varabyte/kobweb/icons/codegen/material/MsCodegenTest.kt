@@ -84,6 +84,46 @@ class MsCodegenTest {
     }
 
     @Test
+    fun stylesHaveTheirCssClasses() {
+        generateBindings("arrow_back")
+
+        val sharedText = packageDir.resolve("_MsIcon.kt").readText()
+        assertThat(sharedText).contains(
+            """
+            private fun MsIconStyle.toClassNameSuffix(): String {
+                return when (this) {
+                    OUTLINED -> "-outlined"
+                    ROUNDED -> "-rounded"
+                    SHARP -> "-sharp"
+                }
+            }
+            """.trimIndent()
+        )
+        assertThat(sharedText).contains(
+            $$"""attrs = modifier.toAttrs { classes("material-symbols${style.toClassNameSuffix()}") }"""
+        )
+    }
+
+    @Test
+    fun legacyNamesAreDeprecatedAliases() {
+        generateBindings("arrow_back")
+
+        assertThat(packageDir.resolve("_MsIcon.kt").readText()).contains(
+            """
+            @Deprecated("Use MsIconStyle instead", ReplaceWith("MsIconStyle"))
+            typealias IconStyle = MsIconStyle
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun stylesheetUrlLoadsEveryStyle() {
+        assertThat(MsCodegen().stylesheetUrl("abc123")).isEqualTo(
+            "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&family=Material+Symbols+Rounded&family=Material+Symbols+Sharp"
+        )
+    }
+
+    @Test
     fun namesDifferingOnlyByUnderscoresKeepTheLongestOne() {
         generateBindings(
             """

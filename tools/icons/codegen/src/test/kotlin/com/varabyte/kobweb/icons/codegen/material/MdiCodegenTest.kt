@@ -3,6 +3,7 @@
 package com.varabyte.kobweb.icons.codegen.material
 
 import com.varabyte.truthish.assertThat
+import com.varabyte.truthish.assertThrows
 import org.junit.Test
 import java.io.File
 import kotlin.io.path.createTempDirectory
@@ -82,6 +83,108 @@ class MdiCodegenTest {
 
         assertThat(packageDir.resolve("label.kt").readText()).endsWith(
             "\n@Composable fun MdiLabel(modifier: Modifier = Modifier, style: MdiIconStyle = OUTLINED) = MdiIcon(\"label\", modifier, style.also { it.assertValidStyle(\"MdiLabel\", OUTLINED, ROUNDED) })"
+        )
+    }
+
+    @Test
+    fun stylesHaveTheirCssClasses() {
+        generateBindings(
+            """
+            mdi=home
+            mdio=
+            mdir=
+            mdis=
+            mdit=
+            """.trimIndent(),
+        )
+
+        val sharedText = packageDir.resolve("_MdiIcon.kt").readText()
+        assertThat(sharedText).contains(
+            """
+            private fun MdiIconStyle.toClassNameSuffix(): String {
+                return when (this) {
+                    FILLED -> ""
+                    OUTLINED -> "-outlined"
+                    ROUNDED -> "-round"
+                    SHARP -> "-sharp"
+                    TWO_TONED -> "-two-tone"
+                }
+            }
+            """.trimIndent()
+        )
+        assertThat(sharedText).contains(
+            $$"""attrs = modifier.toAttrs { classes("material-icons${style.toClassNameSuffix()}") }"""
+        )
+    }
+
+    @Test
+    fun iconsInTheWrongStyleFailWhenRendered() {
+        generateBindings(
+            """
+            mdi=home
+            mdio=
+            mdir=
+            mdis=
+            mdit=
+            """.trimIndent(),
+        )
+
+        assertThat(packageDir.resolve("_MdiIcon.kt").readText()).contains(
+            $$"""
+            internal fun MdiIconStyle.assertValidStyle(methodName: String, vararg validStyles: MdiIconStyle) {
+                if (this !in validStyles) {
+                    error("Attempted to render \"$methodName\" with style $this. Must be one of: ${validStyles.joinToString()}")
+                }
+            }
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun legacyNamesAreDeprecatedAliases() {
+        generateBindings(
+            """
+            mdi=home
+            mdio=
+            mdir=
+            mdis=
+            mdit=
+            """.trimIndent(),
+        )
+
+        val sharedText = packageDir.resolve("_MdiIcon.kt").readText()
+        assertThat(sharedText).contains(
+            """
+            @Deprecated("Use MdiIconStyle instead", ReplaceWith("MdiIconStyle"))
+            typealias IconStyle = MdiIconStyle
+            """.trimIndent()
+        )
+        assertThat(sharedText).contains(
+            """
+            @Deprecated("Use MdiIcon instead", ReplaceWith("MdiIcon(name, modifier, style)"))
+            @Composable
+            fun MdIcon(name: String, modifier: Modifier, style: MdiIconStyle = FILLED) = MdiIcon(name, modifier, style)
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun unknownStyleKeysAreRejected() {
+        val e = assertThrows<IllegalStateException> {
+            generateBindings(
+                """
+                mdi=home
+                mdix=home
+                """.trimIndent(),
+            )
+        }
+        assertThat(e.message!!).isEqualTo("Unexpected style grouping: mdix")
+    }
+
+    @Test
+    fun stylesheetUrlLoadsEveryStyle() {
+        assertThat(MdiCodegen().stylesheetUrl("abc123")).isEqualTo(
+            "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Icons+Outlined&family=Material+Icons+Two+Tone&family=Material+Icons+Round&family=Material+Icons+Sharp"
         )
     }
 
