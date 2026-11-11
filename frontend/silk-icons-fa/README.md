@@ -1,10 +1,5 @@
 Support for integration of font awesome icons in your project.
 
-> [!TIP]
-> This artifact's bindings are generated at a single Font Awesome version, chosen by Kobweb. To pick the version
-> yourself (e.g. to use newer icons), you can instead generate bindings in your own project, using
-> `kobweb { app { icons { fa { version.set("...") } } } }` or `kobweb { library { ... } }`.
-
 Note that, when this module is depended on, Kobweb adds the following entry to the `<head>` block in your document
 template:
 

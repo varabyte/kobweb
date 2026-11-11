@@ -1,10 +1,5 @@
 Support for integration of [Lucide icons](https://lucide.dev/) in your Kobweb project.
 
-> [!TIP]
-> This artifact's bindings are generated at a single Lucide version, chosen by Kobweb. To pick the version yourself
-> (e.g. to use newer icons), you can instead generate bindings in your own project, using
-> `kobweb { app { icons { lucide { version.set("...") } } } }` or `kobweb { library { ... } }`.
-
 This directory contains a file called `lucide-icons.json`, which is parsed and used to generate code
 used in this project.
 
