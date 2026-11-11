@@ -137,7 +137,9 @@ class LucideCodegen : IconSetCodegen {
         for ((iconName, elements) in activeIcons.entries.sortedBy { it.key }) {
             val svgImports = elements.map { it.tag }.toSet().sorted().mapNotNull { tag ->
                 if (tag in SUPPORTED_TAGS) "import com.varabyte.kobweb.compose.dom.svg.${tag.capitalize()}" else null
-            }
+            } + listOfNotNull(
+                "import com.varabyte.kobweb.compose.dom.svg.SVGFillType".takeIf { elements.any { it.fill != null } }
+            )
 
             val fileContent = buildString {
                 appendLine("import androidx.compose.runtime.Composable")
@@ -197,12 +199,17 @@ class LucideCodegen : IconSetCodegen {
         }
     }
 
-    /** Parsed SVG element data, separating parsing from code generation. */
-    private sealed class ElementInfo(val tag: String) {
-        class Path(val d: String) : ElementInfo("path")
-        class Simple(tag: String, val attrs: List<Pair<String, String>>) : ElementInfo(tag)
-        class Points(tag: String, val points: List<String>) : ElementInfo(tag)
-        class Unsupported(tag: String) : ElementInfo(tag)
+    /**
+     * Parsed SVG element data, separating parsing from code generation.
+     *
+     * @property fill The `SVGFillType` entry for the element's `fill` attribute, e.g. "CurrentColor", if it has one.
+     *   Lucide draws outlines, but fills a few small shapes, like the dots in "chart-scatter".
+     */
+    private sealed class ElementInfo(val tag: String, val fill: String?) {
+        class Path(val d: String, fill: String?) : ElementInfo("path", fill)
+        class Simple(tag: String, val attrs: List<Pair<String, String>>, fill: String?) : ElementInfo(tag, fill)
+        class Points(tag: String, val points: List<String>, fill: String?) : ElementInfo(tag, fill)
+        class Unsupported(tag: String) : ElementInfo(tag, fill = null)
 
         companion object {
             /** SVG element tags whose attributes we turn into builder calls, mapped to those attribute names. */
@@ -213,13 +220,21 @@ class LucideCodegen : IconSetCodegen {
                 "rect" to listOf("x", "y", "width", "height", "rx", "ry"),
             )
 
+            /** SVG `fill` keywords, mapped to their `SVGFillType` entries. */
+            private val FILL_TYPES = mapOf("currentColor" to "CurrentColor", "none" to "None")
+
             fun from(tag: String, attributes: Map<String, String>): ElementInfo {
+                val fill = attributes["fill"]?.let { value ->
+                    FILL_TYPES[value] ?: error("Unsupported `fill` value: tag=$tag, attrs=$attributes")
+                }
+
                 if (tag == "path") {
-                    return Path(attributes["d"] ?: "")
+                    return Path(attributes["d"] ?: "", fill)
                 }
 
                 SIMPLE_ELEMENT_ATTRS[tag]?.let { attrNames ->
-                    return Simple(tag, attrNames.mapNotNull { attr -> attributes[attr]?.let { value -> attr to value } })
+                    val attrs = attrNames.mapNotNull { attr -> attributes[attr]?.let { value -> attr to value } }
+                    return Simple(tag, attrs, fill)
                 }
 
                 if (tag == "polyline" || tag == "polygon") {
@@ -230,7 +245,7 @@ class LucideCodegen : IconSetCodegen {
                             if (x != null && y != null) "$x to $y" else null
                         } else null
                     } ?: error("Failed to parse `points` attribute: tag=$tag, attrs=$attributes")
-                    return Points(tag, pairs)
+                    return Points(tag, pairs, fill)
                 }
 
                 return Unsupported(tag)
@@ -244,6 +259,7 @@ class LucideCodegen : IconSetCodegen {
             is ElementInfo.Path -> {
                 appendLine("$INDENT${INDENT}Path {")
                 appendLine("$INDENT$INDENT${INDENT}d(\"${kotlinEscape(element.d)}\")")
+                appendFill(element)
                 appendLine("$INDENT${INDENT}}")
             }
             is ElementInfo.Simple -> {
@@ -251,6 +267,7 @@ class LucideCodegen : IconSetCodegen {
                 for ((attr, value) in element.attrs) {
                     appendLine("$INDENT$INDENT${INDENT}$attr($value)")
                 }
+                appendFill(element)
                 appendLine("$INDENT${INDENT}}")
             }
             is ElementInfo.Points -> {
@@ -258,12 +275,17 @@ class LucideCodegen : IconSetCodegen {
                 if (element.points.isNotEmpty()) {
                     appendLine("$INDENT$INDENT${INDENT}points(${element.points.joinToString(", ")})")
                 }
+                appendFill(element)
                 appendLine("$INDENT${INDENT}}")
             }
             is ElementInfo.Unsupported -> {
                 appendLine("$INDENT${INDENT}// Unsupported SVG element: ${element.tag}")
             }
         }
+    }
+
+    private fun StringBuilder.appendFill(element: ElementInfo) {
+        element.fill?.let { appendLine("$INDENT$INDENT${INDENT}fill(SVGFillType.$it)") }
     }
 
     private fun String.capitalize() = replaceFirstChar { it.uppercase() }

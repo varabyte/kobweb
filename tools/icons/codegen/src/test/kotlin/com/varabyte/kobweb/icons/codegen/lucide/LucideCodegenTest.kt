@@ -28,7 +28,7 @@ class LucideCodegenTest {
             {
               "version": "1.0.0",
               "icons": {
-                "arrow-right": [{"tag":"path","attrs":{"d":"M5 12h14"}},{"tag":"circle","attrs":{"cx":"16","cy":"4","r":"1"}}]
+                "arrow-right": [{"tag":"path","attrs":{"d":"M5 12h14"}},{"tag":"circle","attrs":{"cx":"16","cy":"4","fill":"currentColor","r":"1"}}]
               },
               "renamed": {}
             }
@@ -55,6 +55,7 @@ class LucideCodegenTest {
             import org.jetbrains.compose.web.css.*
             import com.varabyte.kobweb.compose.dom.svg.Circle
             import com.varabyte.kobweb.compose.dom.svg.Path
+            import com.varabyte.kobweb.compose.dom.svg.SVGFillType
 
             @Composable
             fun LucideArrowRight(
@@ -75,6 +76,7 @@ class LucideCodegenTest {
                         cx(16)
                         cy(4)
                         r(1)
+                        fill(SVGFillType.CurrentColor)
                     }
                 }
             }
@@ -244,6 +246,26 @@ class LucideCodegenTest {
             }
             """.trimIndent()
         )
+    }
+
+    // Lucide only uses "fill":"currentColor" today. If another value ever shows up, codegen should fail loudly so we
+    // know to add support for it, rather than silently drop the fill.
+    @Test
+    fun unsupportedFillValuesAreRejected() {
+        val e = assertThrows<IllegalStateException> {
+            generateBindings(
+                """
+                {
+                  "version": "1.0.0",
+                  "icons": {
+                    "dot": [{"tag":"circle","attrs":{"cx":"1","cy":"1","fill":"red","r":"1"}}]
+                  },
+                  "renamed": {}
+                }
+                """.trimIndent(),
+            )
+        }
+        assertThat(e.message!!).isEqualTo("Unsupported `fill` value: tag=circle, attrs={cx=1, cy=1, fill=red, r=1}")
     }
 
     @Test
