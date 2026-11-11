@@ -9,6 +9,7 @@ version = libs.versions.kobweb.get()
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kobweb.icons.model)
     implementation(projects.tools.icons.metadata)
 
     testImplementation(kotlin("test"))
