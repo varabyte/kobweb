@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.varabyte.kobwebx"
-version = libs.versions.kobweb.get()
+version = libs.versions.kobweb.framework.get()
 
 silkIcons {
     iconSet.set("lucide")

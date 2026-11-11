@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.varabyte.kobweb"
-version = libs.versions.kobweb.get()
+version = libs.versions.kobweb.framework.get()
 
 dependencies {
     // Expose kaml as an API dependency. If you use kobweb-common, many classes are associated with yaml files. Using

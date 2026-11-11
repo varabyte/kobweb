@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.varabyte.kobweb"
-version = libs.versions.kobweb.get()
+version = libs.versions.kobweb.framework.get()
 
 dependencies {
     api(projects.common.frameworkAnnotations) // api or else opt-in message won't be shown

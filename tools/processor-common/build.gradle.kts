@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.varabyte.kobweb"
-version = libs.versions.kobweb.get()
+version = libs.versions.kobweb.framework.get()
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)

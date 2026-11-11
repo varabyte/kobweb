@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.varabyte.kobweb"
-version = libs.versions.kobweb.get()
+version = libs.versions.kobweb.framework.get()
 
 val compileOnlyApi: Configuration = configurations.create("compileOnlyApi")
 configurations["compileClasspath"].extendsFrom(compileOnlyApi)
