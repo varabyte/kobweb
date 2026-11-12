@@ -466,7 +466,7 @@ class KobwebApplicationPlugin @Inject constructor(
 val Project.kobwebBuildTarget get() = project.extra["kobwebBuildTarget"] as BuildTarget
 
 /**
- * The components in this dependency graph whose icons metadata can add stylesheets to the site.
+ * The components in this dependency graph whose icon set metadata can add stylesheets to the site.
  *
  * Only Kobweb's own artifacts are trusted, i.e. those in the `com.varabyte` groups, which only we can publish to on Maven
  * Central. Checking the group (rather than, say, whether a component is a Maven module) also covers Kobweb's own

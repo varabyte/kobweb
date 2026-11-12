@@ -74,9 +74,9 @@ val generateIconsTask = tasks.register<JavaExec>("generateIcons") {
     outputs.cacheIf { true }
 }
 
-val generateIconsMetadataTask = tasks.register<JavaExec>("generateIconsMetadata") {
+val generateIconSetMetadataTask = tasks.register<JavaExec>("generateIconSetMetadata") {
     group = "Icon"
-    description = "Generate the icons.json file that tells apps which stylesheet this module's icons need."
+    description = "Generate the iconset.json file that tells apps which stylesheet this module's icons need."
 
     classpath = iconsCodegenClasspath.get()
     mainClass.set("com.varabyte.kobweb.icons.codegen.MainKt")
@@ -103,7 +103,7 @@ pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
 
         sourceSets.named("jsMain") {
             kotlin.srcDir(generateIconsTask)
-            resources.srcDir(generateIconsMetadataTask)
+            resources.srcDir(generateIconSetMetadataTask)
             dependencies {
                 implementation(libs.findLibrary("compose-runtime").get())
                 implementation(libs.findLibrary("compose-html-core").get())

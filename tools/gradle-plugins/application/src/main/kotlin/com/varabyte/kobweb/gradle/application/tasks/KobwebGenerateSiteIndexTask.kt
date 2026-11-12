@@ -11,7 +11,7 @@ import com.varabyte.kobweb.gradle.core.util.HtmlUtil
 import com.varabyte.kobweb.gradle.core.util.downloadOrCached
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.gradle.core.util.toSha256
-import com.varabyte.kobweb.icons.metadata.IconsMetadata
+import com.varabyte.kobweb.icons.metadata.IconSetMetadata
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_LIBRARY
 import com.varabyte.kobweb.project.common.nonStrictDefault
 import com.varabyte.kobweb.project.conf.KobwebConf
@@ -77,9 +77,9 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     abstract val compileClasspath: ConfigurableFileCollection
 
     /**
-     * The files in [compileClasspath] whose icons metadata is allowed to add stylesheets to the site.
+     * The files in [compileClasspath] whose icon set metadata is allowed to add stylesheets to the site.
      *
-     * An artifact's icons metadata file names a stylesheet that gets linked from the site's `<head>`, so that its icon
+     * An artifact's icon set metadata file names a stylesheet that gets linked from the site's `<head>`, so that its icon
      * bindings render. Unlike the `<head>` elements a library declares in its `kobweb { library { index { ... } } }`
      * block, these links aren't reported to users and can't be excluded, so any jar that included the file could
      * quietly add a stylesheet of its choosing to the site. To prevent that, only Kobweb's own icon artifacts are
@@ -312,19 +312,17 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         // Icon set id -> the stylesheet its bindings need
         val stylesheetsByIconSet = sortedMapOf<String, String>()
         compileClasspath.forEach { file ->
-            file.searchZipFor(IconsMetadata.PATH) { bytes ->
+            file.searchZipFor(IconSetMetadata.PATH) { bytes ->
                 if (file !in trustedFiles) {
                     logger.warn(
-                        "w: Ignoring the icons metadata in dependency \"${file.dependencyName}\", since only Kobweb's own " +
+                        "w: Ignoring the icon set metadata in dependency \"${file.dependencyName}\", since only Kobweb's own " +
                             "icon artifacts can add stylesheets this way. Libraries should add them through " +
                             "`kobweb { library { index { head.add { ... } } } }` instead."
                     )
                     return@searchZipFor
                 }
-                val iconsMetadata = Json.nonStrictDefault.decodeFromString(IconsMetadata.serializer(), bytes.decodeToString())
-                iconsMetadata.iconSets.forEach { (id, iconSet) ->
-                    iconSet.stylesheet?.let { stylesheetsByIconSet[id] = it }
-                }
+                val iconSet = Json.nonStrictDefault.decodeFromString(IconSetMetadata.serializer(), bytes.decodeToString())
+                iconSet.stylesheet?.let { stylesheetsByIconSet[iconSet.id] = it }
             }
         }
 

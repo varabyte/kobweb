@@ -15,5 +15,5 @@ dependencies {
 kobwebPublication {
     artifactName.set("Kobweb Icons Metadata")
     artifactId.set("kobweb-icons-metadata")
-    description.set("The format of the icons.json metadata file that Kobweb's icon artifacts include.")
+    description.set("The format of the iconset.json metadata file that Kobweb's icon artifacts include.")
 }
