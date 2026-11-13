@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.navigation
 
+import com.varabyte.kobweb.browser.uri.decodeURIComponent
 import com.varabyte.kobweb.core.RouteInfo
 
 internal fun RouteTree<PageMethod>.createPageData(route: Route, errorPageMethod: PageMethod): PageData {
@@ -11,7 +12,7 @@ internal fun RouteTree<PageMethod>.createPageData(route: Route, errorPageMethod:
     val dynamicParams = mutableMapOf<String, String>()
     resolved.forEach { resolvedEntry ->
         if (resolvedEntry.node is RouteTree.DynamicNode) {
-            dynamicParams[resolvedEntry.node.name] = resolvedEntry.capturedRouteSegment
+            dynamicParams[resolvedEntry.node.name] = decodeURIComponent(resolvedEntry.capturedRouteSegment)
         }
     }
 

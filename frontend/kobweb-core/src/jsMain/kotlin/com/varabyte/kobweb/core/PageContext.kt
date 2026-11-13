@@ -1,12 +1,14 @@
 package com.varabyte.kobweb.core
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.browser.uri.decodeURIComponent
 import com.varabyte.kobweb.core.data.Data
 import com.varabyte.kobweb.navigation.Route
 import com.varabyte.kobweb.navigation.Router
 import kotlinx.browser.window
 
+/**
+ * @param dynamicParams Values captured from the URL's dynamic route parts, already decoded.
+ */
 class RouteInfo internal constructor(
     private val route: Route,
     dynamicParams: Map<String, String>
@@ -31,7 +33,8 @@ class RouteInfo internal constructor(
      * where perhaps you want to explicitly exclude query params from the list of results. For example, checking if
      * this value is not empty is a quick way to determine if the current route is, indeed, a dynamic one.
      */
-    val dynamicParams = dynamicParams.mapValues { (_, value) -> decodeURIComponent(value) }
+    @Suppress("CanBePrimaryConstructorProperty") // Leave property here as it is a better place for our giant KDoc
+    val dynamicParams: Map<String, String> = dynamicParams
 
     /**
      * The origin of the current page.
