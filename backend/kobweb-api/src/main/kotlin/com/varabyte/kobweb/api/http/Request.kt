@@ -33,30 +33,55 @@ sealed interface Request {
     /** The type of http method this call was sent with. */
     val method: HttpMethod
     /**
-     * A list of key/value pairs extracted either from the user's [query string](https://en.wikipedia.org/wiki/Query_string)
-     * or from any dynamic path parts.
+     * Key/value pairs extracted from the request's [query string](https://en.wikipedia.org/wiki/Query_string).
+     *
+     * For example, a request to `/api/users?sort=asc` will have a mapping of "sort" to "asc".
+     *
+     * Use this over [params] when you want to make sure you get the query param value, even if an identically named
+     * dynamic path part exists.
+     *
+     * @see dynamicParams
+     * @see params
+     */
+    val queryParams: Map<String, String>
+    /**
+     * Key/value pairs captured from the dynamic parts of the endpoint's route.
+     *
+     * For example, a request to `/api/users/123` for an API endpoint registered as `/api/users/{user}` will have a
+     * mapping of "user" to "123".
+     *
+     * NOTE: Unlike query params, which can contain any key, the keys of this map are fixed by the endpoint's route.
+     * This means the Kobweb IntelliJ plugin can check your lookups, for example flagging a key that isn't part of the
+     * route (likely a typo) or confirming one that is (meaning it knows it won't ever be null).
+     *
+     * Note that dynamic values are captured when the request is dispatched to its handler, so they will be missing
+     * inside an [ApiInterceptor] until then.
+     *
+     * @see queryParams
+     * @see params
+     */
+    val dynamicParams: Map<String, String>
+    /**
+     * Key/value pairs extracted either from the request's query string or from any dynamic path parts.
      *
      * For example, a request to `/api/users/123?sort=asc` for an API endpoint registered as `/api/users/{user}` will
      * have a mapping of "user" to "123" and "sort" to "asc".
      *
+     * If the same key is specified in both the query string and the dynamic path, the dynamic path will take
+     * precedence.
+     *
+     * This property is fine to use over [dynamicParams] or [queryParams], especially if you don't care where the input
+     * comes from. Prefer [dynamicParams] or [queryParams] when you want to make explicit where a value comes from.
+     * [dynamicParams] has the added advantage that the Kobweb IntelliJ plugin can check its keys against the
+     * endpoint's route.
+     *
      * Note that dynamic values are captured when the request is dispatched to its handler, so they will be missing
      * inside an [ApiInterceptor] until then.
+     *
+     * @see queryParams
+     * @see dynamicParams
      */
     val params: Map<String, String>
-    /**
-     * Like [params] but only for the query string.
-     *
-     * This is provided just in case a user needs to disambiguate between a dynamic path part and a query parameter with
-     * the same name.
-     */
-    val queryParams: Map<String, String>
-    /**
-     * Like [params] but only for the dynamic path parts.
-     *
-     * This is provided just in case a user needs to disambiguate between a dynamic path part and a query parameter with
-     * the same name.
-     */
-    val dynamicParams: Map<String, String>
     /** All headers sent with the request. */
     val headers: Headers
     /**
@@ -128,6 +153,14 @@ sealed interface Request {
     }
 }
 
+/**
+ * A [Request] whose values can be modified, e.g. by an [ApiInterceptor] before the request reaches its handler.
+ *
+ * Note that [params], [queryParams], and [dynamicParams] are separate maps, so changing one does not update the
+ * others. [queryParams] and [dynamicParams] are meant to reflect the request's route, so if you add extra params, add
+ * them to [params] only. (To pass along values that aren't really params, such as a computed auth result, consider
+ * [data] instead.)
+ */
 class MutableRequest(
     override val connection: Request.Connection,
     override var method: HttpMethod,

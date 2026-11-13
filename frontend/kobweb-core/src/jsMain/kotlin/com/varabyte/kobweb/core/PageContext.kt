@@ -14,29 +14,6 @@ class RouteInfo internal constructor(
     dynamicParams: Map<String, String>
 ) {
     /**
-     * Params extracted from the URL's dynamic route
-     *
-     * For example:
-     *
-     * ```
-     * /users/123/posts/11
-     *
-     * # for a URL registered as "/users/{user}/posts/{post}"
-     * ```
-     *
-     * will generate a mapping of "user" to 123 and "post" to 11.
-     *
-     * If any captured part of the original URL was encoded, e.g. "/users/john%20doe", it will be decoded when queried
-     * here.
-     *
-     * Note that you are generally encouraged to use [params] instead. However, this property is provided for cases
-     * where perhaps you want to explicitly exclude query params from the list of results. For example, checking if
-     * this value is not empty is a quick way to determine if the current route is, indeed, a dynamic one.
-     */
-    @Suppress("CanBePrimaryConstructorProperty") // Leave property here as it is a better place for our giant KDoc
-    val dynamicParams: Map<String, String> = dynamicParams
-
-    /**
      * The origin of the current page.
      *
      * In the URL: "https://example.com/a/b/c/slug?x=1&y=2#id", the origin is "https://example.com"
@@ -73,14 +50,44 @@ class RouteInfo internal constructor(
      *
      * will generate a mapping of "user" to 123 and "post" to 11.
      *
-     * Note that you are generally encouraged to use [params] instead. However, this property is provided for cases
-     * where perhaps you want to explicitly exclude dynamic route params from the list of results, or you want to
-     * make sure you get the query param value even if an identically named dynamic route param exists.
+     * Use this over [params] when you want to make sure you get the query param value, even if an identically named
+     * dynamic route param exists.
+     *
+     * @see dynamicParams
+     * @see params
      */
     val queryParams: Map<String, String> = route.queryParams
 
     /**
-     * Params extracted either from the URL's query parameters OR from a dynamic route
+     * Params extracted from the URL's dynamic route.
+     *
+     * For example:
+     *
+     * ```
+     * /users/123/posts/11
+     *
+     * # for a URL registered as "/users/{user}/posts/{post}"
+     * ```
+     *
+     * will generate a mapping of "user" to 123 and "post" to 11.
+     *
+     * If any captured part of the original URL was encoded, e.g. "/users/john%20doe", it will be decoded when queried
+     * here.
+     *
+     * Checking if this value is not empty is a quick way to determine if the current route is, indeed, a dynamic one.
+     *
+     * NOTE: Unlike query params, which can contain any key, the keys of this map are fixed by the page's route. This
+     * means the Kobweb IntelliJ plugin can check your lookups, for example flagging a key that isn't part of the route
+     * (likely a typo) or confirming one that is (meaning it knows it won't ever be null).
+     *
+     * @see queryParams
+     * @see params
+     */
+    @Suppress("CanBePrimaryConstructorProperty") // Leave property here as it is a better place for our giant KDoc
+    val dynamicParams: Map<String, String> = dynamicParams
+
+    /**
+     * Params extracted either from the URL's query parameters OR from a dynamic route.
      *
      * For example:
      *
@@ -100,6 +107,14 @@ class RouteInfo internal constructor(
      *
      * If the same key is specified in both the query parameters and the dynamic route, the dynamic route will take
      * precedence.
+     *
+     * This property is fine to use over [dynamicParams] or [queryParams], especially if you don't care where the input
+     * comes from. Prefer [dynamicParams] or [queryParams] when you want to make explicit where a value comes from.
+     * [dynamicParams] has the added advantage that the Kobweb IntelliJ plugin can check its keys against the page's
+     * route.
+     *
+     * @see dynamicParams
+     * @see queryParams
      */
     val params: Map<String, String> = this.queryParams + this.dynamicParams
 
