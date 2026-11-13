@@ -12,7 +12,7 @@ class RouteInfo internal constructor(
     dynamicParams: Map<String, String>
 ) {
     /**
-     * Params extracted either from the URL's dynamic route
+     * Params extracted from the URL's dynamic route
      *
      * For example:
      *
@@ -60,6 +60,23 @@ class RouteInfo internal constructor(
     val path: String = route.path
 
     /**
+     * The query parameters of a URL, if any.
+     *
+     * For example:
+     *
+     * ```
+     * /users/posts?user=123&post=11
+     * ```
+     *
+     * will generate a mapping of "user" to 123 and "post" to 11.
+     *
+     * Note that you are generally encouraged to use [params] instead. However, this property is provided for cases
+     * where perhaps you want to explicitly exclude dynamic route params from the list of results, or you want to
+     * make sure you get the query param value even if an identically named dynamic route param exists.
+     */
+    val queryParams: Map<String, String> = route.queryParams
+
+    /**
      * Params extracted either from the URL's query parameters OR from a dynamic route
      *
      * For example:
@@ -81,24 +98,7 @@ class RouteInfo internal constructor(
      * If the same key is specified in both the query parameters and the dynamic route, the dynamic route will take
      * precedence.
      */
-    val params: Map<String, String> = route.queryParams + dynamicParams
-
-    /**
-     * The query parameters of a URL, if any.
-     *
-     * For example:
-     *
-     * ```
-     * /users/posts?user=123&post=11
-     * ```
-     *
-     * will generate a mapping of "user" to 123 and "post" to 11.
-     *
-     * Note that you are generally encouraged to use [params] instead. However, this property is provided for cases
-     * where perhaps you want to explicitly exclude dynamic route params from the list of results, or you want to
-     * make sure you get the query param value even if an identically named dynamic route param exists.
-     */
-    val queryParams: Map<String, String> = route.queryParams
+    val params: Map<String, String> = this.queryParams + this.dynamicParams
 
     /**
      * The post-hash fragment of a URL, if specified.
@@ -110,7 +110,7 @@ class RouteInfo internal constructor(
     /**
      * The full path of the current route, including any query parameters and fragment.
      *
-     *In the URL: "https://example.com/a/b/c/slug?x=1&y=2#id", this will return
+     * In the URL: "https://example.com/a/b/c/slug?x=1&y=2#id", this will return
      * "/a/b/c/slug?x=1&y=2#id"
      */
     @RoutePath(RoutePathType.PATH_QUERY_AND_FRAGMENT, mustExist = false)
