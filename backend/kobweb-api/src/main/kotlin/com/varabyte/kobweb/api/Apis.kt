@@ -32,6 +32,7 @@ class Apis(
                     request
                 } else MutableRequest(request).apply {
                     params += captured
+                    dynamicParams += captured
                 }
 
                 val apiCtx = ApiContext(env, request, data, logger)

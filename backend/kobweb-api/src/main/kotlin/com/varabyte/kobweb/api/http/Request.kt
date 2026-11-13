@@ -27,7 +27,7 @@ import com.varabyte.kobweb.api.intercept.ApiInterceptor
  *
  * @see Response
  */
-interface Request {
+sealed interface Request {
     /** Information about the connection that carried the request. */
     val connection: Connection
     /** The type of http method this call was sent with. */
@@ -35,6 +35,12 @@ interface Request {
     /**
      * A list of key/value pairs extracted either from the user's [query string](https://en.wikipedia.org/wiki/Query_string)
      * or from any dynamic path parts.
+     *
+     * For example, a request to `/api/users/123?sort=asc` for an API endpoint registered as `/api/users/{user}` will
+     * have a mapping of "user" to "123" and "sort" to "asc".
+     *
+     * Note that dynamic values are captured when the request is dispatched to its handler, so they will be missing
+     * inside an [ApiInterceptor] until then.
      */
     val params: Map<String, String>
     /**
@@ -44,6 +50,13 @@ interface Request {
      * the same name.
      */
     val queryParams: Map<String, String>
+    /**
+     * Like [params] but only for the dynamic path parts.
+     *
+     * This is provided just in case a user needs to disambiguate between a dynamic path part and a query parameter with
+     * the same name.
+     */
+    val dynamicParams: Map<String, String>
     /** All headers sent with the request. */
     val headers: Headers
     /**
@@ -120,6 +133,7 @@ class MutableRequest(
     override var method: HttpMethod,
     params: Map<String, String>,
     queryParams: Map<String, String>,
+    dynamicParams: Map<String, String>,
     headers: Headers,
     cookies: Map<String, String>,
     override var body: Body?,
@@ -130,6 +144,7 @@ class MutableRequest(
         request.method,
         request.params,
         request.queryParams,
+        request.dynamicParams,
         request.headers,
         request.cookies,
         request.body,
@@ -138,6 +153,7 @@ class MutableRequest(
 
     override val params: MutableMap<String, String> = params.toMutableMap()
     override val queryParams: MutableMap<String, String> = queryParams.toMutableMap()
+    override val dynamicParams: MutableMap<String, String> = dynamicParams.toMutableMap()
     override val headers: MutableHeaders = MutableHeaders(headers)
 
     override val cookies: MutableMap<String, String> = cookies.toMutableMap()

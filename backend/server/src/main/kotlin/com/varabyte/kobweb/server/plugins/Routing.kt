@@ -389,6 +389,7 @@ private suspend fun RoutingContext.handleApiCall(
             httpMethod,
             query,
             query,
+            emptyMap(),
             headers,
             call.request.cookies.rawCookies,
             body,
