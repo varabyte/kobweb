@@ -25,11 +25,11 @@ import org.w3c.dom.url.URLSearchParams
  * AppGlobals.getValue("author") // "bitspittle"
  * ```
  *
- * Consider creating a type-safe extensions for your constants:
+ * Consider creating a type-safe extension for your constants:
  *
  * ```
- * val AppGlobals.author get() = AppGlobals.getValue("author")
- * val AppGlobals.version get() = AppGlobals.getValue("version")
+ * val AppGlobals.author get() = getValue("author")
+ * val AppGlobals.version get() = getValue("version")
  * ```
  *
  * or, if you prefer, a wrapper object:
@@ -59,7 +59,7 @@ object AppGlobals {
     fun getValue(key: String): String = _values.getValue(key)
 }
 
-val AppGlobals.title get() = AppGlobals.getValue("title")
+val AppGlobals.title get() = getValue("title")
 
 /**
  * A property which indicates if we are currently running this site as part of a Kobweb export.
@@ -67,4 +67,5 @@ val AppGlobals.title get() = AppGlobals.getValue("title")
  * While it should be rare that you'll need to use it, it can be useful to check if you want to avoid doing some
  * side effect that shouldn't happen at export time, like sending page visit analytics to a server for example.
  */
+@Suppress("UnusedReceiverParameter") // Receiver is intentionally chosen for scoping
 val AppGlobals.isExporting get() = URLSearchParams(window.location.search).has("_kobwebIsExporting")
