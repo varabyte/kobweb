@@ -561,4 +561,86 @@ class KotlinRendererTest {
             """
         )
     }
+
+    @Test
+    fun `unwraps paragraphs only in tight lists`() {
+        val tightOutput = fixture.renderMarkdown(
+            """
+            - One
+            - Two
+            """,
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+        )
+        val looseOutput = fixture.renderMarkdown(
+            """
+            - One
+
+            - Two
+            """,
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+        )
+
+        tightOutput.assertContainsKotlin(
+            """
+            fun Hello() {
+                org.jetbrains.compose.web.dom.Ul {
+                    org.jetbrains.compose.web.dom.Li {
+                        org.jetbrains.compose.web.dom.Text("One")
+                    }
+                    org.jetbrains.compose.web.dom.Li {
+                        org.jetbrains.compose.web.dom.Text("Two")
+                    }
+                }
+            }
+            """
+        )
+        looseOutput.assertContainsKotlin(
+            """
+            fun Hello() {
+                org.jetbrains.compose.web.dom.Ul {
+                    org.jetbrains.compose.web.dom.Li {
+                        org.jetbrains.compose.web.dom.P {
+                            org.jetbrains.compose.web.dom.Text("One")
+                        }
+                    }
+                    org.jetbrains.compose.web.dom.Li {
+                        org.jetbrains.compose.web.dom.P {
+                            org.jetbrains.compose.web.dom.Text("Two")
+                        }
+                    }
+                }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `renders indented code block like a fenced one`() {
+        val output = fixture.renderMarkdown(
+            """
+            Example:
+
+                val x = 1
+            """,
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+        )
+
+        output.assertContainsKotlin(
+            $$"""
+            fun Hello() {
+                org.jetbrains.compose.web.dom.P {
+                    org.jetbrains.compose.web.dom.Text("Example:")
+                }
+                org.jetbrains.compose.web.dom.Pre { org.jetbrains.compose.web.dom.Code { org.jetbrains.compose.web.dom.Text($${TRIPLE_QUOTE}val x = 1
+            $${TRIPLE_QUOTE}) } }
+            }
+            """
+        )
+    }
 }
