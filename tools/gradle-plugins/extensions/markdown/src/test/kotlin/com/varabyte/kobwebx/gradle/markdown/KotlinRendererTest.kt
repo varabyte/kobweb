@@ -3,98 +3,15 @@
 package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.gradle.core.util.Reporter
-import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
-import com.varabyte.kobwebx.gradle.markdown.util.NodeCache
 import com.varabyte.truthish.assertThat
-import org.gradle.kotlin.dsl.newInstance
-import org.gradle.testfixtures.ProjectBuilder
-import org.intellij.lang.annotations.Language
 import org.junit.Test
-import kotlin.io.path.Path
-import kotlin.io.path.createTempDirectory
-
-/** For writing `"""` inside raw strings, which can't contain it directly. */
-private const val TRIPLE_QUOTE = "\"\"\""
-
-/** Asserts that this generated code contains [kotlin], after trimming it with [trimIndent]. */
-private fun String.assertContainsKotlin(@Language("kotlin") kotlin: String) {
-    assertThat(this).contains(kotlin.trimIndent())
-}
 
 class KotlinRendererTest {
-    private val project = ProjectBuilder.builder().build()
-    private val markdownRoot = createTempDirectory("md-root").toFile().also { it.deleteOnExit() }
-
-    /** Fails the test on any report, so that tests notice unexpected warnings. */
-    private val failingReporter = object : Reporter {
-        override fun error(message: String) = throw AssertionError(message)
-        override fun warn(message: String) = throw AssertionError(message)
-    }
-
-    /**
-     * Renders [markdown] (after trimming it with [trimIndent]) as if it were the file at [filePath] (relative to the
-     * Markdown root) in package [pkg].
-     *
-     * Pass a null [route] for a Markdown file outside the pages package.
-     *
-     * Set [dependsOnMarkdownArtifact] to simulate a site that depends on Kobweb's optional `kobwebx-markdown` library.
-     * With it present, each generated page also registers a `MarkdownContext` (the source file path plus its front
-     * matter), which composables on the page can read via `rememberPageContext().markdown`.
-     *
-     * Silk is off unless [configureHandlers] turns it back on.
-     */
-    private fun renderMarkdown(
-        @Language("markdown") markdown: String,
-        filePath: String,
-        route: String?,
-        funName: String,
-        pkg: String = "",
-        defaultLayout: String? = null,
-        defaultRoot: String? = null,
-        imports: List<String> = emptyList(),
-        configureHandlers: MarkdownHandlers.() -> Unit = {},
-        dependsOnMarkdownArtifact: Boolean = false,
-        reporter: Reporter = failingReporter,
-    ): String {
-        val features = project.objects.newInstance<MarkdownFeatures>()
-        val handlers = project.objects.newInstance<MarkdownHandlers>(project).apply {
-            useSilk.set(false)
-            configureHandlers()
-        }
-
-        val mdFile = markdownRoot.resolve(filePath).apply {
-            parentFile.mkdirs()
-            writeText(markdown.trimIndent())
-        }
-
-        val nodeCache = NodeCache(features.createParser(), setOf(markdownRoot.canonicalFile))
-        val node = nodeCache[mdFile]
-        nodeCache.metadata[node] = NodeCache.Metadata.Entry(
-            projectRoot = "site",
-            markdownSourceRoot = Path("src/jsMain/resources/markdown"),
-            sourceFilePath = Path(filePath),
-            outputRootPath = Path(pkg.replace('.', '/')),
-            `package` = pkg,
-            routeWithSlug = route,
-        )
-
-        val renderer = KotlinRenderer(
-            projectGroup = "org.example",
-            nodeCache = nodeCache,
-            defaultLayout = defaultLayout,
-            defaultRoot = defaultRoot,
-            imports = imports,
-            handlers = handlers,
-            funName = funName,
-            dependsOnMarkdownArtifact = dependsOnMarkdownArtifact,
-            reporter = reporter,
-        )
-        return renderer.render(node)
-    }
+    private val fixture = MarkdownRenderFixture()
 
     @Test
     fun `renders simple formatted markdown as page`() {
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             "Hello *world*",
             filePath = "Hello.md",
             route = "/hello",
@@ -130,7 +47,7 @@ class KotlinRendererTest {
 
     @Test
     fun `renders markdown outside pages as plain composable`() {
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             "Hello",
             filePath = "Greeting.md",
             route = null,
@@ -158,7 +75,7 @@ class KotlinRendererTest {
 
     @Test
     fun `provides markdown context only when markdown artifact is available`() {
-        fun renderPost(dependsOnMarkdownArtifact: Boolean) = renderMarkdown(
+        fun renderPost(dependsOnMarkdownArtifact: Boolean) = fixture.renderMarkdown(
             "Hello",
             filePath = "blog/Post.md",
             route = "/blog/post",
@@ -218,7 +135,7 @@ class KotlinRendererTest {
 
     @Test
     fun `passes user front matter into markdown context`() {
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             """
             ---
             title: Say "hi"
@@ -259,7 +176,7 @@ class KotlinRendererTest {
 
     @Test
     fun `front matter can rename generated functions`() {
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             """
             ---
             funName: CustomPage
@@ -293,7 +210,7 @@ class KotlinRendererTest {
 
     @Test
     fun `adds imports from build script and front matter`() {
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             """
             ---
             imports:
@@ -341,7 +258,7 @@ class KotlinRendererTest {
 
     @Test
     fun `uses default layout`() {
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             "Hello",
             filePath = "Hello.md",
             route = "/hello",
@@ -365,7 +282,7 @@ class KotlinRendererTest {
 
     @Test
     fun `front matter layout overrides default layout`() {
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             """
             ---
             layout: .components.layouts.BlogLayout
@@ -395,7 +312,7 @@ class KotlinRendererTest {
 
     @Test
     fun `empty layout in front matter opts out of default layout`() {
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             """
             ---
             layout: ""
@@ -426,7 +343,7 @@ class KotlinRendererTest {
     // Note: `root` is legacy code. Users are supposed to use `layout` concepts now.
     @Test
     fun `wraps content in default root`() {
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             "Hello",
             filePath = "Hello.md",
             route = "/hello",
@@ -452,7 +369,7 @@ class KotlinRendererTest {
     // Note: `root` is legacy code. Users are supposed to use `layout` concepts now.
     @Test
     fun `front matter root overrides default root`() {
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             """
             ---
             root: .components.layouts.BlogLayout("Blog")
@@ -484,7 +401,7 @@ class KotlinRendererTest {
     // Note: `root` is legacy code. Users are supposed to use `layout` concepts now.
     @Test
     fun `ignores root when a layout is set`() {
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             "Hello",
             filePath = "Hello.md",
             route = "/hello",
@@ -511,7 +428,7 @@ class KotlinRendererTest {
     @Test
     fun `warns when front matter root is ignored because of default layout`() {
         val warnings = mutableListOf<String>()
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             """
             ---
             root: .components.layouts.LegacyRoot
@@ -552,7 +469,7 @@ class KotlinRendererTest {
     @Test
     fun `warns when front matter root is ignored because of front matter layout`() {
         val warnings = mutableListOf<String>()
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             """
             ---
             root: .components.layouts.LegacyRoot
@@ -591,7 +508,7 @@ class KotlinRendererTest {
 
     @Test
     fun `relative route override is relative to the file's folder`() {
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             """
             ---
             routeOverride: first-post
@@ -619,7 +536,7 @@ class KotlinRendererTest {
 
     @Test
     fun `absolute route override replaces the whole route`() {
-        val output = renderMarkdown(
+        val output = fixture.renderMarkdown(
             """
             ---
             routeOverride: /articles/first-post
@@ -639,194 +556,6 @@ class KotlinRendererTest {
             fun PostPage() {
                 org.jetbrains.compose.web.dom.P {
                     org.jetbrains.compose.web.dom.Text("Hello")
-                }
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `escapes quotes, backslashes and dollars in text`() {
-        val output = renderMarkdown(
-            """Say "hi" to C:\Users and pay $5""",
-            filePath = "Hello.md",
-            route = null,
-            funName = "Hello",
-        )
-
-        output.assertContainsKotlin(
-            $$"""
-            fun Hello() {
-                org.jetbrains.compose.web.dom.P {
-                    org.jetbrains.compose.web.dom.Text("Say \"hi\" to C:\\Users and pay ${'$'}5")
-                }
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `gives each heading a unique id`() {
-        val output = renderMarkdown(
-            """
-            # Getting Started
-
-            ## Setup
-
-            ## Setup
-            """,
-            filePath = "Hello.md",
-            route = null,
-            funName = "Hello",
-        )
-
-        output.assertContainsKotlin(
-            """
-            fun Hello() {
-                org.jetbrains.compose.web.dom.H1(attrs = { id("getting-started") }) {
-                    org.jetbrains.compose.web.dom.Text("Getting Started")
-                }
-                org.jetbrains.compose.web.dom.H2(attrs = { id("setup") }) {
-                    org.jetbrains.compose.web.dom.Text("Setup")
-                }
-                org.jetbrains.compose.web.dom.H2(attrs = { id("setup-2") }) {
-                    org.jetbrains.compose.web.dom.Text("Setup")
-                }
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `heading ids can be turned off`() {
-        val output = renderMarkdown(
-            "# Getting Started",
-            filePath = "Hello.md",
-            route = null,
-            funName = "Hello",
-            configureHandlers = { generateHeaderIds.set(false) },
-        )
-
-        output.assertContainsKotlin(
-            """
-            fun Hello() {
-                org.jetbrains.compose.web.dom.H1 {
-                    org.jetbrains.compose.web.dom.Text("Getting Started")
-                }
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `renders links with Silk only when it is available`() {
-        fun renderLink(useSilk: Boolean) = renderMarkdown(
-            "[Kobweb](https://kobweb.varabyte.com)",
-            filePath = "Hello.md",
-            route = null,
-            funName = "Hello",
-            configureHandlers = { this.useSilk.set(useSilk) },
-        )
-
-        renderLink(useSilk = true).assertContainsKotlin(
-            """
-            fun Hello() {
-                org.jetbrains.compose.web.dom.P {
-                    com.varabyte.kobweb.silk.components.navigation.Link("https://kobweb.varabyte.com") {
-                        org.jetbrains.compose.web.dom.Text("Kobweb")
-                    }
-                }
-            }
-            """
-        )
-        renderLink(useSilk = false).assertContainsKotlin(
-            """
-            fun Hello() {
-                org.jetbrains.compose.web.dom.P {
-                    org.jetbrains.compose.web.dom.A("https://kobweb.varabyte.com") {
-                        org.jetbrains.compose.web.dom.Text("Kobweb")
-                    }
-                }
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `renders code block as raw string`() {
-        val output = renderMarkdown(
-            $$"""
-            ```kotlin
-            val price = "$5"
-            val quotes = $${TRIPLE_QUOTE}
-            ```
-            """,
-            filePath = "Hello.md",
-            route = null,
-            funName = "Hello",
-        )
-
-        output.assertContainsKotlin(
-            $$"""
-            fun Hello() {
-                org.jetbrains.compose.web.dom.Pre { org.jetbrains.compose.web.dom.Code { org.jetbrains.compose.web.dom.Text($${TRIPLE_QUOTE}val price = "${'$'}5"
-            val quotes = ${"\"\"\""}
-            $${TRIPLE_QUOTE}) } }
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `unwraps paragraphs only in tight lists`() {
-        val tightOutput = renderMarkdown(
-            """
-            - One
-            - Two
-            """,
-            filePath = "Hello.md",
-            route = null,
-            funName = "Hello",
-        )
-        val looseOutput = renderMarkdown(
-            """
-            - One
-
-            - Two
-            """,
-            filePath = "Hello.md",
-            route = null,
-            funName = "Hello",
-        )
-
-        tightOutput.assertContainsKotlin(
-            """
-            fun Hello() {
-                org.jetbrains.compose.web.dom.Ul {
-                    org.jetbrains.compose.web.dom.Li {
-                        org.jetbrains.compose.web.dom.Text("One")
-                    }
-                    org.jetbrains.compose.web.dom.Li {
-                        org.jetbrains.compose.web.dom.Text("Two")
-                    }
-                }
-            }
-            """
-        )
-        looseOutput.assertContainsKotlin(
-            """
-            fun Hello() {
-                org.jetbrains.compose.web.dom.Ul {
-                    org.jetbrains.compose.web.dom.Li {
-                        org.jetbrains.compose.web.dom.P {
-                            org.jetbrains.compose.web.dom.Text("One")
-                        }
-                    }
-                    org.jetbrains.compose.web.dom.Li {
-                        org.jetbrains.compose.web.dom.P {
-                            org.jetbrains.compose.web.dom.Text("Two")
-                        }
-                    }
                 }
             }
             """
