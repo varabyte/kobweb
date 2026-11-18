@@ -66,6 +66,15 @@ pluginManager.withPlugin("java-gradle-plugin") {
             freeCompilerArgs.add("-Xsuppress-version-warnings")
         }
     }
+    // Tests never ship to Gradle, so they don't need the pin above and can use the latest language features
+    tasks.withType<KotlinCompile>().configureEach {
+        if (name == "compileTestKotlin") {
+            compilerOptions {
+                languageVersion = KotlinVersion.DEFAULT
+                apiVersion = KotlinVersion.DEFAULT
+            }
+        }
+    }
     // Set minimum supported Gradle version
     configurations.named(API_ELEMENTS_CONFIGURATION_NAME) {
         attributes.attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named("8.3"))
