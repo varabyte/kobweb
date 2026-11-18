@@ -22,6 +22,12 @@ class KotlinRendererTest {
     private val project = ProjectBuilder.builder().build()
     private val markdownRoot = createTempDirectory("md-root").toFile().also { it.deleteOnExit() }
 
+    /** Fails the test on any report, so that tests notice unexpected warnings. */
+    private val failingReporter = object : Reporter {
+        override fun error(message: String) = throw AssertionError(message)
+        override fun warn(message: String) = throw AssertionError(message)
+    }
+
     /**
      * Renders [markdown] (after trimming it with [trimIndent]) as if it were the file at [filePath] (relative to the
      * Markdown root) in package [pkg].
@@ -42,6 +48,7 @@ class KotlinRendererTest {
         defaultRoot: String? = null,
         imports: List<String> = emptyList(),
         dependsOnMarkdownArtifact: Boolean = false,
+        reporter: Reporter = failingReporter,
     ): String {
         val features = project.objects.newInstance<MarkdownFeatures>()
         val handlers = project.objects.newInstance<MarkdownHandlers>(project).apply {
@@ -73,10 +80,7 @@ class KotlinRendererTest {
             handlers = handlers,
             funName = funName,
             dependsOnMarkdownArtifact = dependsOnMarkdownArtifact,
-            reporter = object : Reporter {
-                override fun error(message: String) = throw AssertionError(message)
-                override fun warn(message: String) = throw AssertionError(message)
-            },
+            reporter = reporter,
         )
         return renderer.render(node)
     }
@@ -488,6 +492,88 @@ class KotlinRendererTest {
             @Layout(".components.layouts.PageLayout")
             @Composable
             fun HelloPage() {
+                org.jetbrains.compose.web.dom.P {
+                    org.jetbrains.compose.web.dom.Text("Hello")
+                }
+            }
+            """
+        )
+    }
+
+    // Note: `root` is legacy code. Users are supposed to use `layout` concepts now.
+    @Test
+    fun `warns when front matter root is ignored because of default layout`() {
+        val warnings = mutableListOf<String>()
+        val output = renderMarkdown(
+            """
+            ---
+            root: .components.layouts.LegacyRoot
+            ---
+
+            Hello
+            """,
+            filePath = "blog/Post.md",
+            route = "/blog/post",
+            funName = "PostPage",
+            defaultLayout = ".components.layouts.PageLayout",
+            reporter = object : Reporter {
+                override fun error(message: String) = throw AssertionError(message)
+                override fun warn(message: String) {
+                    warnings.add(message)
+                }
+            },
+        )
+
+        assertThat(warnings).containsExactly(
+            "Markdown file 'blog/Post.md' sets `root` in its front matter, but it is ignored because the build script sets `markdown.defaultLayout`. Consider deleting the unused `root` value."
+        )
+        output.assertContainsKotlin(
+            """
+            @Page("/blog/post")
+            @Layout(".components.layouts.PageLayout")
+            @Composable
+            fun PostPage() {
+                org.jetbrains.compose.web.dom.P {
+                    org.jetbrains.compose.web.dom.Text("Hello")
+                }
+            }
+            """
+        )
+    }
+
+    // Note: `root` is legacy code. Users are supposed to use `layout` concepts now.
+    @Test
+    fun `warns when front matter root is ignored because of front matter layout`() {
+        val warnings = mutableListOf<String>()
+        val output = renderMarkdown(
+            """
+            ---
+            root: .components.layouts.LegacyRoot
+            layout: .components.layouts.BlogLayout
+            ---
+
+            Hello
+            """,
+            filePath = "blog/Post.md",
+            route = "/blog/post",
+            funName = "PostPage",
+            reporter = object : Reporter {
+                override fun error(message: String) = throw AssertionError(message)
+                override fun warn(message: String) {
+                    warnings.add(message)
+                }
+            },
+        )
+
+        assertThat(warnings).containsExactly(
+            "Markdown file 'blog/Post.md' sets `root` in its front matter, but it is ignored because its front matter also sets `layout`. Consider deleting the unused `root` value."
+        )
+        output.assertContainsKotlin(
+            """
+            @Page("/blog/post")
+            @Layout(".components.layouts.BlogLayout")
+            @Composable
+            fun PostPage() {
                 org.jetbrains.compose.web.dom.P {
                     org.jetbrains.compose.web.dom.Text("Hello")
                 }

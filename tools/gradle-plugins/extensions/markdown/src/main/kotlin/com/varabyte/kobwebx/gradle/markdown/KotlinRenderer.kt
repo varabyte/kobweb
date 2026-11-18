@@ -273,12 +273,21 @@ class KotlinRenderer internal constructor(
         init {
             // If "root" is set in the YAML block, that represents a top-level composable which should wrap
             // everything else.
-            val root = (frontMatterData?.root ?: defaultRoot)?.takeUnless {
-                // A user is expected either to specify a layout (the new way) or a root (the old way), but not both.
-                // Even if you can conceive of a case where you might want to specify both, it would probably be cleaner
-                // if you updated the layout instead.
-                (frontMatterData?.layout ?: defaultLayout) != null
-            }?.takeUnless { it.isBlank() }
+            // A user is expected either to specify a layout (the new way) or a root (the old way), but not both.
+            // Even if you can conceive of a case where you might want to specify both, it would probably be cleaner
+            // if you updated the layout instead.
+            val hasLayout = (frontMatterData?.layout ?: defaultLayout) != null
+            // Only warn about a root from front matter. A build script `defaultRoot` being overridden by a page's
+            // layout is expected while a site migrates from roots to layouts one page at a time.
+            if (hasLayout && !frontMatterData?.root.isNullOrBlank()) {
+                val layoutSource = if (frontMatterData?.layout != null) {
+                    "its front matter also sets `layout`"
+                } else {
+                    "the build script sets `markdown.defaultLayout`"
+                }
+                reporter.warn("Markdown file '${metadataEntry.sourceFilePath.invariantSeparatorsPathString}' sets `root` in its front matter, but it is ignored because $layoutSource. Consider deleting the unused `root` value.")
+            }
+            val root = (frontMatterData?.root ?: defaultRoot)?.takeUnless { hasLayout }?.takeUnless { it.isBlank() }
             if (root != null) {
                 visit(KobwebCall(root, appendBrace = true))
                 ++indentCount
