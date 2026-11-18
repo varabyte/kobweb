@@ -26,6 +26,11 @@ dependencies {
     // Compile only - the plugin itself should exist at runtime, provided by either the
     // Library or Application plugin.
     compileOnly(projects.tools.gradlePlugins.core)
+
+    testImplementation(kotlin("test"))
+    testImplementation(libs.truthish)
+    // Tests construct plugin classes directly, so they need at runtime what the Kobweb plugins otherwise provide
+    testImplementation(projects.tools.gradlePlugins.core)
 }
 
 gradlePlugin {
