@@ -9,13 +9,13 @@ fun Modifier.overflow(overflow: Overflow) = styleModifier {
     overflow(overflow)
 }
 
-fun Modifier.overflow(overflowX: Overflow, overflowY: Overflow) = styleModifier {
+fun Modifier.overflow(overflowX: Overflow.Mode, overflowY: Overflow.Mode) = styleModifier {
     overflow(overflowX, overflowY)
 }
 
 class OverflowScope internal constructor(private val styleScope: StyleScope) {
-    fun x(overflowX: Overflow) = styleScope.overflowX(overflowX)
-    fun y(overflowY: Overflow) = styleScope.overflowY(overflowY)
+    fun x(overflowX: Overflow.SingleValue) = styleScope.overflowX(overflowX)
+    fun y(overflowY: Overflow.SingleValue) = styleScope.overflowY(overflowY)
 }
 
 fun Modifier.overflow(scope: OverflowScope.() -> Unit) = styleModifier {

@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.compose.css
 
-import com.varabyte.kobweb.compose.css.Overflow.Mode
 import org.jetbrains.compose.web.css.*
 
 internal sealed interface CssOverflowModeValues<T: StylePropertyValue> {
@@ -13,8 +12,8 @@ internal sealed interface CssOverflowModeValues<T: StylePropertyValue> {
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow
 sealed interface Overflow : StylePropertyValue {
-    sealed interface SingleValue : Overflow
-    sealed interface Mode : SingleValue
+    sealed interface SingleValue : Overflow // Mode values OR global values
+    sealed interface Mode : SingleValue // Mode values ONLY
 
     companion object : CssOverflowModeValues<Mode>, CssGlobalValues<SingleValue> {
         fun of(x: Mode, y: Mode) = "$x $y".unsafeCast<Overflow>()
@@ -25,15 +24,17 @@ fun StyleScope.overflow(overflow: Overflow) {
     property("overflow", overflow)
 }
 
-fun StyleScope.overflow(overflowX: Overflow, overflowY: Overflow) {
-    property("overflow", "$overflowX $overflowY")
+fun StyleScope.overflow(overflowX: Overflow.Mode, overflowY: Overflow.Mode) {
+    overflow(Overflow.of(overflowX, overflowY))
 }
 
-fun StyleScope.overflowX(overflowX: Overflow) {
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-x
+fun StyleScope.overflowX(overflowX: Overflow.SingleValue) {
     property("overflow-x", overflowX)
 }
 
-fun StyleScope.overflowY(overflowY: Overflow) {
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-y
+fun StyleScope.overflowY(overflowY: Overflow.SingleValue) {
     property("overflow-y", overflowY)
 }
 

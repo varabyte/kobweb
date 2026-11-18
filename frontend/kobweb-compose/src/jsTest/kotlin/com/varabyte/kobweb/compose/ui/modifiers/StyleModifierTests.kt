@@ -391,10 +391,10 @@ class StyleModifierTests {
 
         assertThat(modifierToText {
             Modifier.overflow {
-                x(Overflow.Hidden)
+                x(Overflow.Inherit)
                 y(Overflow.Scroll)
             }
-        }).isEqualTo("overflow-x: hidden; overflow-y: scroll")
+        }).isEqualTo("overflow-x: inherit; overflow-y: scroll")
 
         assertThat(modifierToText {
             Modifier.overflowWrap(OverflowWrap.BreakWord)
