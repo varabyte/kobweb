@@ -4,6 +4,7 @@ package com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall
 
 import com.varabyte.kobwebx.gradle.markdown.MarkdownRenderFixture
 import com.varabyte.kobwebx.gradle.markdown.assertContainsKotlin
+import com.varabyte.truthish.assertThat
 import org.junit.Test
 
 class KobwebCallTest {
@@ -211,5 +212,15 @@ class KobwebCallTest {
             }
             """
         )
+    }
+
+    @Test
+    fun `toFqn leaves fully qualified names alone`() {
+        assertThat(KobwebCall("com.example.Widget").toFqn("org.example")).isEqualTo("com.example.Widget()")
+    }
+
+    @Test
+    fun `toFqn opens a block without adding parentheses`() {
+        assertThat(KobwebCall(".layouts.Card", appendBrace = true).toFqn("org.example")).isEqualTo("org.example.layouts.Card {")
     }
 }
