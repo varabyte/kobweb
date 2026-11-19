@@ -412,8 +412,13 @@ class KotlinRenderer internal constructor(
             // handle that here as well. We intentionally avoid absolute links
             // (e.g. "[link](http://path/to/example.md)"), since in that case, the user is explicitly linking to an
             // external resource.
-            if (link.destination.endsWith(".md") && !link.destination.contains("://")) {
-                val destinationPath = metadataEntry.sourceFilePath.resolveSibling(link.destination).normalize().toString()
+            // A query or fragment (e.g. "b.md#intro") isn't part of the file path, so set it aside and re-append it
+            val suffixStart = link.destination.indexOfAny(charArrayOf('?', '#')).takeIf { it >= 0 }
+                ?: link.destination.length
+            val linkPath = link.destination.substring(0, suffixStart)
+            val linkSuffix = link.destination.substring(suffixStart)
+            if (linkPath.endsWith(".md") && !linkPath.contains("://")) {
+                val destinationPath = metadataEntry.sourceFilePath.resolveSibling(linkPath).normalize().toString()
                 val destinationNode = nodeCache.getRelative(destinationPath.removePrefix("/"))
                 if (destinationNode != null) {
                     // Only Markdown files under the pages package get a route. Others (e.g. a component written in
@@ -432,7 +437,7 @@ class KotlinRenderer internal constructor(
                         error("Markdown file link '${link.destination}' links to file with dynamic route override. This is not supported!")
                     }
 
-                    link.destination = route.resolve(destinationPath)
+                    link.destination = route.resolve(destinationPath) + linkSuffix
                 }
             }
 

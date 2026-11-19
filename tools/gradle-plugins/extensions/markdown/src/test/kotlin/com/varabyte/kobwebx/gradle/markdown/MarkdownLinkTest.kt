@@ -36,6 +36,52 @@ class MarkdownLinkTest {
     }
 
     @Test
+    fun `keeps the fragment when linking to a markdown page`() {
+        fixture.addMarkdownFile("Hello", filePath = "blog/Post.md", route = "/blog/post")
+        val output = fixture.renderMarkdown(
+            "[Intro](Post.md#intro)",
+            filePath = "blog/Index.md",
+            route = "/blog/",
+            funName = "IndexPage",
+        )
+
+        output.assertContainsKotlin(
+            """
+            fun IndexPage() {
+                org.jetbrains.compose.web.dom.P {
+                    org.jetbrains.compose.web.dom.A("/blog/post#intro") {
+                        org.jetbrains.compose.web.dom.Text("Intro")
+                    }
+                }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `keeps the query when linking to a markdown page`() {
+        fixture.addMarkdownFile("Hello", filePath = "blog/Post.md", route = "/blog/post")
+        val output = fixture.renderMarkdown(
+            "[Comments](Post.md?tab=comments#top)",
+            filePath = "blog/Index.md",
+            route = "/blog/",
+            funName = "IndexPage",
+        )
+
+        output.assertContainsKotlin(
+            """
+            fun IndexPage() {
+                org.jetbrains.compose.web.dom.P {
+                    org.jetbrains.compose.web.dom.A("/blog/post?tab=comments#top") {
+                        org.jetbrains.compose.web.dom.Text("Comments")
+                    }
+                }
+            }
+            """
+        )
+    }
+
+    @Test
     fun `links to a markdown page in a parent folder`() {
         fixture.addMarkdownFile("Hello", filePath = "About.md", route = "/about")
         val output = fixture.renderMarkdown(
