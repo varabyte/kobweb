@@ -307,7 +307,10 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
             }
         }
         ul.convention { "$JB_DOM.Ul" }
-        ol.convention { "$JB_DOM.Ol" }
+        ol.convention { list ->
+            val start = list.markerStartNumber ?: 1
+            if (start != 1) "$JB_DOM.Ol(attrs = { attr(\"start\", \"$start\") })" else "$JB_DOM.Ol"
+        }
         li.convention { "$JB_DOM.Li" }
         code.convention { codeBlock ->
             val text = "\"\"\"${codeBlock.literal.escapeTripleQuotedText()}\"\"\""

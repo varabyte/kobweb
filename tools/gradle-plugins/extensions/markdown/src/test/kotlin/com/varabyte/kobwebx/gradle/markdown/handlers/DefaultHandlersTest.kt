@@ -374,6 +374,27 @@ class DefaultHandlersTest {
         )
     }
 
+    // Handler under test: ol
+    @Test
+    fun `ordered list keeps its start number`() {
+        val output = fixture.renderMarkdown(
+            """
+            3. Three
+            4. Four
+            """,
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+        )
+
+        output.assertContainsKotlin(
+            """
+            fun Hello() {
+                org.jetbrains.compose.web.dom.Ol(attrs = { attr("start", "3") }) {
+            """
+        )
+    }
+
     // Handlers under test: table, thead, tbody, tr, th, td
     @Test
     fun `aligns table cells`() {
