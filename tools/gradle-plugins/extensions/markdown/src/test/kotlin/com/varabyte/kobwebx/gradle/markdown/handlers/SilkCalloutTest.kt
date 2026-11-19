@@ -145,6 +145,26 @@ class SilkCalloutTest {
     }
 
     @Test
+    fun `marker variant can be a shortcut`() {
+        val output = fixture.renderMarkdown(
+            """
+            > [!WARNING {variant = .components.widgets.OutlinedVariant}]
+            > Careful.
+            """,
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+            configureHandlers = { useSilk.set(true) },
+        )
+
+        output.assertContainsKotlin(
+            """
+            com.varabyte.kobweb.silk.components.display.Callout(type = com.varabyte.kobweb.silk.components.display.CalloutType.WARNING, label = null, variant = org.example.components.widgets.OutlinedVariant) {
+            """
+        )
+    }
+
+    @Test
     fun `ignores malformed marker options`() {
         val output = fixture.renderMarkdown(
             """
@@ -277,6 +297,29 @@ class SilkCalloutTest {
                     }
                 }
             }
+            """
+        )
+    }
+
+    @Test
+    fun `default variant can be a shortcut`() {
+        val output = fixture.renderMarkdown(
+            """
+            > [!NOTE]
+            > Note.
+            """,
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+            configureHandlers = {
+                useSilk.set(true)
+                blockquote.set(SilkCalloutBlockquoteHandler(variant = ".components.widgets.CustomVariant"))
+            },
+        )
+
+        output.assertContainsKotlin(
+            """
+            com.varabyte.kobweb.silk.components.display.Callout(type = com.varabyte.kobweb.silk.components.display.CalloutType.NOTE, label = null, variant = org.example.components.widgets.CustomVariant) {
             """
         )
     }

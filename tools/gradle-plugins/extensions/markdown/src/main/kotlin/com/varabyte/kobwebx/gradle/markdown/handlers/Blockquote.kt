@@ -52,7 +52,8 @@ val SilkCalloutTypes = mapOf(
  * Finally, you can specify an alternate callout variant to use (perhaps `OutlinedCalloutVariant` or something from
  * your own project) by setting the [variant] parameter. You can specify an override for the variant in markdown by
  * wrapping it in curly braces, like
- * so: `[!NOTE {variant = com.varabyte.kobweb.silk.components.display.OutlinedCalloutVariant}]`.
+ * so: `[!NOTE {variant = com.varabyte.kobweb.silk.components.display.OutlinedCalloutVariant}]`. As with [types],
+ * variant names starting with a `.` are relative to your project's group (e.g. `.components.widgets.MyVariant`).
  */
 fun SilkCalloutBlockquoteHandler(
     types: Map<String, String> = SilkCalloutTypes,
@@ -90,11 +91,11 @@ fun SilkCalloutBlockquoteHandler(
                     }
                 }
                 ?: emptyMap()
+            val projectGroup = PackageName(data.getValue(MarkdownHandlers.DataKeys.ProjectGroup))
             @Suppress("NAME_SHADOWING")
-            val variant = parameters["variant"] ?: variant ?: "$SILK.display.CalloutDefaults.Variant"
-            val calloutTypeFqn = types[typeId]?.let {
-                PackageName(data.getValue(MarkdownHandlers.DataKeys.ProjectGroup)).resolve(FqNameShortcut(it))
-            }
+            val variant = (parameters["variant"] ?: variant)?.let { projectGroup.resolve(FqNameShortcut(it)) }
+                ?: "$SILK.display.CalloutDefaults.Variant"
+            val calloutTypeFqn = types[typeId]?.let { projectGroup.resolve(FqNameShortcut(it)) }
 
             if (calloutTypeFqn != null) {
                 """$SILK.display.Callout(type = $calloutTypeFqn, label = ${label?.let { "\"$it\"" }}, variant = $variant)"""
