@@ -66,11 +66,19 @@ fun SilkCalloutBlockquoteHandler(
             val firstChild = firstChild as? Text ?: return@let null
             val regex = """\[!([^ ]+)( "(.*)")?( \{(.*)})?]""".toRegex() // [!TYPE "LABEL" {VARIANT}]
             val typeMatch = regex.find(firstChild.literal) ?: return@let null
+
+            val typeId = typeMatch.groupValues[1]
+            val projectGroup = PackageName(data.getValue(MarkdownHandlers.DataKeys.ProjectGroup))
+            val calloutTypeFqn = types[typeId]?.let { projectGroup.resolve(FqNameShortcut(it)) } ?: run {
+                // Keep the marker in the fallback blockquote, as when Silk isn't used
+                reporter.warn("Unknown Markdown callout type: $typeId")
+                return@let null
+            }
+
             // Trim the space left by the line break after the marker
             firstChild.literal = firstChild.literal.substringAfter(typeMatch.value).trimStart()
             if (firstChild.literal.isEmpty()) firstChild.unlink()
 
-            val typeId = typeMatch.groupValues[1]
             val isLabelSet = typeMatch.groupValues[2].isNotBlank()
             val label = typeMatch.groupValues[3].takeIf { isLabelSet } ?: labels[typeId]
             val areParametersSet = typeMatch.groupValues[4].isNotBlank()
@@ -91,18 +99,11 @@ fun SilkCalloutBlockquoteHandler(
                     }
                 }
                 ?: emptyMap()
-            val projectGroup = PackageName(data.getValue(MarkdownHandlers.DataKeys.ProjectGroup))
             @Suppress("NAME_SHADOWING")
             val variant = (parameters["variant"] ?: variant)?.let { projectGroup.resolve(FqNameShortcut(it)) }
                 ?: "$SILK.display.CalloutDefaults.Variant"
-            val calloutTypeFqn = types[typeId]?.let { projectGroup.resolve(FqNameShortcut(it)) }
 
-            if (calloutTypeFqn != null) {
-                """$SILK.display.Callout(type = $calloutTypeFqn, label = ${label?.let { "\"$it\"" }}, variant = $variant)"""
-            } else {
-                reporter.warn("Unknown Markdown callout type: $typeId")
-                null
-            }
+            """$SILK.display.Callout(type = $calloutTypeFqn, label = ${label?.let { "\"$it\"" }}, variant = $variant)"""
         }
         silkCallout ?: "$KOBWEB_DOM.GenericTag(\"blockquote\")"
     }

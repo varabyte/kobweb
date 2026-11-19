@@ -215,6 +215,11 @@ class SilkCalloutTest {
             """
             fun Hello() {
                 com.varabyte.kobweb.compose.dom.GenericTag("blockquote") {
+                    org.jetbrains.compose.web.dom.P {
+                        org.jetbrains.compose.web.dom.Text("[!BOGUS] Unknown.")
+                    }
+                }
+            }
             """
         )
     }
