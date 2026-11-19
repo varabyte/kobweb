@@ -5,6 +5,7 @@ package com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall
 import com.varabyte.kobwebx.gradle.markdown.MarkdownRenderFixture
 import com.varabyte.kobwebx.gradle.markdown.assertContainsKotlin
 import com.varabyte.truthish.assertThat
+import com.varabyte.truthish.assertThrows
 import org.junit.Rule
 import org.junit.Test
 
@@ -179,11 +180,11 @@ class KobwebCallTest {
     @Test
     fun `block call delimiters can be changed`() {
         val output = fixture.renderMarkdown(
-            "[[[ .components.widgets.Counter ]]]",
+            "((( .components.widgets.Counter )))",
             filePath = "Hello.md",
             route = null,
             funName = "Hello",
-            configureFeatures = { kobwebCallDelimiters.set('[' to ']') },
+            configureFeatures = { kobwebCallDelimiters.set('(' to ')') },
         )
 
         output.assertContainsKotlin(
@@ -192,6 +193,45 @@ class KobwebCallTest {
                 org.example.components.widgets.Counter()
             }
             """
+        )
+    }
+
+    @Test
+    fun `inline call delimiters can be changed`() {
+        val output = fixture.renderMarkdown(
+            $$"""$(.components.widgets.Counter) clicks""",
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+            configureFeatures = { kobwebCallDelimiters.set('(' to ')') },
+        )
+
+        output.assertContainsKotlin(
+            """
+            fun Hello() {
+                org.jetbrains.compose.web.dom.P {
+                    org.example.components.widgets.Counter()
+                    org.jetbrains.compose.web.dom.Text(" clicks")
+                }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `square bracket delimiters are rejected`() {
+        val e = assertThrows<IllegalArgumentException> {
+            fixture.renderMarkdown(
+                "[[[ .components.widgets.Counter ]]]",
+                filePath = "Hello.md",
+                route = null,
+                funName = "Hello",
+                configureFeatures = { kobwebCallDelimiters.set('[' to ']') },
+            )
+        }
+
+        assertThat(e.message).isEqualTo(
+            "Kobweb call delimiters can't be square brackets, since Markdown reserves them for links."
         )
     }
 

@@ -70,6 +70,8 @@ abstract class MarkdownFeatures {
      *
      * By default, it is curly braces `{}`, but you can change the character if this
      * causes a problem in your project for some unforeseeable reason.
+     *
+     * Square brackets `[]` aren't allowed, since Markdown reserves them for links.
      */
     @get:Input
     abstract val kobwebCallDelimiters: Property<Pair<Char, Char>>
@@ -121,7 +123,11 @@ abstract class MarkdownFeatures {
             extensions.add(FrontMatterExtension.create())
         }
         if (kobwebCall.get()) {
-            extensions.add(KobwebCallExtension.create(kobwebCallDelimiters.get()) { createParser() })
+            val delimiters = kobwebCallDelimiters.get()
+            require('[' !in delimiters.toList() && ']' !in delimiters.toList()) {
+                "Kobweb call delimiters can't be square brackets, since Markdown reserves them for links."
+            }
+            extensions.add(KobwebCallExtension.create(delimiters) { createParser() })
         }
         if (tables.get()) {
             extensions.add(TablesExtension.create())
