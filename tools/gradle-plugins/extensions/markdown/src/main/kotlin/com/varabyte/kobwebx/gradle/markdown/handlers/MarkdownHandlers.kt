@@ -440,7 +440,13 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
 
             val sb = StringBuilder()
             val doc = Jsoup.parseBodyFragment(htmlBlock.literal)
-            doc.body().children().forEach { root -> renderNode(root, indentCount = 0, sb) }
+            doc.body().children().forEach { root ->
+                renderNode(root, indentCount = 0, sb)
+                // An element without children doesn't end its line, so end it here to keep sibling elements apart
+                if (!sb.endsWith("\n")) {
+                    sb.appendLine()
+                }
+            }
 
             sb.toString()
         }

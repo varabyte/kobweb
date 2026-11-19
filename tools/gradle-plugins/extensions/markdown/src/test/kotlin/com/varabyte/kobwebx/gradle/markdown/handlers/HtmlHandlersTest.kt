@@ -90,6 +90,26 @@ class HtmlHandlersTest {
 
     // Handler under test: html
     @Test
+    fun `renders sibling html block elements on separate lines`() {
+        val output = fixture.renderMarkdown(
+            """<div></div><div></div>""",
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+        )
+
+        output.assertContainsKotlin(
+            """
+            fun Hello() {
+                com.varabyte.kobweb.compose.dom.GenericTag<org.w3c.dom.Element>("div")
+                com.varabyte.kobweb.compose.dom.GenericTag<org.w3c.dom.Element>("div")
+            }
+            """
+        )
+    }
+
+    // Handler under test: html
+    @Test
     fun `escapes html attribute values`() {
         val output = fixture.renderMarkdown(
             $$"""<div title='say "hi" $5'></div>""",
