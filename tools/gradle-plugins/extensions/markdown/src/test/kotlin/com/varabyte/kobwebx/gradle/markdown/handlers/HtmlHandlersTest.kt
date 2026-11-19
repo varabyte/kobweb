@@ -27,7 +27,6 @@ class HtmlHandlersTest {
             funName = "Hello",
         )
 
-        // The blank line after an html block is harmless: the generated code still compiles.
         output.assertContainsKotlin(
             $$"""
             fun Hello() {
@@ -39,7 +38,6 @@ class HtmlHandlersTest {
                         }
                     }
                 }
-
             }
             """
         )
@@ -66,7 +64,6 @@ class HtmlHandlersTest {
                     org.jetbrains.compose.web.dom.Text($${TRIPLE_QUOTE}price: ${'$'}5 ${"\"\"\""}
             $${TRIPLE_QUOTE})
                 }
-
             }
             """
         )

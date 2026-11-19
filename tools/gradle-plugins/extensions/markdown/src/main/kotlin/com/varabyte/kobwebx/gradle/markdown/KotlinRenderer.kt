@@ -304,8 +304,8 @@ class KotlinRenderer internal constructor(
         private fun <N : Node> doVisit(node: N, composableCall: Provider<NodeScope.(N) -> String>) {
             val scope = NodeScope(reporter, data, indentCount)
             composableCall.get().invoke(scope, node).takeIf { it.isNotBlank() }?.let { code ->
-                // Remove leading indentation (if any) because we add it ourselves
-                doVisit(node, code.trimStart(), scope)
+                // Remove leading indentation and trailing newlines (if any) because we add them ourselves
+                doVisit(node, code.trim(), scope)
             }
         }
 
