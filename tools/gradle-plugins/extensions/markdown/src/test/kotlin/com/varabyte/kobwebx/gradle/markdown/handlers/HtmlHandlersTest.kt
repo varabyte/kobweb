@@ -5,6 +5,7 @@ package com.varabyte.kobwebx.gradle.markdown.handlers
 import com.varabyte.kobwebx.gradle.markdown.MarkdownRenderFixture
 import com.varabyte.kobwebx.gradle.markdown.TRIPLE_QUOTE
 import com.varabyte.kobwebx.gradle.markdown.assertContainsKotlin
+import com.varabyte.truthish.assertThat
 import org.junit.Rule
 import org.junit.Test
 
@@ -157,5 +158,25 @@ class HtmlHandlersTest {
             }
             """
         )
+    }
+
+    // Handler under test: rawTag
+    @Test
+    fun `raw tag handler receives the text inside each opening tag`() {
+        val rawTags = mutableListOf<String>()
+        fixture.renderMarkdown(
+            """Hello <span id="x">there</span><br><img src="a.png" />!""",
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+            configureHandlers = {
+                rawTag.set { tag ->
+                    rawTags.add(tag)
+                    "Tag()"
+                }
+            },
+        )
+
+        assertThat(rawTags).containsExactly("""span id="x"""", "br", """img src="a.png"""").inOrder()
     }
 }

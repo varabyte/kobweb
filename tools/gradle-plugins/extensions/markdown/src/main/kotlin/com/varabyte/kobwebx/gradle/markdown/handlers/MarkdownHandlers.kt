@@ -387,7 +387,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
             val scope = this
             buildString {
                 if (!tag.startsWith("</")) {
-                    append(rawTag.get().invoke(scope, tag))
+                    append(rawTag.get().invoke(scope, tag.stripTagBrackets().trim()))
                     if (!tag.endsWith("/>") && tag.stripTagBrackets() !in voidElements) {
                         append(" {")
                     }
