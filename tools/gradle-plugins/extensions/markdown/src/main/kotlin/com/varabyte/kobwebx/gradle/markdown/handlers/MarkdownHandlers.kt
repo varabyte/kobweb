@@ -44,6 +44,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Attributes
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
+import org.jsoup.parser.Tag
 import javax.inject.Inject
 
 internal const val JB_DOM = "org.jetbrains.compose.web.dom"
@@ -381,14 +382,16 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
         }
 
         inlineTag.set { htmlInline ->
-            val voidElements = setOf("br", "hr", "img")
             val tag = htmlInline.literal
 
             val scope = this
             buildString {
                 if (!tag.startsWith("</")) {
-                    append(rawTag.get().invoke(scope, tag.stripTagBrackets().trim()))
-                    if (!tag.endsWith("/>") && tag.stripTagBrackets() !in voidElements) {
+                    val tagText = tag.stripTagBrackets().trim()
+                    append(rawTag.get().invoke(scope, tagText))
+                    val tagName = tagText.takeWhile { !it.isWhitespace() }.lowercase()
+                    // Jsoup calls HTML void tags (e.g. `br`, `img`, `input`), which never get a closing tag, "empty"
+                    if (!tag.endsWith("/>") && !Tag.valueOf(tagName).isEmpty) {
                         append(" {")
                     }
                 } else {

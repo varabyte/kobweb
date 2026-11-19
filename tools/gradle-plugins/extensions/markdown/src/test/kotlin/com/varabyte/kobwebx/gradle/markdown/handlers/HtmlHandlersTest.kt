@@ -177,6 +177,31 @@ class HtmlHandlersTest {
         )
     }
 
+    // Handlers under test: inlineTag, rawTag
+    @Test
+    fun `renders inline void tags with attributes without content`() {
+        val output = fixture.renderMarkdown(
+            """a<img src="a.png">b<input type="checkbox">c""",
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+        )
+
+        output.assertContainsKotlin(
+            """
+            fun Hello() {
+                org.jetbrains.compose.web.dom.P {
+                    org.jetbrains.compose.web.dom.Text("a")
+                    com.varabyte.kobweb.compose.dom.GenericTag<org.w3c.dom.Element>("img", attrs = {attr("src", "a.png")})
+                    org.jetbrains.compose.web.dom.Text("b")
+                    com.varabyte.kobweb.compose.dom.GenericTag<org.w3c.dom.Element>("input", attrs = {attr("type", "checkbox")})
+                    org.jetbrains.compose.web.dom.Text("c")
+                }
+            }
+            """
+        )
+    }
+
     // Handler under test: rawTag
     @Test
     fun `raw tag handler receives the text inside each opening tag`() {
