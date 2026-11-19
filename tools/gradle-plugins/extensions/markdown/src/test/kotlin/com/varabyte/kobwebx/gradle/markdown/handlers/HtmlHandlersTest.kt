@@ -6,6 +6,7 @@ import com.varabyte.kobwebx.gradle.markdown.MarkdownRenderFixture
 import com.varabyte.kobwebx.gradle.markdown.TRIPLE_QUOTE
 import com.varabyte.kobwebx.gradle.markdown.assertContainsKotlin
 import com.varabyte.truthish.assertThat
+import com.varabyte.truthish.assertThrows
 import org.junit.Rule
 import org.junit.Test
 
@@ -199,6 +200,89 @@ class HtmlHandlersTest {
                 }
             }
             """
+        )
+    }
+
+    // Handler under test: inlineTag
+    @Test
+    fun `renders nested inline tags with the same name`() {
+        val output = fixture.renderMarkdown(
+            """<span>a<span>b</span>c</span>""",
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+        )
+
+        output.assertContainsKotlin(
+            """
+            fun Hello() {
+                org.jetbrains.compose.web.dom.P {
+                    com.varabyte.kobweb.compose.dom.GenericTag<org.w3c.dom.Element>("span", attrs = {}) {
+                        org.jetbrains.compose.web.dom.Text("a")
+                        com.varabyte.kobweb.compose.dom.GenericTag<org.w3c.dom.Element>("span", attrs = {}) {
+                            org.jetbrains.compose.web.dom.Text("b")
+                        }
+                        org.jetbrains.compose.web.dom.Text("c")
+                    }
+                }
+            }
+            """
+        )
+    }
+
+    // Handler under test: inlineTag
+    @Test
+    fun `reports inline tag that is never closed`() {
+        // The fixture's reporter throws on any report, which stops the render at the first error
+        val error = assertThrows<AssertionError> {
+            fixture.renderMarkdown(
+                """This is <span class="hint">important.""",
+                filePath = "Hello.md",
+                route = null,
+                funName = "Hello",
+            )
+        }
+
+        assertThat(error.message).isEqualTo(
+            """Markdown file 'Hello.md': Inline HTML tag `<span class="hint">` isn't closed within its paragraph"""
+        )
+    }
+
+    // Handler under test: inlineTag
+    @Test
+    fun `reports inline tag closed in a later paragraph`() {
+        val error = assertThrows<AssertionError> {
+            fixture.renderMarkdown(
+                """
+                <span>One
+
+                Two</span>
+                """,
+                filePath = "Hello.md",
+                route = null,
+                funName = "Hello",
+            )
+        }
+
+        assertThat(error.message).isEqualTo(
+            "Markdown file 'Hello.md': Inline HTML tag `<span>` isn't closed within its paragraph"
+        )
+    }
+
+    // Handler under test: inlineTag
+    @Test
+    fun `reports inline closing tag without an opening tag`() {
+        val error = assertThrows<AssertionError> {
+            fixture.renderMarkdown(
+                """Oops</span>""",
+                filePath = "Hello.md",
+                route = null,
+                funName = "Hello",
+            )
+        }
+
+        assertThat(error.message).isEqualTo(
+            "Markdown file 'Hello.md': Inline HTML tag `</span>` has no opening tag within its paragraph"
         )
     }
 

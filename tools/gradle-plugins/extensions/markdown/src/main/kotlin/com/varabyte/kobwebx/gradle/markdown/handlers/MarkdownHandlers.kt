@@ -381,21 +381,51 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
             "$KOBWEB_DOM.GenericTag<$W3C_DOM.Element>($name, attrs = $attrs)"
         }
 
+        fun HtmlInline.isClosingTag() = literal.startsWith("</")
+        fun HtmlInline.tagName() = literal.stripTagBrackets().trim().takeWhile { !it.isWhitespace() }.lowercase()
+        fun HtmlInline.isOpeningTag() =
+            // Jsoup calls HTML void tags (e.g. `br`, `img`, `input`), which never get a closing tag, "empty"
+            !isClosingTag() && !literal.endsWith("/>") && !Tag.valueOf(tagName()).isEmpty
+
+        // Each inline tag is its own node, and only sibling nodes in the same paragraph can pair up, since the opening
+        // and closing tags of a pair must wrap the same generated block of code.
+        fun HtmlInline.hasPartnerTag(): Boolean {
+            val name = tagName()
+            val searchForward = isOpeningTag()
+            // Opening tags nest one level deeper going forward, closing tags going backward
+            var depth = 0
+            var curr: Node? = this
+            while (curr != null) {
+                if (curr is HtmlInline && curr.tagName() == name) {
+                    if (curr.isOpeningTag()) {
+                        depth += if (searchForward) 1 else -1
+                    } else if (curr.isClosingTag()) {
+                        depth += if (searchForward) -1 else 1
+                    }
+                    if (depth == 0) return true
+                }
+                curr = if (searchForward) curr.next else curr.previous
+            }
+            return false
+        }
+
         inlineTag.set { htmlInline ->
             val tag = htmlInline.literal
 
             val scope = this
             buildString {
-                if (!tag.startsWith("</")) {
-                    val tagText = tag.stripTagBrackets().trim()
-                    append(rawTag.get().invoke(scope, tagText))
-                    val tagName = tagText.takeWhile { !it.isWhitespace() }.lowercase()
-                    // Jsoup calls HTML void tags (e.g. `br`, `img`, `input`), which never get a closing tag, "empty"
-                    if (!tag.endsWith("/>") && !Tag.valueOf(tagName).isEmpty) {
+                if (!htmlInline.isClosingTag()) {
+                    append(rawTag.get().invoke(scope, tag.stripTagBrackets().trim()))
+                    if (htmlInline.isOpeningTag()) {
+                        if (!htmlInline.hasPartnerTag()) {
+                            reporter.error("Inline HTML tag `$tag` isn't closed within its paragraph")
+                        }
                         append(" {")
                     }
                 } else {
-                    // Closing tag
+                    if (!htmlInline.hasPartnerTag()) {
+                        reporter.error("Inline HTML tag `$tag` has no opening tag within its paragraph")
+                    }
                     append("}")
                 }
             }
