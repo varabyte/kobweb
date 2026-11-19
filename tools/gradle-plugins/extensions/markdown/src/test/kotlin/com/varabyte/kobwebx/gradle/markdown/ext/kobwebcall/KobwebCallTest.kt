@@ -5,10 +5,12 @@ package com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall
 import com.varabyte.kobwebx.gradle.markdown.MarkdownRenderFixture
 import com.varabyte.kobwebx.gradle.markdown.assertContainsKotlin
 import com.varabyte.truthish.assertThat
+import org.junit.Rule
 import org.junit.Test
 
 class KobwebCallTest {
-    private val fixture = MarkdownRenderFixture()
+    @get:Rule
+    val fixture = MarkdownRenderFixture()
 
     @Test
     fun `block call adds parentheses when missing`() {

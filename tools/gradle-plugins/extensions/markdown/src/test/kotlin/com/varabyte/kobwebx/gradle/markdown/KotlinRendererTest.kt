@@ -4,10 +4,12 @@ package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.truthish.assertThat
+import org.junit.Rule
 import org.junit.Test
 
 class KotlinRendererTest {
-    private val fixture = MarkdownRenderFixture()
+    @get:Rule
+    val fixture = MarkdownRenderFixture()
 
     @Test
     fun `renders simple formatted markdown as page`() {

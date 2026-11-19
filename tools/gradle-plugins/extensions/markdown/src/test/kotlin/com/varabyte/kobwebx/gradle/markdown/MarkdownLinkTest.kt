@@ -3,12 +3,14 @@
 package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.truthish.assertThat
+import org.junit.Rule
 import org.junit.Test
 import kotlin.test.assertFailsWith
 
 // Links to other Markdown files are rewritten into the routes of the pages generated from them.
 class MarkdownLinkTest {
-    private val fixture = MarkdownRenderFixture()
+    @get:Rule
+    val fixture = MarkdownRenderFixture()
 
     @Test
     fun `links to a sibling markdown page by its route`() {

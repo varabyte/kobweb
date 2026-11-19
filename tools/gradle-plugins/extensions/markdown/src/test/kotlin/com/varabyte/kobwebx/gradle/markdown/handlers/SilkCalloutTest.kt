@@ -6,13 +6,15 @@ import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobwebx.gradle.markdown.MarkdownRenderFixture
 import com.varabyte.kobwebx.gradle.markdown.assertContainsKotlin
 import com.varabyte.truthish.assertThat
+import org.junit.Rule
 import org.junit.Test
 
 // Handler under tests: blockquote, which delegates to SilkCalloutBlockquoteHandler when Silk is available.
 // TODO: Callout text starts with a space, left over from the line break after the `[!TYPE]` marker. That's a bug; once
 //  fixed, drop the leading space from the expected `Text(...)` calls below.
 class SilkCalloutTest {
-    private val fixture = MarkdownRenderFixture()
+    @get:Rule
+    val fixture = MarkdownRenderFixture()
 
     @Test
     fun `renders callout from type marker`() {

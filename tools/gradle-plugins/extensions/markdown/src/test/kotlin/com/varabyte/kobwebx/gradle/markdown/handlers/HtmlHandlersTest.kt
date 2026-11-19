@@ -5,10 +5,12 @@ package com.varabyte.kobwebx.gradle.markdown.handlers
 import com.varabyte.kobwebx.gradle.markdown.MarkdownRenderFixture
 import com.varabyte.kobwebx.gradle.markdown.TRIPLE_QUOTE
 import com.varabyte.kobwebx.gradle.markdown.assertContainsKotlin
+import org.junit.Rule
 import org.junit.Test
 
 class HtmlHandlersTest {
-    private val fixture = MarkdownRenderFixture()
+    @get:Rule
+    val fixture = MarkdownRenderFixture()
 
     // Handler under test: html
     @Test
