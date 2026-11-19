@@ -458,7 +458,7 @@ class KotlinRendererTest {
             },
         )
 
-        assertThat(warnings).containsExactly("blog/Post.md:8: Found emphasis")
+        assertThat(warnings).containsExactly("blog/Post.md:8:6 Found emphasis")
     }
 
     // Note: `root` is legacy code. Users are supposed to use `layout` concepts now.
@@ -486,7 +486,7 @@ class KotlinRendererTest {
         )
 
         assertThat(warnings).containsExactly(
-            "Markdown file 'blog/Post.md' sets `root` in its front matter, but it is ignored because the build script sets `markdown.defaultLayout`. Consider deleting the unused `root` value."
+            "blog/Post.md Front matter sets `root`, but it is ignored because the build script sets `markdown.defaultLayout`. Consider deleting the unused `root` value."
         )
         output.assertContainsKotlin(
             """
@@ -527,7 +527,7 @@ class KotlinRendererTest {
         )
 
         assertThat(warnings).containsExactly(
-            "Markdown file 'blog/Post.md' sets `root` in its front matter, but it is ignored because its front matter also sets `layout`. Consider deleting the unused `root` value."
+            "blog/Post.md Front matter sets `root`, but it is ignored because the front matter also sets `layout`. Consider deleting the unused `root` value."
         )
         output.assertContainsKotlin(
             """

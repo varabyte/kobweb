@@ -34,6 +34,8 @@ internal class NodeCache(private val parser: Parser, private val roots: Set<File
             val projectRoot: String,
             val markdownSourceRoot: Path,
             val sourceFilePath: Path,
+            // Only for messages to users: keep absolute paths out of generated code, so builds stay relocatable
+            val sourceFile: File,
             val outputRootPath: Path,
             val `package`: String,
             val routeWithSlug: String?,

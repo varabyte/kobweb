@@ -2,6 +2,9 @@ package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
+import com.varabyte.kobwebx.gradle.markdown.report.MarkdownLocation
+import com.varabyte.kobwebx.gradle.markdown.report.MarkdownReporter
+import com.varabyte.kobwebx.gradle.markdown.report.toRelativeString
 import com.varabyte.kobwebx.gradle.markdown.util.NodeCache
 import com.varabyte.truthish.assertThat
 import org.gradle.kotlin.dsl.newInstance
@@ -72,6 +75,9 @@ class MarkdownRenderFixture : TestRule {
      * matter), which composables on the page can read via `rememberPageContext().markdown`.
      *
      * Silk is off unless [configureHandlers] turns it back on.
+     *
+     * Each message sent to [reporter] starts with the location it's about, relative to the Markdown root (e.g.
+     * `blog/Post.md:12:9 `), since the temp folder's absolute path changes on every run.
      */
     fun renderMarkdown(
         @Language("markdown") markdown: String,
@@ -101,6 +107,7 @@ class MarkdownRenderFixture : TestRule {
                 projectRoot = "site",
                 markdownSourceRoot = Path("src/jsMain/resources/markdown"),
                 sourceFilePath = Path(filePath),
+                sourceFile = markdownRoot.resolve(filePath),
                 outputRootPath = Path(pkg.replace('.', '/')),
                 `package` = pkg,
                 routeWithSlug = route,
@@ -119,7 +126,13 @@ class MarkdownRenderFixture : TestRule {
             handlers = handlers,
             funName = funName,
             dependsOnMarkdownArtifact = dependsOnMarkdownArtifact,
-            reporter = reporter,
+            reporter = object : MarkdownReporter {
+                override fun error(location: MarkdownLocation, message: String) =
+                    reporter.error("${location.toRelativeString()} $message")
+
+                override fun warn(location: MarkdownLocation, message: String) =
+                    reporter.warn("${location.toRelativeString()} $message")
+            },
         )
         return renderer.render(node)
     }

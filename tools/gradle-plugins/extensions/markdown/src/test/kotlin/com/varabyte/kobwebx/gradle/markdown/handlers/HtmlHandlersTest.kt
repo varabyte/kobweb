@@ -244,7 +244,7 @@ class HtmlHandlersTest {
         }
 
         assertThat(error.message).isEqualTo(
-            """Hello.md:1: Inline HTML tag `<span class="hint">` isn't closed within its paragraph"""
+            """Hello.md:1:9 Inline HTML tag `<span class="hint">` isn't closed within its paragraph"""
         )
     }
 
@@ -265,7 +265,7 @@ class HtmlHandlersTest {
         }
 
         assertThat(error.message).isEqualTo(
-            "Hello.md:1: Inline HTML tag `<span>` isn't closed within its paragraph"
+            "Hello.md:1:1 Inline HTML tag `<span>` isn't closed within its paragraph"
         )
     }
 
@@ -282,7 +282,7 @@ class HtmlHandlersTest {
         }
 
         assertThat(error.message).isEqualTo(
-            "Hello.md:1: Inline HTML tag `</span>` has no opening tag within its paragraph"
+            "Hello.md:1:5 Inline HTML tag `</span>` has no opening tag within its paragraph"
         )
     }
 

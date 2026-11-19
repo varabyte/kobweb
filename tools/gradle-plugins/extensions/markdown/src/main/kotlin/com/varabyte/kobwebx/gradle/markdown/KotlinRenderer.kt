@@ -2,7 +2,6 @@ package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.common.navigation.Route
-import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.project.common.FqNameShortcut
 import com.varabyte.kobweb.project.common.PackageName
 import com.varabyte.kobweb.project.common.PackageShortcut
@@ -13,6 +12,9 @@ import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlockVisito
 import com.varabyte.kobwebx.gradle.markdown.frontmatter.FrontMatterBlock
 import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
 import com.varabyte.kobwebx.gradle.markdown.handlers.NodeScope
+import com.varabyte.kobwebx.gradle.markdown.report.MarkdownLocation
+import com.varabyte.kobwebx.gradle.markdown.report.MarkdownReporter
+import com.varabyte.kobwebx.gradle.markdown.report.at
 import com.varabyte.kobwebx.gradle.markdown.util.NodeCache
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import org.commonmark.ext.gfm.tables.TableBlock
@@ -49,6 +51,9 @@ import org.gradle.api.provider.Provider
 import java.util.*
 import kotlin.io.path.invariantSeparatorsPathString
 
+/** One level of indentation in generated code. */
+internal const val INDENT = "    "
+
 /**
  * A markdown renderer that generates a Kobweb source file given an input markdown file.
  *
@@ -71,10 +76,10 @@ class KotlinRenderer internal constructor(
     private val funName: String,
     // If true, we have access to the `MarkdownContext` class and CompositionLocal
     private val dependsOnMarkdownArtifact: Boolean,
-    private val reporter: Reporter,
+    private val reporter: MarkdownReporter,
 ) : Renderer {
     private var indentCount = 0
-    private val indent get() = NodeScope(reporter, TypedMap()).indent(indentCount)
+    private val indent get() = INDENT.repeat(indentCount)
 
     // Flexible data which can be used by Node handlers however they need
     private val data = TypedMap().apply {
@@ -267,18 +272,14 @@ class KotlinRenderer internal constructor(
         AbstractVisitor() {
         private val onFinish = Stack<() -> Unit>()
 
-        // Handlers only see their own node, so tell users which file and line their reports are about
-        private fun handlerReporter(node: Node): Reporter {
-            val line = node.sourceSpans.firstOrNull()?.let { it.lineIndex + 1 }
-            val prefix = buildString {
-                append(metadataEntry.sourceFilePath.invariantSeparatorsPathString)
-                if (line != null) append(":$line")
-                append(": ")
-            }
-            return object : Reporter {
-                override fun error(message: String) = reporter.error(prefix + message)
-                override fun warn(message: String) = reporter.warn(prefix + message)
-            }
+        private val fileLocation = MarkdownLocation(metadataEntry.sourceFile, metadataEntry.sourceFilePath)
+        private fun Node.toLocation(): MarkdownLocation {
+            val span = sourceSpans.firstOrNull() ?: return fileLocation
+            return MarkdownLocation(
+                metadataEntry.sourceFile,
+                metadataEntry.sourceFilePath,
+                MarkdownLocation.Position(line = span.lineIndex + 1, column = span.columnIndex + 1),
+            )
         }
 
         fun finish() {
@@ -296,11 +297,11 @@ class KotlinRenderer internal constructor(
             // layout is expected while a site migrates from roots to layouts one page at a time.
             if (hasLayout && !frontMatterData?.root.isNullOrBlank()) {
                 val layoutSource = if (frontMatterData?.layout != null) {
-                    "its front matter also sets `layout`"
+                    "the front matter also sets `layout`"
                 } else {
                     "the build script sets `markdown.defaultLayout`"
                 }
-                reporter.warn("Markdown file '${metadataEntry.sourceFilePath.invariantSeparatorsPathString}' sets `root` in its front matter, but it is ignored because $layoutSource. Consider deleting the unused `root` value.")
+                reporter.warn(fileLocation, "Front matter sets `root`, but it is ignored because $layoutSource. Consider deleting the unused `root` value.")
             }
             val root = (frontMatterData?.root ?: defaultRoot)?.takeUnless { hasLayout }?.takeUnless { it.isBlank() }
             if (root != null) {
@@ -317,7 +318,8 @@ class KotlinRenderer internal constructor(
         }
 
         private fun <N : Node> doVisit(node: N, composableCall: Provider<NodeScope.(N) -> String>) {
-            val scope = NodeScope(handlerReporter(node), data, indentCount)
+            // Handlers only see their own node, so their reports are about that node's location
+            val scope = NodeScope(reporter.at(node.toLocation()), data, indentCount)
             composableCall.get().invoke(scope, node).takeIf { it.isNotBlank() }?.let { code ->
                 // Remove leading indentation and trailing newlines (if any) because we add them ourselves
                 doVisit(node, code.trim(), scope)
@@ -482,7 +484,7 @@ class KotlinRenderer internal constructor(
 
                 else -> {
                     val unhandledNodeName = customNode::class.simpleName!!
-                    reporter.warn("Unhandled Markdown custom node: $unhandledNodeName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20node%20%22$unhandledNodeName%22")
+                    reporter.warn(customNode.toLocation(), "Unhandled Markdown custom node: $unhandledNodeName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20node%20%22$unhandledNodeName%22")
                 }
             }
         }
@@ -535,7 +537,7 @@ class KotlinRenderer internal constructor(
 
                 else -> {
                     val unhandledBlockName = customBlock::class.simpleName!!
-                    reporter.warn("Unhandled Markdown custom block: $unhandledBlockName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20block%20%22$unhandledBlockName%22")
+                    reporter.warn(customBlock.toLocation(), "Unhandled Markdown custom block: $unhandledBlockName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20block%20%22$unhandledBlockName%22")
                 }
             }
         }

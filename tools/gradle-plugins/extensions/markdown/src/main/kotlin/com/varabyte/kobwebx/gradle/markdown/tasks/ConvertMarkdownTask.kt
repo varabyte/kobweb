@@ -4,13 +4,15 @@ import com.varabyte.kobweb.common.lang.packageConcat
 import com.varabyte.kobweb.common.lang.packageFromFile
 import com.varabyte.kobweb.common.text.ensureSurrounded
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
-import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.project.common.PackageName
 import com.varabyte.kobweb.project.common.toPath
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
 import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
+import com.varabyte.kobwebx.gradle.markdown.report.MarkdownLocation
+import com.varabyte.kobwebx.gradle.markdown.report.MarkdownReporter
+import com.varabyte.kobwebx.gradle.markdown.report.toAbsoluteString
 import com.varabyte.kobwebx.gradle.markdown.util.NodeCache
 import com.varabyte.kobwebx.gradle.markdown.util.RouteUtils
 import com.varabyte.kobwebx.gradle.markdown.util.visitFiles
@@ -93,6 +95,7 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                     projectRoot.get(),
                     rootDir.relativeTo(projectLayout.projectDirectory.asFile).toPath(),
                     relativePath.toPath(),
+                    file,
                     outputRootPath,
                     absolutePackage,
                     // Route should only be set for pages
@@ -109,14 +112,16 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
 
         // Logging an error doesn't fail the build, so count errors and fail once every file has had a chance to report
         var errorCount = 0
-        val reporter = object : Reporter {
+        val reporter = object : MarkdownReporter {
             private val delegate = LoggingReporter(logger)
-            override fun error(message: String) {
+            override fun error(location: MarkdownLocation, message: String) {
                 ++errorCount
-                delegate.error(message)
+                delegate.error("${location.toAbsoluteString()} $message")
             }
 
-            override fun warn(message: String) = delegate.warn(message)
+            override fun warn(location: MarkdownLocation, message: String) {
+                delegate.warn("${location.toAbsoluteString()} $message")
+            }
         }
 
         markdownFolders.get().forEach { markdownFolder ->

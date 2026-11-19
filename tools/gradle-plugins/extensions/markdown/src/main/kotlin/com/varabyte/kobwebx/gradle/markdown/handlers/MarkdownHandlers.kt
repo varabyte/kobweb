@@ -7,6 +7,7 @@ import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.gradle.core.util.getJsDependencyResults
 import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
+import com.varabyte.kobwebx.gradle.markdown.INDENT
 import com.varabyte.kobwebx.gradle.markdown.util.escapeBackslashes
 import com.varabyte.kobwebx.gradle.markdown.util.escapeDollars
 import com.varabyte.kobwebx.gradle.markdown.util.escapeNewLines
@@ -67,7 +68,7 @@ class NodeScope(val reporter: Reporter, val data: TypedMap, private val indentCo
      *
      * The indent applied here will be consistent with the indent used by the Markdown -> Kotlin renderer.
      */
-    fun indent(indentCount: Int) = "    ".repeat(indentCountBase + indentCount)
+    fun indent(indentCount: Int) = INDENT.repeat(indentCountBase + indentCount)
 }
 
 /**
