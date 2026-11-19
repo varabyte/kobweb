@@ -222,6 +222,11 @@ class KobwebCallTest {
     }
 
     @Test
+    fun `toFqn adds parentheses after type arguments`() {
+        assertThat(KobwebCall(".widgets.Picker<String>").toFqn("org.example")).isEqualTo("org.example.widgets.Picker<String>()")
+    }
+
+    @Test
     fun `toFqn opens a block without adding parentheses`() {
         assertThat(KobwebCall(".layouts.Card", appendBrace = true).toFqn("org.example")).isEqualTo("org.example.layouts.Card {")
     }

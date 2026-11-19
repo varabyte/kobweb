@@ -31,7 +31,9 @@ class KobwebCall(val partiallyQualifiedName: String, var appendBrace: Boolean = 
         return buildString {
             append(PackageName(projectGroup).resolve(FqNameShortcut(name)))
             append(partiallyQualifiedName.removePrefix(name))
-            if (partiallyQualifiedName.last().isLetterOrDigit() && !appendBrace) {
+            // A call ending in a name or type arguments (e.g. `Picker<String>`) has no argument list yet
+            val needsParentheses = partiallyQualifiedName.last().let { it.isLetterOrDigit() || it == '>' }
+            if (needsParentheses && !appendBrace) {
                 append("()")
             }
 
