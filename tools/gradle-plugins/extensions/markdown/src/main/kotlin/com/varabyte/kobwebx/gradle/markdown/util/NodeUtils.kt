@@ -15,6 +15,6 @@ internal val Node.nestedLiteral: String get() {
     return when (this) {
         is Text -> this.literal
         is Code -> this.literal
-        else -> this.children().joinToString { it.nestedLiteral }
+        else -> this.children().joinToString("") { it.nestedLiteral }
     }
 }

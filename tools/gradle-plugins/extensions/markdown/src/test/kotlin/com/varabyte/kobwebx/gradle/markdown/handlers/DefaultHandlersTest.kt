@@ -68,6 +68,23 @@ class DefaultHandlersTest {
 
     // Handler under test: heading
     @Test
+    fun `heading ids include text from inline formatting`() {
+        val output = fixture.renderMarkdown(
+            "# Using `Modifier`s",
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+        )
+
+        output.assertContainsKotlin(
+            """
+            org.jetbrains.compose.web.dom.H1(attrs = { id("using-modifiers") }) {
+            """
+        )
+    }
+
+    // Handler under test: heading
+    @Test
     fun `heading ids can be turned off`() {
         val output = fixture.renderMarkdown(
             "# Getting Started",
