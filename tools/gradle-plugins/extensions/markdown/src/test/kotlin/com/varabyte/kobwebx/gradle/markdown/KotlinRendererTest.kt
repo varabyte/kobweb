@@ -426,6 +426,41 @@ class KotlinRendererTest {
         )
     }
 
+    @Test
+    fun `handler reports name the file and line`() {
+        val warnings = mutableListOf<String>()
+        val _ = fixture.renderMarkdown(
+            """
+            ---
+            title: Post
+            ---
+
+            First paragraph.
+
+            Second paragraph
+            with *emphasis* on its second line.
+            """,
+            filePath = "blog/Post.md",
+            route = null,
+            funName = "Post",
+            configureHandlers = {
+                // A handler that reports on every emphasis node, so we know which line the report should name
+                em.set {
+                    reporter.warn("Found emphasis")
+                    "org.jetbrains.compose.web.dom.Em"
+                }
+            },
+            reporter = object : Reporter {
+                override fun error(message: String) = throw AssertionError(message)
+                override fun warn(message: String) {
+                    warnings.add(message)
+                }
+            },
+        )
+
+        assertThat(warnings).containsExactly("blog/Post.md:8: Found emphasis")
+    }
+
     // Note: `root` is legacy code. Users are supposed to use `layout` concepts now.
     @Test
     fun `warns when front matter root is ignored because of default layout`() {
