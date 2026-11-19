@@ -3,9 +3,9 @@
 package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.truthish.assertThat
+import com.varabyte.truthish.assertThrows
 import org.junit.Rule
 import org.junit.Test
-import kotlin.test.assertFailsWith
 
 // Links to other Markdown files are rewritten into the routes of the pages generated from them.
 class MarkdownLinkTest {
@@ -172,7 +172,7 @@ class MarkdownLinkTest {
     fun `fails on a link to markdown that is not a page`() {
         fixture.addMarkdownFile("Hello", filePath = "blog/Widget.md", route = null)
 
-        val e = assertFailsWith<IllegalStateException> {
+        val e = assertThrows<IllegalStateException> {
             fixture.renderMarkdown(
                 "[Widget](Widget.md)",
                 filePath = "blog/Index.md",
@@ -200,7 +200,7 @@ class MarkdownLinkTest {
             route = "/blog/post",
         )
 
-        val e = assertFailsWith<IllegalStateException> {
+        val e = assertThrows<IllegalStateException> {
             fixture.renderMarkdown(
                 "[Read](Post.md)",
                 filePath = "blog/Index.md",
