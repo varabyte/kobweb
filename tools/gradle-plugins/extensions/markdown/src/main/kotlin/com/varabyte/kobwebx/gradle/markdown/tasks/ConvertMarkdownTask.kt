@@ -4,6 +4,7 @@ import com.varabyte.kobweb.common.lang.packageConcat
 import com.varabyte.kobweb.common.lang.packageFromFile
 import com.varabyte.kobweb.common.text.ensureSurrounded
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
+import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.project.common.PackageName
 import com.varabyte.kobweb.project.common.toPath
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
@@ -13,6 +14,7 @@ import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
 import com.varabyte.kobwebx.gradle.markdown.util.NodeCache
 import com.varabyte.kobwebx.gradle.markdown.util.RouteUtils
 import com.varabyte.kobwebx.gradle.markdown.util.visitFiles
+import org.gradle.api.GradleException
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -105,6 +107,18 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
             }
         }
 
+        // Logging an error doesn't fail the build, so count errors and fail once every file has had a chance to report
+        var errorCount = 0
+        val reporter = object : Reporter {
+            private val delegate = LoggingReporter(logger)
+            override fun error(message: String) {
+                ++errorCount
+                delegate.error(message)
+            }
+
+            override fun warn(message: String) = delegate.warn(message)
+        }
+
         markdownFolders.get().forEach { markdownFolder ->
             markdownFolder.files.visitFiles {
                 val node = try {
@@ -136,11 +150,15 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                         funName = sourcePath.capitalizedNameWithoutExtension +
                             "Page".takeIf { metadata.routeWithSlug != null }.orEmpty(),
                         dependsOnMarkdownArtifact.get(),
-                        LoggingReporter(logger),
+                        reporter,
                     )
                     outputFile.writeText(ktRenderer.render(nodeCache[file]))
                 }
             }
+        }
+
+        if (errorCount > 0) {
+            throw GradleException("e: Markdown conversion failed with $errorCount error(s). See above for details.")
         }
     }
 }
