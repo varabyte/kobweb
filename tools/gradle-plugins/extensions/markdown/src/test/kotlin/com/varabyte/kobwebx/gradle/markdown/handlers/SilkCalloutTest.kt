@@ -10,8 +10,6 @@ import org.junit.Rule
 import org.junit.Test
 
 // Handler under tests: blockquote, which delegates to SilkCalloutBlockquoteHandler when Silk is available.
-// TODO: Callout text starts with a space, left over from the line break after the `[!TYPE]` marker. That's a bug; once
-//  fixed, drop the leading space from the expected `Text(...)` calls below.
 class SilkCalloutTest {
     @get:Rule
     val fixture = MarkdownRenderFixture()
@@ -34,7 +32,59 @@ class SilkCalloutTest {
             fun Hello() {
                 com.varabyte.kobweb.silk.components.display.Callout(type = com.varabyte.kobweb.silk.components.display.CalloutType.NOTE, label = null, variant = com.varabyte.kobweb.silk.components.display.CalloutDefaults.Variant) {
                     org.jetbrains.compose.web.dom.P {
-                        org.jetbrains.compose.web.dom.Text(" This is a note.")
+                        org.jetbrains.compose.web.dom.Text("This is a note.")
+                    }
+                }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `callout text can start on the marker line`() {
+        val output = fixture.renderMarkdown(
+            "> [!NOTE] This is a note.",
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+            configureHandlers = { useSilk.set(true) },
+        )
+
+        output.assertContainsKotlin(
+            """
+            fun Hello() {
+                com.varabyte.kobweb.silk.components.display.Callout(type = com.varabyte.kobweb.silk.components.display.CalloutType.NOTE, label = null, variant = com.varabyte.kobweb.silk.components.display.CalloutDefaults.Variant) {
+                    org.jetbrains.compose.web.dom.P {
+                        org.jetbrains.compose.web.dom.Text("This is a note.")
+                    }
+                }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `callout text can start with formatting`() {
+        val output = fixture.renderMarkdown(
+            """
+            > [!NOTE]
+            > *Important* note.
+            """,
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+            configureHandlers = { useSilk.set(true) },
+        )
+
+        output.assertContainsKotlin(
+            """
+            fun Hello() {
+                com.varabyte.kobweb.silk.components.display.Callout(type = com.varabyte.kobweb.silk.components.display.CalloutType.NOTE, label = null, variant = com.varabyte.kobweb.silk.components.display.CalloutDefaults.Variant) {
+                    org.jetbrains.compose.web.dom.P {
+                        org.jetbrains.compose.web.dom.Em {
+                            org.jetbrains.compose.web.dom.Text("Important")
+                        }
+                        org.jetbrains.compose.web.dom.Text(" note.")
                     }
                 }
             }
@@ -60,7 +110,7 @@ class SilkCalloutTest {
             fun Hello() {
                 com.varabyte.kobweb.silk.components.display.Callout(type = com.varabyte.kobweb.silk.components.display.CalloutType.TIP, label = "Pro tip", variant = com.varabyte.kobweb.silk.components.display.CalloutDefaults.Variant) {
                     org.jetbrains.compose.web.dom.P {
-                        org.jetbrains.compose.web.dom.Text(" Use it.")
+                        org.jetbrains.compose.web.dom.Text("Use it.")
                     }
                 }
             }
@@ -86,7 +136,7 @@ class SilkCalloutTest {
             fun Hello() {
                 com.varabyte.kobweb.silk.components.display.Callout(type = com.varabyte.kobweb.silk.components.display.CalloutType.WARNING, label = null, variant = com.example.OutlinedVariant) {
                     org.jetbrains.compose.web.dom.P {
-                        org.jetbrains.compose.web.dom.Text(" Careful.")
+                        org.jetbrains.compose.web.dom.Text("Careful.")
                     }
                 }
             }
@@ -112,7 +162,7 @@ class SilkCalloutTest {
             fun Hello() {
                 com.varabyte.kobweb.silk.components.display.Callout(type = com.varabyte.kobweb.silk.components.display.CalloutType.WARNING, label = null, variant = com.varabyte.kobweb.silk.components.display.CalloutDefaults.Variant) {
                     org.jetbrains.compose.web.dom.P {
-                        org.jetbrains.compose.web.dom.Text(" Careful.")
+                        org.jetbrains.compose.web.dom.Text("Careful.")
                     }
                 }
             }
@@ -223,7 +273,7 @@ class SilkCalloutTest {
             fun Hello() {
                 com.varabyte.kobweb.silk.components.display.Callout(type = org.example.components.widgets.CustomCalloutType, label = null, variant = org.example.components.widgets.CustomVariant) {
                     org.jetbrains.compose.web.dom.P {
-                        org.jetbrains.compose.web.dom.Text(" Custom.")
+                        org.jetbrains.compose.web.dom.Text("Custom.")
                     }
                 }
             }
@@ -252,7 +302,7 @@ class SilkCalloutTest {
             fun Hello() {
                 com.varabyte.kobweb.silk.components.display.Callout(type = com.varabyte.kobweb.silk.components.display.CalloutType.QUOTE, label = "", variant = com.varabyte.kobweb.silk.components.display.CalloutDefaults.Variant) {
                     org.jetbrains.compose.web.dom.P {
-                        org.jetbrains.compose.web.dom.Text(" Quoted.")
+                        org.jetbrains.compose.web.dom.Text("Quoted.")
                     }
                 }
             }

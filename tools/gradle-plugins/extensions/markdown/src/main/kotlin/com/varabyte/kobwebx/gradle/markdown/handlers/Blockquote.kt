@@ -65,7 +65,9 @@ fun SilkCalloutBlockquoteHandler(
             val firstChild = firstChild as? Text ?: return@let null
             val regex = """\[!([^ ]+)( "(.*)")?( \{(.*)})?]""".toRegex() // [!TYPE "LABEL" {VARIANT}]
             val typeMatch = regex.find(firstChild.literal) ?: return@let null
-            firstChild.literal = firstChild.literal.substringAfter(typeMatch.value)
+            // Trim the space left by the line break after the marker
+            firstChild.literal = firstChild.literal.substringAfter(typeMatch.value).trimStart()
+            if (firstChild.literal.isEmpty()) firstChild.unlink()
 
             val typeId = typeMatch.groupValues[1]
             val isLabelSet = typeMatch.groupValues[2].isNotBlank()
