@@ -7,7 +7,6 @@ import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.gradle.core.util.getJsDependencyResults
 import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
-import com.varabyte.kobwebx.gradle.markdown.children
 import com.varabyte.kobwebx.gradle.markdown.util.escapeBackslashes
 import com.varabyte.kobwebx.gradle.markdown.util.escapeDollars
 import com.varabyte.kobwebx.gradle.markdown.util.escapeNewLines
@@ -228,10 +227,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
      * children nodes, which this logic abstracts away.
      */
     fun NodeScope.processImage(image: Image, output: (ImageData) -> String): String {
-        val altText = image.children()
-            .filterIsInstance<Text>()
-            .map { it.literal.escapeSingleQuotedText() }
-            .joinToString("")
+        val altText = image.nestedLiteral.escapeSingleQuotedText()
         this.childrenOverride = emptyList()
 
         return output(ImageData(image.destination.escapeDollars(), altText, image.title))

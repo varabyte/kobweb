@@ -324,6 +324,27 @@ class DefaultHandlersTest {
         )
     }
 
+    // Handler under test: img
+    @Test
+    fun `image alt text strips inline formatting but keeps its text`() {
+        val output = fixture.renderMarkdown(
+            "![A *fluffy* `cat`](cat.png)",
+            filePath = "Hello.md",
+            route = null,
+            funName = "Hello",
+        )
+
+        output.assertContainsKotlin(
+            """
+            fun Hello() {
+                org.jetbrains.compose.web.dom.P {
+                    org.jetbrains.compose.web.dom.Img("cat.png", "A fluffy cat")
+                }
+            }
+            """
+        )
+    }
+
     // Handlers under test: ol, li
     @Test
     fun `renders ordered list`() {
