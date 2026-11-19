@@ -210,7 +210,7 @@ class SilkCalloutTest {
             },
         )
 
-        assertThat(warnings).containsExactly("Unknown Markdown callout type: BOGUS")
+        assertThat(warnings).containsExactly("Markdown file 'Hello.md': Unknown Markdown callout type 'BOGUS'")
         output.assertContainsKotlin(
             """
             fun Hello() {

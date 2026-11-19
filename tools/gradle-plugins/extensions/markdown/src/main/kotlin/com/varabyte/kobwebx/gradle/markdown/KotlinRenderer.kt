@@ -266,6 +266,14 @@ class KotlinRenderer internal constructor(
     ) :
         AbstractVisitor() {
         private val onFinish = Stack<() -> Unit>()
+
+        // Handlers only see their own node, so tell users which file their reports are about
+        private val handlerReporter = object : Reporter {
+            private val prefix = "Markdown file '${metadataEntry.sourceFilePath.invariantSeparatorsPathString}': "
+            override fun error(message: String) = reporter.error(prefix + message)
+            override fun warn(message: String) = reporter.warn(prefix + message)
+        }
+
         fun finish() {
             onFinish.forEach { action -> action() }
         }
@@ -302,7 +310,7 @@ class KotlinRenderer internal constructor(
         }
 
         private fun <N : Node> doVisit(node: N, composableCall: Provider<NodeScope.(N) -> String>) {
-            val scope = NodeScope(reporter, data, indentCount)
+            val scope = NodeScope(handlerReporter, data, indentCount)
             composableCall.get().invoke(scope, node).takeIf { it.isNotBlank() }?.let { code ->
                 // Remove leading indentation and trailing newlines (if any) because we add them ourselves
                 doVisit(node, code.trim(), scope)

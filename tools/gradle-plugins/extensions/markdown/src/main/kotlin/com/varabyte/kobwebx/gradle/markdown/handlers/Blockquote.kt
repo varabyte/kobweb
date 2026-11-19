@@ -71,7 +71,7 @@ fun SilkCalloutBlockquoteHandler(
             val projectGroup = PackageName(data.getValue(MarkdownHandlers.DataKeys.ProjectGroup))
             val calloutTypeFqn = types[typeId]?.let { projectGroup.resolve(FqNameShortcut(it)) } ?: run {
                 // Keep the marker in the fallback blockquote, as when Silk isn't used
-                reporter.warn("Unknown Markdown callout type: $typeId")
+                reporter.warn("Unknown Markdown callout type '$typeId'")
                 return@let null
             }
 
