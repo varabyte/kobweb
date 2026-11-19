@@ -29,6 +29,26 @@ internal class MarkdownRenderFixture {
         override fun warn(message: String) = throw AssertionError(message)
     }
 
+    private class OtherFile(val filePath: String, val route: String?)
+    private val otherFiles = mutableListOf<OtherFile>()
+
+    /**
+     * Adds a Markdown file next to the one [renderMarkdown] renders, e.g. as a target for links.
+     *
+     * [filePath] and [route] mean the same as in [renderMarkdown].
+     */
+    fun addMarkdownFile(@Language("markdown") markdown: String, filePath: String, route: String?) {
+        writeMarkdownFile(markdown, filePath)
+        otherFiles.add(OtherFile(filePath, route))
+    }
+
+    private fun writeMarkdownFile(markdown: String, filePath: String) {
+        markdownRoot.resolve(filePath).apply {
+            parentFile.mkdirs()
+            writeText(markdown.trimIndent())
+        }
+    }
+
     /**
      * Renders [markdown] (after trimming it with [trimIndent]) as if it were the file at [filePath] (relative to the
      * Markdown root) in package [pkg].
@@ -50,31 +70,33 @@ internal class MarkdownRenderFixture {
         defaultLayout: String? = null,
         defaultRoot: String? = null,
         imports: List<String> = emptyList(),
+        configureFeatures: MarkdownFeatures.() -> Unit = {},
         configureHandlers: MarkdownHandlers.() -> Unit = {},
         dependsOnMarkdownArtifact: Boolean = false,
         reporter: Reporter = failingReporter,
     ): String {
-        val features = project.objects.newInstance<MarkdownFeatures>()
+        val features = project.objects.newInstance<MarkdownFeatures>().apply(configureFeatures)
         val handlers = project.objects.newInstance<MarkdownHandlers>(project).apply {
             useSilk.set(false)
             configureHandlers()
         }
 
-        val mdFile = markdownRoot.resolve(filePath).apply {
-            parentFile.mkdirs()
-            writeText(markdown.trimIndent())
-        }
+        writeMarkdownFile(markdown, filePath)
 
         val nodeCache = NodeCache(features.createParser(), setOf(markdownRoot.canonicalFile))
-        val node = nodeCache[mdFile]
-        nodeCache.metadata[node] = NodeCache.Metadata.Entry(
-            projectRoot = "site",
-            markdownSourceRoot = Path("src/jsMain/resources/markdown"),
-            sourceFilePath = Path(filePath),
-            outputRootPath = Path(pkg.replace('.', '/')),
-            `package` = pkg,
-            routeWithSlug = route,
-        )
+        fun register(filePath: String, pkg: String, route: String?) {
+            nodeCache.metadata[nodeCache[markdownRoot.resolve(filePath)]] = NodeCache.Metadata.Entry(
+                projectRoot = "site",
+                markdownSourceRoot = Path("src/jsMain/resources/markdown"),
+                sourceFilePath = Path(filePath),
+                outputRootPath = Path(pkg.replace('.', '/')),
+                `package` = pkg,
+                routeWithSlug = route,
+            )
+        }
+        register(filePath, pkg, route)
+        otherFiles.forEach { register(it.filePath, pkg = "", it.route) }
+        val node = nodeCache[markdownRoot.resolve(filePath)]
 
         val renderer = KotlinRenderer(
             projectGroup = "org.example",
