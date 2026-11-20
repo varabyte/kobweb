@@ -1,4 +1,4 @@
-@file:Suppress("FunctionName", "LocalVariableName")
+@file:Suppress("FunctionName", "LocalVariableName", "PropertyName")
 
 package com.varabyte.kobweb.ksp.frontend
 
@@ -286,6 +286,182 @@ class SilkStyleKspTest {
         assertThat(result.appFrontendData.frontendData.cssStyles.map { it.name to it.layer }).containsExactly(
             "regular" to null,
             "important" to "important",
+        )
+    }
+
+    @Test
+    fun `styles declared in a class are not registered`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/Widget.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.silk.style.CssStyle
+
+                    class Widget {
+                        val WidgetStyle = CssStyle {}
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).containsExactly(
+            "Not registering css style `val WidgetStyle`, as local style block declarations are not supported. You can only declare them globally, either at a top level or inside an object singleton. Although fixing this is recommended, you can manually register your css style inside an @InitSilk block instead (`ctx.theme.registerStyle(WidgetStyle)`). Suppress this message by adding a `@Suppress(\"LOCAL_CSS_STYLE\")` annotation."
+        )
+        assertThat(result.appFrontendData.frontendData.cssStyles).isEmpty()
+    }
+
+    @Test
+    fun `local style warning can be suppressed`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/Widget.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.silk.style.CssStyle
+
+                    class Widget {
+                        @Suppress("LOCAL_CSS_STYLE")
+                        val WidgetStyle = CssStyle {}
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).isEmpty()
+        assertThat(result.appFrontendData.frontendData.cssStyles).isEmpty()
+    }
+
+    @Test
+    fun `private styles are not registered`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/Styles.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.silk.style.CssStyle
+
+                    private val HiddenStyle = CssStyle {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).containsExactly(
+            "Not registering css style `val HiddenStyle`, as it is not public. Although fixing this is recommended, you can manually register your css style inside an @InitSilk block instead (`ctx.theme.registerStyle(HiddenStyle)`). Suppress this message by adding a `@Suppress(\"PRIVATE_CSS_STYLE\")` annotation or prepending the name with an underscore."
+        )
+        assertThat(result.appFrontendData.frontendData.cssStyles).isEmpty()
+    }
+
+    @Test
+    fun `private style warning can be suppressed with an annotation`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/Styles.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.silk.style.CssStyle
+
+                    @Suppress("PRIVATE_CSS_STYLE")
+                    private val HiddenStyle = CssStyle {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).isEmpty()
+        assertThat(result.appFrontendData.frontendData.cssStyles).isEmpty()
+    }
+
+    @Test
+    fun `private style warning can be suppressed with a leading underscore`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/Styles.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.silk.style.CssStyle
+
+                    private val _HeroStyle = CssStyle {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).isEmpty()
+        assertThat(result.appFrontendData.frontendData.cssStyles).isEmpty()
+    }
+
+    @Test
+    fun `a component kind can only be used by one style`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/components/Button.kt" to
+                    //language=kotlin
+                    """
+                    package example.components
+
+                    import com.varabyte.kobweb.silk.style.ComponentKind
+                    import com.varabyte.kobweb.silk.style.CssStyle
+
+                    sealed interface ButtonKind : ComponentKind
+                    val ButtonStyle = CssStyle<ButtonKind> {}
+                    val FancyButtonStyle = CssStyle<ButtonKind> {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`ButtonKind` can only be associated with a single CSS style. `val FancyButtonStyle = CssStyle<ButtonKind>` was declared after `val ButtonStyle = CssStyle<ButtonKind>`. Either remove one of these style declarations, or create a new `ComponentKind` type for one of them."
+        )
+    }
+
+    @Test
+    fun `a component style must be declared in the same file as its kind`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/components/ButtonKind.kt" to
+                    //language=kotlin
+                    """
+                    package example.components
+
+                    import com.varabyte.kobweb.silk.style.ComponentKind
+
+                    sealed interface ButtonKind : ComponentKind
+                """.trimIndent(),
+                "example/components/ButtonStyle.kt" to
+                    //language=kotlin
+                    """
+                    package example.components
+
+                    import com.varabyte.kobweb.silk.style.CssStyle
+
+                    val ButtonStyle = CssStyle<ButtonKind> {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`val ButtonStyle = CssStyle<ButtonKind>` is using a kind type defined in a different file, which is not allowed. Please declare a new `ComponentKind` implementation in the same file and use that one, or declare your `CssStyle<ButtonKind>` in the same file as the `ButtonKind` definition."
         )
     }
 }
