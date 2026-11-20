@@ -28,6 +28,20 @@ object KobwebStubs {
 
             class PageContext
         """.trimIndent(),
+        "com/varabyte/kobweb/core/init/InitKobweb.kt" to """
+            package com.varabyte.kobweb.core.init
+
+            annotation class InitKobweb
+
+            class InitKobwebContext
+        """.trimIndent(),
+        "com/varabyte/kobweb/core/init/InitRoute.kt" to """
+            package com.varabyte.kobweb.core.init
+
+            annotation class InitRoute
+
+            class InitRouteContext
+        """.trimIndent(),
         "com/varabyte/kobweb/core/layout/Layout.kt" to """
             package com.varabyte.kobweb.core.layout
 
@@ -38,12 +52,12 @@ object KobwebStubs {
 
             annotation class NoLayout
         """.trimIndent(),
-        "com/varabyte/kobweb/core/init/InitRoute.kt" to """
-            package com.varabyte.kobweb.core.init
+        "com/varabyte/kobweb/silk/init/InitSilk.kt" to """
+            package com.varabyte.kobweb.silk.init
 
-            annotation class InitRoute
+            annotation class InitSilk
 
-            class InitRouteContext
+            class InitSilkContext
         """.trimIndent(),
     )
 }
