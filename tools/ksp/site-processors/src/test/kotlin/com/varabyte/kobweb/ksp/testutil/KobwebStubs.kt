@@ -8,75 +8,101 @@ package com.varabyte.kobweb.ksp.testutil
  */
 object KobwebStubs {
     val frontend = mapOf(
-        "androidx/compose/runtime/Composable.kt" to """
+        "androidx/compose/runtime/Composable.kt" to
+            //language=kotlin
+            """
             package androidx.compose.runtime
 
             annotation class Composable
         """.trimIndent(),
-        "com/varabyte/kobweb/core/App.kt" to """
+        "com/varabyte/kobweb/core/App.kt" to
+            //language=kotlin
+            """
             package com.varabyte.kobweb.core
 
             annotation class App
         """.trimIndent(),
-        "com/varabyte/kobweb/core/PackageMapping.kt" to """
+        "com/varabyte/kobweb/core/PackageMapping.kt" to
+            //language=kotlin
+            """
             package com.varabyte.kobweb.core
 
             annotation class PackageMapping(val value: String)
         """.trimIndent(),
-        "com/varabyte/kobweb/core/Page.kt" to """
+        "com/varabyte/kobweb/core/Page.kt" to
+            //language=kotlin
+            """
             package com.varabyte.kobweb.core
 
             annotation class Page(val routeOverride: String = "")
         """.trimIndent(),
-        "com/varabyte/kobweb/core/PageContext.kt" to """
+        "com/varabyte/kobweb/core/PageContext.kt" to
+            //language=kotlin
+            """
             package com.varabyte.kobweb.core
 
             class PageContext
         """.trimIndent(),
-        "com/varabyte/kobweb/core/init/InitKobweb.kt" to """
+        "com/varabyte/kobweb/core/init/InitKobweb.kt" to
+            //language=kotlin
+            """
             package com.varabyte.kobweb.core.init
 
             annotation class InitKobweb
 
             class InitKobwebContext
         """.trimIndent(),
-        "com/varabyte/kobweb/core/init/InitRoute.kt" to """
+        "com/varabyte/kobweb/core/init/InitRoute.kt" to
+            //language=kotlin
+            """
             package com.varabyte.kobweb.core.init
 
             annotation class InitRoute
 
             class InitRouteContext
         """.trimIndent(),
-        "com/varabyte/kobweb/core/layout/Layout.kt" to """
+        "com/varabyte/kobweb/core/layout/Layout.kt" to
+            //language=kotlin
+            """
             package com.varabyte.kobweb.core.layout
 
             annotation class Layout(val fqn: String = "")
         """.trimIndent(),
-        "com/varabyte/kobweb/core/layout/NoLayout.kt" to """
+        "com/varabyte/kobweb/core/layout/NoLayout.kt" to
+            //language=kotlin
+            """
             package com.varabyte.kobweb.core.layout
 
             annotation class NoLayout
         """.trimIndent(),
-        "com/varabyte/kobweb/silk/init/InitSilk.kt" to """
+        "com/varabyte/kobweb/silk/init/InitSilk.kt" to
+            //language=kotlin
+            """
             package com.varabyte.kobweb.silk.init
 
             annotation class InitSilk
 
             class InitSilkContext
         """.trimIndent(),
-        "com/varabyte/kobweb/silk/style/CssLayer.kt" to """
+        "com/varabyte/kobweb/silk/style/CssLayer.kt" to
+            //language=kotlin
+            """
             package com.varabyte.kobweb.silk.style
 
             annotation class CssLayer(val name: String)
         """.trimIndent(),
-        "com/varabyte/kobweb/silk/style/CssName.kt" to """
+        "com/varabyte/kobweb/silk/style/CssName.kt" to
+            //language=kotlin
+            """
             package com.varabyte.kobweb.silk.style
 
             annotation class CssName(val name: String)
 
             annotation class CssPrefix(val prefix: String)
         """.trimIndent(),
-        "com/varabyte/kobweb/silk/style/CssStyle.kt" to """
+        "com/varabyte/kobweb/silk/style/CssStyle.kt" to
+            //language=kotlin
+            """
             package com.varabyte.kobweb.silk.style
 
             sealed interface CssKind
@@ -90,7 +116,9 @@ object KobwebStubs {
 
             fun <K : ComponentKind> CssStyle(init: () -> Unit): CssStyle<K> = object : CssStyle<K>() {}
         """.trimIndent(),
-        "com/varabyte/kobweb/silk/style/CssStyleVariant.kt" to """
+        "com/varabyte/kobweb/silk/style/CssStyleVariant.kt" to
+            //language=kotlin
+            """
             package com.varabyte.kobweb.silk.style
 
             abstract class CssStyleVariant<K : ComponentKind>
@@ -98,7 +126,9 @@ object KobwebStubs {
             fun <K : ComponentKind> CssStyle<K>.addVariant(init: () -> Unit): CssStyleVariant<K> =
                 object : CssStyleVariant<K>() {}
         """.trimIndent(),
-        "com/varabyte/kobweb/silk/style/animation/Keyframes.kt" to """
+        "com/varabyte/kobweb/silk/style/animation/Keyframes.kt" to
+            //language=kotlin
+            """
             package com.varabyte.kobweb.silk.style.animation
 
             class Keyframes(init: () -> Unit)
