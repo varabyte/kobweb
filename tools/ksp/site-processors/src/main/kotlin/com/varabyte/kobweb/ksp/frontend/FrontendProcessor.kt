@@ -203,7 +203,7 @@ internal class FrontendProcessor(
 
                 if (layoutMethodData != null) {
                     if (annotatedFun.annotations.none { it.shortName.asString() == "Composable" }) {
-                        logger.warn("`fun ${annotatedFun.qualifiedName!!.asString()}` annotated with @Layout must also be @Composable.", annotatedFun)
+                        logger.error("`fun ${annotatedFun.qualifiedName!!.asString()}` annotated with @Layout must also be @Composable.", annotatedFun)
                     }
 
                     layoutMethods.firstOrNull { it.method.qualifiedName!!.asString() == layoutMethodData.method.qualifiedName!!.asString() }

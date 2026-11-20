@@ -572,6 +572,30 @@ class LayoutKspTest {
     }
 
     @Test
+    fun `layout which is not composable is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/components/layouts/PageLayout.kt" to
+                    //language=kotlin
+                    """
+                    package example.components.layouts
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.layout.Layout
+
+                    @Layout
+                    fun PageLayout(content: @Composable () -> Unit) {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`fun example.components.layouts.PageLayout` annotated with @Layout must also be @Composable."
+        )
+    }
+
+    @Test
     fun `layout with other parameters is an error`() {
         val result = ksp.runFrontend(
             options = FrontendKspOptions.app(projectGroup = "example"),
