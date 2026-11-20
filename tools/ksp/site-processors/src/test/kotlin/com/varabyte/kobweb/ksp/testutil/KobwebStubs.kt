@@ -150,5 +150,37 @@ object KobwebStubs {
 
             class ApiContext
         """.trimIndent(),
+        "com/varabyte/kobweb/api/PackageMapping.kt" to
+            //language=kotlin
+            """
+            package com.varabyte.kobweb.api
+
+            annotation class PackageMapping(val value: String)
+        """.trimIndent(),
+        "com/varabyte/kobweb/api/http/Response.kt" to
+            //language=kotlin
+            """
+            package com.varabyte.kobweb.api.http
+
+            class Response
+        """.trimIndent(),
+        "com/varabyte/kobweb/api/init/InitApi.kt" to
+            //language=kotlin
+            """
+            package com.varabyte.kobweb.api.init
+
+            annotation class InitApi
+
+            class InitApiContext
+        """.trimIndent(),
+        "com/varabyte/kobweb/api/intercept/ApiInterceptor.kt" to
+            //language=kotlin
+            """
+            package com.varabyte.kobweb.api.intercept
+
+            annotation class ApiInterceptor
+
+            class ApiInterceptorContext
+        """.trimIndent(),
     )
 }
