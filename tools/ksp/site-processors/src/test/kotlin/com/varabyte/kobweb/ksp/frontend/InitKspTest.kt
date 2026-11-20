@@ -71,4 +71,77 @@ class InitKspTest {
         assertThat(result.appFrontendData.frontendData.silkInits.map { it.fqn })
             .containsExactly("example.initTheme", "example.initWidgetStyles")
     }
+
+    @Test
+    fun `init kobweb with other parameters is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/Init.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.core.init.InitKobweb
+
+                    class Settings
+
+                    @InitKobweb
+                    fun initRouter(settings: Settings) {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`example.initRouter` is tagged with the `@InitKobweb` annotation but takes parameters that aren't allowed for init methods. It should take (optionally) an InitKobwebContext parameter or nothing."
+        )
+    }
+
+    @Test
+    fun `init silk without a context is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/Theme.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.silk.init.InitSilk
+
+                    @InitSilk
+                    fun initTheme() {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`example.initTheme` is tagged with the `@InitSilk` annotation but doesn't take an InitSilkContext as its only parameter."
+        )
+    }
+
+    @Test
+    fun `init silk with other parameters is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/Theme.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.silk.init.InitSilk
+
+                    class Settings
+
+                    @InitSilk
+                    fun initTheme(settings: Settings) {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`example.initTheme` is tagged with the `@InitSilk` annotation but doesn't take an InitSilkContext as its only parameter."
+        )
+    }
 }

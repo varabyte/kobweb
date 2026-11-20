@@ -31,8 +31,10 @@ import com.varabyte.kobweb.ksp.common.CSS_PREFIX_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_VARIANT_FQN
 import com.varabyte.kobweb.ksp.common.DefaultLayout
+import com.varabyte.kobweb.ksp.common.INIT_KOBWEB_CONTEXT_FQN
 import com.varabyte.kobweb.ksp.common.INIT_KOBWEB_FQN
 import com.varabyte.kobweb.ksp.common.INIT_ROUTE_FQN
+import com.varabyte.kobweb.ksp.common.INIT_SILK_CONTEXT_FQN
 import com.varabyte.kobweb.ksp.common.INIT_SILK_FQN
 import com.varabyte.kobweb.ksp.common.KEYFRAMES_FQN
 import com.varabyte.kobweb.ksp.common.LAYOUT_FQN
@@ -150,6 +152,10 @@ internal class FrontendProcessor(
         } else null
     }
 
+    private fun KSFunctionDeclaration.takesOnly(typeFqn: String): Boolean {
+        return parameters.singleOrNull()?.type?.resolve()?.declaration?.qualifiedName?.asString() == typeFqn
+    }
+
     private fun KSFunctionDeclaration.isPageMethod(resolver: Resolver): Boolean {
         if (!hasPageAnnotation()) return false
 
@@ -243,15 +249,24 @@ internal class FrontendProcessor(
             }
         }
 
-        kobwebInits += resolver.getSymbolsWithAnnotation(INIT_KOBWEB_FQN).map { annotatedFun ->
+        kobwebInits += resolver.getSymbolsWithAnnotation(INIT_KOBWEB_FQN).mapNotNull { annotatedFun ->
             fileDependencies.add(annotatedFun.containingFile!!)
             val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
-            InitKobwebEntry(name, acceptsContext = annotatedFun.parameters.size == 1)
+            if (annotatedFun.parameters.isNotEmpty() && !annotatedFun.takesOnly(INIT_KOBWEB_CONTEXT_FQN)) {
+                logger.error("`$name` is tagged with the `@InitKobweb` annotation but takes parameters that aren't allowed for init methods. It should take (optionally) an InitKobwebContext parameter or nothing.", annotatedFun)
+                return@mapNotNull null
+            }
+            InitKobwebEntry(name, acceptsContext = annotatedFun.parameters.isNotEmpty())
         }
 
-        silkInits += resolver.getSymbolsWithAnnotation(INIT_SILK_FQN).map { annotatedFun ->
+        silkInits += resolver.getSymbolsWithAnnotation(INIT_SILK_FQN).mapNotNull { annotatedFun ->
             fileDependencies.add(annotatedFun.containingFile!!)
             val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
+            // The generated code always passes a context, so it isn't optional here
+            if (!annotatedFun.takesOnly(INIT_SILK_CONTEXT_FQN)) {
+                logger.error("`$name` is tagged with the `@InitSilk` annotation but doesn't take an InitSilkContext as its only parameter.", annotatedFun)
+                return@mapNotNull null
+            }
             InitSilkEntry(name)
         }
 

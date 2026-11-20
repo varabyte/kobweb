@@ -16,8 +16,10 @@ const val API_STREAM_FQN = "${KOBWEB_API_FQN_PREFIX}stream.$API_STREAM_SIMPLE_NA
 
 const val APP_FQN = "${KOBWEB_CORE_FQN_PREFIX}App"
 const val INIT_KOBWEB_FQN = "${KOBWEB_CORE_FQN_PREFIX}init.InitKobweb"
+const val INIT_KOBWEB_CONTEXT_FQN = "${KOBWEB_CORE_FQN_PREFIX}init.InitKobwebContext"
 const val INIT_ROUTE_FQN = "${KOBWEB_CORE_FQN_PREFIX}init.InitRoute"
 const val INIT_SILK_FQN = "${KOBWEB_SILK_FQN_PREFIX}init.InitSilk"
+const val INIT_SILK_CONTEXT_FQN = "${KOBWEB_SILK_FQN_PREFIX}init.InitSilkContext"
 const val PACKAGE_MAPPING_PAGE_FQN = "${KOBWEB_CORE_FQN_PREFIX}PackageMapping"
 const val PAGE_FQN = "${KOBWEB_CORE_FQN_PREFIX}Page"
 const val PAGE_CONTEXT_FQN = "${KOBWEB_CORE_FQN_PREFIX}PageContext"
