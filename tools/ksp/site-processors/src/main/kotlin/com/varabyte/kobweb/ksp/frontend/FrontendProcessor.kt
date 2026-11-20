@@ -177,12 +177,12 @@ internal class FrontendProcessor(
                     logger.error(buildString {
                         append("@Layout(\"${layoutMethodName.asString()}\") does not reference a valid layout method.")
 
-                        if (matchesByName.all { !it.hasLayoutAnnotation() }) {
-                            append(" Did you forget to add the @Layout annotation on the target method?")
-                        } else if (matchesByName.any()) {
-                            append(" Please check that the @Layout method takes the expected arguments (optionally, a PageContext, and a composable lambda).")
-                        } else {
+                        if (matchesByName.none()) {
                             append(" No methods with that name were found. Please check the spelling of the path.")
+                        } else if (matchesByName.none { it.hasLayoutAnnotation() }) {
+                            append(" Did you forget to add the @Layout annotation on the target method?")
+                        } else {
+                            append(" Please check that the @Layout method takes the expected arguments (optionally, a PageContext, and a composable lambda).")
                         }
                     }, context)
                 }

@@ -380,6 +380,47 @@ class LayoutKspTest {
     }
 
     @Test
+    fun `page with both Layout and NoLayout is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/components/layouts/PageLayout.kt" to
+                    //language=kotlin
+                    """
+                    package example.components.layouts
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.layout.Layout
+
+                    @Layout
+                    @Composable
+                    fun PageLayout(content: @Composable () -> Unit) {}
+                """.trimIndent(),
+                "example/pages/About.kt" to
+                    //language=kotlin
+                    """
+                    package example.pages
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.Page
+                    import com.varabyte.kobweb.core.layout.Layout
+                    import com.varabyte.kobweb.core.layout.NoLayout
+
+                    @Page
+                    @Layout(".components.layouts.PageLayout")
+                    @NoLayout
+                    @Composable
+                    fun AboutPage() {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`example.pages.AboutPage` is tagged with both conflicting @NoLayout and @Layout annotations. Please remove one of them."
+        )
+    }
+
+    @Test
     fun `page receiver matches the layout content receiver`() {
         val result = ksp.runFrontend(
             options = FrontendKspOptions.app(projectGroup = "example"),
@@ -423,5 +464,227 @@ class LayoutKspTest {
             .containsExactly("example.components.layouts.PageLayout" to "example.components.layouts.PageScope")
         assertThat(data.pages.map { it.fqn to it.receiverFqn })
             .containsExactly("example.pages.AboutPage" to "example.components.layouts.PageScope")
+    }
+
+    @Test
+    fun `page receiver without a layout content receiver is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/components/layouts/PageLayout.kt" to
+                    //language=kotlin
+                    """
+                    package example.components.layouts
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.layout.Layout
+
+                    @Layout
+                    @Composable
+                    fun PageLayout(content: @Composable () -> Unit) {}
+                """.trimIndent(),
+                "example/pages/About.kt" to
+                    //language=kotlin
+                    """
+                    package example.pages
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.Page
+                    import com.varabyte.kobweb.core.layout.Layout
+
+                    class PageScope
+
+                    @Page
+                    @Layout(".components.layouts.PageLayout")
+                    @Composable
+                    fun PageScope.AboutPage() {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "Function `example.pages.AboutPage` declares receiver `example.pages.PageScope` but targets layout `example.components.layouts.PageLayout` which does not declare any receiver on its content callback. Please add a receiver to the layout callback or remove the receiver scope from the function."
+        )
+    }
+
+    @Test
+    fun `layout target which does not exist is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/pages/About.kt" to
+                    //language=kotlin
+                    """
+                    package example.pages
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.Page
+                    import com.varabyte.kobweb.core.layout.Layout
+
+                    @Page
+                    @Layout(".components.layouts.PageLayout")
+                    @Composable
+                    fun AboutPage() {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "@Layout(\"example.components.layouts.PageLayout\") does not reference a valid layout method. No methods with that name were found. Please check the spelling of the path."
+        )
+    }
+
+    @Test
+    fun `layout target without a Layout annotation is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/components/layouts/PageLayout.kt" to
+                    //language=kotlin
+                    """
+                    package example.components.layouts
+
+                    import androidx.compose.runtime.Composable
+
+                    @Composable
+                    fun PageLayout(content: @Composable () -> Unit) {}
+                """.trimIndent(),
+                "example/pages/About.kt" to
+                    //language=kotlin
+                    """
+                    package example.pages
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.Page
+                    import com.varabyte.kobweb.core.layout.Layout
+
+                    @Page
+                    @Layout(".components.layouts.PageLayout")
+                    @Composable
+                    fun AboutPage() {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "@Layout(\"example.components.layouts.PageLayout\") does not reference a valid layout method. Did you forget to add the @Layout annotation on the target method?"
+        )
+    }
+
+    @Test
+    fun `layout with other parameters is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/components/layouts/PageLayout.kt" to
+                    //language=kotlin
+                    """
+                    package example.components.layouts
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.layout.Layout
+
+                    class Settings
+
+                    @Layout
+                    @Composable
+                    fun PageLayout(settings: Settings) {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`example.components.layouts.PageLayout` is tagged with the `@Layout` annotation but takes parameters that aren't allowed for layout methods. It should take (optionally) a PageContext parameter and a composable content callback."
+        )
+    }
+
+    @Test
+    fun `page layout without a target is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/pages/About.kt" to
+                    //language=kotlin
+                    """
+                    package example.pages
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.Page
+                    import com.varabyte.kobweb.core.layout.Layout
+
+                    @Page
+                    @Layout
+                    @Composable
+                    fun AboutPage() {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "@Page method \"example.pages.AboutPage\" cannot apply a `@Layout` annotation without specifying a target path. Please add a valid layout path to the layout annotation or remove it."
+        )
+    }
+
+    @Test
+    fun `layout which names itself as its parent is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/components/layouts/PageLayout.kt" to
+                    //language=kotlin
+                    """
+                    package example.components.layouts
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.layout.Layout
+
+                    @Layout(".components.layouts.PageLayout")
+                    @Composable
+                    fun PageLayout(content: @Composable () -> Unit) {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "Layout \"PageLayout\" has a circular dependency with itself."
+        )
+    }
+
+    @Test
+    fun `layouts which name each other as parents is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/components/layouts/PageLayout.kt" to
+                    //language=kotlin
+                    """
+                    package example.components.layouts
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.layout.Layout
+
+                    @Layout(".components.layouts.BlogLayout")
+                    @Composable
+                    fun PageLayout(content: @Composable () -> Unit) {}
+                """.trimIndent(),
+                "example/components/layouts/BlogLayout.kt" to
+                    //language=kotlin
+                    """
+                    package example.components.layouts
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.layout.Layout
+
+                    @Layout(".components.layouts.PageLayout")
+                    @Composable
+                    fun BlogLayout(content: @Composable () -> Unit) {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "Circular dependency detected: \"PageLayout\" -> \"BlogLayout\" -> \"PageLayout\"",
+            "Circular dependency detected: \"BlogLayout\" -> \"PageLayout\" -> \"BlogLayout\"",
+        )
     }
 }
