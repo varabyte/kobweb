@@ -51,6 +51,7 @@ import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.suppresses
 import com.varabyte.kobweb.ksp.util.getAnnotationArgumentValue
 import com.varabyte.kobweb.ksp.util.getArgumentValue
+import com.varabyte.kobweb.ksp.util.isComposable
 import com.varabyte.kobweb.ksp.util.receiverClass
 import com.varabyte.kobweb.ksp.util.toPackageName
 import com.varabyte.kobweb.project.common.FqNameShortcut
@@ -208,7 +209,7 @@ internal class FrontendProcessor(
                 fileDependencies.add(annotatedFun.containingFile!!)
 
                 if (layoutMethodData != null) {
-                    if (annotatedFun.annotations.none { it.shortName.asString() == "Composable" }) {
+                    if (!annotatedFun.isComposable) {
                         logger.error("`fun ${annotatedFun.qualifiedName!!.asString()}` annotated with @Layout must also be @Composable.", annotatedFun)
                     }
 

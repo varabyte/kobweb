@@ -10,6 +10,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.varabyte.kobweb.ksp.common.APP_FQN
+import com.varabyte.kobweb.ksp.util.isComposable
 import com.varabyte.kobweb.project.common.PackageName
 import com.varabyte.kobweb.project.common.nonStrictDefault
 import com.varabyte.kobweb.project.frontend.AppFrontendData
@@ -47,7 +48,7 @@ internal class AppFrontendProcessor(
             appFun.singleOrNull()?.let {
                 val appMethod = it as KSFunctionDeclaration
                 val fqn = appMethod.qualifiedName!!.asString()
-                if (appMethod.annotations.none { annotation -> annotation.shortName.asString() == "Composable" }) {
+                if (!appMethod.isComposable) {
                     logger.error("`fun $fqn` annotated with `@App` must also be `@Composable`.", appMethod)
                 }
                 // The generated code calls the app method with a trailing content lambda

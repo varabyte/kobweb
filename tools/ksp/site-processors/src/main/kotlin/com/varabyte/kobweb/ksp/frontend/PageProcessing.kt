@@ -8,6 +8,7 @@ import com.varabyte.kobweb.ksp.common.toRoute
 import com.varabyte.kobweb.ksp.common.reportProblems
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.util.getArgumentValue
+import com.varabyte.kobweb.ksp.util.isComposable
 import com.varabyte.kobweb.ksp.util.receiverClass
 import com.varabyte.kobweb.ksp.util.toPackageName
 import com.varabyte.kobweb.project.common.PackageName
@@ -30,7 +31,7 @@ fun KSFunctionDeclaration.toPageEntry(
     val pageSimpleName = pageAnnotation.shortName.asString()
     val file = containingFile ?: error("Symbol does not come from a source file")
 
-    if (annotations.none { it.shortName.asString() == "Composable" }) {
+    if (!isComposable) {
         logger.error("`fun ${funName}` annotated with `@$pageSimpleName` must also be `@Composable`.", this)
     }
 

@@ -8,6 +8,8 @@ import com.google.devtools.ksp.symbol.KSName
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.project.common.PackageName
 
+private const val COMPOSABLE_FQN = "androidx.compose.runtime.Composable"
+
 /**
  * Get the value associated with a named argument on an annotation, or the first argument if no name is specified.
  *
@@ -33,6 +35,10 @@ fun KSAnnotation.getArgumentValue(name: String? = null): String? {
 fun KSAnnotated.getAnnotationArgumentValue(fqn: String, name: String? = null): String? {
     return this.getAnnotationsByName(fqn).firstOrNull()?.getArgumentValue(name)
 }
+
+/** Whether this function is annotated with `@Composable`. */
+val KSFunctionDeclaration.isComposable: Boolean
+    get() = getAnnotationsByName(COMPOSABLE_FQN).any()
 
 /**
  * A receiver class that this method extends, e.g. `Scope` in `fun Scope.someFun()`, or null if none.
