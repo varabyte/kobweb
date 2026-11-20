@@ -241,7 +241,7 @@ class FrontendProcessorTest {
     }
 
     @Test
-    fun `page which is not composable gets a warning`() {
+    fun `page which is not composable is an error`() {
         val result = ksp.runFrontend(
             options = FrontendKspOptions.app(projectGroup = "example"),
             sources = mapOf(
@@ -258,8 +258,7 @@ class FrontendProcessorTest {
             ),
         )
 
-        assertThat(result.errors).isEmpty()
-        assertThat(result.warnings).containsExactly(
+        assertThat(result.errors).containsExactly(
             "`fun AboutPage` annotated with `@Page` must also be `@Composable`."
         )
     }

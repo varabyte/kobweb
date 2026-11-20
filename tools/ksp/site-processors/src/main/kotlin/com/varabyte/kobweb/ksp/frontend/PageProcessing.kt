@@ -31,7 +31,7 @@ fun KSFunctionDeclaration.toPageEntry(
     val file = containingFile ?: error("Symbol does not come from a source file")
 
     if (annotations.none { it.shortName.asString() == "Composable" }) {
-        logger.warn("`fun ${funName}` annotated with `@$pageSimpleName` must also be `@Composable`.", this)
+        logger.error("`fun ${funName}` annotated with `@$pageSimpleName` must also be `@Composable`.", this)
     }
 
     val currPackage = packageName.toPackageName()
