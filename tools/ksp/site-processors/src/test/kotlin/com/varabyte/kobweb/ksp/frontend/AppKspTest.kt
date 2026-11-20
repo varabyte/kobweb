@@ -99,6 +99,82 @@ class AppKspTest {
     }
 
     @Test
+    fun `app function which is not composable is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/AppEntry.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.App
+
+                    @App
+                    fun AppEntry(content: @Composable () -> Unit) {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`fun example.AppEntry` annotated with `@App` must also be `@Composable`."
+        )
+    }
+
+    @Test
+    fun `app function without a content callback is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/AppEntry.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.App
+
+                    @App
+                    @Composable
+                    fun AppEntry() {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`example.AppEntry` is tagged with the `@App` annotation but doesn't take a composable content callback as its only parameter."
+        )
+    }
+
+    @Test
+    fun `app function with other parameters is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/AppEntry.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.App
+
+                    class Settings
+
+                    @App
+                    @Composable
+                    fun AppEntry(settings: Settings) {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`example.AppEntry` is tagged with the `@App` annotation but doesn't take a composable content callback as its only parameter."
+        )
+    }
+
+    @Test
     fun `app function in a library is an error`() {
         val result = ksp.runFrontend(
             options = FrontendKspOptions.library(projectGroup = "example"),

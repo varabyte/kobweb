@@ -8,7 +8,7 @@ import org.jetbrains.compose.web.css.*
  * An annotation which identifies a [Composable] function as one which will be used as the root skeleton for every
  * page.
  *
- * The method should take a `content: @Composable () -> Unit` parameter.
+ * The method should only take a single `content: @Composable () -> Unit` parameter.
  *
  * If no method is annotated `@App` then a reasonable default will be used ([KobwebApp] at a bare minimum, or possibly
  * `SilkApp` if using the silk library). Of course, your own custom app method can compose these functions if it wishes

@@ -45,8 +45,20 @@ internal class AppFrontendProcessor(
             logger.error("At most one @App function is allowed per project.")
         } else {
             appFun.singleOrNull()?.let {
-                fileDependencies.add(it.containingFile!!)
-                appFqn = (it as KSFunctionDeclaration).qualifiedName?.asString()
+                val appMethod = it as KSFunctionDeclaration
+                val fqn = appMethod.qualifiedName!!.asString()
+                if (appMethod.annotations.none { annotation -> annotation.shortName.asString() == "Composable" }) {
+                    logger.error("`fun $fqn` annotated with `@App` must also be `@Composable`.", appMethod)
+                }
+                // The generated code calls the app method with a trailing content lambda
+                val takesContentCallback = appMethod.parameters.singleOrNull()
+                    ?.type?.resolve()?.declaration?.qualifiedName?.asString() == "kotlin.Function0"
+                if (!takesContentCallback) {
+                    logger.error("`$fqn` is tagged with the `@App` annotation but doesn't take a composable content callback as its only parameter.", appMethod)
+                }
+
+                fileDependencies.add(appMethod.containingFile!!)
+                appFqn = fqn
             }
         }
 
