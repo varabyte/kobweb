@@ -28,6 +28,16 @@ object KobwebStubs {
 
             class PageContext
         """.trimIndent(),
+        "com/varabyte/kobweb/core/layout/Layout.kt" to """
+            package com.varabyte.kobweb.core.layout
+
+            annotation class Layout(val fqn: String = "")
+        """.trimIndent(),
+        "com/varabyte/kobweb/core/layout/NoLayout.kt" to """
+            package com.varabyte.kobweb.core.layout
+
+            annotation class NoLayout
+        """.trimIndent(),
         "com/varabyte/kobweb/core/init/InitRoute.kt" to """
             package com.varabyte.kobweb.core.init
 
