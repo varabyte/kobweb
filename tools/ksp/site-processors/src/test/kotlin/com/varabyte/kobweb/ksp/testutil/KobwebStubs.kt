@@ -64,5 +64,44 @@ object KobwebStubs {
 
             class InitSilkContext
         """.trimIndent(),
+        "com/varabyte/kobweb/silk/style/CssLayer.kt" to """
+            package com.varabyte.kobweb.silk.style
+
+            annotation class CssLayer(val name: String)
+        """.trimIndent(),
+        "com/varabyte/kobweb/silk/style/CssName.kt" to """
+            package com.varabyte.kobweb.silk.style
+
+            annotation class CssName(val name: String)
+
+            annotation class CssPrefix(val prefix: String)
+        """.trimIndent(),
+        "com/varabyte/kobweb/silk/style/CssStyle.kt" to """
+            package com.varabyte.kobweb.silk.style
+
+            sealed interface CssKind
+            sealed interface GeneralKind : CssKind
+            sealed interface RestrictedKind : CssKind
+            interface ComponentKind : CssKind
+
+            abstract class CssStyle<K : CssKind>
+
+            fun CssStyle(init: () -> Unit): CssStyle<GeneralKind> = object : CssStyle<GeneralKind>() {}
+
+            fun <K : ComponentKind> CssStyle(init: () -> Unit): CssStyle<K> = object : CssStyle<K>() {}
+        """.trimIndent(),
+        "com/varabyte/kobweb/silk/style/CssStyleVariant.kt" to """
+            package com.varabyte.kobweb.silk.style
+
+            abstract class CssStyleVariant<K : ComponentKind>
+
+            fun <K : ComponentKind> CssStyle<K>.addVariant(init: () -> Unit): CssStyleVariant<K> =
+                object : CssStyleVariant<K>() {}
+        """.trimIndent(),
+        "com/varabyte/kobweb/silk/style/animation/Keyframes.kt" to """
+            package com.varabyte.kobweb.silk.style.animation
+
+            class Keyframes(init: () -> Unit)
+        """.trimIndent(),
     )
 }

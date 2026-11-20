@@ -35,13 +35,15 @@ class FrontendKspOptions(
         fun app(
             projectGroup: String,
             pagesPackage: String = ".pages",
-        ) = FrontendKspOptions(ProcessorMode.APP, projectGroup, pagesPackage)
+            defaultCssPrefix: String? = null,
+        ) = FrontendKspOptions(ProcessorMode.APP, projectGroup, pagesPackage, defaultCssPrefix)
 
         /** Convenience method for creating [ProcessorMode.LIBRARY] options, with useful defaults. */
         fun library(
             projectGroup: String,
             pagesPackage: String = ".pages",
-        ) = FrontendKspOptions(ProcessorMode.LIBRARY, projectGroup, pagesPackage)
+            defaultCssPrefix: String? = null,
+        ) = FrontendKspOptions(ProcessorMode.LIBRARY, projectGroup, pagesPackage, defaultCssPrefix)
     }
 }
 
@@ -49,7 +51,7 @@ private fun FrontendKspOptions.toMap() = buildMap {
     put(KSP_PROCESSOR_MODE_KEY, mode.name)
     put(KSP_PROJECT_GROUP_KEY, projectGroup)
     put(KSP_PAGES_PACKAGE_KEY, pagesPackage)
-    defaultCssPrefix?.let { put(KSP_DEFAULT_CSS_PREFIX_KEY, it) }
+    defaultCssPrefix?.takeIf { it.isNotBlank() }?.let { put(KSP_DEFAULT_CSS_PREFIX_KEY, it) }
 }
 
 /**

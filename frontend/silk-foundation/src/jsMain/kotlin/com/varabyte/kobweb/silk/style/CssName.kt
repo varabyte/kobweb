@@ -13,6 +13,21 @@ package com.varabyte.kobweb.silk.style
  *
  * It is not expected many users will ever use this annotation, but it can be useful as a way to shorten long names or
  * deal with name collisions with a different style generated in another package.
+ *
+ * ## A note on variants
+ *
+ * A variant's name is normally appended to its style's name. Start a variant's CSS name with a dash to keep that
+ * behavior; otherwise, the name is used as is:
+ *
+ * ```
+ * val ButtonStyle = CssStyle<ButtonKind> { ... }
+ *
+ * @CssName("-ghost") // "button-ghost"
+ * val TransparentButtonVariant = ButtonStyle.addVariant { ... }
+ *
+ * @CssName("outline") // "outline"
+ * val OutlinedButtonVariant = ButtonStyle.addVariant { ... }
+ * ```
  */
 @Target(AnnotationTarget.CLASS, AnnotationTarget.PROPERTY)
 annotation class CssName(val name: String)
