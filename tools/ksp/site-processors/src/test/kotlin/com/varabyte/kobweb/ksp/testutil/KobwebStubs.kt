@@ -134,4 +134,21 @@ object KobwebStubs {
             class Keyframes(init: () -> Unit)
         """.trimIndent(),
     )
+
+    val backend = mapOf(
+        "com/varabyte/kobweb/api/Api.kt" to
+            //language=kotlin
+            """
+            package com.varabyte.kobweb.api
+
+            annotation class Api(val routeOverride: String = "")
+        """.trimIndent(),
+        "com/varabyte/kobweb/api/ApiContext.kt" to
+            //language=kotlin
+            """
+            package com.varabyte.kobweb.api
+
+            class ApiContext
+        """.trimIndent(),
+    )
 }
