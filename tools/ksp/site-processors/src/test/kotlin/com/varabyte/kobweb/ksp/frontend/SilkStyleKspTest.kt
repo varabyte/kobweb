@@ -310,7 +310,7 @@ class SilkStyleKspTest {
 
         assertThat(result.errors).isEmpty()
         assertThat(result.warnings).containsExactly(
-            "Not registering css style `val WidgetStyle`, as local style block declarations are not supported. You can only declare them globally, either at a top level or inside an object singleton. Although fixing this is recommended, you can manually register your css style inside an @InitSilk block instead (`ctx.theme.registerStyle(WidgetStyle)`). Suppress this message by adding a `@Suppress(\"LOCAL_CSS_STYLE\")` annotation."
+            "Not registering css style `val WidgetStyle`, as local style block declarations are not supported. You can only declare them globally, either at a top level or inside an object singleton. Although fixing this is recommended, you can manually register your css style inside an @InitSilk block instead (`ctx.theme.registerStyle(\"widget\", WidgetStyle)`). Suppress this message by adding a `@Suppress(\"LOCAL_CSS_STYLE\")` annotation."
         )
         assertThat(result.appFrontendData.frontendData.cssStyles).isEmpty()
     }
@@ -359,9 +359,43 @@ class SilkStyleKspTest {
 
         assertThat(result.errors).isEmpty()
         assertThat(result.warnings).containsExactly(
-            "Not registering css style `val HiddenStyle`, as it is not public. Although fixing this is recommended, you can manually register your css style inside an @InitSilk block instead (`ctx.theme.registerStyle(HiddenStyle)`). Suppress this message by adding a `@Suppress(\"PRIVATE_CSS_STYLE\")` annotation or prepending the name with an underscore."
+            "Not registering css style `val HiddenStyle`, as it is not public. Although fixing this is recommended, you can manually register your css style inside an @InitSilk block instead (`ctx.theme.registerStyle(\"hidden\", HiddenStyle)`). Suppress this message by adding a `@Suppress(\"PRIVATE_CSS_STYLE\")` annotation or prepending the name with an underscore."
         )
         assertThat(result.appFrontendData.frontendData.cssStyles).isEmpty()
+    }
+
+    @Test
+    fun `private variants and keyframes are not registered`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/components/Button.kt" to
+                    //language=kotlin
+                    """
+                    package example.components
+
+                    import com.varabyte.kobweb.silk.style.ComponentKind
+                    import com.varabyte.kobweb.silk.style.CssStyle
+                    import com.varabyte.kobweb.silk.style.addVariant
+                    import com.varabyte.kobweb.silk.style.animation.Keyframes
+
+                    sealed interface ButtonKind : ComponentKind
+                    val ButtonStyle = CssStyle<ButtonKind> {}
+                    private val OutlinedButtonVariant = ButtonStyle.addVariant {}
+
+                    private val SpinKeyframes = Keyframes {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).containsExactly(
+            "Not registering css style variant `val OutlinedButtonVariant`, as it is not public. Although fixing this is recommended, you can manually register your css style variant inside an @InitSilk block instead (`ctx.theme.registerVariant(\"-outlined\", OutlinedButtonVariant)`). Suppress this message by adding a `@Suppress(\"PRIVATE_CSS_STYLE_VARIANT\")` annotation or prepending the name with an underscore.",
+            "Not registering keyframes `val SpinKeyframes`, as it is not public. Although fixing this is recommended, you can manually register your keyframes inside an @InitSilk block instead (`ctx.theme.registerKeyframes(\"spin\", SpinKeyframes)`). Suppress this message by adding a `@Suppress(\"PRIVATE_KEYFRAMES\")` annotation or prepending the name with an underscore.",
+        )
+        val frontendData = result.appFrontendData.frontendData
+        assertThat(frontendData.cssStyleVariants).isEmpty()
+        assertThat(frontendData.keyframesList).isEmpty()
     }
 
     @Test

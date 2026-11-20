@@ -385,15 +385,15 @@ internal class FrontendProcessor(
             val cssStyleDeclaration = DeclarationType(
                 types.cssStyleType,
                 "ctx.theme.registerStyle",
-            )
+            ) { processCssStyle(it).name }
             val cssStyleVariantDeclaration = DeclarationType(
                 types.cssStyleVariantType,
                 "ctx.theme.registerVariant",
-            )
+            ) { processCssStyleVariant(it).name }
             val keyframesDeclaration = DeclarationType(
                 types.keyframesType,
-                "ctx.stylesheet.registerKeyframes",
-            )
+                "ctx.theme.registerKeyframes",
+            ) { processKeyframes(it).name }
 
             listOf(
                 cssStyleDeclaration,
@@ -651,11 +651,15 @@ internal class FrontendProcessor(
             declarationInfo: DeclarationType
         ): Boolean {
             val propertyName = property.simpleName.asString()
+            // The call users would need to register this property themselves, using the name we would have generated
+            val registerCall by lazy {
+                "${declarationInfo.function}(\"${declarationInfo.cssName(property)}\", $propertyName)"
+            }
             if (property.parent !is KSFile && (property.owningSingletonClassDeclaration == null)) {
                 val localSuppression = "LOCAL_${declarationInfo.suppressionName}"
                 if (!property.suppresses(localSuppression)) {
                     logger.warn(
-                        "Not registering ${declarationInfo.displayString} `val $propertyName`, as local style block declarations are not supported. You can only declare them globally, either at a top level or inside an object singleton. Although fixing this is recommended, you can manually register your ${declarationInfo.displayString} inside an @InitSilk block instead (`${declarationInfo.function}($propertyName)`). Suppress this message by adding a `@Suppress(\"$localSuppression\")` annotation.",
+                        "Not registering ${declarationInfo.displayString} `val $propertyName`, as local style block declarations are not supported. You can only declare them globally, either at a top level or inside an object singleton. Although fixing this is recommended, you can manually register your ${declarationInfo.displayString} inside an @InitSilk block instead (`$registerCall`). Suppress this message by adding a `@Suppress(\"$localSuppression\")` annotation.",
                         property
                     )
                 }
@@ -671,7 +675,7 @@ internal class FrontendProcessor(
                 val privateSuppression = "PRIVATE_${declarationInfo.suppressionName}"
                 if (!property.suppresses(privateSuppression)) {
                     logger.warn(
-                        "Not registering ${declarationInfo.displayString} `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your ${declarationInfo.displayString} inside an @InitSilk block instead (`${declarationInfo.function}($propertyName)`). Suppress this message by adding a `@Suppress(\"$privateSuppression\")` annotation or prepending the name with an underscore.",
+                        "Not registering ${declarationInfo.displayString} `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your ${declarationInfo.displayString} inside an @InitSilk block instead (`$registerCall`). Suppress this message by adding a `@Suppress(\"$privateSuppression\")` annotation or prepending the name with an underscore.",
                         property
                     )
                 }
@@ -725,6 +729,7 @@ internal class FrontendProcessor(
         private inner class DeclarationType(
             val type: KSType,
             val function: String,
+            val cssName: (KSPropertyDeclaration) -> String,
         ) {
             val name = type.declaration.simpleName.asString()
             val displayString: String = name.splitCamelCase().joinToString(" ") { it.lowercase() }
