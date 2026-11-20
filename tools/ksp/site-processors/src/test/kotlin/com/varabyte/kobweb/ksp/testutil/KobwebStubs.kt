@@ -13,6 +13,11 @@ object KobwebStubs {
 
             annotation class Composable
         """.trimIndent(),
+        "com/varabyte/kobweb/core/PackageMapping.kt" to """
+            package com.varabyte.kobweb.core
+
+            annotation class PackageMapping(val value: String)
+        """.trimIndent(),
         "com/varabyte/kobweb/core/Page.kt" to """
             package com.varabyte.kobweb.core
 
@@ -22,6 +27,13 @@ object KobwebStubs {
             package com.varabyte.kobweb.core
 
             class PageContext
+        """.trimIndent(),
+        "com/varabyte/kobweb/core/init/InitRoute.kt" to """
+            package com.varabyte.kobweb.core.init
+
+            annotation class InitRoute
+
+            class InitRouteContext
         """.trimIndent(),
     )
 }

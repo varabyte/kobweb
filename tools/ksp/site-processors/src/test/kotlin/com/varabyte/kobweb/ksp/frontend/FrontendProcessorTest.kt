@@ -262,4 +262,179 @@ class FrontendProcessorTest {
             "`fun AboutPage` annotated with `@Page` must also be `@Composable`."
         )
     }
+
+    @Test
+    fun `package mapping renames its package in routes`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/pages/users/user/PackageMapping.kt" to
+                    //language=kotlin
+                    """
+                    @file:PackageMapping("{}")
+
+                    package example.pages.users.user
+
+                    import com.varabyte.kobweb.core.PackageMapping
+                """.trimIndent(),
+                "example/pages/users/user/Profile.kt" to
+                    //language=kotlin
+                    """
+                    package example.pages.users.user
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.Page
+
+                    @Page
+                    @Composable
+                    fun ProfilePage() {}
+                """.trimIndent(),
+                "example/pages/users/user/posts/Index.kt" to
+                    //language=kotlin
+                    """
+                    package example.pages.users.user.posts
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.Page
+
+                    @Page
+                    @Composable
+                    fun PostsPage() {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).isEmpty()
+        assertThat(result.appFrontendData.frontendData.pages.map { it.fqn to it.route })
+            .containsExactly(
+                "example.pages.users.user.ProfilePage" to "/users/{user}/profile",
+                "example.pages.users.user.posts.PostsPage" to "/users/{user}/posts/",
+            )
+    }
+
+    @Test
+    fun `package mapping outside the pages package is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/components/PackageMapping.kt" to
+                    //language=kotlin
+                    """
+                    @file:PackageMapping("widgets")
+
+                    package example.components
+
+                    import com.varabyte.kobweb.core.PackageMapping
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`@file:PackageMapping` is defined under package `example.components` but must exist under `example.pages`."
+        )
+    }
+
+    @Test
+    fun `init route is attached to the page in its file`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/pages/About.kt" to
+                    //language=kotlin
+                    """
+                    package example.pages
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.Page
+                    import com.varabyte.kobweb.core.init.InitRoute
+                    import com.varabyte.kobweb.core.init.InitRouteContext
+
+                    @InitRoute
+                    fun initAboutPage(ctx: InitRouteContext) {}
+
+                    @Page
+                    @Composable
+                    fun AboutPage() {}
+                """.trimIndent(),
+                "example/pages/Contact.kt" to
+                    //language=kotlin
+                    """
+                    package example.pages
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.Page
+
+                    @Page
+                    @Composable
+                    fun ContactPage() {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).isEmpty()
+        assertThat(result.appFrontendData.frontendData.pages.map { it.fqn to it.initRouteFqn })
+            .containsExactly(
+                "example.pages.AboutPage" to "example.pages.initAboutPage",
+                "example.pages.ContactPage" to null,
+            )
+    }
+
+    @Test
+    fun `init route without a page or layout in its file is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/pages/About.kt" to
+                    //language=kotlin
+                    """
+                    package example.pages
+
+                    import com.varabyte.kobweb.core.init.InitRoute
+                    import com.varabyte.kobweb.core.init.InitRouteContext
+
+                    @InitRoute
+                    fun initAboutPage(ctx: InitRouteContext) {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "@InitRoute method \"example.pages.initAboutPage\" must be defined in the same file as a @Page or @Layout method."
+        )
+    }
+
+    @Test
+    fun `multiple init routes in one file is an error`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/pages/About.kt" to
+                    //language=kotlin
+                    """
+                    package example.pages
+
+                    import androidx.compose.runtime.Composable
+                    import com.varabyte.kobweb.core.Page
+                    import com.varabyte.kobweb.core.init.InitRoute
+                    import com.varabyte.kobweb.core.init.InitRouteContext
+
+                    @InitRoute
+                    fun initAboutPage(ctx: InitRouteContext) {}
+
+                    @InitRoute
+                    fun initAboutPageAgain(ctx: InitRouteContext) {}
+
+                    @Page
+                    @Composable
+                    fun AboutPage() {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "Only one @InitRoute method per file is allowed, but found multiple: initAboutPage, initAboutPageAgain. Please remove all but one."
+        )
+    }
 }
