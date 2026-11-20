@@ -13,6 +13,11 @@ object KobwebStubs {
 
             annotation class Composable
         """.trimIndent(),
+        "com/varabyte/kobweb/core/App.kt" to """
+            package com.varabyte.kobweb.core
+
+            annotation class App
+        """.trimIndent(),
         "com/varabyte/kobweb/core/PackageMapping.kt" to """
             package com.varabyte.kobweb.core
 
