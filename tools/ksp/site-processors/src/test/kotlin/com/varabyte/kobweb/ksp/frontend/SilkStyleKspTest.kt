@@ -498,4 +498,85 @@ class SilkStyleKspTest {
             "`val ButtonStyle = CssStyle<ButtonKind>` is using a kind type defined in a different file, which is not allowed. Please declare a new `ComponentKind` implementation in the same file and use that one, or declare your `CssStyle<ButtonKind>` in the same file as the `ButtonKind` definition."
         )
     }
+
+    @Test
+    fun `extension properties on singletons are namespaced by their receiver`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/lib/Styling.kt" to
+                    //language=kotlin
+                    """
+                    package example.lib
+
+                    object LibStyles
+
+                    class Card {
+                        companion object
+                    }
+                """.trimIndent(),
+                "example/Extensions.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.silk.style.CssStyle
+                    import example.lib.Card
+                    import example.lib.LibStyles
+
+                    private val _HeroStyle = CssStyle {}
+                    val LibStyles.HeroStyle get() = _HeroStyle
+
+                    private val _TitleStyle = CssStyle {}
+                    val Card.Companion.TitleStyle get() = _TitleStyle
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).isEmpty()
+        // Generated code needs the import to access an extension property
+        assertThat(result.appFrontendData.frontendData.cssStyles.map { Triple(it.name, it.fqcn, it.import) })
+            .containsExactly(
+                Triple("lib-styles_hero", "example.lib.LibStyles.HeroStyle", "example.HeroStyle"),
+                Triple("card_title", "example.lib.Card.TitleStyle", "example.TitleStyle"),
+            )
+    }
+
+    @Test
+    fun `variants of nested component kinds drop the full kind name`() {
+        val result = ksp.runFrontend(
+            options = FrontendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/components/Switch.kt" to
+                    //language=kotlin
+                    """
+                    package example.components
+
+                    import com.varabyte.kobweb.silk.style.ComponentKind
+                    import com.varabyte.kobweb.silk.style.CssStyle
+                    import com.varabyte.kobweb.silk.style.addVariant
+
+                    sealed interface SwitchKind : ComponentKind {
+                        sealed interface Track : ComponentKind
+                        sealed interface Thumb : ComponentKind
+                    }
+
+                    val SwitchStyle = CssStyle<SwitchKind> {}
+                    val SwitchTrackStyle = CssStyle<SwitchKind.Track> {}
+                    val SwitchThumbStyle = CssStyle<SwitchKind.Thumb> {}
+
+                    val ThinSwitchTrackVariant = SwitchTrackStyle.addVariant {}
+                    val LargeSwitchThumbVariant = SwitchThumbStyle.addVariant {}
+                    val SwitchThumbRoundVariant = SwitchThumbStyle.addVariant {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).isEmpty()
+        val frontendData = result.appFrontendData.frontendData
+        assertThat(frontendData.cssStyles.map { it.name }).containsExactly("switch", "switch-track", "switch-thumb")
+        assertThat(frontendData.cssStyleVariants.map { it.name }).containsExactly("-thin", "-large", "-round")
+    }
 }
