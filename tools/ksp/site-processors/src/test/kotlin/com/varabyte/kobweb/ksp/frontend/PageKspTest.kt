@@ -9,7 +9,7 @@ import com.varabyte.truthish.assertThat
 import org.junit.Rule
 import org.junit.Test
 
-class FrontendProcessorTest {
+class PageKspTest {
     @get:Rule
     val ksp = KspFixture()
 
