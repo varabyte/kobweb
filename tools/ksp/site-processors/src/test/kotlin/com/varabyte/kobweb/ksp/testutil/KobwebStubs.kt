@@ -18,5 +18,10 @@ object KobwebStubs {
 
             annotation class Page(val routeOverride: String = "")
         """.trimIndent(),
+        "com/varabyte/kobweb/core/PageContext.kt" to """
+            package com.varabyte.kobweb.core
+
+            class PageContext
+        """.trimIndent(),
     )
 }

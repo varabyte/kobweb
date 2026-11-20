@@ -29,8 +29,11 @@ class FrontendKspOptions(
     val defaultCssPrefix: String? = null,
 ) {
     companion object {
-        /** Options for an app whose `kobweb` block leaves `pagesPackage` at its default. */
-        fun app(projectGroup: String) = FrontendKspOptions(ProcessorMode.APP, projectGroup, pagesPackage = ".pages")
+        /** Convenience method for creating [ProcessorMode.APP] options, with useful defaults. */
+        fun app(
+            projectGroup: String,
+            pagesPackage: String = ".pages",
+        ) = FrontendKspOptions(ProcessorMode.APP, projectGroup, pagesPackage)
     }
 }
 
