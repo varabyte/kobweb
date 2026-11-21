@@ -238,13 +238,35 @@ class ApiStreamKspTest {
 
         assertThat(result.errors).isEmpty()
         assertThat(result.warnings).containsExactly(
-            "Not registering ApiStream `val echo`, as it is not public. Although fixing this is recommended, you can manually register your API Stream inside an @InitApi block instead (`ctx.apis.registerStream(\"route\", echo)`). Suppress this message by adding a `@Suppress(\"PRIVATE_API_STREAM\")` annotation."
+            "Not registering ApiStream `val echo`, as it is not public. Although fixing this is recommended, you can manually register your API Stream inside an @InitApi block instead (`ctx.apis.registerStream(\"route\", echo)`). Suppress this message by adding a `@Suppress(\"PRIVATE_API_STREAM\")` annotation or prepending the name with an underscore."
         )
         assertThat(result.appBackendData.backendData.apiStreamProperties).isEmpty()
     }
 
     @Test
-    fun `private api stream warning can be suppressed`() {
+    fun `private api stream warning can be suppressed with a leading underscore`() {
+        val result = ksp.runBackend(
+            options = BackendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/api/Echo.kt" to
+                    //language=kotlin
+                    """
+                    package example.api
+
+                    import com.varabyte.kobweb.api.stream.ApiStream
+
+                    private val _echo = ApiStream { ctx -> }
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).isEmpty()
+        assertThat(result.appBackendData.backendData.apiStreamProperties).isEmpty()
+    }
+
+    @Test
+    fun `private api stream warning can be suppressed with an annotation`() {
         val result = ksp.runBackend(
             options = BackendKspOptions.app(projectGroup = "example"),
             sources = mapOf(

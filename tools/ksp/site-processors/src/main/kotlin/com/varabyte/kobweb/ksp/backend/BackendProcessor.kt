@@ -126,9 +126,10 @@ internal class BackendProcessor(
                 return
             }
             if (!property.isPublic()) {
-                if (!property.suppresses(privateSuppression)) {
+                // Like Silk styles, a leading underscore marks a property as private on purpose
+                if (!propertyName.startsWith('_') && !property.suppresses(privateSuppression)) {
                     logger.warn(
-                        "Not registering ApiStream `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your API Stream inside an @InitApi block instead (`ctx.apis.registerStream(\"route\", $propertyName)`). Suppress this message by adding a `@Suppress(\"$privateSuppression\")` annotation.",
+                        "Not registering ApiStream `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your API Stream inside an @InitApi block instead (`ctx.apis.registerStream(\"route\", $propertyName)`). Suppress this message by adding a `@Suppress(\"$privateSuppression\")` annotation or prepending the name with an underscore.",
                         property
                     )
                 }
