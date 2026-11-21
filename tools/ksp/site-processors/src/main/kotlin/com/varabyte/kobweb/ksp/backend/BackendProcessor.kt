@@ -13,10 +13,12 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
+import com.varabyte.kobweb.ksp.common.API_CONTEXT_FQN
 import com.varabyte.kobweb.ksp.common.API_FQN
 import com.varabyte.kobweb.ksp.common.API_INTERCEPTOR_FQN
 import com.varabyte.kobweb.ksp.common.API_STREAM_FQN
 import com.varabyte.kobweb.ksp.common.API_STREAM_SIMPLE_NAME
+import com.varabyte.kobweb.ksp.common.INIT_API_CONTEXT_FQN
 import com.varabyte.kobweb.ksp.common.INIT_API_FQN
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_API_FQN
 import com.varabyte.kobweb.ksp.common.PackageRouteMapping
@@ -30,6 +32,7 @@ import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.resolveQualifiedName
 import com.varabyte.kobweb.ksp.symbol.suppresses
 import com.varabyte.kobweb.ksp.util.getArgumentValue
+import com.varabyte.kobweb.ksp.util.takesOnly
 import com.varabyte.kobweb.ksp.util.toPackageName
 import com.varabyte.kobweb.project.backend.ApiEntry
 import com.varabyte.kobweb.project.backend.ApiStreamEntry
@@ -64,9 +67,13 @@ internal class BackendProcessor(
     private val fileDependencies = mutableSetOf<KSFile>()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        initMethods += resolver.getSymbolsWithAnnotation(INIT_API_FQN).map { annotatedFun ->
+        initMethods += resolver.getSymbolsWithAnnotation(INIT_API_FQN).mapNotNull { annotatedFun ->
             fileDependencies.add(annotatedFun.containingFile!!)
             val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
+            if (!annotatedFun.takesOnly(INIT_API_CONTEXT_FQN)) {
+                logger.error("`$name` is tagged with the `@InitApi` annotation but doesn't take an InitApiContext as its only parameter.", annotatedFun)
+                return@mapNotNull null
+            }
             InitApiEntry(name)
         }
 
@@ -221,6 +228,10 @@ private fun KSFunctionDeclaration.toApiEntry(
     logger: KSPLogger,
 ): ApiEntry? {
     val apiAnnotation = getAnnotationsByName(API_FQN).first()
+    if (!takesOnly(API_CONTEXT_FQN)) {
+        logger.error("`${qualifiedName!!.asString()}` is tagged with the `@Api` annotation but doesn't take an ApiContext as its only parameter.", this)
+        return null
+    }
     val currPackage = packageName.toPackageName()
     val file = containingFile ?: error("Symbol does not come from a source file")
     val routeOverride = apiAnnotation.getArgumentValue()?.takeIf { it.isNotBlank() }?.let { RouteOverride(it) }

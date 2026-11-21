@@ -88,6 +88,30 @@ class ApiInterceptorKspTest {
     }
 
     @Test
+    fun `api interceptor without a context is an error`() {
+        val result = ksp.runBackend(
+            options = BackendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/Intercept.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.api.http.Response
+                    import com.varabyte.kobweb.api.intercept.ApiInterceptor
+
+                    @ApiInterceptor
+                    suspend fun intercept(): Response = Response()
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`example.intercept` is tagged with the `@ApiInterceptor` annotation but doesn't take an ApiInterceptorContext as its only parameter."
+        )
+    }
+
+    @Test
     fun `multiple api interceptors is an error`() {
         val result = ksp.runBackend(
             options = BackendKspOptions.app(projectGroup = "example"),

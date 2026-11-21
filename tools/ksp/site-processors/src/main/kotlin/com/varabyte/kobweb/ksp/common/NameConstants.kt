@@ -8,9 +8,12 @@ private const val KOBWEB_API_FQN_PREFIX = "${KOBWEB_FQN_PREFIX}api."
 const val RESPONSE_FQN = "${KOBWEB_API_FQN_PREFIX}http.Response"
 
 const val INIT_API_FQN = "${KOBWEB_API_FQN_PREFIX}init.InitApi"
+const val INIT_API_CONTEXT_FQN = "${KOBWEB_API_FQN_PREFIX}init.InitApiContext"
 const val API_INTERCEPTOR_FQN = "${KOBWEB_API_FQN_PREFIX}intercept.ApiInterceptor"
+const val API_INTERCEPTOR_CONTEXT_FQN = "${KOBWEB_API_FQN_PREFIX}intercept.ApiInterceptorContext"
 const val PACKAGE_MAPPING_API_FQN = "${KOBWEB_API_FQN_PREFIX}PackageMapping"
 const val API_FQN = "${KOBWEB_API_FQN_PREFIX}Api"
+const val API_CONTEXT_FQN = "${KOBWEB_API_FQN_PREFIX}ApiContext"
 const val API_STREAM_SIMPLE_NAME = "ApiStream"
 const val API_STREAM_FQN = "${KOBWEB_API_FQN_PREFIX}stream.$API_STREAM_SIMPLE_NAME"
 

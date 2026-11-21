@@ -101,6 +101,29 @@ class ApiKspTest {
     }
 
     @Test
+    fun `api without a context is an error`() {
+        val result = ksp.runBackend(
+            options = BackendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/api/Echo.kt" to
+                    //language=kotlin
+                    """
+                    package example.api
+
+                    import com.varabyte.kobweb.api.Api
+
+                    @Api
+                    suspend fun echo() {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`example.api.echo` is tagged with the `@Api` annotation but doesn't take an ApiContext as its only parameter."
+        )
+    }
+
+    @Test
     fun `route override replaces the file name`() {
         val result = ksp.runBackend(
             options = BackendKspOptions.app(projectGroup = "example"),
@@ -309,5 +332,28 @@ class ApiKspTest {
         assertThat(result.warnings).isEmpty()
         assertThat(result.appBackendData.backendData.initMethods.map { it.fqn })
             .containsExactly("example.initDatabase", "example.initCache")
+    }
+
+    @Test
+    fun `init api without a context is an error`() {
+        val result = ksp.runBackend(
+            options = BackendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/Init.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.api.init.InitApi
+
+                    @InitApi
+                    fun initDatabase() {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "`example.initDatabase` is tagged with the `@InitApi` annotation but doesn't take an InitApiContext as its only parameter."
+        )
     }
 }

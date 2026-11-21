@@ -40,6 +40,11 @@ fun KSAnnotated.getAnnotationArgumentValue(fqn: String, name: String? = null): S
 val KSFunctionDeclaration.isComposable: Boolean
     get() = getAnnotationsByName(COMPOSABLE_FQN).any()
 
+/** Whether this function takes exactly one parameter, whose type has the fully qualified name [typeFqn]. */
+fun KSFunctionDeclaration.takesOnly(typeFqn: String): Boolean {
+    return parameters.singleOrNull()?.type?.resolve()?.declaration?.qualifiedName?.asString() == typeFqn
+}
+
 /**
  * A receiver class that this method extends, e.g. `Scope` in `fun Scope.someFun()`, or null if none.
  */

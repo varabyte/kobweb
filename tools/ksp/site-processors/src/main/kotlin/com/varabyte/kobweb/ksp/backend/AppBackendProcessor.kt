@@ -8,8 +8,10 @@ import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.varabyte.kobweb.ksp.common.API_INTERCEPTOR_CONTEXT_FQN
 import com.varabyte.kobweb.ksp.common.API_INTERCEPTOR_FQN
 import com.varabyte.kobweb.ksp.common.RESPONSE_FQN
+import com.varabyte.kobweb.ksp.util.takesOnly
 import com.varabyte.kobweb.project.backend.ApiInterceptorEntry
 import com.varabyte.kobweb.project.backend.AppBackendData
 import com.varabyte.kobweb.project.common.PackageName
@@ -42,6 +44,9 @@ internal class AppBackendProcessor(
             } else {
                 apiInterceptorMethods.singleOrNull()?.let {
                     val funDeclaration = it as KSFunctionDeclaration
+                    if (!funDeclaration.takesOnly(API_INTERCEPTOR_CONTEXT_FQN)) {
+                        logger.error("`${funDeclaration.qualifiedName!!.asString()}` is tagged with the `@ApiInterceptor` annotation but doesn't take an ApiInterceptorContext as its only parameter.", funDeclaration)
+                    }
                     funDeclaration.returnType?.resolve()?.let { returnType ->
                         if (returnType.declaration.qualifiedName?.asString() != RESPONSE_FQN || returnType.isMarkedNullable) {
                             logger.error("The method annotated with @ApiInterceptor must return `Response`, got `${returnType.declaration.qualifiedName?.asString()}${if (returnType.isMarkedNullable) "?" else ""}`", funDeclaration)

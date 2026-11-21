@@ -53,6 +53,7 @@ import com.varabyte.kobweb.ksp.util.getAnnotationArgumentValue
 import com.varabyte.kobweb.ksp.util.getArgumentValue
 import com.varabyte.kobweb.ksp.util.isComposable
 import com.varabyte.kobweb.ksp.util.receiverClass
+import com.varabyte.kobweb.ksp.util.takesOnly
 import com.varabyte.kobweb.ksp.util.toPackageName
 import com.varabyte.kobweb.project.common.FqNameShortcut
 import com.varabyte.kobweb.project.common.PackageName
@@ -151,10 +152,6 @@ internal class FrontendProcessor(
                 contentCallbackTypeMaybe,
             )
         } else null
-    }
-
-    private fun KSFunctionDeclaration.takesOnly(typeFqn: String): Boolean {
-        return parameters.singleOrNull()?.type?.resolve()?.declaration?.qualifiedName?.asString() == typeFqn
     }
 
     private fun KSFunctionDeclaration.isPageMethod(resolver: Resolver): Boolean {
