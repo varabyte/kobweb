@@ -16,8 +16,7 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation(libs.truthish)
-    testImplementation(libs.ksp.standalone)
-    testImplementation(libs.ksp.standalone.deps)
+    testImplementation(projects.tools.ksp.kspTestUtils)
 }
 
 kobwebPublication {

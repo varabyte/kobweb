@@ -1,9 +1,5 @@
 package com.varabyte.kobweb.ksp.testutil
 
-import com.google.devtools.ksp.impl.KotlinSymbolProcessing
-import com.google.devtools.ksp.processing.KSPConfig
-import com.google.devtools.ksp.processing.KSPJsConfig
-import com.google.devtools.ksp.processing.KSPJvmConfig
 import com.varabyte.kobweb.ProcessorMode
 import com.varabyte.kobweb.ksp.KOBWEB_APP_METADATA_BACKEND
 import com.varabyte.kobweb.ksp.KOBWEB_APP_METADATA_FRONTEND
@@ -21,11 +17,6 @@ import com.varabyte.kobweb.project.common.nonStrictDefault
 import com.varabyte.kobweb.project.frontend.AppFrontendData
 import com.varabyte.kobweb.project.frontend.FrontendData
 import kotlinx.serialization.json.Json
-import org.junit.rules.TemporaryFolder
-import org.junit.rules.TestRule
-import org.junit.runner.Description
-import org.junit.runners.model.Statement
-import java.io.File
 
 /**
  * The options which the Kobweb Gradle plugin passes to the processor for a site module's JS sources.
@@ -93,96 +84,25 @@ private fun BackendKspOptions.toMap() = mapOf(
     KSP_API_PACKAGE_KEY to apiPackage,
 )
 
-/** Fill in the config settings shared by all platforms, for a run working in [rootDir]. */
-private fun KSPConfig.Builder.configure(rootDir: File, processorOptions: Map<String, String>) {
-    moduleName = "test"
-    sourceRoots = listOf(rootDir.resolve("src"))
-    commonSourceRoots = emptyList()
-    // No stdlib or framework libraries; tests declare stubs for the framework types they need
-    libraries = emptyList()
-    this.processorOptions = processorOptions
-    projectBaseDir = rootDir
-    outputBaseDir = rootDir.resolve("out")
-    cachesDir = rootDir.resolve("caches")
-    kotlinOutputDir = rootDir.resolve("out/kotlin")
-    resourceOutputDir = rootDir.resolve("out/resources")
-    classOutputDir = rootDir.resolve("out/classes")
-    languageVersion = KotlinVersion.CURRENT.let { "${it.major}.${it.minor}" }
-    apiVersion = languageVersion
+/**
+ * Run [KobwebProcessorProvider] the way it runs on a site module's JS sources, where it collects frontend metadata.
+ *
+ * @param sources Kotlin source files, keyed by their path relative to the source root. [KobwebStubs.frontend] are
+ *   always added, the way a real site always has the framework on its classpath.
+ */
+fun KspFixture.runFrontend(options: FrontendKspOptions, sources: Map<String, String>): KspResult {
+    return runJs(KobwebProcessorProvider(), options.toMap(), KobwebStubs.frontend + sources)
 }
 
 /**
- * A rule for running [KobwebProcessorProvider] for real, through KSP2, over some test sources.
+ * Run [KobwebProcessorProvider] the way it runs on a site module's JVM sources, where it collects backend metadata.
  *
- * Each run works in its own folder, which is deleted when the test finishes.
+ * @param sources Kotlin source files, keyed by their path relative to the source root. [KobwebStubs.backend] are
+ *   always added, the way a real site always has the framework on its classpath.
  */
-class KspFixture : TestRule {
-    private val tempFolder = TemporaryFolder()
-
-    override fun apply(base: Statement, description: Description): Statement = tempFolder.apply(base, description)
-
-    /**
-     * Run the processor the way it runs on a site module's JS sources, where it collects frontend metadata.
-     *
-     * @param sources Kotlin source files, keyed by their path relative to the source root. [KobwebStubs.frontend] are
-     *   always added, the way a real site always has the framework on its classpath.
-     */
-    fun runFrontend(options: FrontendKspOptions, sources: Map<String, String>): KspResult {
-        return runKsp(KobwebStubs.frontend + sources) { rootDir ->
-            KSPJsConfig.Builder().apply {
-                configure(rootDir, options.toMap())
-                backend = "JS"
-            }.build()
-        }
-    }
-
-    /**
-     * Run the processor the way it runs on a site module's JVM sources, where it collects backend metadata.
-     *
-     * @param sources Kotlin source files, keyed by their path relative to the source root. [KobwebStubs.backend] are
-     *   always added, the way a real site always has the framework on its classpath.
-     */
-    fun runBackend(options: BackendKspOptions, sources: Map<String, String>): KspResult {
-        return runKsp(KobwebStubs.backend + sources) { rootDir ->
-            KSPJvmConfig.Builder().apply {
-                configure(rootDir, options.toMap())
-                javaSourceRoots = emptyList()
-                javaOutputDir = rootDir.resolve("out/java")
-                jvmTarget = "11"
-            }.build()
-        }
-    }
-
-    private fun runKsp(sources: Map<String, String>, createConfig: (rootDir: File) -> KSPConfig): KspResult {
-        val rootDir = tempFolder.newFolder()
-        sources.forEach { (path, content) ->
-            rootDir.resolve("src/$path").apply { parentFile.mkdirs() }.writeText(content)
-        }
-
-        val logger = RecordingLogger()
-        KotlinSymbolProcessing(createConfig(rootDir), listOf(KobwebProcessorProvider()), logger).execute()
-
-        val outputDirs = rootDir.resolve("out").listFiles().orEmpty().filter { it.isDirectory }
-        val generatedFiles = outputDirs.flatMap { outputDir ->
-            outputDir.walk()
-                .filter { it.isFile }
-                .map { it.relativeTo(outputDir).invariantSeparatorsPath to it.readText() }
-        }.toMap()
-        return KspResult(generatedFiles, logger.warnings, logger.errors)
-    }
+fun KspFixture.runBackend(options: BackendKspOptions, sources: Map<String, String>): KspResult {
+    return runJvm(KobwebProcessorProvider(), options.toMap(), KobwebStubs.backend + sources)
 }
-
-/**
- * What a [KspFixture] run produced.
- *
- * @property generatedFiles The contents of every file the processor generated, keyed by its path relative to the
- *   output folder it was written to, e.g. "kobweb/metadata/frontend.json".
- */
-class KspResult(
-    val generatedFiles: Map<String, String>,
-    val warnings: List<String>,
-    val errors: List<String>,
-)
 
 /** The frontend metadata generated by an app run, i.e. [FrontendKspOptions.mode] was [ProcessorMode.APP]. */
 val KspResult.appFrontendData: AppFrontendData

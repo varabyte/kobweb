@@ -6,6 +6,7 @@ import com.varabyte.kobweb.ksp.testutil.BackendKspOptions
 import com.varabyte.kobweb.ksp.testutil.KspFixture
 import com.varabyte.kobweb.ksp.testutil.appBackendData
 import com.varabyte.kobweb.ksp.testutil.libraryBackendData
+import com.varabyte.kobweb.ksp.testutil.runBackend
 import com.varabyte.truthish.assertThat
 import org.junit.Rule
 import org.junit.Test

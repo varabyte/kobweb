@@ -5,6 +5,7 @@ package com.varabyte.kobweb.ksp.frontend
 import com.varabyte.kobweb.ksp.testutil.FrontendKspOptions
 import com.varabyte.kobweb.ksp.testutil.KspFixture
 import com.varabyte.kobweb.ksp.testutil.libraryFrontendData
+import com.varabyte.kobweb.ksp.testutil.runFrontend
 import com.varabyte.truthish.assertThat
 import org.junit.Rule
 import org.junit.Test
