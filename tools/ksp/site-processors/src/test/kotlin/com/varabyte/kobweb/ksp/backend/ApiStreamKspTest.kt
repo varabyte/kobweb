@@ -117,7 +117,7 @@ class ApiStreamKspTest {
         )
 
         assertThat(result.errors).containsExactly(
-            "`val echo` is defined under package `example.server` but must exist under `example.api` (or use `@Api` with a route override that starts with a slash)."
+            "`val echo` is defined under package `example.server` but must exist under `example.api`."
         )
     }
 

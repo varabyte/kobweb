@@ -177,7 +177,7 @@ internal class BackendProcessor(
                 routeOverride = routeOverride,
             ) ?: run {
                 logger.error(
-                    "`val ${property.simpleName.asString()}` is defined under package `${property.packageName.asString()}` but must exist under `$apiPackage` (or use `@Api` with a route override that starts with a slash).",
+                    "`val ${property.simpleName.asString()}` is defined under package `${property.packageName.asString()}` but must exist under `$apiPackage`.",
                     property
                 )
                 return@mapNotNull null
@@ -244,7 +244,7 @@ private fun KSFunctionDeclaration.toApiEntry(
         routeOverride = routeOverride,
     ) ?: run {
         logger.error(
-            "`@$annotationName fun $funName` is defined under package `$currPackage` but must exist under `$qualifiedApiPackage` (or use a route override that starts with a slash).",
+            "`@$annotationName fun $funName` is defined under package `$currPackage` but must exist under `$qualifiedApiPackage`.",
             this
         )
         return null

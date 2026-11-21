@@ -43,7 +43,7 @@ fun KSFunctionDeclaration.toPageEntry(
         routeOverride = routeOverride,
     )?.let { if (it.endsWith("/index")) it.removeSuffix("index") else it } ?: run {
         logger.error(
-            "`@$pageSimpleName fun $funName` is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage` (or use a route override that starts with a slash).",
+            "`@$pageSimpleName fun $funName` is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`.",
             this
         )
         return null

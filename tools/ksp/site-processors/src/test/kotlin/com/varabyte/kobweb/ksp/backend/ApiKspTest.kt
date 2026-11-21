@@ -97,7 +97,7 @@ class ApiKspTest {
         )
 
         assertThat(result.errors).containsExactly(
-            "`@Api fun health` is defined under package `example.server` but must exist under `example.api` (or use a route override that starts with a slash)."
+            "`@Api fun health` is defined under package `example.server` but must exist under `example.api`."
         )
     }
 

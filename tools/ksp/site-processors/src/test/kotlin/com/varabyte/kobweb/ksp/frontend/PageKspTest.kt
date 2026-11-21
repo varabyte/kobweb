@@ -236,7 +236,7 @@ class PageKspTest {
         )
 
         assertThat(result.errors).containsExactly(
-            "`@Page fun AboutPage` is defined under package `example.components` but must exist under `example.pages` (or use a route override that starts with a slash)."
+            "`@Page fun AboutPage` is defined under package `example.components` but must exist under `example.pages`."
         )
     }
 
