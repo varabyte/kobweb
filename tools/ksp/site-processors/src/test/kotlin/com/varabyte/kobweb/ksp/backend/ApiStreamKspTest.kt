@@ -1,4 +1,4 @@
-@file:Suppress("FunctionName")
+@file:Suppress("FunctionName", "RedundantExplicitType")
 
 package com.varabyte.kobweb.ksp.backend
 
@@ -47,6 +47,80 @@ class ApiStreamKspTest {
             "example.api.echo" to "/echo",
             "example.api.chat.room" to "/chat/room",
         )
+    }
+
+    @Test
+    fun `api stream subclasses are registered`() {
+        val result = ksp.runBackend(
+            options = BackendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/api/Chat.kt" to
+                    //language=kotlin
+                    """
+                    package example.api
+
+                    import com.varabyte.kobweb.api.stream.ApiStream
+
+                    class ChatStream : ApiStream() {
+                        override suspend fun onTextReceived(ctx: TextReceivedContext) {}
+                    }
+
+                    val chat = ChatStream()
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).isEmpty()
+        assertThat(result.appBackendData.backendData.apiStreamProperties.map { it.fqn to it.route })
+            .containsExactly("example.api.chat" to "/chat")
+    }
+
+    @Test
+    fun `api streams typed with an import alias are registered`() {
+        // The explicit `: Stream` type matters: an inferred type resolves to `ApiStream`, but an explicit type is
+        // written with the alias, so a check on the type's name as written would miss it
+        val result = ksp.runBackend(
+            options = BackendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/api/Echo.kt" to
+                    //language=kotlin
+                    """
+                    package example.api
+
+                    import com.varabyte.kobweb.api.stream.ApiStream as Stream
+
+                    val echo: Stream = Stream { ctx -> }
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).isEmpty()
+        assertThat(result.appBackendData.backendData.apiStreamProperties.map { it.fqn to it.route })
+            .containsExactly("example.api.echo" to "/echo")
+    }
+
+    @Test
+    fun `classes named ApiStream from other packages are ignored`() {
+        val result = ksp.runBackend(
+            options = BackendKspOptions.app(projectGroup = "example"),
+            sources = mapOf(
+                "example/api/Echo.kt" to
+                    //language=kotlin
+                    """
+                    package example.api
+
+                    class ApiStream
+
+                    val echo: ApiStream = ApiStream()
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).isEmpty()
+        assertThat(result.appBackendData.backendData.apiStreamProperties).isEmpty()
     }
 
     @Test
