@@ -79,6 +79,32 @@ class WorkerKspTest {
     }
 
     @Test
+    fun `generic input and output types are written out in full`() {
+        val result = ksp.runWorker(
+            options = WorkerKspOptions(outputPath = "site/pi.js"),
+            sources = mapOf(
+                "example/CalculatePiWorkerFactory.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.worker.WorkerFactory
+
+                    class PiInput
+                    class PiOutput
+
+                    internal class CalculatePiWorkerFactory : WorkerFactory<List<PiInput?>, Map<String, PiOutput>>
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.generatedFiles.getValue("example/CalculatePiWorker.kt")).contains(
+            "com.varabyte.kobweb.worker.Worker<kotlin.collections.List<example.PiInput?>, kotlin.collections.Map<kotlin.String, example.PiOutput>>"
+        )
+    }
+
+    @Test
     fun `missing worker factory is an error`() {
         val result = ksp.runWorker(
             options = WorkerKspOptions(outputPath = "site/pi.js"),
