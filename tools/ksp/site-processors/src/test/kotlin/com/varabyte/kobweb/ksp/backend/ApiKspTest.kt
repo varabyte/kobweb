@@ -5,6 +5,7 @@ package com.varabyte.kobweb.ksp.backend
 import com.varabyte.kobweb.ksp.testutil.BackendKspOptions
 import com.varabyte.kobweb.ksp.testutil.KspFixture
 import com.varabyte.kobweb.ksp.testutil.appBackendData
+import com.varabyte.kobweb.ksp.testutil.libraryBackendData
 import com.varabyte.truthish.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -355,5 +356,43 @@ class ApiKspTest {
         assertThat(result.errors).containsExactly(
             "`example.initDatabase` is tagged with the `@InitApi` annotation but doesn't take an InitApiContext as its only parameter."
         )
+    }
+
+    @Test
+    fun `library apis and init functions are written to library metadata`() {
+        val result = ksp.runBackend(
+            options = BackendKspOptions.library(projectGroup = "example"),
+            sources = mapOf(
+                "example/api/Echo.kt" to
+                    //language=kotlin
+                    """
+                    package example.api
+
+                    import com.varabyte.kobweb.api.Api
+                    import com.varabyte.kobweb.api.ApiContext
+
+                    @Api
+                    suspend fun echo(ctx: ApiContext) {}
+                """.trimIndent(),
+                "example/Init.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.api.init.InitApi
+                    import com.varabyte.kobweb.api.init.InitApiContext
+
+                    @InitApi
+                    fun initDatabase(ctx: InitApiContext) {}
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).isEmpty()
+        assertThat(result.libraryBackendData.apiMethods.map { it.fqn to it.route })
+            .containsExactly("example.api.echo" to "/echo")
+        assertThat(result.libraryBackendData.initMethods.map { it.fqn })
+            .containsExactly("example.initDatabase")
     }
 }
