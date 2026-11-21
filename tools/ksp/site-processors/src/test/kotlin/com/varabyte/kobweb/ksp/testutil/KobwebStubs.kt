@@ -182,5 +182,20 @@ object KobwebStubs {
 
             class ApiInterceptorContext
         """.trimIndent(),
+        "com/varabyte/kobweb/api/stream/ApiStream.kt" to
+            //language=kotlin
+            """
+            package com.varabyte.kobweb.api.stream
+
+            abstract class ApiStream {
+                class TextReceivedContext
+
+                abstract suspend fun onTextReceived(ctx: TextReceivedContext)
+            }
+
+            fun ApiStream(block: suspend (ApiStream.TextReceivedContext) -> Unit): ApiStream = object : ApiStream() {
+                override suspend fun onTextReceived(ctx: TextReceivedContext) = block(ctx)
+            }
+        """.trimIndent(),
     )
 }
