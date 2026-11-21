@@ -10,7 +10,7 @@ import com.varabyte.kobweb.serialization.IOSerializer
  * By implementing this interface, the user will:
  *
  * * Define a `WorkerStrategy`, which represents the logic that handles values sent over from the application and
-performs some (presumably expensive) logic on it.
+ *   performs some (presumably expensive) logic on it.
  * * Implement serialization / deserialization logic, which is needed to pass messages between the separated application
  *   domain and the worker domain.
  *
@@ -25,7 +25,7 @@ performs some (presumably expensive) logic on it.
  * ```
  * // Json.createIOSerializer comes from the kobwebx-serialization-kotlinx library.
  * // InParams and OutParams must be marked @Serializable or else a runtime error will occur
- * class ExampleWorkerFactory : WorkerFactory<InParams, OutParams>() {
+ * internal class ExampleWorkerFactory : WorkerFactory<InParams, OutParams> {
  *    override fun createIOSerializer() = Json.createIOSerializer<InParams, OutParams>()
  * }
  * ```
@@ -38,14 +38,14 @@ performs some (presumably expensive) logic on it.
  *
  * ```
  * // In the worker module:
- * class ExampleWorkerFactory : WorkerFactory<InParams, OutParams>() { ... }
+ * internal class ExampleWorkerFactory : WorkerFactory<InParams, OutParams> { ... }
  *
  * // In the application module:
  * val worker = rememberWorker { ExampleWorker() { outParams -> ... } }
  * ```
  *
  * The name of the final class should end with "WorkerFactory" (since a correlated "Worker" class will
- * automatically be generated with its name derived from it, e.g. "ExampleWorkerFactory" to "ExampleWorker". The
+ * automatically be generated with its name derived from it, e.g. "ExampleWorkerFactory" to "ExampleWorker"). The
  * factory implementation should also be marked `internal` because there shouldn't be a reason for the application to
  * ever interact with it.
  */
