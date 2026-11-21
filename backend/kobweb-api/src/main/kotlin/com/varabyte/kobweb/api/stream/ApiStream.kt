@@ -13,7 +13,7 @@ import com.varabyte.kobweb.api.log.Logger
  * ```
  * // src/api/Example.kt
  * // By default, the name of this stream will be "example", taken from the file path + name.
- * val exampleStream = object : ApiStream {
+ * val exampleStream = object : ApiStream() {
  *    ...
  * }
  * ```

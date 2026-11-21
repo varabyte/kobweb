@@ -32,7 +32,7 @@ import com.varabyte.kobweb.api.stream.ApiStream
  *
  * ```
  * @Api // Optional in this case
- * val echoStream = object : ApiStream { ... }
+ * val echoStream = object : ApiStream() { ... }
  * ```
  *
  * ### routeOverride
@@ -72,7 +72,7 @@ import com.varabyte.kobweb.api.stream.ApiStream
  * With API methods, the final route represents a URL. With API streams, the final route is just a unique string ID used
  * to identify the stream.
  *
- * As such, if you override the route of an API stream, it will get prepended with "/api/" as part of the URL, while for
+ * As such, if you override the route of an API method, it will get prepended with "/api/" as part of the URL, while for
  * API streams, it will not:
  *
  * ```
@@ -84,7 +84,7 @@ import com.varabyte.kobweb.api.stream.ApiStream
  *
  * // API stream
  * @Api("/a/b/c") // results in the ID "a/b/c"
- * val testStream = object : ApiStream { ... }
+ * val testStream = object : ApiStream() { ... }
  * ```
  *
  * Note that the leading slash of the route override in the API stream case is not included in the final ID (although
