@@ -66,7 +66,7 @@ class WorkerProcessor(
         }
 
         val workerFactory = visitor.workerStrategies.singleOrNull() ?: run {
-            error(buildString {
+            logger.error(buildString {
                 append("A Kobweb worker module must have exactly one class that implements `$WORKER_FACTORY_SIMPLE_NAME`. ")
                 if (visitor.workerStrategies.isEmpty()) {
                     append("However, none were found.")
@@ -78,39 +78,47 @@ class WorkerProcessor(
                     append("].")
                 }
             })
+            return emptyList()
+        }
+
+        // Report every problem with the factory in one build, rather than making the user fix them one at a time
+        var hasErrors = false
+        fun reportError(message: String) {
+            logger.error(message, workerFactory.classDeclaration)
+            hasErrors = true
         }
 
         if (workerFactory.classDeclaration.getConstructors()
                 .none { (it.isPublic() || it.isInternal()) && (it.parameters.isEmpty() || it.parameters.all { param -> param.hasDefault }) }
         ) {
-            error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation must have a public empty constructor. Please add one to `${workerFactory.classDeclaration.qualifiedName!!.asString()}`.")
+            reportError("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation must have a public empty constructor. Please add one to `${workerFactory.classDeclaration.qualifiedName!!.asString()}`.")
         }
 
         if (workerFactory.classDeclaration.isPrivate()) {
-            error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation cannot be private, as this prevents us from generating code that wraps it. Please make `${workerFactory.classDeclaration.qualifiedName!!.asString()}` internal.")
+            reportError("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation cannot be private, as this prevents us from generating code that wraps it. Please make `${workerFactory.classDeclaration.qualifiedName!!.asString()}` internal.")
         }
         if (workerFactory.classDeclaration.isPublic()) {
             val publicSuppression = "PUBLIC_WORKER_FACTORY"
             if (!workerFactory.classDeclaration.suppresses(publicSuppression)) {
-                logger.warn("It is recommended that you make your `$WORKER_FACTORY_SIMPLE_NAME` implementation internal to prevent Kobweb applications from using it unintentionally. Please add `internal` to `${workerFactory.classDeclaration.qualifiedName!!.asString()}`. You can annotate your class with `@Suppress(\"$publicSuppression\")` to suppress this warning.")
+                logger.warn("It is recommended that you make your `$WORKER_FACTORY_SIMPLE_NAME` implementation internal to prevent Kobweb applications from using it unintentionally. Please add `internal` to `${workerFactory.classDeclaration.qualifiedName!!.asString()}`. You can annotate your class with `@Suppress(\"$publicSuppression\")` to suppress this warning.", workerFactory.classDeclaration)
             }
         }
 
         workerFactory.inputType.allDeclarations().firstOrNull { !it.isPublic() }?.let { nonPublicDeclaration ->
-            error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's input type (`${workerFactory.inputType.toFqString()}`) must be public so the Kobweb application can use it. Please make `${nonPublicDeclaration.qualifiedName!!.asString()}` public.")
+            reportError("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's input type (`${workerFactory.inputType.toFqString()}`) must be public so the Kobweb application can use it. Please make `${nonPublicDeclaration.qualifiedName!!.asString()}` public.")
         }
 
         workerFactory.outputType.allDeclarations().firstOrNull { !it.isPublic() }?.let { nonPublicDeclaration ->
-            error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's output type (`${workerFactory.outputType.toFqString()}`) must be public so the Kobweb application can use it. Please make `${nonPublicDeclaration.qualifiedName!!.asString()}` public.")
+            reportError("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's output type (`${workerFactory.outputType.toFqString()}`) must be public so the Kobweb application can use it. Please make `${nonPublicDeclaration.qualifiedName!!.asString()}` public.")
         }
 
         if (classNameOverride == null && !workerFactory.classDeclaration.simpleName.asString()
                 .let { it.endsWith(WORKER_FACTORY_SIMPLE_NAME) && it != WORKER_FACTORY_SIMPLE_NAME }
         ) {
-            error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's name should end with the suffix \"$WORKER_FACTORY_SIMPLE_NAME\", so we can automatically generate an associated \"Worker\" class from it. Please change the name of `${workerFactory.classDeclaration.qualifiedName!!.asString()}` to meet this requirement. Alternately, call `kobweb { worker { fqcn.set(...) }` to explicitly set the generated class name.")
+            reportError("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's name should end with the suffix \"$WORKER_FACTORY_SIMPLE_NAME\", so we can automatically generate an associated \"Worker\" class from it. Please change the name of `${workerFactory.classDeclaration.qualifiedName!!.asString()}` to meet this requirement. Alternately, call `kobweb { worker { fqcn.set(...) }` to explicitly set the generated class name.")
         }
 
-        workerFactoryInfo = workerFactory
+        if (!hasErrors) workerFactoryInfo = workerFactory
 
         return emptyList()
     }
