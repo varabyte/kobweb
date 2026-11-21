@@ -12,6 +12,10 @@ dependencies {
     implementation(libs.kotlinpoet.ksp)
     implementation(projects.tools.processorCommon)
     implementation(projects.tools.ksp.kspExt)
+
+    testImplementation(kotlin("test"))
+    testImplementation(libs.truthish)
+    testImplementation(projects.tools.ksp.kspTestUtils)
 }
 
 kobwebPublication {

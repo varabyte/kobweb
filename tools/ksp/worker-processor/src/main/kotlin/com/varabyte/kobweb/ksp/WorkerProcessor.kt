@@ -4,6 +4,7 @@ import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.getAllSuperTypes
 import com.google.devtools.ksp.getConstructors
 import com.google.devtools.ksp.getKotlinClassByName
+import com.google.devtools.ksp.isAbstract
 import com.google.devtools.ksp.isInternal
 import com.google.devtools.ksp.isPrivate
 import com.google.devtools.ksp.isPublic
@@ -18,6 +19,7 @@ import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSVisitorVoid
+import com.google.devtools.ksp.symbol.Modifier
 import com.squareup.kotlinpoet.ksp.toTypeName
 import com.varabyte.kobweb.ksp.symbol.suppresses
 
@@ -293,6 +295,10 @@ class WorkerProcessor(
             // Quick check / early abort first to see if this class is even a subclass of WorkerFactory. If so, we'll do
             // more expensive checks later.
             if (!workerFactoryClassStarProjected.isAssignableFrom(classDeclaration.asStarProjectedType())) return
+            // We have a strict requirement that only a single worker factory is allowed per codebase -- but that
+            // restriction should only apply to concrete classes. If someone creates a helper base class, they
+            // shouldn't be penalized for that.
+            if (classDeclaration.isAbstract() || Modifier.SEALED in classDeclaration.modifiers) return
 
             val workerFactoryBaseClass = classDeclaration
                 .getAllSuperTypes()
