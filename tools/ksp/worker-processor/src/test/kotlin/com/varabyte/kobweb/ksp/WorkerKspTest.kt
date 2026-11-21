@@ -201,6 +201,58 @@ class WorkerKspTest {
     }
 
     @Test
+    fun `public worker factory is a warning`() {
+        val result = ksp.runWorker(
+            options = WorkerKspOptions(outputPath = "site/pi.js"),
+            sources = mapOf(
+                "example/CalculatePiWorkerFactory.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.worker.WorkerFactory
+
+                    class PiInput
+                    class PiOutput
+
+                    class CalculatePiWorkerFactory : WorkerFactory<PiInput, PiOutput>
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).containsExactly(
+            "It is recommended that you make your `WorkerFactory` implementation internal to prevent Kobweb applications from using it unintentionally. Please add `internal` to `example.CalculatePiWorkerFactory`. You can annotate your class with `@Suppress(\"PUBLIC_WORKER_FACTORY\")` to suppress this warning."
+        )
+        assertThat(result.generatedFiles.keys).containsExactly("example/CalculatePiWorker.kt", "main.kt")
+    }
+
+    @Test
+    fun `public worker factory warning can be suppressed`() {
+        val result = ksp.runWorker(
+            options = WorkerKspOptions(outputPath = "site/pi.js"),
+            sources = mapOf(
+                "example/CalculatePiWorkerFactory.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.worker.WorkerFactory
+
+                    class PiInput
+                    class PiOutput
+
+                    @Suppress("PUBLIC_WORKER_FACTORY")
+                    class CalculatePiWorkerFactory : WorkerFactory<PiInput, PiOutput>
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.warnings).isEmpty()
+    }
+
+    @Test
     fun `non-public input type is an error`() {
         val result = ksp.runWorker(
             options = WorkerKspOptions(outputPath = "site/pi.js"),
@@ -222,6 +274,31 @@ class WorkerKspTest {
 
         assertThat(result.errors).containsExactly(
             "A Kobweb `WorkerFactory` implementation's input type (`example.PiInput`) must be public so the Kobweb application can use it. Please make `example.PiInput` public."
+        )
+    }
+
+    @Test
+    fun `non-public type argument of the input type is an error`() {
+        val result = ksp.runWorker(
+            options = WorkerKspOptions(outputPath = "site/pi.js"),
+            sources = mapOf(
+                "example/CalculatePiWorkerFactory.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.worker.WorkerFactory
+
+                    internal class PiInput
+                    class PiOutput
+
+                    internal class CalculatePiWorkerFactory : WorkerFactory<List<PiInput>, PiOutput>
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).containsExactly(
+            "A Kobweb `WorkerFactory` implementation's input type (`kotlin.collections.List<example.PiInput>`) must be public so the Kobweb application can use it. Please make `example.PiInput` public."
         )
     }
 
