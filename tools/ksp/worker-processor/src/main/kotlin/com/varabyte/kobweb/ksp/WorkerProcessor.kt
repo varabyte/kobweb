@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.ksp
 
 import com.google.devtools.ksp.KspExperimental
-import com.google.devtools.ksp.getAllSuperTypes
 import com.google.devtools.ksp.getConstructors
 import com.google.devtools.ksp.getKotlinClassByName
 import com.google.devtools.ksp.isAbstract
@@ -18,6 +17,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.google.devtools.ksp.symbol.Modifier
 import com.squareup.kotlinpoet.ksp.toTypeName
@@ -60,7 +60,7 @@ class WorkerProcessor(
         // If no WorkerFactory class is found, then we are somehow applying this KSP processor to a non-worker codebase
         // We don't expect this to happen, but it is easy enough to handle it by early aborting.
         val workerFactoryClass = resolver.getKotlinClassByName(WORKER_FACTORY_FQN) ?: return emptyList()
-        val visitor = WorkerFactoryVisitor(workerFactoryClass)
+        val visitor = WorkerFactoryVisitor(workerFactoryClass, resolver)
         resolver.getAllFiles().forEach { file ->
             file.accept(visitor, Unit)
         }
@@ -288,7 +288,10 @@ class WorkerProcessor(
      * Ideally, a Kobweb worker module has exactly one implementation. If there are none or multiple, an error should be
      * reported to the user, but this is handled at a higher level.
      */
-    private inner class WorkerFactoryVisitor(workerFactoryClass: KSClassDeclaration) : KSVisitorVoid() {
+    private inner class WorkerFactoryVisitor(
+        workerFactoryClass: KSClassDeclaration,
+        private val resolver: Resolver,
+    ) : KSVisitorVoid() {
         private val _workerStrategies = mutableListOf<WorkerFactoryInfo>()
         val workerStrategies: List<WorkerFactoryInfo> = _workerStrategies
 
@@ -308,11 +311,9 @@ class WorkerProcessor(
             // shouldn't be penalized for that.
             if (classDeclaration.isAbstract() || Modifier.SEALED in classDeclaration.modifiers) return
 
-            val workerFactoryBaseClass = classDeclaration
-                .getAllSuperTypes()
-                .first { it.declaration.qualifiedName?.asString() == WORKER_FACTORY_FQN }
-
-            val resolvedTypes = workerFactoryBaseClass.arguments.mapNotNull { it.type?.resolve() }
+            val resolvedTypes = classDeclaration.findSuperType(WORKER_FACTORY_FQN, resolver)
+                ?.arguments.orEmpty()
+                .mapNotNull { it.type?.resolve() }
 
             // WorkerFactory<I, O>
             check(resolvedTypes.size == 2) {
@@ -331,6 +332,60 @@ class WorkerProcessor(
             )
         }
     }
+}
+
+/**
+ * Find the supertype of this class with the given fully qualified name, with its type arguments as seen from this class.
+ *
+ * For example, given `abstract class Base<T> : Parent<List<T>>` and `class Child : Base<Int>()`, then calling this on
+ * `Child` for `Parent` returns `Parent<List<Int>>`.
+ *
+ * KSP's `getAllSuperTypes()` can't be used for this, because it returns each supertype as its class declared it, i.e.
+ * `Parent<List<T>>` in the example above.
+ *
+ * @param substitutions This class's type parameters, mapped by name to the types its subclass passed in.
+ * @return The supertype, or null if this class doesn't inherit from it.
+ */
+private fun KSClassDeclaration.findSuperType(
+    superTypeFqn: String,
+    resolver: Resolver,
+    substitutions: Map<String, KSType> = emptyMap(),
+): KSType? {
+    for (superTypeRef in superTypes) {
+        val superType = superTypeRef.resolve().substitute(substitutions, resolver)
+        val superClass = superType.declaration as? KSClassDeclaration ?: continue
+        if (superClass.qualifiedName?.asString() == superTypeFqn) return superType
+
+        val superSubstitutions = superClass.typeParameters
+            .zip(superType.arguments)
+            // A star projection has no type to pass in
+            .mapNotNull { (typeParameter, argument) ->
+                argument.type?.resolve()?.let { typeParameter.name.asString() to it }
+            }
+            .toMap()
+        superClass.findSuperType(superTypeFqn, resolver, superSubstitutions)?.let { return it }
+    }
+    return null
+}
+
+/** Replace any type parameters in this type, including nested ones like the `T` in `List<T>`. */
+private fun KSType.substitute(substitutions: Map<String, KSType>, resolver: Resolver): KSType {
+    if (substitutions.isEmpty()) return this
+
+    val typeParameter = declaration as? KSTypeParameter
+    if (typeParameter != null) {
+        val replacement = substitutions[typeParameter.name.asString()] ?: return this
+        return if (isMarkedNullable) replacement.makeNullable() else replacement
+    }
+
+    if (arguments.isEmpty()) return this
+    return replace(arguments.map { argument ->
+        val argumentType = argument.type?.resolve() ?: return@map argument
+        resolver.getTypeArgument(
+            resolver.createKSTypeReferenceFromKSType(argumentType.substitute(substitutions, resolver)),
+            argument.variance,
+        )
+    })
 }
 
 /**

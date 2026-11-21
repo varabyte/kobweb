@@ -79,6 +79,60 @@ class WorkerKspTest {
     }
 
     @Test
+    fun `generic worker factory base classes pass their type arguments through`() {
+        val result = ksp.runWorker(
+            options = WorkerKspOptions(outputPath = "site/pi.js"),
+            sources = mapOf(
+                "example/CalculatePiWorkerFactory.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.worker.WorkerFactory
+
+                    class PiInput
+                    class PiOutput
+
+                    abstract class BaseWorkerFactory<I, O> : WorkerFactory<I, O>
+
+                    internal class CalculatePiWorkerFactory : BaseWorkerFactory<PiInput, PiOutput>()
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.generatedFiles.getValue("example/CalculatePiWorker.kt"))
+            .contains("com.varabyte.kobweb.worker.Worker<example.PiInput, example.PiOutput>")
+    }
+
+    @Test
+    fun `generic worker factory base classes can wrap their type arguments`() {
+        val result = ksp.runWorker(
+            options = WorkerKspOptions(outputPath = "site/pi.js"),
+            sources = mapOf(
+                "example/CalculatePiWorkerFactory.kt" to
+                    //language=kotlin
+                    """
+                    package example
+
+                    import com.varabyte.kobweb.worker.WorkerFactory
+
+                    class PiInput
+                    class PiOutput
+
+                    abstract class BatchWorkerFactory<T> : WorkerFactory<List<T>, T?>
+
+                    internal class CalculatePiWorkerFactory : BatchWorkerFactory<PiInput>()
+                """.trimIndent(),
+            ),
+        )
+
+        assertThat(result.errors).isEmpty()
+        assertThat(result.generatedFiles.getValue("example/CalculatePiWorker.kt"))
+            .contains("com.varabyte.kobweb.worker.Worker<kotlin.collections.List<example.PiInput>, example.PiInput?>")
+    }
+
+    @Test
     fun `generic input and output types are written out in full`() {
         val result = ksp.runWorker(
             options = WorkerKspOptions(outputPath = "site/pi.js"),
